@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>OSharp.Beatmap</name>
+    </assembly>
+    <members>
+        <member name="M:OSharp.Beatmap.Bezier.GetBezierTrail(System.Collections.Generic.IReadOnlyList{OSharp.Beatmap.Vector2{System.Single}},System.Single)">
+            <summary>
+            绘制n阶贝塞尔曲线路径
+            </summary>
+            <param name="points">输入点</param>
+            <param name="step">步长,步长越小，轨迹点越密集</param>
+            <returns></returns>
+        </member>
+        <member name="M:OSharp.Beatmap.Bezier.CalcPoint(System.Single,System.Collections.Generic.IReadOnlyList{OSharp.Beatmap.Vector2{System.Single}})">
+            <summary>
+            n阶贝塞尔曲线插值计算函数
+            根据起点，n个控制点，终点 计算贝塞尔曲线插值
+            </summary>
+            <param name="ratio">当前插值位置0~1 ，0为起点，1为终点</param>
+            <param name="points">起点，n-1个控制点，终点</param>
+            <returns></returns>
+        </member>
+        <member name="M:OSharp.Beatmap.Bezier.CalcCombination(System.Int32,System.Int32)">
+            <summary>
+            计算组合数公式
+            </summary>
+            <param name="n"></param>
+            <param name="k"></param>
+            <returns></returns>
+        </member>
+        <member name="M:OSharp.Beatmap.Sections.TimingSection.GetInterval(System.Double)">
+            <summary>
+            获取当前bpm的节奏的间隔
+            </summary>
+            <param name="multiple">multiple: 1, 0.5, 1/3d, etc.</param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

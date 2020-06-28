@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>E:\milkitic\repo\OSharp\OSharp.Beatmap\OSharp.Beatmap.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OSharp.Shared\OSharp.Shared.csproj" />
+    <ProjectReference Include="..\OSharp.Storyboard\OSharp.Storyboard.csproj" />
+  </ItemGroup>
+
+</Project>
