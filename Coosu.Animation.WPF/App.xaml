@@ -1,8 +1,7 @@
 ﻿<Application
-    startX:Class="Coosu.Animation.WPF.App"
-    startXmlns="http://schemas.microsoft.com/winfstartX/2006/startXaml/presentation"
-    startXmlns:startX="http://schemas.microsoft.com/winfstartX/2006/startXaml"
-    startXmlns:local="clr-namespace:Coosu.Animation.WPF"
-    StartupUri="MainWindow.startXaml">
+    xmlns:startX="http://schemas.microsoft.com/winfstartX/2006/startXaml"
+    xmlns:local="clr-namespace:Coosu.Animation.WPF"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    StartupUri="MainWindow.xaml">
     <Application.Resources />
 </Application>

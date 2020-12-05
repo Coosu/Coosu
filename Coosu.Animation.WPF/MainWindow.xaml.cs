@@ -96,7 +96,7 @@ namespace Coosu.Animation.WPF
 
             //_list.Add(ele);
             _group = _canvasHost.CreateStoryboardGroup();
-            var folder = @"C:\Program Files (x86)\osu!\Songs\497380 himmel feat YooSanHyakurei - Maple Wind";
+            var folder = @"D:\Games\osu!\Songs\497380 himmel feat YooSanHyakurei - Maple Wind";
             var eg = ElementGroup.ParseFromFile(System.IO.Path.Combine(folder,
                 "himmel feat. YooSanHyakurei - Maple Wind (Crystal).osb"));
 
