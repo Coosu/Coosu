@@ -1,0 +1,32 @@
+﻿namespace Coosu.Animation
+{
+    public enum BlendMode
+    {
+        Color,
+        ColorBurn,
+        ColorDodge,
+        Darken,
+        DarkerColor,
+        Difference,
+        Divide,
+        Exclusion,
+        HardLight,
+        HardMix,
+        Hue,
+        Lighten,
+        LighterColor,
+        LinearBurn,
+        LinearDodge,
+        LinearLight,
+        Luminosity,
+        Multiply,
+        Normal,
+        Overlay,
+        PinLight,
+        Saturation,
+        Screen,
+        SoftLight,
+        Subtract,
+        VividLight,
+    }
+}
