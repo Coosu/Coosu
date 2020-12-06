@@ -26,18 +26,18 @@ namespace Coosu.Animation
             func?.Invoke(internalObj);
             var time1 = internalObj.TransformDictionary.Count > 0
                 ? internalObj.TransformDictionary.Min(k => k.Value.Min(o => o.StartTime))
-                : double.MaxValue;
+                : int.MaxValue;
             var time2 = internalObj.loopList.Count > 0
                 ? internalObj.loopList.Min(k => k.startTime)
-                : double.MaxValue;
+                : int.MaxValue;
             
             var time3 = internalObj.TransformDictionary.Count > 0
                 ? internalObj.TransformDictionary.Max(k => k.Value.Max(o => o.EndTime))
-                : double.MinValue;
+                : int.MinValue;
             var time4 = internalObj.loopList.Count > 0
                 ? internalObj.loopList.Max(k =>
                     k.transformList.TransformDictionary.Max(o => o.Value.Max(s => s.EndTime)))
-                : double.MinValue;
+                : int.MinValue;
             MinTime = Math.Min(time1, time2);
             MaxTime = Math.Max(time3, time4);
 

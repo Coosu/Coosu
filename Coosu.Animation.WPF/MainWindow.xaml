@@ -10,7 +10,7 @@
     Height="480"
     Loaded="Window_Loaded"
     mc:Ignorable="d">
-    <Grid Background="Black">
+    <Grid Background="White">
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
             <ColumnDefinition />
@@ -42,16 +42,22 @@
             Grid.Row="0"
             Grid.RowSpan="2"
             Grid.Column="0"
-            Grid.ColumnSpan="2">
+            Grid.ColumnSpan="2"
+            VerticalAlignment="Top">
             <Canvas
                 Width="854"
                 Height="480"
+                Background="#181818"
+                ClipToBounds="True"
                 RenderOptions.BitmapScalingMode="HighQuality">
                 <Canvas
                     x:Name="MainCanvas"
                     Canvas.Left="107"
                     Width="640"
-                    Height="480" />
+                    Height="480"
+                    Background="Black">
+                    <!--<Canvas.ClipToBounds>True</Canvas.ClipToBounds>-->
+                </Canvas>
             </Canvas>
         </Viewbox>
         <Button
@@ -62,6 +68,27 @@
             HorizontalAlignment="Left"
             VerticalAlignment="Bottom"
             Click="Button_Click"
-            Content="TEST" />
+            Content="Play" />
+        <!--<Border
+            Width="180"
+            Height="120" 
+            RenderTransformOrigin="0.5,1">
+            <Border.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform />
+                    <RotateTransform />
+                    <TranslateTransform />
+                </TransformGroup>
+            </Border.RenderTransform>
+            <Image
+                Width="180"
+                Height="120"
+                RenderTransformOrigin="0.5,0.5"
+                Source="D:\Games\osu!\Songs\94790 Hatsuki Yura - Fuuga\SB\cao.jpg">
+                <Image.RenderTransform>
+                    <ScaleTransform ScaleY="1" />
+                </Image.RenderTransform>
+            </Image>
+        </Border>-->
     </Grid>
 </Window>

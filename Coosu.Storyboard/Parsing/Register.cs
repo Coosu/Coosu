@@ -22,6 +22,11 @@ namespace Coosu.Storyboard.Parsing
     public abstract class SubjectHandler : IParsingHandler
     {
         public abstract string MahouWord { get; }
+        public object Parse(string line)
+        {
+            throw new NotImplementedException();
+        }
+
         protected List<Type> ActionHandlers { get; private set; }
     }
 
@@ -55,6 +60,10 @@ namespace Coosu.Storyboard.Parsing
     public abstract class ActionHandler : IParsingHandler
     {
         public abstract string MahouWord { get; }
+        public object Parse(string line)
+        {
+            throw new NotImplementedException();
+        }
     }
     public abstract class BasicTimelineHandler : ActionHandler
     {

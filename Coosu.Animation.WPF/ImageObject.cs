@@ -27,7 +27,7 @@ namespace Coosu.Animation.WPF
             _blendDurationQueue.Clear();
         }
 
-        private Image _image;
+        private FrameworkElement _image;
         private Rectangle _addImage;
 
         private readonly List<(DependencyProperty prop, AnimationTimeline animation)> _transformList =
@@ -36,7 +36,7 @@ namespace Coosu.Animation.WPF
         internal readonly SysAni.Storyboard Storyboard;
         internal readonly List<SysAni.Storyboard> LoopList = new List<SysAni.Storyboard>();
         private AnimateStatus _blendStatus;
-        private AnimateStatus _flipStatus;
+        //private AnimateStatus _flipStatus;
         private readonly Queue<Vector2<double>> _blendDurationQueue = new Queue<Vector2<double>>();
         private DispatcherTimer _dispatcherT;
         private SolidColorBrush _coverBrush;
@@ -66,7 +66,7 @@ namespace Coosu.Animation.WPF
         internal StoryboardCanvasHost Host { get; set; }
         public bool IsFinished { get; set; } = false;
 
-        internal ImageObject(Image image, double width, double height, Origin<double> origin, double defaultX,
+        internal ImageObject(FrameworkElement image, double width, double height, Origin<double> origin, double defaultX,
             double defaultY, SysAni.Storyboard storyboard = null)
         {
             _image = image;
@@ -214,7 +214,7 @@ namespace Coosu.Animation.WPF
         {
             if (_firstRotate == null)
             {
-                _firstRotate = (double)actions.First().StartParam / Math.PI * 360;
+                _firstRotate = (double)actions.First().StartParam / Math.PI * 180;
             }
 
             foreach (var transformAction in actions)
@@ -223,8 +223,8 @@ namespace Coosu.Animation.WPF
                 var duration = new Duration(dur < TimeSpan.Zero ? TimeSpan.Zero : dur);
                 _transformList.Add((RotateTransform.AngleProperty, new DoubleAnimation
                 {
-                    From = (double)transformAction.StartParam / Math.PI * 360,
-                    To = (double)transformAction.EndParam / Math.PI * 360,
+                    From = (double)transformAction.StartParam / Math.PI * 180,
+                    To = (double)transformAction.EndParam / Math.PI * 180,
                     EasingFunction = ConvertEasing(transformAction.Easing),
                     BeginTime = TimeSpan.FromMilliseconds(transformAction.StartTime - (_groupMode ? 0 : MinTime)),
                     Duration = duration
@@ -388,7 +388,7 @@ namespace Coosu.Animation.WPF
 
         protected override void BlendAction(List<TransformAction> actions)
         {
-            var source = _image.Source;
+            //var source = _image.Source;
             //if (!StoryboardCanvasHost.BrushCache.ContainsKey(source))
             //{
             //    StoryboardCanvasHost.BrushCache.Add(source, new VisualBrush { Visual = _image });
@@ -444,16 +444,44 @@ namespace Coosu.Animation.WPF
             //    {
             //        g.Children.Add(new ScaleTransform(1, 1));
             //    }
+            var dic = new Dictionary<FlipMode, AnimateStatus>()
+            {
+                [FlipMode.FlipX] = AnimateStatus.None,
+                [FlipMode.FlipY] = AnimateStatus.None
+            };
 
-            if (actions.Count == 1)
+            var groupBy = actions.GroupBy(k => (FlipMode)k.EndParam)
+                .ToDictionary(k => k.Key, k => k.ToList());
+            foreach (var kvp in groupBy)
             {
-                var o = actions[0];
-                _flipStatus = o.StartTime.Equals(o.EndTime) ? AnimateStatus.Static : AnimateStatus.Dynamic;
+                if (kvp.Value.Count > 1)
+                {
+                    dic[kvp.Key] = AnimateStatus.Dynamic;
+                }
+                else if (kvp.Value[0].StartTime.Equals(kvp.Value[0].EndTime))
+                {
+                    dic[kvp.Key] = AnimateStatus.Static;
+                }
+                else
+                {
+                    dic[kvp.Key] = AnimateStatus.Dynamic;
+                }
             }
-            else
-            {
-                _flipStatus = AnimateStatus.Dynamic;
-            }
+
+            //if (actions.Count == 1)
+            //{
+            //    var o = actions[0];
+            //    var flipMode = (FlipMode)transformAction.EndParam;
+            //    flipStatus = o.StartTime.Equals(o.EndTime) ? AnimateStatus.Static : AnimateStatus.Dynamic;
+            //}
+            //else if (actions.Count == 2 && actions[0].EndParam != actions[1].EndParam)
+            //{
+
+            //}
+            //else
+            //{
+            //    flipStatus = AnimateStatus.Dynamic;
+            //}
 
             foreach (var transformAction in actions)
             {
@@ -480,7 +508,7 @@ namespace Coosu.Animation.WPF
                     Duration = TimeSpan.Zero
                 }));
 
-                if (_flipStatus == AnimateStatus.Dynamic)
+                if (dic[flip] == AnimateStatus.Dynamic)
                 {
                     _transformList.Add((prop, new DoubleAnimation
                     {
@@ -545,6 +573,12 @@ namespace Coosu.Animation.WPF
                 }
             }
 
+            if (_transformList.Count(k => k.prop == SkewTransform.AngleXProperty ||
+                                          k.prop == SkewTransform.AngleYProperty) > 1)
+            {
+
+            }
+
             foreach (var (prop, animation) in _transformList)
             {
                 //if (prop == SolidColorBrush.ColorProperty)
@@ -556,23 +590,28 @@ namespace Coosu.Animation.WPF
                 }
 
                 AnimationTimeline copy = null;
-                switch (_blendStatus)
-                {
-                    case AnimateStatus.None:
-                        SysAni.Storyboard.SetTarget(animation, _image);
-                        break;
-                    case AnimateStatus.Static when prop != SolidColorBrush.ColorProperty:
-                        SysAni.Storyboard.SetTarget(animation, _addImage);
-                        break;
-                    case AnimateStatus.Dynamic:
-                        copy = animation.Clone();
-                        SysAni.Storyboard.SetTarget(copy, _addImage);
-                        SysAni.Storyboard.SetTarget(animation, _image);
+                if (prop != SkewTransform.AngleXProperty && prop != SkewTransform.AngleYProperty)
+                    switch (_blendStatus)
+                    {
+                        case AnimateStatus.None:
+                            SysAni.Storyboard.SetTarget(animation, _image);
+                            break;
+                        case AnimateStatus.Static when prop != SolidColorBrush.ColorProperty:
+                            SysAni.Storyboard.SetTarget(animation, _addImage);
+                            break;
+                        case AnimateStatus.Dynamic:
+                            copy = animation.Clone();
+                            SysAni.Storyboard.SetTarget(copy, _addImage);
+                            SysAni.Storyboard.SetTarget(animation, _image);
 
-                        Storyboard.Children.Add(copy);
-                        break;
-                        //default:
-                        //    throw new ArgumentOutOfRangeException();
+                            Storyboard.Children.Add(copy);
+                            break;
+                            //default:
+                            //    throw new ArgumentOutOfRangeException();
+                    }
+                else
+                {
+                    SysAni.Storyboard.SetTarget(animation, ((Border)(_image)).Child);
                 }
 
                 Storyboard.Children.Add(animation);
@@ -608,13 +647,13 @@ namespace Coosu.Animation.WPF
                 else if (prop == SkewTransform.AngleXProperty)
                 {
                     SysAni.Storyboard.SetTargetProperty(animation,
-                        new PropertyPath("RenderTransform.Children[2].ScaleX"));
+                        new PropertyPath("RenderTransform.ScaleX"));
                     //SetProp("RenderTransform.Children[0].ScaleX", animation, copy);
                 }
                 else if (prop == SkewTransform.AngleYProperty)
                 {
                     SysAni.Storyboard.SetTargetProperty(animation,
-                        new PropertyPath("RenderTransform.Children[2].ScaleY"));
+                        new PropertyPath("RenderTransform.ScaleY"));
                     //SetProp("RenderTransform.Children[0].ScaleY", animation, copy);
                 }
                 else if (prop == SolidColorBrush.ColorProperty)
@@ -704,9 +743,9 @@ namespace Coosu.Animation.WPF
                 case Easing.ElasticOut:
                     return new ElasticEase { EasingMode = EasingMode.EaseOut };
                 case Easing.ElasticHalfOut:
-                    break;
+                    return new ElasticEase { EasingMode = EasingMode.EaseInOut, Springiness = 1.5 };
                 case Easing.ElasticQuarterOut:
-                    break;
+                    return new ElasticEase { EasingMode = EasingMode.EaseInOut, Springiness = 1.5 };
                 case Easing.ElasticInOut:
                     return new ElasticEase { EasingMode = EasingMode.EaseInOut };
                 case Easing.BackIn:

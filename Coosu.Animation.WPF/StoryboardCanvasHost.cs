@@ -23,7 +23,7 @@ namespace Coosu.Animation.WPF
             Canvas = canvas;
         }
 
-        public virtual ImageObject CreateElement(Image ui,
+        public virtual ImageObject CreateElement(FrameworkElement ui,
             Origin<double> origin,
             double width,
             double height,

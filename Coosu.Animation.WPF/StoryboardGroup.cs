@@ -17,7 +17,7 @@ namespace Coosu.Animation.WPF
             Storyboard = new System.Windows.Media.Animation.Storyboard();
         }
 
-        public override ImageObject CreateElement(Image ui,
+        public override ImageObject CreateElement(FrameworkElement ui,
             Origin<double> origin,
             double width,
             double height,

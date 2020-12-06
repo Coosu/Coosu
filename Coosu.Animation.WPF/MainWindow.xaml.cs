@@ -95,10 +95,12 @@ namespace Coosu.Animation.WPF
             //});
 
             //_list.Add(ele);
+            var file =
+                @"D:\Games\osu!\Songs\161089 Tamura Yukari - MERRY MERRY MERRY MENU Ne!\Tamura Yukari - MERRY MERRY MERRY MENU... Ne! (moonlightleaf).osb";
+            var folder = System.IO.Path.GetDirectoryName(file);
             _group = _canvasHost.CreateStoryboardGroup();
-            var folder = @"D:\Games\osu!\Songs\497380 himmel feat YooSanHyakurei - Maple Wind";
-            var eg = ElementGroup.ParseFromFile(System.IO.Path.Combine(folder,
-                "himmel feat. YooSanHyakurei - Maple Wind (Crystal).osb"));
+            //var folder = @"D:\Games\osu!\Songs\ok";
+            var eg = ElementGroup.ParseFromFile(file);
 
             var min = eg.ElementList.Min(k => k.MinTime);
             if (min > 0)
@@ -137,8 +139,20 @@ namespace Coosu.Animation.WPF
                 if (!System.IO.File.Exists(imagePath)) continue;
                 var bitmap = new BitmapImage(new Uri(imagePath));
                 _bitmaps.Add(bitmap);
-                var uii = new Image { Source = bitmap };
-                var ele = _group.CreateElement(uii, origin, bitmap.Width, bitmap.Height, i, x, y);
+                var container = new Border()
+                {
+                    Width = bitmap.PixelWidth,
+                    Height = bitmap.PixelHeight,
+                    Child = new Image
+                    {
+                        Source = bitmap,
+                        Height = bitmap.PixelHeight,
+                        Width = bitmap.PixelWidth,
+                        RenderTransformOrigin = new Point(0.5, 0.5),
+                        RenderTransform = new ScaleTransform(1, 1)
+                    }
+                };
+                var ele = _group.CreateElement(container, origin, bitmap.PixelWidth, bitmap.PixelHeight, i, x, y);
 
                 ele.ApplyAnimation(k =>
                 {
@@ -230,7 +244,7 @@ namespace Coosu.Animation.WPF
                                             k.Flip(startT, endT, FlipMode.FlipY);
                                             break;
                                         case ParameterType.Additive:
-                                            k.Blend(startT, endT, BlendMode.Normal);
+                                            //k.Blend(startT, endT, BlendMode.Normal);
                                             break;
                                         default:
                                             throw new ArgumentOutOfRangeException();
@@ -249,8 +263,8 @@ namespace Coosu.Animation.WPF
                                     break;
                                 }
 
-                            default:
-                                throw new ArgumentOutOfRangeException();
+                            //default:
+                            //    throw new ArgumentOutOfRangeException();
                         }
                     }
                 });
@@ -297,33 +311,6 @@ namespace Coosu.Animation.WPF
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            //var group = image.RenderTransform as TransformGroup;
-            //var children = group.Children;
-
-            //var ui = new Rectangle()
-            //{
-            //    Width = 100,
-            //    OriginHeight = 100,
-            //    Fill = Brushes.Red,
-            //    Stroke = Brushes.Black,
-            //    StrokeThickness = 3
-            //};
-            //var ele = _canvasHost.CreateElement(uii, Origins.Center, bitmap.Width, bitmap.Height);
-
-            //ele.ApplyAnimation(k =>
-            //{
-            //    k.Move(0, 0, 0, new Vector2<double>(320, 240), new Vector2<double>(320, 240));
-            //    k.Rotate(0, 0, 10000, 0, Math.PI * 10);
-            //});
-            //            foreach (var imageObject in _list)
-            //            {
-            //                imageObject.Reset();
-            //            }
-
-            //foreach (var imageObject in _list)
-            //{
-            //    imageObject.BeginAnimation();
-            //}
             _group.PlayWhole();
         }
     }
