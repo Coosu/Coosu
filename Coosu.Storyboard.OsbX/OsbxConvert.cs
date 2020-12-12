@@ -1,13 +1,12 @@
-﻿using Coosu.Osbx.SubjectHandlers;
-using Coosu.Storyboard;
-using Coosu.Storyboard.Extensibility;
-using Coosu.Storyboard.Management;
-using System;
+﻿using System;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using Coosu.Storyboard.Extensibility;
+using Coosu.Storyboard.Management;
+using Coosu.Storyboard.OsbX.SubjectHandlers;
 
-namespace Coosu.Osbx
+namespace Coosu.Storyboard.OsbX
 {
     public static class OsbxConvert
     {

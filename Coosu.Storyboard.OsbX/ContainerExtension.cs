@@ -1,7 +1,6 @@
-﻿using Coosu.Storyboard;
-using Coosu.Storyboard.Events;
+﻿using Coosu.Storyboard.Events;
 
-namespace Coosu.Osbx
+namespace Coosu.Storyboard.OsbX
 {
     public static class ContainerExtension
     {

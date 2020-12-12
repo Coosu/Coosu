@@ -1,7 +1,7 @@
 ﻿using Coosu.Storyboard.Events;
 using Coosu.Storyboard.Extensibility;
 
-namespace Coosu.Osbx.ActionHandlers
+namespace Coosu.Storyboard.OsbX.ActionHandlers
 {
     public class MoveActionHandler : BasicTimelineHandler<Move>
     {

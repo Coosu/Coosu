@@ -21,7 +21,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Coosu.Animation.WPF", "Coos
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoosuTestCore", "CoosuTestCore\CoosuTestCore.csproj", "{10177DA6-386D-46E9-B991-716A67773240}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Coosu.Osbx", "Coosu.Osbx\Coosu.Osbx.csproj", "{4851D011-B66F-422B-B7E1-C12E3E0C2E22}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Coosu.Storyboard.OsbX", "Coosu.Storyboard.OsbX\Coosu.Storyboard.OsbX.csproj", "{4851D011-B66F-422B-B7E1-C12E3E0C2E22}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,5 +1,5 @@
-﻿using Coosu.Osbx;
-using Coosu.Storyboard.Management;
+﻿using Coosu.Storyboard.Management;
+using Coosu.Storyboard.OsbX;
 using System;
 using System.Diagnostics;
 using System.IO;

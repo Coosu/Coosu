@@ -1,12 +1,11 @@
-﻿using Coosu.Osbx.ActionHandlers;
-using Coosu.Storyboard;
-using Coosu.Storyboard.Extensibility;
-using Coosu.Storyboard.Utils;
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
+using Coosu.Storyboard.Extensibility;
+using Coosu.Storyboard.OsbX.ActionHandlers;
+using Coosu.Storyboard.Utils;
 
-namespace Coosu.Osbx.SubjectHandlers
+namespace Coosu.Storyboard.OsbX.SubjectHandlers
 {
     public class Camera2Handler : SubjectHandler<Camera2Element>
     {

@@ -1,9 +1,8 @@
-﻿using Coosu.Osbx.ActionHandlers;
-using Coosu.Storyboard;
+﻿using System;
 using Coosu.Storyboard.Extensibility;
-using System;
+using Coosu.Storyboard.OsbX.ActionHandlers;
 
-namespace Coosu.Osbx.SubjectHandlers
+namespace Coosu.Storyboard.OsbX.SubjectHandlers
 {
     public class SpriteHandler : SubjectHandler<Element>
     {

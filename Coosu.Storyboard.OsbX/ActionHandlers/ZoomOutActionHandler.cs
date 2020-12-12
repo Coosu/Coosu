@@ -1,7 +1,7 @@
-﻿using Coosu.Osbx.Actions;
-using Coosu.Storyboard.Extensibility;
+﻿using Coosu.Storyboard.Extensibility;
+using Coosu.Storyboard.OsbX.Actions;
 
-namespace Coosu.Osbx.ActionHandlers
+namespace Coosu.Storyboard.OsbX.ActionHandlers
 {
     public class ZoomOutActionHandler : BasicTimelineHandler<ZoomOut>
     {

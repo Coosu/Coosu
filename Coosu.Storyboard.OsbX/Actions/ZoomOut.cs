@@ -1,6 +1,6 @@
 ﻿using Coosu.Storyboard.Events;
 
-namespace Coosu.Osbx.Actions
+namespace Coosu.Storyboard.OsbX.Actions
 {
     public class ZoomOut : CommonEvent
     {
