@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Coosu.Beatmap\Coosu.Beatmap.csproj" />
+    <ProjectReference Include="..\Coosu.Osbx\Coosu.Osbx.csproj" />
   </ItemGroup>
 
 </Project>

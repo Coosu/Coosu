@@ -1,26 +1,31 @@
-﻿using System;
+﻿using Coosu.Osbx;
+using Coosu.Storyboard.Management;
+using System;
+using System.Diagnostics;
 using System.IO;
-using Coosu.Beatmap;
+using System.Threading.Tasks;
 
 namespace CoosuTestCore
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
-            var o = OsuFile.ReadFromFileAsync(@"D:\ValveUnhandledExceptionFilter.txt").Result;
-           
-            var fileName = "op.avi";
-            var fi = new FileInfo(@"F:\项目\GitHub\CoosuLocal\folder \" + fileName);
-            if (fi.Exists)
-            {
-                Console.WriteLine(fi.FullName);
-            }
+            using var sr =
+                new StreamReader(@"D:\Games\osu!\Songs\406217 Chata - enn\largetest.osb");
+            var sw = Stopwatch.StartNew();
+            var ggg = await ElementGroup.ParseFromFileAsync(
+                @"D:\Games\osu!\Songs\406217 Chata - enn\Chata - enn (EvilElvis).osb");
+            var time = sw.ElapsedMilliseconds;
+            Console.WriteLine(time);
+            sw.Restart();
+            var em = await OsbxConvert.DeserializeObjectAsync(sr);
+            time = sw.ElapsedMilliseconds;
+            Console.WriteLine(time);
 
-            var dir = fi.Directory;
-            var pathWithCombine = Path.Combine(dir.FullName, fi.Name);
-            Console.WriteLine(pathWithCombine);
 
+            var osb = em.ToString();
+            var osbx = await OsbxConvert.SerializeObjectAsync(em);
         }
     }
 }
