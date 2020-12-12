@@ -2,7 +2,7 @@
 {
     public sealed class MoveY : CommonEvent, IAdjustablePositionEvent
     {
-        public override EventType EventType => EventType.MoveY;
+        public override EventType EventType => EventTypes.MoveY;
 
         public float StartY
         {
@@ -18,6 +18,10 @@
 
         public MoveY(EasingType easing, float startTime, float endTime, float y1, float y2) :
             base(easing, startTime, endTime, new[] { y1 }, new[] { y2 })
+        {
+        }
+
+        public MoveY()
         {
         }
 

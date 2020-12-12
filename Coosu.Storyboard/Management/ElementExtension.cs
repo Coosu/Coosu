@@ -1,5 +1,5 @@
 ﻿using Coosu.Storyboard.Events;
-using Coosu.Storyboard.Internal;
+using Coosu.Storyboard.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -92,21 +92,21 @@ namespace Coosu.Storyboard.Management
         public static void FillObsoleteList(this Element element)
         {
             var possibleList = element.EventList
-                .Where(k => k.EventType == EventType.Fade ||
-                            k.EventType == EventType.Scale ||
-                            k.EventType == EventType.Vector);
+                .Where(k => k.EventType == EventTypes.Fade ||
+                            k.EventType == EventTypes.Scale ||
+                            k.EventType == EventTypes.Vector);
 
             if (possibleList.Any())
             {
                 var dic = new Dictionary<EventType, EventSettings>
                 {
-                    [EventType.Fade] = new EventSettings(),
-                    [EventType.Scale] = new EventSettings(),
-                    [EventType.Vector] = new EventSettings()
+                    [EventTypes.Fade] = new EventSettings(),
+                    [EventTypes.Scale] = new EventSettings(),
+                    [EventTypes.Vector] = new EventSettings()
                 };
                 foreach (var e in possibleList)
                 {
-                    if (e.EventType == EventType.Fade)
+                    if (e.EventType == EventTypes.Fade)
                     {
 
                     }
@@ -242,8 +242,10 @@ namespace Coosu.Storyboard.Management
         {
             if (!expand && !fillFadeout)
                 return;
-            foreach (var ele in eleG.ElementList)
+            foreach (var ec in eleG.ElementList)
             {
+                if (!(ec is Element ele)) continue;
+
                 if (expand) ele.Expand();
                 if (fillFadeout) ele.FillObsoleteList();
             }

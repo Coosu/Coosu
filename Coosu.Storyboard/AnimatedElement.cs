@@ -1,4 +1,4 @@
-﻿using Coosu.Storyboard.Internal;
+﻿using Coosu.Storyboard.Utils;
 using System;
 using System.IO;
 
@@ -7,7 +7,7 @@ namespace Coosu.Storyboard
     public sealed class AnimatedElement : Element
     {
         protected override string Head =>
-            $"{Type},{Layer},{Origin},\"{ImagePath}\",{DefaultX},{DefaultY},{FrameCount},{FrameDelay},{LoopType}";
+            $"{ElementTypeSign.GetString(Type)},{Layer},{Origin},\"{ImagePath}\",{DefaultX},{DefaultY},{FrameCount},{FrameDelay},{LoopType}";
 
         public int FrameCount { get; set; }
         public float FrameDelay { get; set; }

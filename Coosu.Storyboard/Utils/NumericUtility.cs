@@ -2,9 +2,9 @@
 using System.Globalization;
 using System.Linq;
 
-namespace Coosu.Storyboard.Internal
+namespace Coosu.Storyboard.Utils
 {
-    internal static class NumericUtility
+    public static class NumericUtility
     {
         public static float GetMaxValue(params IEnumerable<float>[] floatLists)
         {

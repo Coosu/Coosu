@@ -2,7 +2,7 @@
 {
     public sealed class Vector : CommonEvent
     {
-        public override EventType EventType => EventType.Vector;
+        public override EventType EventType => EventTypes.Vector;
 
         public float StartScaleX
         {
@@ -30,6 +30,10 @@
 
         public Vector(EasingType easing, float startTime, float endTime, float vx1, float vy1, float vx2, float vy2) :
             base(easing, startTime, endTime, new[] { vx1, vy1 }, new[] { vx2, vy2 })
+        {
+        }
+
+        public Vector()
         {
         }
     }

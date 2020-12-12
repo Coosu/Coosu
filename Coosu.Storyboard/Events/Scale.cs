@@ -2,7 +2,7 @@
 {
     public sealed class Scale : CommonEvent
     {
-        public override EventType EventType => EventType.Scale; 
+        public override EventType EventType => EventTypes.Scale; 
        
         public float StartScale
         {
@@ -18,6 +18,10 @@
 
         public Scale(EasingType easing, float startTime, float endTime, float s1, float s2):
             base(easing, startTime, endTime, new[] { s1 }, new[] { s2 })
+        {
+        }
+
+        public Scale()
         {
         }
     }

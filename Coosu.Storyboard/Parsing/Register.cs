@@ -1,88 +1,52 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Coosu.Storyboard.Events;
 
 namespace Coosu.Storyboard.Parsing
 {
-    /// <summary>
-    /// 1. should be pre-compiled for basic
-    /// 2. extensible for subject and action
-    /// </summary>
     public static class Register
     {
-        public static SubjectHandler RegisterSubject(SubjectHandler handler)
+        private static readonly Dictionary<EventType, AddEventDelegate> EventTransformationDictionary
+            = new Dictionary<EventType, AddEventDelegate>();
+
+        private static readonly Dictionary<string, ISubjectParsingHandler> SubjectHandlerDic
+            = new Dictionary<string, ISubjectParsingHandler>();
+
+        private static readonly Dictionary<Type, IActionParsingHandler> ActionHandlerInstances
+            = new Dictionary<Type, IActionParsingHandler>();
+
+        public static ISubjectParsingHandler RegisterSubject(ISubjectParsingHandler handler)
         {
-            throw new NotImplementedException();
+            SubjectHandlerDic.Add(handler.Flag, handler);
             return handler;
         }
-    }
 
-    public abstract class SubjectHandler : IParsingHandler
-    {
-        public abstract string MahouWord { get; }
-        public object Parse(string line)
+        public static ISubjectParsingHandler GetSubjectHandler(string magicWord)
         {
-            throw new NotImplementedException();
+            return SubjectHandlerDic.ContainsKey(magicWord) ? SubjectHandlerDic[magicWord] : null;
         }
 
-        protected List<Type> ActionHandlers { get; private set; }
-    }
-
-    //extent
-    public class CameraHandler : SubjectHandler
-    {
-        public override string MahouWord => "Camera";
-    }
-
-    public class AnimationHandler : SubjectHandler
-    {
-        public override string MahouWord => "Animation";
-    }
-
-    public class SpriteHandler : SubjectHandler
-    {
-        public override string MahouWord => "Sprite";
-    }
-
-    public interface IParsingHandler<T> : IParsingHandler
-    {
-        T Parse(string line);
-    }
-
-    public interface IParsingHandler
-    {
-        string MahouWord { get; }
-        object Parse(string line);
-    }
-
-    public abstract class ActionHandler : IParsingHandler
-    {
-        public abstract string MahouWord { get; }
-        public object Parse(string line)
+        public static void RegisterEventTransformation(EventType eventType, AddEventDelegate @delegate)
         {
-            throw new NotImplementedException();
+            EventTransformationDictionary.Add(eventType, @delegate);
         }
-    }
-    public abstract class BasicTimelineHandler : ActionHandler
-    {
-    }
 
-    public class FadeActionHandler : ActionHandler
-    {
-        public override string MahouWord => "F";
-    }
+        public static AddEventDelegate GetEventTransformation(EventType eventType)
+        {
+            if (EventTransformationDictionary.ContainsKey(eventType))
+                return EventTransformationDictionary[eventType];
+            return null;
+        }
 
-    //extent
-    public class ZoomInActionHandler : ActionHandler
-    {
-        public override string MahouWord => "ZI";
-    }
+        public static T GetActionHandlerInstance<T>() where T : IActionParsingHandler, new()
+        {
+            var type = typeof(T);
+            if (ActionHandlerInstances.ContainsKey(type))
+                return (T)ActionHandlerInstances[type];
 
-    //extent
-    public class ZoomOutActionHandler : ActionHandler
-    {
-        public override string MahouWord => "ZO";
+            var inst = new T();
+            ActionHandlerInstances.Add(type, inst);
+            return inst;
+        }
     }
 }

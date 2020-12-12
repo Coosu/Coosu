@@ -2,7 +2,7 @@
 {
     public sealed class Fade : CommonEvent
     {
-        public override EventType EventType => EventType.Fade;
+        public override EventType EventType => EventTypes.Fade;
 
         public float StartOpacity
         {
@@ -20,5 +20,7 @@
             : base(easing, startTime, endTime, new[] { f1 }, new[] { f2 })
         {
         }
+
+        public Fade() { }
     }
 }

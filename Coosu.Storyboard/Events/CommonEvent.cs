@@ -9,8 +9,8 @@ namespace Coosu.Storyboard.Events
         public EasingType Easing { get; set; }
         public float StartTime { get; set; }
         public float EndTime { get; set; }
-        public float[] Start { get; }
-        public float[] End { get; }
+        public float[] Start { get; set; }
+        public float[] End { get; set; }
 
         protected virtual string Script
         {
@@ -64,6 +64,10 @@ namespace Coosu.Storyboard.Events
 
         public virtual int ParamLength => Start.Length;
         public virtual bool IsStatic => Start.Equals(End);
+
+        public CommonEvent()
+        {
+        }
 
         protected CommonEvent(EasingType easing, float startTime, float endTime, float[] start, float[] end)
         {

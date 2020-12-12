@@ -1,5 +1,5 @@
 ﻿using Coosu.Storyboard.Events;
-using Coosu.Storyboard.Internal;
+using Coosu.Storyboard.Utils;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -40,7 +40,7 @@ namespace Coosu.Storyboard.Management
 
         public ElementCompressor(ElementGroup elementGroup)
         {
-            _elements = elementGroup.ElementList;
+            _elements = elementGroup.ElementList.Where(k => k is Element).Cast<Element>().ToList();
         }
 
         public string BackgroundPath { get; set; }
@@ -459,7 +459,7 @@ namespace Coosu.Storyboard.Management
                             }
                         }
                         // 当 此event为move，param固定，且唯一时
-                        else if (type == EventType.Move
+                        else if (type == EventTypes.Move
                                  && container is Element element)
                         {
                             if (list.Count == 1 && nowE.IsStatic()
@@ -551,7 +551,7 @@ namespace Coosu.Storyboard.Management
                          * 且 此event当前动作 = 此event上个动作
                         */
                         else if (nowE.IsSmallerThenMaxTime(container) /*||
-                                 type == EventType.Fade && nowStartP.SequenceEqual(EventExtension.UnworthyDictionary[EventType.Fade]) */
+                                 type == EventTypes.Fade && nowStartP.SequenceEqual(EventExtension.UnworthyDictionary[EventTypes.Fade]) */
                                  && nowE.IsStatic()
                                  && EventCompare.IsEventSequent(preE, nowE))
                         {

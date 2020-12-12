@@ -1,6 +1,6 @@
 ﻿using Coosu.Shared.Mathematics;
 using Coosu.Storyboard.Events;
-using Coosu.Storyboard.Internal;
+using Coosu.Storyboard.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;

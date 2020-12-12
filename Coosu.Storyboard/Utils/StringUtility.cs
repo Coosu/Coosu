@@ -4,27 +4,35 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace Coosu.Storyboard.Internal
+namespace Coosu.Storyboard.Utils
 {
-    internal static class StringUtility
+    public static class StringUtility
     {
-        public static void WriteGroupedEvent(this TextWriter sw, IEnumerable<CommonEvent> events, int index)
+        internal static void WriteGroupedEvent(this TextWriter sw, IEnumerable<CommonEvent> events, int index)
         {
             var indent = new string(' ', index);
-            var groupedEvents = events.OrderBy(k=>k.EventType).GroupBy(k => k.EventType);
+            var groupedEvents = events.OrderBy(k => k.EventType).GroupBy(k => k.EventType);
             foreach (var grouping in groupedEvents)
                 foreach (CommonEvent e in grouping)
                     sw.WriteLine(indent + e);
         }
 
-        public static void WriteSequentialEvent(this TextWriter sw, IEnumerable<CommonEvent> events, int index)
+        internal static void WriteSequentialEvent(this TextWriter sw, IEnumerable<CommonEvent> events, int index)
         {
             var indent = new string(' ', index);
             foreach (CommonEvent e in events)
                 sw.WriteLine(indent + e);
         }
 
-        public static void WriteElementEvents(this TextWriter sw, Element element, bool group)
+        public static void WriteContainerEvents(TextWriter sw, EventContainer container, bool group)
+        {
+            if (group)
+                sw.WriteGroupedEvent(container.EventList, 1);
+            else
+                sw.WriteSequentialEvent(container.EventList, 1);
+        }
+
+        internal static void WriteElementEvents(this TextWriter sw, Element element, bool group)
         {
             if (group)
                 sw.WriteGroupedEvent(element.EventList, 1);
@@ -37,7 +45,7 @@ namespace Coosu.Storyboard.Internal
                 sw.WriteTrigger(trigger, group);
         }
 
-        public static void WriteTrigger(this TextWriter sw, Trigger trigger, bool group)
+        internal static void WriteTrigger(this TextWriter sw, Trigger trigger, bool group)
         {
             var head = " " + trigger;
             sw.WriteLine(head);
@@ -48,7 +56,7 @@ namespace Coosu.Storyboard.Internal
                 sw.WriteSequentialEvent(trigger.EventList, 2);
         }
 
-        public static void WriteLoop(this TextWriter sw, Loop loop, bool group)
+        internal static void WriteLoop(this TextWriter sw, Loop loop, bool group)
         {
             var head = " " + loop;
             sw.WriteLine(head);

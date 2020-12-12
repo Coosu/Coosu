@@ -1,8 +1,8 @@
-﻿using Coosu.Storyboard.Events;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Coosu.Storyboard.Events;
 
-namespace Coosu.Storyboard.Internal
+namespace Coosu.Storyboard.Utils
 {
     public static class EventExtension
     {
@@ -10,11 +10,11 @@ namespace Coosu.Storyboard.Internal
             new ReadOnlyDictionary<EventType, float[]>(
                 new Dictionary<EventType, float[]>
                 {
-                    [EventType.Fade] = new[] { 1f },
-                    [EventType.Scale] = new[] { 1f },
-                    [EventType.Vector] = new[] { 1f, 1f },
-                    [EventType.Rotate] = new[] { 0f },
-                    [EventType.Color] = new[] { 255f, 255f, 255f },
+                    [EventTypes.Fade] = new[] { 1f },
+                    [EventTypes.Scale] = new[] { 1f },
+                    [EventTypes.Vector] = new[] { 1f, 1f },
+                    [EventTypes.Rotate] = new[] { 0f },
+                    [EventTypes.Color] = new[] { 255f, 255f, 255f },
                 }
             );
 
@@ -22,10 +22,10 @@ namespace Coosu.Storyboard.Internal
             new ReadOnlyDictionary<EventType, float[]>(
                 new Dictionary<EventType, float[]>
                 {
-                    [EventType.Fade] = new[] { 0f },
-                    [EventType.Scale] = new[] { 0f },
-                    [EventType.Vector] = new[] { 0f, 0f },
-                    [EventType.Color] = new[] { 0f, 0f, 0f },
+                    [EventTypes.Fade] = new[] { 0f },
+                    [EventTypes.Scale] = new[] { 0f },
+                    [EventTypes.Vector] = new[] { 0f, 0f },
+                    [EventTypes.Color] = new[] { 0f, 0f, 0f },
                 }
             );
 

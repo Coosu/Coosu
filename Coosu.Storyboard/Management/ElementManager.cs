@@ -6,16 +6,40 @@ namespace Coosu.Storyboard.Management
 {
     public class ElementManager
     {
-        private SortedSet<ElementGroup> GroupList { get; set; } = new SortedSet<ElementGroup>(new GroupComparer());
+        public Dictionary<int, ElementGroup> GroupList { get; } = new Dictionary<int, ElementGroup>();
 
-        public void CreateGroup(int layerIndex)
+        public bool ContainsGroup(int zIndex)
         {
-            GroupList.Add(new ElementGroup(layerIndex));
+            return GroupList.ContainsKey(zIndex);
         }
 
-        public void Add(ElementGroup elementGroup)
+        public ElementGroup GetOrAddGroup(int zIndex)
         {
-            GroupList.Add(elementGroup);
+            if (ContainsGroup(zIndex))
+                return GroupList[zIndex];
+            return CreateGroup(zIndex);
+        }
+
+        public ElementGroup CreateGroup(int zIndex)
+        {
+            var elementGroup = new ElementGroup(zIndex);
+            GroupList.Add(zIndex, elementGroup);
+            return elementGroup;
+        }
+
+        public void AddGroup(ElementGroup elementGroup)
+        {
+            GroupList.Add(elementGroup.Index, elementGroup);
+        }
+
+        public void DeleteGroup(ElementGroup elementGroup)
+        {
+            GroupList.Remove(elementGroup.Index);
+        }
+
+        public void DeleteGroup(int zIndex)
+        {
+            GroupList.Remove(zIndex);
         }
 
         public static ElementGroup Adjust(ElementGroup elementGroup, float offsetX, float offsetY, int offsetTiming)
@@ -31,9 +55,9 @@ namespace Coosu.Storyboard.Management
         {
             StringBuilder sb = new StringBuilder();
 
-            foreach (var a in GroupList)
+            foreach (var a in GroupList.Values)
             {
-                sb.Append(a);
+                sb.Append(a.ToOsbString());
             }
 
             return sb.ToString();

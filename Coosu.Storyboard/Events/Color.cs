@@ -2,7 +2,7 @@
 {
     public sealed class Color : CommonEvent
     {
-        public override EventType EventType => EventType.Color;
+        public override EventType EventType => EventTypes.Color;
 
         public float StartR
         {

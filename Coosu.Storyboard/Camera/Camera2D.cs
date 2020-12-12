@@ -18,7 +18,7 @@ namespace Coosu.Storyboard.Camera
 
         public Camera2D(ElementGroup group)
         {
-            this._objects = group.ElementList;
+            //this._objects = group.ElementList;
         }
 
         public void Translate(EasingType easing, float startTime, float endTime, float x, float y)

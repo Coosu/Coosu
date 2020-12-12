@@ -14,11 +14,11 @@ namespace Coosu.Storyboard.Management
         public int Index { get; set; }
         public ElementGroup(int layerIndex) => Index = layerIndex;
 
-        public List<Element> ElementList { get; set; } = new List<Element>();
+        public List<EventContainer> ElementList { get; set; } = new List<EventContainer>();
 
-        public Element this[int index] => ElementList[index];
+        public EventContainer this[int index] => ElementList[index];
 
-        public IEnumerable<Element> this[Func<Element, bool> predicate] => ElementList.Where(predicate);
+        public IEnumerable<EventContainer> this[Func<EventContainer, bool> predicate] => ElementList.Where(predicate);
 
         /// <summary>
         /// Create a storyboard element by a static image.
@@ -27,7 +27,7 @@ namespace Coosu.Storyboard.Management
         /// <returns></returns>
         public Element CreateSprite(string filePath)
         {
-            var obj = new Element(ElementType.Sprite, LayerType.Foreground, OriginType.Centre, filePath, 320, 240);
+            var obj = new Element(ElementTypes.Sprite, LayerType.Foreground, OriginType.Centre, filePath, 320, 240);
             AddElement(obj);
             return obj;
         }
@@ -40,7 +40,7 @@ namespace Coosu.Storyboard.Management
         /// <returns></returns>
         public Element CreateSprite(OriginType origin, string filePath)
         {
-            var obj = new Element(ElementType.Sprite, LayerType.Foreground, origin, filePath, 320, 240);
+            var obj = new Element(ElementTypes.Sprite, LayerType.Foreground, origin, filePath, 320, 240);
             AddElement(obj);
             return obj;
         }
@@ -54,7 +54,7 @@ namespace Coosu.Storyboard.Management
         /// <returns></returns>
         public Element CreateSprite(LayerType layer, OriginType origin, string filePath)
         {
-            var obj = new Element(ElementType.Sprite, layer, origin, filePath, 320, 240);
+            var obj = new Element(ElementTypes.Sprite, layer, origin, filePath, 320, 240);
             AddElement(obj);
             return obj;
         }
@@ -69,7 +69,7 @@ namespace Coosu.Storyboard.Management
         /// <returns></returns>
         public Element CreateSprite(LayerType layer, OriginType origin, string filePath, System.Drawing.Point defaultLocation)
         {
-            var obj = new Element(ElementType.Sprite, layer, origin, filePath, defaultLocation.X, defaultLocation.Y);
+            var obj = new Element(ElementTypes.Sprite, layer, origin, filePath, defaultLocation.X, defaultLocation.Y);
             AddElement(obj);
             return obj;
         }
@@ -85,7 +85,7 @@ namespace Coosu.Storyboard.Management
         /// <returns></returns>
         public Element CreateSprite(LayerType layer, OriginType origin, string filePath, float defaultX, float defaultY)
         {
-            var obj = new Element(ElementType.Sprite, layer, origin, filePath, defaultX, defaultY);
+            var obj = new Element(ElementTypes.Sprite, layer, origin, filePath, defaultX, defaultY);
             AddElement(obj);
             return obj;
         }
@@ -98,7 +98,7 @@ namespace Coosu.Storyboard.Management
             int frameCount, float frameDelay, LoopType loopType)
         {
             var obj = new AnimatedElement(
-                ElementType.Sprite,
+                ElementTypes.Sprite,
                 layer,
                 origin,
                 filePath,
@@ -110,6 +110,16 @@ namespace Coosu.Storyboard.Management
             );
             AddElement(obj);
             return obj;
+        }
+
+        public void AddSubject(EventContainer element)
+        {
+            ElementList.Add(element);
+        }
+
+        public void AddSubject(params EventContainer[] elements)
+        {
+            ElementList.AddRange(elements);
         }
 
         public void AddElement(Element element)

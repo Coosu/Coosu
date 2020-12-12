@@ -1,7 +1,7 @@
 ﻿using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Events;
 using Coosu.Storyboard.Events.Containers;
-using Coosu.Storyboard.Internal;
+using Coosu.Storyboard.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,8 +15,7 @@ namespace Coosu.Storyboard
     public class Element : EventContainer
     {
         protected override string Head =>
-            $"{Type},{Layer},{Origin},\"{ImagePath}\",{DefaultX},{DefaultY}";
-        public ElementType Type { get; }
+            $"{ElementTypeSign.GetString(Type)},{Layer},{Origin},\"{ImagePath}\",{DefaultX},{DefaultY}";
         public LayerType Layer { get; }
         public OriginType Origin { get; }
         public string ImagePath { get; }
@@ -109,7 +108,7 @@ namespace Coosu.Storyboard
 
         public Element(string type, string layer, string origin, string imagePath, float defaultX, float defaultY)
         {
-            Type = (ElementType)Enum.Parse(typeof(ElementType), type);
+            Type = ElementType.Parse(type);
             Layer = (LayerType)Enum.Parse(typeof(LayerType), layer);
             Origin = (OriginType)Enum.Parse(typeof(OriginType), origin);
             ImagePath = imagePath;
@@ -187,105 +186,105 @@ namespace Coosu.Storyboard
 
         // Move
         public void Move(int startTime, Vector2 point) =>
-            AddEvent(EventType.Move, 0, startTime, startTime, point.X, point.Y, point.X, point.Y);
+            AddEvent(EventTypes.Move, 0, startTime, startTime, point.X, point.Y, point.X, point.Y);
         public void Move(int startTime, float x, float y) =>
-            AddEvent(EventType.Move, 0, startTime, startTime, x, y, x, y);
+            AddEvent(EventTypes.Move, 0, startTime, startTime, x, y, x, y);
         public void Move(int startTime, int endTime, float x, float y) =>
-            AddEvent(EventType.Move, 0, startTime, endTime, x, y, x, y);
+            AddEvent(EventTypes.Move, 0, startTime, endTime, x, y, x, y);
         public void Move(int startTime, int endTime, float x1, float y1, float x2, float y2) =>
-            AddEvent(EventType.Move, 0, startTime, endTime, x1, y1, x2, y2);
+            AddEvent(EventTypes.Move, 0, startTime, endTime, x1, y1, x2, y2);
         public void Move(int startTime, int endTime, Vector2 startPoint, Vector2 endPoint) =>
-            AddEvent(EventType.Move, 0, startTime, endTime, startPoint.X, startPoint.Y, endPoint.X, endPoint.Y);
+            AddEvent(EventTypes.Move, 0, startTime, endTime, startPoint.X, startPoint.Y, endPoint.X, endPoint.Y);
         public void Move(EasingType easing, int startTime, int endTime, Vector2 startPoint, Vector2 endPoint) =>
-            AddEvent(EventType.Move, easing, startTime, endTime, startPoint.X, startPoint.Y, endPoint.X, endPoint.Y);
+            AddEvent(EventTypes.Move, easing, startTime, endTime, startPoint.X, startPoint.Y, endPoint.X, endPoint.Y);
         public void Move(EasingType easing, int startTime, int endTime, float x1, float y1, float x2, float y2) =>
-            AddEvent(EventType.Move, easing, startTime, endTime, x1, y1, x2, y2);
+            AddEvent(EventTypes.Move, easing, startTime, endTime, x1, y1, x2, y2);
 
         // Fade
         public void Fade(int startTime, float opacity) =>
-            AddEvent(EventType.Fade, 0, startTime, startTime, opacity, opacity);
+            AddEvent(EventTypes.Fade, 0, startTime, startTime, opacity, opacity);
         public void Fade(int startTime, int endTime, float opacity) =>
-            AddEvent(EventType.Fade, 0, startTime, endTime, opacity, opacity);
+            AddEvent(EventTypes.Fade, 0, startTime, endTime, opacity, opacity);
         public void Fade(int startTime, int endTime, float startOpacity, float endOpacity) =>
-            AddEvent(EventType.Fade, 0, startTime, endTime, startOpacity, endOpacity);
+            AddEvent(EventTypes.Fade, 0, startTime, endTime, startOpacity, endOpacity);
         public void Fade(EasingType easing, int startTime, int endTime, float startOpacity, float endOpacity) =>
-            AddEvent(EventType.Fade, easing, startTime, endTime, startOpacity, endOpacity);
+            AddEvent(EventTypes.Fade, easing, startTime, endTime, startOpacity, endOpacity);
 
         // Scale
         public void Scale(int startTime, float scale) =>
-            AddEvent(EventType.Scale, 0, startTime, startTime, scale, scale);
+            AddEvent(EventTypes.Scale, 0, startTime, startTime, scale, scale);
         public void Scale(int startTime, int endTime, float scale) =>
-            AddEvent(EventType.Scale, 0, startTime, endTime, scale, scale);
+            AddEvent(EventTypes.Scale, 0, startTime, endTime, scale, scale);
         public void Scale(int startTime, int endTime, float startScale, float endScale) =>
-            AddEvent(EventType.Scale, 0, startTime, endTime, startScale, endScale);
+            AddEvent(EventTypes.Scale, 0, startTime, endTime, startScale, endScale);
         public void Scale(EasingType easing, int startTime, int endTime, float startScale, float endScale) =>
-            AddEvent(EventType.Scale, easing, startTime, endTime, startScale, endScale);
+            AddEvent(EventTypes.Scale, easing, startTime, endTime, startScale, endScale);
 
         // Rotate
         public void Rotate(int startTime, float rotate) =>
-            AddEvent(EventType.Rotate, 0, startTime, startTime, rotate, rotate);
+            AddEvent(EventTypes.Rotate, 0, startTime, startTime, rotate, rotate);
         public void Rotate(int startTime, int endTime, float rotate) =>
-            AddEvent(EventType.Rotate, 0, startTime, endTime, rotate, rotate);
+            AddEvent(EventTypes.Rotate, 0, startTime, endTime, rotate, rotate);
         public void Rotate(int startTime, int endTime, float startRotate, float endRotate) =>
-            AddEvent(EventType.Rotate, 0, startTime, endTime, startRotate, endRotate);
+            AddEvent(EventTypes.Rotate, 0, startTime, endTime, startRotate, endRotate);
         public void Rotate(EasingType easing, int startTime, int endTime, float startRotate, float endRotate) =>
-            AddEvent(EventType.Rotate, easing, startTime, endTime, startRotate, endRotate);
+            AddEvent(EventTypes.Rotate, easing, startTime, endTime, startRotate, endRotate);
 
         // MoveX
         public void MoveX(int startTime, float x) =>
-            AddEvent(EventType.MoveX, 0, startTime, startTime, x, x);
+            AddEvent(EventTypes.MoveX, 0, startTime, startTime, x, x);
         public void MoveX(int startTime, int endTime, float x) =>
-            AddEvent(EventType.MoveX, 0, startTime, endTime, x, x);
+            AddEvent(EventTypes.MoveX, 0, startTime, endTime, x, x);
         public void MoveX(int startTime, int endTime, float startX, float endX) =>
-            AddEvent(EventType.MoveX, 0, startTime, endTime, startX, endX);
+            AddEvent(EventTypes.MoveX, 0, startTime, endTime, startX, endX);
         public void MoveX(EasingType easing, int startTime, int endTime, float startX, float endX) =>
-            AddEvent(EventType.MoveX, easing, startTime, endTime, startX, endX);
+            AddEvent(EventTypes.MoveX, easing, startTime, endTime, startX, endX);
 
         // MoveY
         public void MoveY(int startTime, float y) =>
-            AddEvent(EventType.MoveY, 0, startTime, startTime, y, y);
+            AddEvent(EventTypes.MoveY, 0, startTime, startTime, y, y);
         public void MoveY(int startTime, int endTime, float y) =>
-            AddEvent(EventType.MoveY, 0, startTime, endTime, y, y);
+            AddEvent(EventTypes.MoveY, 0, startTime, endTime, y, y);
         public void MoveY(int startTime, int endTime, float startY, float endY) =>
-            AddEvent(EventType.MoveY, 0, startTime, endTime, startY, endY);
+            AddEvent(EventTypes.MoveY, 0, startTime, endTime, startY, endY);
         public void MoveY(EasingType easing, int startTime, int endTime, float startY, float endY) =>
-            AddEvent(EventType.MoveY, easing, startTime, endTime, startY, endY);
+            AddEvent(EventTypes.MoveY, easing, startTime, endTime, startY, endY);
 
         // Color
         public void Color(int startTime, Vector3 color) =>
-            AddEvent(EventType.Color, 0, startTime, startTime, color.X, color.Y, color.Z, color.X, color.Y, color.Z);
+            AddEvent(EventTypes.Color, 0, startTime, startTime, color.X, color.Y, color.Z, color.X, color.Y, color.Z);
         public void Color(int startTime, int endTime, Vector3 color) =>
-            AddEvent(EventType.Color, 0, startTime, endTime, color.X, color.Y, color.Z, color.X, color.Y, color.Z);
+            AddEvent(EventTypes.Color, 0, startTime, endTime, color.X, color.Y, color.Z, color.X, color.Y, color.Z);
         public void Color(int startTime, int endTime, Vector3 color1, Vector3 color2) =>
-            AddEvent(EventType.Color, 0, startTime, endTime, color1.X, color1.Y, color1.Z, color2.X, color2.Y, color2.Z);
+            AddEvent(EventTypes.Color, 0, startTime, endTime, color1.X, color1.Y, color1.Z, color2.X, color2.Y, color2.Z);
         public void Color(EasingType easing, int startTime, int endTime, Vector3 color1, Vector3 color2) =>
-            AddEvent(EventType.Color, easing, startTime, endTime, color1.X, color1.Y, color1.Z, color2.X, color2.Y, color2.Z);
+            AddEvent(EventTypes.Color, easing, startTime, endTime, color1.X, color1.Y, color1.Z, color2.X, color2.Y, color2.Z);
         public void Color(int startTime, int r, int g, int b) =>
-            AddEvent(EventType.Color, 0, startTime, startTime, r, g, b, r, g, b);
+            AddEvent(EventTypes.Color, 0, startTime, startTime, r, g, b, r, g, b);
         public void Color(int startTime, int endTime, int r, int g, int b) =>
-            AddEvent(EventType.Color, 0, startTime, endTime, r, g, b, r, g, b);
+            AddEvent(EventTypes.Color, 0, startTime, endTime, r, g, b, r, g, b);
         public void Color(int startTime, int endTime, int startR, int startG, int startB, int endR, int endG, int endB) =>
-            AddEvent(EventType.Color, 0, startTime, endTime, startR, startG, startB, endR, endG, endB);
+            AddEvent(EventTypes.Color, 0, startTime, endTime, startR, startG, startB, endR, endG, endB);
         public void Color(EasingType easing, int startTime, int endTime, int startR, int startG, int startB, int endR, int endG, int endB) =>
-            AddEvent(EventType.Color, easing, startTime, endTime, startR, startG, startB, endR, endG, endB);
+            AddEvent(EventTypes.Color, easing, startTime, endTime, startR, startG, startB, endR, endG, endB);
         public void Color(EasingType easing, int startTime, int endTime, float startR, float startG, float startB, float endR, float endG, float endB) =>
-            AddEvent(EventType.Color, easing, startTime, endTime, startR, startG, startB, endR, endG, endB);
+            AddEvent(EventTypes.Color, easing, startTime, endTime, startR, startG, startB, endR, endG, endB);
 
         // Vector
         public void Vector(int startTime, Vector2 vector) =>
-            AddEvent(EventType.Vector, 0, startTime, startTime, vector.X, vector.Y, vector.X, vector.Y);
+            AddEvent(EventTypes.Vector, 0, startTime, startTime, vector.X, vector.Y, vector.X, vector.Y);
         public void Vector(int startTime, float w, float h) =>
-            AddEvent(EventType.Vector, 0, startTime, startTime, w, h, w, h);
+            AddEvent(EventTypes.Vector, 0, startTime, startTime, w, h, w, h);
         public void Vector(int startTime, int endTime, float w, float h) =>
-            AddEvent(EventType.Vector, 0, startTime, endTime, w, h, w, h);
+            AddEvent(EventTypes.Vector, 0, startTime, endTime, w, h, w, h);
         public void Vector(int startTime, int endTime, Vector2 startZoom, Vector2 endZoom) =>
-            AddEvent(EventType.Vector, 0, startTime, endTime, startZoom.X, startZoom.Y, endZoom.X, endZoom.Y);
+            AddEvent(EventTypes.Vector, 0, startTime, endTime, startZoom.X, startZoom.Y, endZoom.X, endZoom.Y);
         public void Vector(EasingType easing, int startTime, int endTime, Vector2 startZoom, Vector2 endZoom) =>
-            AddEvent(EventType.Vector, easing, startTime, endTime, startZoom.X, startZoom.Y, endZoom.X, endZoom.Y);
+            AddEvent(EventTypes.Vector, easing, startTime, endTime, startZoom.X, startZoom.Y, endZoom.X, endZoom.Y);
         public void Vector(int startTime, int endTime, float w1, float h1, float w2, float h2) =>
-            AddEvent(EventType.Vector, 0, startTime, endTime, w1, h1, w2, h2);
+            AddEvent(EventTypes.Vector, 0, startTime, endTime, w1, h1, w2, h2);
         public void Vector(EasingType easing, int startTime, int endTime, float w1, float h1, float w2, float h2) =>
-            AddEvent(EventType.Vector, easing, startTime, endTime, w1, h1, w2, h2);
+            AddEvent(EventTypes.Vector, easing, startTime, endTime, w1, h1, w2, h2);
 
         //Extra
         public void FlipH(int startTime) => AddEvent(0, startTime, startTime, ParameterType.Horizontal);
@@ -338,7 +337,7 @@ namespace Coosu.Storyboard
             float x1, float y1, float z1, float x2, float y2, float z2) =>
             AddEvent(e, easing, startTime, endTime, new[] { x1, y1, z1 }, new[] { x2, y2, z2 });
         public void AddEvent(EasingType easing, float startTime, float endTime, ParameterType p) =>
-            AddEvent(EventType.Parameter, easing, startTime, endTime, new[] { (float)(int)p }, new[] { (float)(int)p });
+            AddEvent(EventTypes.Parameter, easing, startTime, endTime, new[] { (float)(int)p }, new[] { (float)(int)p });
 
         internal override void AddEvent(EventType e, EasingType easing, float startTime, float endTime, float[] start, float[] end)
         {

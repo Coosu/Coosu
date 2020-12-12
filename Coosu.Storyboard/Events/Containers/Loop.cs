@@ -1,4 +1,4 @@
-﻿using Coosu.Storyboard.Internal;
+﻿using Coosu.Storyboard.Utils;
 using System.IO;
 using System.Linq;
 
@@ -18,8 +18,6 @@ namespace Coosu.Storyboard.Events.Containers
         public override float MinTime => EventList.Count > 0 ? EventList.Min(k => k.StartTime) : 0;
         public override float MaxStartTime => EventList.Count > 0 ? EventList.Max(k => k.StartTime) : 0;
         public override float MinEndTime => EventList.Count > 0 ? EventList.Min(k => k.EndTime) : 0;
-
-        public Element BaseElement { get; internal set; }
 
         public Loop(float startTime, int loopCount)
         {

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Coosu.Storyboard.Internal
+namespace Coosu.Storyboard.Utils
 {
-    internal static class ListExtension
+    public static class ListExtension
     {
         public static void AddSorted<T>(this List<T> list, T item) where T : IComparable<T>
         {

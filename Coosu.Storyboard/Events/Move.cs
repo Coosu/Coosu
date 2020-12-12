@@ -2,7 +2,7 @@
 {
     public sealed class Move : CommonEvent, IAdjustablePositionEvent
     {
-        public override EventType EventType => EventType.Move;
+        public override EventType EventType => EventTypes.Move;
 
         public float StartX
         {
@@ -32,6 +32,10 @@
             base(easing, startTime, endTime, new[] { x1, y1 }, new[] { x2, y2 })
         {
 
+        }
+
+        public Move()
+        {
         }
 
         public void AdjustPosition(float x, float y)

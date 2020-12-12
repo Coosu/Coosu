@@ -2,7 +2,7 @@
 {
     public class Rotate : CommonEvent
     {
-        public override EventType EventType => EventType.Rotate;
+        public override EventType EventType => EventTypes.Rotate;
 
         public float StartRotate
         {
@@ -18,6 +18,10 @@
 
         public Rotate(EasingType easing, float startTime, float endTime, float r1, float r2) :
             base(easing, startTime, endTime, new[] { r1 }, new[] { r2 })
+        {
+        }
+
+        public Rotate()
         {
         }
     }

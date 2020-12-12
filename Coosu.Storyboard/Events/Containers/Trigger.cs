@@ -1,4 +1,4 @@
-﻿using Coosu.Storyboard.Internal;
+﻿using Coosu.Storyboard.Utils;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -29,7 +29,7 @@ namespace Coosu.Storyboard.Events.Containers
                 : 0); //if hitsound played at end time
 
         public override float MinEndTime => StartTime; // if no hitsound here
-        
+
         public Trigger(float startTime, float endTime, TriggerType triggerType, bool listenSample = false, uint? customSampleSet = null)
         {
             StartTime = startTime;
