@@ -1,8 +1,6 @@
-﻿using Coosu.Storyboard;
-using Coosu.Storyboard.Parsing;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace Coosu.Osbx
+namespace Coosu.Storyboard.Parsing
 {
     public abstract class SubjectHandler<T> : ISubjectParsingHandler<T> where T : EventContainer
     {

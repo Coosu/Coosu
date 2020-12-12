@@ -1,6 +1,6 @@
 ﻿using Coosu.Storyboard.Events;
 
-namespace Coosu.Osbx
+namespace Coosu.Osbx.Actions
 {
     public class Origin : CommonEvent
     {

@@ -1,4 +1,7 @@
-﻿namespace Coosu.Osbx.ActionHandlers
+﻿using Coosu.Osbx.Actions;
+using Coosu.Storyboard.Parsing;
+
+namespace Coosu.Osbx.ActionHandlers
 {
     public class OriginActionHandler : BasicTimelineHandler<Origin>
     {
