@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Coosu.Storyboard.Events;
 
-namespace Coosu.Storyboard.Parsing
+namespace Coosu.Storyboard.Extensibility
 {
     public static class Register
     {

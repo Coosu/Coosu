@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Coosu.Storyboard.Parsing
+namespace Coosu.Storyboard.Extensibility
 {
     public abstract class SubjectHandler<T> : ISubjectParsingHandler<T> where T : EventContainer
     {

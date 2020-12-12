@@ -1,6 +1,6 @@
 ﻿using Coosu.Storyboard.Events;
 
-namespace Coosu.Storyboard.Parsing
+namespace Coosu.Storyboard.Extensibility
 {
     public interface IActionParsingHandler : IParsingHandler
     {

@@ -2,7 +2,7 @@
 using System.Globalization;
 using Coosu.Storyboard.Events;
 
-namespace Coosu.Storyboard.Parsing
+namespace Coosu.Storyboard.Extensibility
 {
     public abstract class BasicTimelineHandler<T> : ActionHandler<T> where T : CommonEvent, new()
     {
