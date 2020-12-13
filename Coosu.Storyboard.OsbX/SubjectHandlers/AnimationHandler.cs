@@ -1,6 +1,6 @@
-﻿using System;
-using Coosu.Storyboard.Extensibility;
+﻿using Coosu.Storyboard.Extensibility;
 using Coosu.Storyboard.OsbX.ActionHandlers;
+using System;
 
 namespace Coosu.Storyboard.OsbX.SubjectHandlers
 {
@@ -21,16 +21,16 @@ namespace Coosu.Storyboard.OsbX.SubjectHandlers
         public override string Flag => "Animation";
         public override string Serialize(AnimatedElement raw)
         {
-            return string.Format("{0},{1},{2},\"{3}\",{4},{5},{6},{7},{8}", Flag, raw.Layer, raw.Origin, raw.ImagePath,
-                    raw.DefaultX, raw.DefaultY, raw.FrameCount, raw.FrameDelay, raw.LoopType);
+            return string.Format("{0},{1},{2},\"{3}\",{4},{5},{6},{7},{8},{9},{10},{11}", Flag, raw.Layer, raw.Origin, raw.ImagePath,
+                    raw.DefaultX, raw.DefaultY, raw.FrameCount, raw.FrameDelay, raw.LoopType, raw.CameraId, raw.ZDistance, 0);
         }
 
         public override AnimatedElement Deserialize(string[] split)
         {
-            if (split.Length == 8 || split.Length == 9)
+            if (split.Length == 8 || split.Length == 9 || split.Length == 12)
             {
                 var type = ElementTypeSign.Parse(split[0]);
-                var zIndex = int.TryParse(split[1], out var result) ? result : 1;
+                var layerType = (LayerType)Enum.Parse(typeof(LayerType), split[1]);
                 var origin = (OriginType)Enum.Parse(typeof(OriginType), split[2]);
                 var path = split[3].Trim('\"');
                 var defX = float.Parse(split[4]);
@@ -40,9 +40,24 @@ namespace Coosu.Storyboard.OsbX.SubjectHandlers
                 var loopType = split.Length == 9
                     ? (LoopType)Enum.Parse(typeof(LoopType), split[8])
                     : LoopType.LoopForever;
-                return new AnimatedElement(type, LayerType.Foreground, origin, path, defX, defY, frameCount, frameDelay, loopType)
+
+                float zDistance = 1;
+                int cameraId = 0;
+                if (split.Length == 11)
                 {
-                    ZIndex = zIndex
+                    cameraId = int.Parse(split[9]);
+                    zDistance = int.TryParse(split[10], out var result) ? result : 1;
+                    var absolute = int.Parse(split[11]) != 0;
+                    if (absolute)
+                    {
+                        throw new NotImplementedException("Absolute mode currently is not supported.");
+                    }
+                }
+
+                return new AnimatedElement(type, layerType, origin, path, defX, defY, frameCount, frameDelay, loopType)
+                {
+                    ZDistance = zDistance,
+                    CameraId = cameraId
                 };
             }
 

@@ -12,9 +12,9 @@ namespace Coosu.Storyboard.Management
                 return 1;
             if (x == null)
                 return -1;
-            if (x.Index > y.Index)
+            if (x.ZDistance > y.ZDistance)
                 return 1;
-            if (x.Index < y.Index)
+            if (x.ZDistance < y.ZDistance)
                 return -1;
             return 0;
         }

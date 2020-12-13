@@ -11,8 +11,8 @@ namespace Coosu.Storyboard.Management
     {
         public void Dispose() { }
 
-        public int Index { get; set; }
-        public ElementGroup(int layerIndex) => Index = layerIndex;
+        public float ZDistance { get; set; }
+        public ElementGroup(float zDistance) => ZDistance = zDistance;
 
         public List<EventContainer> ElementList { get; set; } = new List<EventContainer>();
 

@@ -127,7 +127,7 @@ namespace Coosu.Storyboard.OsbX
                             try
                             {
                                 var subject = handler.Deserialize(split);
-                                var eg = em.GetOrAddGroup(subject.ZIndex);
+                                var eg = em.GetOrAddGroup(subject.ZDistance);
                                 eg.AddSubject(subject);
 
                                 lastSubject = subject;

@@ -6,35 +6,35 @@ namespace Coosu.Storyboard.Management
 {
     public class ElementManager
     {
-        public Dictionary<int, ElementGroup> GroupList { get; } = new Dictionary<int, ElementGroup>();
+        public Dictionary<float, ElementGroup> GroupList { get; } = new Dictionary<float, ElementGroup>();
 
-        public bool ContainsGroup(int zIndex)
+        public bool ContainsGroup(float zDistance)
         {
-            return GroupList.ContainsKey(zIndex);
+            return GroupList.ContainsKey(zDistance);
         }
 
-        public ElementGroup GetOrAddGroup(int zIndex)
+        public ElementGroup GetOrAddGroup(float zDistance)
         {
-            if (ContainsGroup(zIndex))
-                return GroupList[zIndex];
-            return CreateGroup(zIndex);
+            if (ContainsGroup(zDistance))
+                return GroupList[zDistance];
+            return CreateGroup(zDistance);
         }
 
-        public ElementGroup CreateGroup(int zIndex)
+        public ElementGroup CreateGroup(float zDistance)
         {
-            var elementGroup = new ElementGroup(zIndex);
-            GroupList.Add(zIndex, elementGroup);
+            var elementGroup = new ElementGroup(zDistance);
+            GroupList.Add(zDistance, elementGroup);
             return elementGroup;
         }
 
         public void AddGroup(ElementGroup elementGroup)
         {
-            GroupList.Add(elementGroup.Index, elementGroup);
+            GroupList.Add(elementGroup.ZDistance, elementGroup);
         }
 
         public void DeleteGroup(ElementGroup elementGroup)
         {
-            GroupList.Remove(elementGroup.Index);
+            GroupList.Remove(elementGroup.ZDistance);
         }
 
         public void DeleteGroup(int zIndex)

@@ -1,9 +1,9 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using Coosu.Storyboard.Extensibility;
+﻿using Coosu.Storyboard.Extensibility;
 using Coosu.Storyboard.OsbX.ActionHandlers;
 using Coosu.Storyboard.Utils;
+using System;
+using System.IO;
+using System.Linq;
 
 namespace Coosu.Storyboard.OsbX.SubjectHandlers
 {
@@ -32,15 +32,21 @@ namespace Coosu.Storyboard.OsbX.SubjectHandlers
         // Camera
         public override string Serialize(Camera2Element raw)
         {
-            return Flag;
+            return $"{Flag},{raw.CameraId}";
         }
 
         public override Camera2Element Deserialize(string[] split)
         {
-            if (split.Length == 1)
+            if (split.Length >= 1)
             {
                 var type = ElementTypeSign.Parse(split[0]);
-                return new Camera2Element(type);
+                int cameraId = 0;
+                if (split.Length >= 2)
+                {
+                    cameraId = int.Parse(split[1]);
+                }
+
+                return new Camera2Element(type) { CameraId = cameraId };
             }
 
             throw new ArgumentOutOfRangeException();
@@ -49,7 +55,7 @@ namespace Coosu.Storyboard.OsbX.SubjectHandlers
 
     public class Camera2Element : EventContainer
     {
-        protected override string Head => $"{ElementTypeSign.GetString(Type)}";
+        protected override string Head => $"{ElementTypeSign.GetString(Type)},{CameraId}";
 
         static Camera2Element()
         {

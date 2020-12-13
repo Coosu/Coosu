@@ -10,6 +10,10 @@
     <PackageTags>osu, osu!</PackageTags>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Copyright>Copyright © Coosu 2020</Copyright>
+    <Version>1.0.1</Version>
+    <Deterministic>False</Deterministic>
+    <AssemblyVersion>1.0.1.*</AssemblyVersion>
+    <PackageReleaseNotes>Better support for Camera2D.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

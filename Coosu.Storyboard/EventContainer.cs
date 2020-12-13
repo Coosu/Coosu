@@ -24,7 +24,8 @@ namespace Coosu.Storyboard
         public virtual int MaxTimeCount => EventList.Count(k => k.EndTime.Equals(MaxTime));
         public virtual int MinTimeCount => EventList.Count(k => k.StartTime.Equals(MinTime));
 
-        public int ZIndex { get; set; }
+        public float ZDistance { get; set; }
+        public int CameraId { get; set; }
 
         // Extension
         public IEnumerable<Fade> FadeList =>
