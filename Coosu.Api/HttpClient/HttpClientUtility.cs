@@ -50,6 +50,19 @@ namespace Coosu.Api.HttpClient
             };
         }
 
+        public void SetDefaultAuthorization(string scheme, string parameter)
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(scheme, parameter);
+        }
+
+        public void SetDefaultHeader(IDictionary<string, string> argsHeader)
+        {
+            foreach (var kvp in argsHeader)
+            {
+                _httpClient.DefaultRequestHeaders.Add(kvp.Key, kvp.Value);
+            }
+        }
+
         /// <summary>
         /// GET with value-pairs.
         /// </summary>
