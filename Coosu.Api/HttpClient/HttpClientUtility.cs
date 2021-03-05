@@ -272,13 +272,14 @@ namespace Coosu.Api.HttpClient
                         default:
                             throw new ArgumentOutOfRangeException(nameof(requestMethod), requestMethod, null);
                     }
-                    // ensure if the request is success.
-                    response.EnsureSuccessStatusCode();
                     // read the Json asynchronously.
 
                     // notice currently was auto decompressed with GZip,
                     // because AutomaticDecompression was set to DecompressionMethods.GZip
                     responseStr = response.Content.ReadAsStringAsync().Result;
+
+                    // ensure if the request is success.
+                    response.EnsureSuccessStatusCode();
                     return responseStr;
                 }
                 catch (Exception)

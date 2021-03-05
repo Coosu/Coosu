@@ -14,28 +14,28 @@ namespace Coosu.Api.V2.Authorization
         /// <a href="https://osu.ppy.sh/wiki/en/Bot_account">Chat Bot</a> and
         /// <a href="https://osu.ppy.sh/docs/index.html#client-credentials-grant">Client Credentials</a> Grant exclusive scope.
         /// </summary>
-        Bot = 0x1,
+        Bot = 0xb1,
 
         /// <summary>
         /// Allows sending chat messages on a user's behalf;
         /// exclusive to <a href="https://osu.ppy.sh/wiki/en/Bot_account">Chat Bot</a>s
         /// </summary>
-        Chat_Write = 0x2,
+        Chat_Write = 0xb10,
 
         /// <summary>
         /// Allows reading of the user's friend list.
         /// </summary>
-        Friends_Read = 0x3,
+        Friends_Read = 0xb100,
 
         /// <summary>
         /// Allows reading of the public profile of the user (<code>/me</code>).
         /// </summary>
-        Identify = 0x4,
+        Identify = 0xb1000,
 
         /// <summary>
         /// Allows reading of publicly available data on behalf of the user.
         /// </summary>
-        Public = 0x4
+        Public = 0xb10000
     }
 
     /// <summary>
@@ -73,6 +73,8 @@ namespace Coosu.Api.V2.Authorization
                     return "friends.read";
                 case AuthorizationScope.Identify:
                     return "identify";
+                case AuthorizationScope.Public:
+                    return "public";
                 default:
                     throw new ArgumentOutOfRangeException(nameof(scope), scope, null);
             }

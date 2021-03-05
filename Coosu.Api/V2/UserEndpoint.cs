@@ -35,9 +35,9 @@ namespace Coosu.Api.V2
             return obj;
         }
 
-        public Beatmapset[] GetUserBeatmaps()
-        {
+        //public Beatmapset[] GetUserBeatmaps()
+        //{
 
-        }
+        //}
     }
 }

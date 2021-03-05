@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Text;
-using Coosu.Api.HttpClient;
+﻿using Coosu.Api.HttpClient;
 using Coosu.Api.V2.ResponseModels;
 
 namespace Coosu.Api.V2

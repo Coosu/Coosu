@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Web;
 
 namespace Coosu.Api.V2.Authorization
 {
@@ -37,10 +38,9 @@ namespace Coosu.Api.V2.Authorization
 
             string responseType = "code";
 
-            sb.Append($"response_type={responseType}");
-            sb.Append($"&client_id={_clientId}");
-            sb.Append($"&redirect_uri={_registeredRedirectUri.AbsoluteUri}");
-            sb.Append($"&response_type=code");
+            sb.Append($"client_id={_clientId}");
+            sb.Append($"&redirect_uri={HttpUtility.UrlEncode(_registeredRedirectUri.OriginalString)}");
+            sb.Append($"&response_type={responseType}");
             sb.Append($"&scope={string.Join(" ", scope.GetRequestArray())}");
             sb.Append($"&state={state}");
 
@@ -61,7 +61,7 @@ namespace Coosu.Api.V2.Authorization
             sb.Append($"&client_secret={clientSecret}");
             sb.Append($"&code={code}");
             sb.Append($"&grant_type=authorization_code");
-            sb.Append($"&redirect_uri={_registeredRedirectUri.AbsoluteUri}");
+            sb.Append($"&redirect_uri={HttpUtility.UrlEncode(_registeredRedirectUri.OriginalString)}");
 
             return new Uri(sb.ToString());
         }
@@ -79,6 +79,24 @@ namespace Coosu.Api.V2.Authorization
             sb.Append($"&client_secret={clientSecret}");
             sb.Append($"&grant_type=client_credentials");
             sb.Append($"&scope=public");
+
+            return new Uri(sb.ToString());
+        }
+
+        /// <summary>
+        /// Build RefreshToken() URI.
+        /// </summary>
+        /// <param name="clientSecret">The client secret of your application.</param>
+        /// <returns>Generated RefreshToken() link.</returns>
+        public Uri BuildRefreshUserTokenLink(string clientSecret, string refreshToken)
+        {
+            var sb = new StringBuilder($"{TokenLink}?");
+
+            sb.Append($"&client_id={_clientId}");
+            sb.Append($"&client_secret={clientSecret}");
+            //sb.Append($"&code={code}");
+            sb.Append($"&grant_type=refresh_token");
+            sb.Append($"&refresh_token={refreshToken}");
 
             return new Uri(sb.ToString());
         }
