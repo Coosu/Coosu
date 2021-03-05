@@ -1,9 +1,10 @@
-﻿using Coosu.Storyboard.Management;
-using Coosu.Storyboard.OsbX;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Net.Http;
 using System.Threading.Tasks;
+using Coosu.Api.V2;
+using Coosu.Api.V2.Authorization;
 
 namespace CoosuTestCore
 {
@@ -11,23 +12,17 @@ namespace CoosuTestCore
     {
         static async Task Main(string[] args)
         {
+            var redirectUri = new Uri("");
+            var sb = new AuthorizationLinkBuilder(5044, redirectUri);
+            var uri = sb.BuildAuthorizationLink("2241521134", AuthorizationScope.Public
+                                                          | AuthorizationScope.Identify);
+            var o = uri.ToString();
 
+            var code = "";
+            var clientSecret = "";
+            var uri2 = sb.BuildAuthorizationTokenLink(clientSecret, code).ToString();
 
-            using var sr =
-                new StreamReader(@"D:\Games\osu!\Songs\406217 Chata - enn\largetest.osb");
-            var sw = Stopwatch.StartNew();
-            //var ggg = await ElementGroup.ParseFromFileAsync(
-            //    @"D:\Games\osu!\Songs\406217 Chata - enn\Chata - enn (EvilElvis).osb");
-            //var time = sw.ElapsedMilliseconds;
-            //Console.WriteLine(time);
-            //sw.Restart();
-            var em = await OsbxConvert.DeserializeObjectAsync(sr);
-            var time = sw.ElapsedMilliseconds;
-            Console.WriteLine(time);
-
-
-            //var osb = em.ToString();
-            var osbx = await OsbxConvert.SerializeObjectAsync(em);
+            var result = AuthorizationHelper.GetUserToken(5044, redirectUri, clientSecret, code);
         }
     }
 }

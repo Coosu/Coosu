@@ -6,8 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Coosu.Beatmap\Coosu.Beatmap.csproj" />
-    <ProjectReference Include="..\Coosu.Storyboard.Osbx\Coosu.Storyboard.OsbX.csproj" />
+    <ProjectReference Include="..\Coosu.Api\Coosu.Api.csproj" />
   </ItemGroup>
 
 </Project>
