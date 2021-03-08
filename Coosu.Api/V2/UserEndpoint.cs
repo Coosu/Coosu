@@ -29,7 +29,7 @@ namespace Coosu.Api.V2
         public User GetOwnData(GameMode? gameMode)
         {
             string route = "/me/" + gameMode?.ToParamString();
-            var json = _httpClient.HttpPostJson(OsuClientV2.BaseUri + route, null);
+            var json = _httpClient.HttpGet(OsuClientV2.BaseUri + route);
 
             var obj = JsonConvert.DeserializeObject<User>(json);
             return obj;
