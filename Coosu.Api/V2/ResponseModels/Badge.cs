@@ -6,7 +6,7 @@ namespace Coosu.Api.V2.ResponseModels
     public partial class Badge
     {
         [JsonProperty("awarded_at")]
-        public DateTimeOffset AwardedAt { get; set; }
+        public DateTimeOffset? AwardedAt { get; set; }
 
         [JsonProperty("description")]
         public string Description { get; set; }

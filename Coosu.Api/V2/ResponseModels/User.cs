@@ -33,7 +33,7 @@ namespace Coosu.Api.V2.ResponseModels
         public bool IsSupporter { get; set; }
 
         [JsonProperty("last_visit")]
-        public DateTimeOffset LastVisit { get; set; }
+        public DateTimeOffset? LastVisit { get; set; }
 
         [JsonProperty("pm_friends_only")]
         public bool PmFriendsOnly { get; set; }
@@ -54,16 +54,16 @@ namespace Coosu.Api.V2.ResponseModels
         public bool HasSupported { get; set; }
 
         [JsonProperty("interests")]
-        public object Interests { get; set; }
+        public string Interests { get; set; }
 
         [JsonProperty("join_date")]
-        public DateTimeOffset JoinDate { get; set; }
+        public DateTimeOffset? JoinDate { get; set; }
 
         [JsonProperty("kudosu")]
         public Kudosu Kudosu { get; set; }
 
         [JsonProperty("location")]
-        public object Location { get; set; }
+        public string Location { get; set; }
 
         [JsonProperty("max_blocks")]
         public long MaxBlocks { get; set; }
@@ -72,7 +72,7 @@ namespace Coosu.Api.V2.ResponseModels
         public long MaxFriends { get; set; }
 
         [JsonProperty("occupation")]
-        public object Occupation { get; set; }
+        public string Occupation { get; set; }
 
         [JsonProperty("playmode")]
         public string Playmode { get; set; }
@@ -87,10 +87,10 @@ namespace Coosu.Api.V2.ResponseModels
         public string[] ProfileOrder { get; set; }
 
         [JsonProperty("skype")]
-        public object Skype { get; set; }
+        public string Skype { get; set; }
 
         [JsonProperty("title")]
-        public object Title { get; set; }
+        public string Title { get; set; }
 
         [JsonProperty("twitter")]
         public string Twitter { get; set; }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Coosu.Api.V2.Authorization;
 using Newtonsoft.Json;
 
 namespace Coosu.Api.V2.ResponseModels

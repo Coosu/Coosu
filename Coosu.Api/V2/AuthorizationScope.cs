@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Coosu.Api.V2.Authorization
+namespace Coosu.Api.V2
 {
     /// <summary>
     /// Access scope option.
