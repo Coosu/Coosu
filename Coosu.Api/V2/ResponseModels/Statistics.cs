@@ -7,9 +7,6 @@ namespace Coosu.Api.V2.ResponseModels
         [JsonProperty("level")]
         public Level Level { get; set; }
 
-        [JsonProperty("global_rank")]
-        public long? GlobalRank { get; set; }
-
         [JsonProperty("pp")]
         public long Pp { get; set; }
 
@@ -46,7 +43,7 @@ namespace Coosu.Api.V2.ResponseModels
         [JsonProperty("country_rank")]
         public int? CountryRank { get; set; }
 
-        [JsonProperty("rank")]
-        public Rank Rank { get; set; }
+        [JsonProperty("global_rank")]
+        public long? GlobalRank { get; set; }
     }
 }
