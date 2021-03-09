@@ -1,5 +1,5 @@
-﻿using System;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using System;
 
 namespace Coosu.Api.V2.ResponseModels
 {
@@ -39,10 +39,13 @@ namespace Coosu.Api.V2.ResponseModels
         public bool PmFriendsOnly { get; set; }
 
         [JsonProperty("profile_colour")]
-        public string ProfileColour { get; set; }
+        public string ProfileColor { get; set; }
 
         [JsonProperty("username")]
         public string Username { get; set; }
+
+        [JsonProperty("comments_count")]
+        public int CommentsCount { get; set; }
 
         [JsonProperty("cover_url")]
         public Uri CoverUrl { get; set; }
@@ -66,10 +69,10 @@ namespace Coosu.Api.V2.ResponseModels
         public string Location { get; set; }
 
         [JsonProperty("max_blocks")]
-        public long MaxBlocks { get; set; }
+        public int MaxBlocks { get; set; }
 
         [JsonProperty("max_friends")]
-        public long MaxFriends { get; set; }
+        public int MaxFriends { get; set; }
 
         [JsonProperty("occupation")]
         public string Occupation { get; set; }
@@ -81,16 +84,16 @@ namespace Coosu.Api.V2.ResponseModels
         public string[] Playstyle { get; set; }
 
         [JsonProperty("post_count")]
-        public long PostCount { get; set; }
+        public int PostCount { get; set; }
 
         [JsonProperty("profile_order")]
         public string[] ProfileOrder { get; set; }
 
-        [JsonProperty("skype")]
-        public string Skype { get; set; }
-
         [JsonProperty("title")]
         public string Title { get; set; }
+
+        [JsonProperty("title_url")]
+        public Uri TitleUrl { get; set; }
 
         [JsonProperty("twitter")]
         public string Twitter { get; set; }
@@ -113,20 +116,26 @@ namespace Coosu.Api.V2.ResponseModels
         [JsonProperty("badges")]
         public Badge[] Badges { get; set; }
 
+        [JsonProperty("beatmap_playcounts_count")]
+        public int BeatmapPlaycountsCount { get; set; }
+
         [JsonProperty("favourite_beatmapset_count")]
-        public long FavouriteBeatmapsetCount { get; set; }
+        public int FavouriteBeatmapsetCount { get; set; }
 
         [JsonProperty("follower_count")]
-        public long FollowerCount { get; set; }
+        public int FollowerCount { get; set; }
 
         [JsonProperty("graveyard_beatmapset_count")]
-        public long GraveyardBeatmapsetCount { get; set; }
+        public int GraveyardBeatmapsetCount { get; set; }
 
         [JsonProperty("groups")]
         public Group[] Groups { get; set; }
 
         [JsonProperty("loved_beatmapset_count")]
-        public long LovedBeatmapsetCount { get; set; }
+        public int LovedBeatmapsetCount { get; set; }
+
+        [JsonProperty("mapping_follower_count")]
+        public int MappingFollowerCount { get; set; }
 
         [JsonProperty("monthly_playcounts")]
         public CountInfo[] MonthlyPlaycounts { get; set; }
@@ -138,22 +147,28 @@ namespace Coosu.Api.V2.ResponseModels
         public string[] PreviousUsernames { get; set; }
 
         [JsonProperty("ranked_and_approved_beatmapset_count")]
-        public long RankedAndApprovedBeatmapsetCount { get; set; }
+        public int RankedAndApprovedBeatmapsetCount { get; set; }
 
         [JsonProperty("replays_watched_counts")]
         public CountInfo[] ReplaysWatchedCounts { get; set; }
 
+        [JsonProperty("scores_best_count")]
+        public int ScoresBestCount { get; set; }
+
         [JsonProperty("scores_first_count")]
-        public long ScoresFirstCount { get; set; }
+        public int ScoresFirstCount { get; set; }
+
+        [JsonProperty("scores_recent_count")]
+        public int ScoresRecentCount { get; set; }
 
         [JsonProperty("statistics")]
         public Statistics Statistics { get; set; }
 
         [JsonProperty("support_level")]
-        public long SupportLevel { get; set; }
+        public int SupportLevel { get; set; }
 
         [JsonProperty("unranked_beatmapset_count")]
-        public long UnrankedBeatmapsetCount { get; set; }
+        public int UnrankedBeatmapsetCount { get; set; }
 
         [JsonProperty("user_achievements")]
         public UserAchievement[] UserAchievements { get; set; }

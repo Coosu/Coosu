@@ -4,10 +4,7 @@ namespace Coosu.Api.V2.ResponseModels
 {
     public partial class Rank
     {
-        [JsonProperty("global")]
-        public long? Global { get; set; }
-
         [JsonProperty("country")]
-        public long? Country { get; set; }
+        public int? Country { get; set; }
     }
 }

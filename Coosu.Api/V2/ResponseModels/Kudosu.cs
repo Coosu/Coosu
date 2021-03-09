@@ -5,9 +5,9 @@ namespace Coosu.Api.V2.ResponseModels
     public partial class Kudosu
     {
         [JsonProperty("total")]
-        public long Total { get; set; }
+        public int Total { get; set; }
 
         [JsonProperty("available")]
-        public long Available { get; set; }
+        public int Available { get; set; }
     }
 }

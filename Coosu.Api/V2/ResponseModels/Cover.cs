@@ -12,7 +12,7 @@ namespace Coosu.Api.V2.ResponseModels
         public Uri Url { get; set; }
 
         [JsonProperty("id")]
-        public object Id { get; set; }
+        public int? Id { get; set; } // nullable for custom
     }
 
     public class BeatmapsetCompact
