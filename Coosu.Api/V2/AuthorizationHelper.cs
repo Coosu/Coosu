@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using Coosu.Api.HttpClient;
+﻿using Coosu.Api.HttpClient;
 using Coosu.Api.V2.ResponseModels;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 
 namespace Coosu.Api.V2
 {
@@ -14,7 +14,7 @@ namespace Coosu.Api.V2
 
         public static UserToken GetUserToken(int clientId, Uri registeredRedirectUri, string clientSecret, string code)
         {
-            var dic = new Dictionary<string, string>()
+            var dic = new Dictionary<string, string>
             {
                 ["client_id"] = clientId.ToString(),
                 ["client_secret"] = clientSecret,
@@ -31,11 +31,11 @@ namespace Coosu.Api.V2
 
         public static UserToken RefreshUserToken(int clientId, string clientSecret, string refreshToken)
         {
-            var dic = new Dictionary<string, string>()
+            var dic = new Dictionary<string, string>
             {
                 ["client_id"] = clientId.ToString(),
                 ["client_secret"] = clientSecret,
-                ["grant_type"] = "authorization_code",
+                ["grant_type"] = "refresh_token",
                 ["refresh_token"] = refreshToken
             };
 
@@ -47,7 +47,7 @@ namespace Coosu.Api.V2
 
         public static UserToken GetPublicToken(int clientId, string clientSecret)
         {
-            var dic = new Dictionary<string, string>()
+            var dic = new Dictionary<string, string>
             {
                 ["client_id"] = clientId.ToString(),
                 ["client_secret"] = clientSecret,

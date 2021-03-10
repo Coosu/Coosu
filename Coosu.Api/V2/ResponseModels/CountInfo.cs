@@ -1,5 +1,5 @@
-﻿using System;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using System;
 
 namespace Coosu.Api.V2.ResponseModels
 {
@@ -9,6 +9,6 @@ namespace Coosu.Api.V2.ResponseModels
         public DateTimeOffset StartDate { get; set; }
 
         [JsonProperty("count")]
-        public long CountCount { get; set; }
+        public long Count { get; set; }
     }
 }

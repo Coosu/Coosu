@@ -16,8 +16,10 @@ namespace Coosu.Api.V2
             _httpClient = new HttpClientUtility();
             _httpClient.SetDefaultAuthorization(_token.TokenType, _token.AccessToken);
             User = new UserEndpoint(token, _httpClient);
+            Beatmap = new BeatmapEndpoint(token, _httpClient);
         }
 
         public UserEndpoint User { get; }
+        public BeatmapEndpoint Beatmap { get; }
     }
 }

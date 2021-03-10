@@ -75,7 +75,7 @@ namespace Coosu.Api.V1.User
         public long TotalScore { get; set; }
 
         /// <summary>
-        /// Pp rank of the user.
+        /// PP rank of the user.
         /// </summary>
         [JsonProperty("pp_rank")]
         [JsonConverter(typeof(ParseStringConverter))]

@@ -217,7 +217,7 @@ namespace Coosu.Api.HttpClient
                     {
                         foreach (var item in argsHeader)
                         {
-                            message.Headers.Add(item.Key, item.Value);
+                            message.Headers.TryAddWithoutValidation(item.Key, item.Value);
                         }
                     }
 
@@ -228,6 +228,7 @@ namespace Coosu.Api.HttpClient
                     }
 
                     responseStr = response.Content.ReadAsStringAsync().Result;
+                    response.EnsureSuccessStatusCode();
                     return responseStr;
                 }
                 catch (Exception)
@@ -238,6 +239,12 @@ namespace Coosu.Api.HttpClient
                         Timeout,
                         fullUrl)
                     );
+                    if (message.RequestUri.OriginalString != fullUrl)
+                    {
+                        fullUrl = message.RequestUri.OriginalString;
+                        i--;
+                    }
+
                     if (i == RetryCount - 1)
                         throw;
                 }

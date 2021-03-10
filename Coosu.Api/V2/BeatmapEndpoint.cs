@@ -1,20 +1,19 @@
 ﻿using Coosu.Api.HttpClient;
 using Coosu.Api.V2.ResponseModels;
 using Newtonsoft.Json;
-using HttpUtility = System.Web.HttpUtility;
 
 namespace Coosu.Api.V2
 {
-    public class UserEndpoint
+    public class BeatmapEndpoint
     {
         private readonly TokenBase _token;
         private readonly HttpClientUtility _httpClient;
 
-        public UserEndpoint(TokenBase token) : this(token, new HttpClientUtility())
+        public BeatmapEndpoint(TokenBase token) : this(token, new HttpClientUtility())
         {
         }
 
-        internal UserEndpoint(TokenBase token, HttpClientUtility httpClient)
+        internal BeatmapEndpoint(TokenBase token, HttpClientUtility httpClient)
         {
             _token = token;
             _httpClient = httpClient;
@@ -25,14 +24,14 @@ namespace Coosu.Api.V2
         /// Similar to Get User but with authenticated user (token owner) as user id.
         /// <code>scope = identify</code>
         /// </summary>
-        /// <param name="gameMode"><see cref="GameMode"/>. User default mode will be used if not specified.</param>
+        /// <param name="id">b id</param>
         /// <returns></returns>
-        public User GetOwnData(GameMode? gameMode = null)
+        public Beatmap GetBeatmap(int id)
         {
-            string route = "/me/" + gameMode?.ToParamString();
+            string route = $"/beatmaps/{id}";
             var json = _httpClient.HttpGet(OsuClientV2.BaseUri + route);
 
-            var obj = JsonConvert.DeserializeObject<User>(json);
+            var obj = JsonConvert.DeserializeObject<Beatmap>(json);
             return obj;
         }
 
@@ -40,15 +39,14 @@ namespace Coosu.Api.V2
         /// Similar to Get User but with authenticated user (token owner) as user id.
         /// <code>scope = identify</code>
         /// </summary>
-        /// <param name="user">Id of the user.</param>
-        /// <param name="gameMode"><see cref="GameMode"/>. User default mode will be used if not specified.</param>
+        /// <param name="id">s id</param>
         /// <returns></returns>
-        public User GetUser(string user, GameMode? gameMode = null)
+        public Beatmapset GetBeatmapset(int id)
         {
-            string route = $"/users/{HttpUtility.UrlEncode(user)}/{gameMode?.ToParamString()}";
+            string route = $"/beatmapsets/{id}";
             var json = _httpClient.HttpGet(OsuClientV2.BaseUri + route);
 
-            var obj = JsonConvert.DeserializeObject<User>(json);
+            var obj = JsonConvert.DeserializeObject<Beatmapset>(json);
             return obj;
         }
     }
