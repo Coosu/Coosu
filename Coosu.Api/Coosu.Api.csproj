@@ -10,8 +10,8 @@
     <PackageTags>osu, osu!</PackageTags>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Copyright>Copyright © Coosu 2020</Copyright>
-    <Version>1.0.6</Version>
-    <PackageReleaseNotes>Fix nullable.</PackageReleaseNotes>
+    <Version>1.1.0</Version>
+    <PackageReleaseNotes>Support for beatmaps.</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
