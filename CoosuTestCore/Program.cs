@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Coosu.Api.HttpClient;
 using Coosu.Api.V2;
 using Coosu.Api.V2.ResponseModels;
 
@@ -22,9 +23,18 @@ namespace CoosuTestCore
             //var clientSecret = "";
             //var uri2 = sb.BuildAuthorizationTokenLink(clientSecret, code).ToString();
 
-            //var result = AuthorizationHelper.GetUserToken(5044, redirectUri, clientSecret, code);
+            //var result = AuthorizationClient.GetUserToken(5044, redirectUri, clientSecret, code);
 
-            var publicAuth = AuthorizationHelper.GetPublicToken(5044, "");
+            var authClient = new AuthorizationClient(new ClientOptions()
+            {
+                Socks5ProxyOptions = new Socks5ProxyOptions()
+                {
+                    HostName = "localhost",
+                    UseSocks5Proxy = true,
+                    Port = 10801
+                }
+            });
+            var publicAuth = authClient.GetPublicToken(5044, "");
             var g = new OsuClientV2(publicAuth);
             try
             {

@@ -9,6 +9,7 @@ using System.Net.Http.Headers;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
+using MihaZupan;
 
 namespace Coosu.Api.HttpClient
 {
@@ -27,22 +28,30 @@ namespace Coosu.Api.HttpClient
 
         private readonly System.Net.Http.HttpClient _httpClient;
 
-        public HttpClientUtility() : this(TimeSpan.FromSeconds(8), 3)
+        public HttpClientUtility(Socks5ProxyOptions socks5ProxyOptions = null) : this(TimeSpan.FromSeconds(8), 3, socks5ProxyOptions)
         {
         }
 
-        public HttpClientUtility(TimeSpan timeout) : this(timeout, 3)
+        public HttpClientUtility(TimeSpan timeout, Socks5ProxyOptions socks5ProxyOptions = null) : this(timeout, 3, socks5ProxyOptions)
         {
         }
 
-        public HttpClientUtility(TimeSpan timeout, int retryCount)
+        public HttpClientUtility(TimeSpan timeout, int retryCount, Socks5ProxyOptions socks5ProxyOptions = null)
         {
+            socks5ProxyOptions = socks5ProxyOptions ?? new Socks5ProxyOptions();
+
             Timeout = timeout;
             RetryCount = retryCount;
             var handler = new HttpClientHandler
             {
                 AutomaticDecompression = DecompressionMethods.GZip
             };
+
+            if (socks5ProxyOptions.UseSocks5Proxy)
+            {
+                handler.Proxy = new HttpToSocks5Proxy(socks5ProxyOptions.HostName, socks5ProxyOptions.Port);
+            }
+
             ServicePointManager.ServerCertificateValidationCallback = CheckValidationResult;
             _httpClient = new System.Net.Http.HttpClient(handler)
             {
@@ -231,9 +240,9 @@ namespace Coosu.Api.HttpClient
                     response.EnsureSuccessStatusCode();
                     return responseStr;
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    Debug.WriteLine(string.Format("Tried {0} time{1} for timed out. (>{2}ms): {3}",
+                    Debug.WriteLine(string.Format("Tried {0} time{1}. (>{2}ms): {3}",
                         i + 1,
                         i + 1 > 1 ? "s" : "",
                         Timeout,
@@ -243,6 +252,14 @@ namespace Coosu.Api.HttpClient
                     {
                         fullUrl = message.RequestUri.OriginalString;
                         i--;
+                    }
+
+                    if (ex is HttpRequestException hre)
+                    {
+                        if (hre.StackTrace.Contains("EnsureSuccessStatusCode"))
+                        {
+                            throw;
+                        }
                     }
 
                     if (i == RetryCount - 1)
@@ -289,9 +306,17 @@ namespace Coosu.Api.HttpClient
                     response.EnsureSuccessStatusCode();
                     return responseStr;
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    Debug.WriteLine(string.Format("Tried {0} time{1} for timed out. (>{2}ms): {3}",
+                    if (ex is HttpRequestException hre)
+                    {
+                        if (hre.StackTrace.Contains("EnsureSuccessStatusCode"))
+                        {
+                            throw;
+                        }
+                    }
+
+                    Debug.WriteLine(string.Format("Tried {0} time{1}. (>{2}ms): {3}",
                         i + 1,
                         i + 1 > 1 ? "s" : "",
                         Timeout,

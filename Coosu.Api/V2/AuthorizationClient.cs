@@ -6,13 +6,18 @@ using System.Collections.Generic;
 
 namespace Coosu.Api.V2
 {
-    public static class AuthorizationHelper
+    public class AuthorizationClient
     {
-        private static HttpClientUtility _httpClient
-            = new HttpClientUtility();
+        private HttpClientUtility _httpClient;
         private const string TokenLink = "https://osu.ppy.sh/oauth/token";
 
-        public static UserToken GetUserToken(int clientId, Uri registeredRedirectUri, string clientSecret, string code)
+        public AuthorizationClient(ClientOptions options = null)
+        {
+            options = options ?? new ClientOptions();
+            _httpClient = new HttpClientUtility(options.Socks5ProxyOptions);
+        }
+
+        public UserToken GetUserToken(int clientId, Uri registeredRedirectUri, string clientSecret, string code)
         {
             var dic = new Dictionary<string, string>
             {
@@ -29,7 +34,7 @@ namespace Coosu.Api.V2
             return deserializeObject;
         }
 
-        public static UserToken RefreshUserToken(int clientId, string clientSecret, string refreshToken)
+        public UserToken RefreshUserToken(int clientId, string clientSecret, string refreshToken)
         {
             var dic = new Dictionary<string, string>
             {
@@ -45,7 +50,7 @@ namespace Coosu.Api.V2
             return deserializeObject;
         }
 
-        public static UserToken GetPublicToken(int clientId, string clientSecret)
+        public UserToken GetPublicToken(int clientId, string clientSecret)
         {
             var dic = new Dictionary<string, string>
             {
