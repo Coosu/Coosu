@@ -10,8 +10,8 @@
     <PackageTags>osu, osu!</PackageTags>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Copyright>Copyright © Coosu 2020</Copyright>
-    <Version>1.2.0</Version>
-    <PackageReleaseNotes>Support socks5 proxy.</PackageReleaseNotes>
+    <Version>1.2.1</Version>
+    <PackageReleaseNotes>Fix type bug.</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

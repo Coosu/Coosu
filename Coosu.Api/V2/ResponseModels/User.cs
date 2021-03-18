@@ -73,7 +73,7 @@ namespace Coosu.Api.V2.ResponseModels
         public object[] AccountHistory { get; set; }
 
         [JsonProperty("active_tournament_banner")]
-        public object[] ActiveTournamentBanner { get; set; }
+        public object ActiveTournamentBanner { get; set; }
 
         [JsonProperty("badges")]
         public Badge[] Badges { get; set; }

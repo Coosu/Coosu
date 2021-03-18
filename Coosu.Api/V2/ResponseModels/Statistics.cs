@@ -20,7 +20,7 @@ namespace Coosu.Api.V2.ResponseModels
         public int PlayCount { get; set; }
 
         [JsonProperty("play_time")]
-        public int PlayTime { get; set; }
+        public int? PlayTime { get; set; }
 
         [JsonProperty("total_score")]
         public long TotalScore { get; set; }
