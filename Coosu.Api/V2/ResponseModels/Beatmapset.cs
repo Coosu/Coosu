@@ -75,7 +75,7 @@ namespace Coosu.Api.V2.ResponseModels
         public DateTimeOffset LastUpdated { get; set; }
 
         [JsonProperty("legacy_thread_url")]
-        public Uri LegacyThreadUrl { get; set; }
+        public string LegacyThreadUrl { get; set; }
 
         [JsonProperty("nominations_summary")]
         public NominationsSummary NominationsSummary { get; set; }

@@ -34,12 +34,12 @@ namespace CoosuTestCore
                     Port = 10801
                 }
             });
-            var publicAuth = authClient.GetPublicToken(5044, "");
+            var publicAuth = authClient.GetPublicToken(5044, "SwbQi6CeSs13gE01302Qpp8BrqEADVj5DQadtdbD");
             var g = new OsuClientV2(publicAuth);
             try
             {
                 //var b = g.User.GetOwnData();
-                var a = g.User.GetUser("1243669");
+                var a = g.User.GetUserBeatmap("1243669", UserBeatmapType.Favourite);
                 var c = g.User.GetUser("gust");
             }
             catch (HttpRequestException e)

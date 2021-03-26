@@ -78,7 +78,7 @@ namespace Coosu.Api.V2.ResponseModels
         public long Ranked { get; set; }
 
         [JsonProperty("url")]
-        public Uri Url { get; set; }
+        public string Url { get; set; }
 
         [JsonProperty("failtimes")]
         public Failtimes Failtimes { get; set; }

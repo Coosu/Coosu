@@ -51,5 +51,14 @@ namespace Coosu.Api.V2
             var obj = JsonConvert.DeserializeObject<User>(json);
             return obj;
         }
+
+        public Beatmapset[] GetUserBeatmap(string user, UserBeatmapType type)
+        {
+            string route = $"/users/{HttpUtility.UrlEncode(user)}/beatmapsets/{type.ToParamString()}?limit=500&offset=0";
+            var json = _httpClient.HttpGet(OsuClientV2.BaseUri + route);
+
+            var obj = JsonConvert.DeserializeObject<Beatmapset[]>(json);
+            return obj;
+        }
     }
 }

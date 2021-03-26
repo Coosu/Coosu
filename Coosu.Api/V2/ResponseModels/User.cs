@@ -10,7 +10,7 @@ namespace Coosu.Api.V2.ResponseModels
         public int CommentsCount { get; set; }
 
         [JsonProperty("cover_url")]
-        public Uri CoverUrl { get; set; }
+        public string CoverUrl { get; set; }
 
         [JsonProperty("discord")]
         public string Discord { get; set; }
@@ -55,13 +55,13 @@ namespace Coosu.Api.V2.ResponseModels
         public string Title { get; set; }
 
         [JsonProperty("title_url")]
-        public Uri TitleUrl { get; set; }
+        public string TitleUrl { get; set; }
 
         [JsonProperty("twitter")]
         public string Twitter { get; set; }
 
         [JsonProperty("website")]
-        public Uri Website { get; set; }
+        public string Website { get; set; }
 
         [JsonProperty("country")]
         public Country Country { get; set; }
