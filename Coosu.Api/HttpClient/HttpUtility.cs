@@ -8,7 +8,7 @@ namespace Coosu.Api.HttpClient
     {
         public static string ToUrlParamString(this IDictionary<string, string> args)
         {
-            if (args == null || args.Count <= 1)
+            if (args == null || args.Count < 1)
                 return "";
             StringBuilder sb = new StringBuilder("?");
             foreach (var item in args)
