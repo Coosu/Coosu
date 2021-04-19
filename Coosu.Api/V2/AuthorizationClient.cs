@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace Coosu.Api.V2
 {
-    public class AuthorizationClient
+    public class AuthorizationClient : IDisposable
     {
         private HttpClientUtility _httpClient;
         private const string TokenLink = "https://osu.ppy.sh/oauth/token";
@@ -64,6 +64,12 @@ namespace Coosu.Api.V2
             var deserializeObject = JsonConvert.DeserializeObject<UserToken>(result);
             deserializeObject.CreateTime = DateTimeOffset.Now;
             return deserializeObject;
+        }
+
+        /// <inheritdoc />
+        public void Dispose()
+        {
+            _httpClient?.Dispose();
         }
     }
 }

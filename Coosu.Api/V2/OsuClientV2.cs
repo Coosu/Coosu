@@ -1,9 +1,10 @@
 ﻿using Coosu.Api.HttpClient;
 using Coosu.Api.V2.ResponseModels;
+using System;
 
 namespace Coosu.Api.V2
 {
-    public class OsuClientV2
+    public class OsuClientV2 : IDisposable
     {
         internal const string BaseUri = "https://osu.ppy.sh/api/v2";
 
@@ -23,5 +24,12 @@ namespace Coosu.Api.V2
 
         public UserEndpoint User { get; }
         public BeatmapEndpoint Beatmap { get; }
+
+        public void Dispose()
+        {
+            _httpClient?.Dispose();
+            User?.Dispose();
+            Beatmap?.Dispose();
+        }
     }
 }

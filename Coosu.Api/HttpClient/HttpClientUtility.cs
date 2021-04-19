@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MihaZupan;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -9,7 +10,6 @@ using System.Net.Http.Headers;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
-using MihaZupan;
 
 namespace Coosu.Api.HttpClient
 {
@@ -17,7 +17,7 @@ namespace Coosu.Api.HttpClient
     /// Helper class of HttpClient.
     /// To increase the efficiency, please consider to initialize this class infrequently.
     /// </summary>
-    internal class HttpClientUtility
+    internal class HttpClientUtility : IDisposable
     {
         public static readonly string CacheImagePath =
             Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "imageCache");
@@ -333,6 +333,11 @@ namespace Coosu.Api.HttpClient
         private static bool CheckValidationResult(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors errors)
         {
             return true; // always accept.  
+        }
+
+        public void Dispose()
+        {
+            _httpClient?.Dispose();
         }
     }
 }

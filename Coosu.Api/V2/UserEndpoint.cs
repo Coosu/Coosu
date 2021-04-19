@@ -1,11 +1,12 @@
 ﻿using Coosu.Api.HttpClient;
 using Coosu.Api.V2.ResponseModels;
 using Newtonsoft.Json;
+using System;
 using HttpUtility = System.Web.HttpUtility;
 
 namespace Coosu.Api.V2
 {
-    public class UserEndpoint
+    public class UserEndpoint : IDisposable
     {
         private readonly TokenBase _token;
         private readonly HttpClientUtility _httpClient;
@@ -59,6 +60,11 @@ namespace Coosu.Api.V2
 
             var obj = JsonConvert.DeserializeObject<Beatmapset[]>(json);
             return obj;
+        }
+
+        public void Dispose()
+        {
+            _httpClient?.Dispose();
         }
     }
 }
