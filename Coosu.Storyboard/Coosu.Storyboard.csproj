@@ -10,26 +10,11 @@
     <PackageTags>osu, osu!</PackageTags>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Copyright>Copyright © Coosu 2020</Copyright>
-    <Version>1.0.1</Version>
-    <Deterministic>False</Deterministic>
-    <AssemblyVersion>1.0.1.*</AssemblyVersion>
+    <Version>2.0.0</Version>
     <PackageReleaseNotes>Better support for Camera2D.</PackageReleaseNotes>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <WarningLevel>3</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-  </PropertyGroup>
-
   <ItemGroup>
-    <Compile Remove="MGLib\**" />
-    <EmbeddedResource Remove="MGLib\**" />
-    <None Remove="MGLib\**" />
   </ItemGroup>
 
   <ItemGroup>

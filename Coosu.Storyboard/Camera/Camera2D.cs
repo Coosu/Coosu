@@ -16,7 +16,7 @@ namespace Coosu.Storyboard.Camera
             this._objects = objects;
         }
 
-        public Camera2D(ElementGroup group)
+        public Camera2D(VirtualLayer group)
         {
             //this._objects = group.ElementList;
         }

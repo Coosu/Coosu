@@ -7,6 +7,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Coosu.Storyboard;
 
 namespace Coosu.Beatmap.Sections
 {
@@ -17,7 +18,7 @@ namespace Coosu.Beatmap.Sections
         public VideoData VideoInfo { get; set; }
         public List<StoryboardSampleData> SampleInfo { get; set; } = new List<StoryboardSampleData>();
         public List<RangeValue<int>> Breaks { get; set; } = new List<RangeValue<int>>();
-        public ElementGroup ElementGroup { get; set; }
+        public VirtualLayer Layer { get; set; }
 
         public EventSection(OsuFile osuFile)
         {
@@ -48,7 +49,7 @@ namespace Coosu.Beatmap.Sections
                         _currentSection = SectionBreak;
                         break;
                     case SectionSbSamples:
-                        if (!_options.StoryboardIgnored) ElementGroup = ElementGroup.ParseFromText(_sbInfo.ToString().Trim('\r', '\n'));
+                        if (!_options.StoryboardIgnored) Layer = VirtualLayer.ParseFromText(_sbInfo.ToString().Trim('\r', '\n'));
                         _currentSection = SectionSbSamples;
                         break;
                     default:

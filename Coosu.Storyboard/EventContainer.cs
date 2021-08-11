@@ -5,17 +5,16 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Coosu.Storyboard
 {
-    public abstract class EventContainer
+    public abstract class EventContainer : IScriptable
     {
         public ElementType Type { get; protected set; }
 
-        public EventHandler<ErrorEventArgs> OnErrorOccured;
-        protected abstract string Head { get; }
-        public SortedSet<CommonEvent> EventList { get; } = new SortedSet<CommonEvent>(new EventComparer());
-        //public List<Event> EventList { get; } = new List<Event>();
+        public EventHandler<ErrorEventArgs>? OnErrorOccurred;
+        public SortedSet<CommonEvent> EventList { get; } = new(new EventComparer());
         public abstract float MaxTime { get; }
         public abstract float MinTime { get; }
         public abstract float MaxStartTime { get; }
@@ -27,27 +26,7 @@ namespace Coosu.Storyboard
         public float ZDistance { get; set; }
         public int CameraId { get; set; }
 
-        // Extension
-        public IEnumerable<Fade> FadeList =>
-            EventList.Where(k => k.EventType == EventTypes.Fade).Select(k => k as Fade);
-        public IEnumerable<Color> ColorList =>
-            EventList.Where(k => k.EventType == EventTypes.Color).Select(k => k as Color);
-        public IEnumerable<Move> MoveList =>
-            EventList.Where(k => k.EventType == EventTypes.Move).Select(k => k as Move);
-        public IEnumerable<MoveX> MoveXList =>
-            EventList.Where(k => k.EventType == EventTypes.MoveX).Select(k => k as MoveX);
-        public IEnumerable<MoveY> MoveYList =>
-            EventList.Where(k => k.EventType == EventTypes.MoveY).Select(k => k as MoveY);
-        public IEnumerable<Parameter> ParameterList =>
-            EventList.Where(k => k.EventType == EventTypes.Parameter).Select(k => k as Parameter);
-        public IEnumerable<Rotate> RotateList =>
-            EventList.Where(k => k.EventType == EventTypes.Rotate).Select(k => k as Rotate);
-        public IEnumerable<Scale> ScaleList =>
-            EventList.Where(k => k.EventType == EventTypes.Scale).Select(k => k as Scale);
-        public IEnumerable<Vector> VectorList =>
-            EventList.Where(k => k.EventType == EventTypes.Vector).Select(k => k as Vector);
-
-        public Element BaseElement { get; internal set; }
+        public virtual Element? BaseElement { get; internal set; }
 
         public virtual void Adjust(float offsetX, float offsetY, int offsetTiming)
         {
@@ -66,7 +45,7 @@ namespace Coosu.Storyboard
 
         public TimeRange ObsoleteList { get; } = new TimeRange();
 
-        internal virtual void AddEvent(EventType e, EasingType easing, float startTime, float endTime, float[] start, float[] end)
+        internal virtual void AddEvent(EventType e, EasingType easing, float startTime, float endTime, float[] start, float[]? end)
         {
             CommonEvent newCommonEvent;
             if (end == null || end.Length == 0)
@@ -111,9 +90,8 @@ namespace Coosu.Storyboard
             }
             else
             {
-                newCommonEvent = Register.GetEventTransformation(e)?.Invoke(e, easing, startTime, endTime, start, end);
-                if (newCommonEvent == null)
-                    throw new ArgumentOutOfRangeException(nameof(e), e, null);
+                var result = Register.GetEventTransformation(e)?.Invoke(e, easing, startTime, endTime, start, end);
+                newCommonEvent = result ?? throw new ArgumentOutOfRangeException(nameof(e), e, null);
             }
 
             //List
@@ -126,15 +104,8 @@ namespace Coosu.Storyboard
             EventList.Add(newCommonEvent);
         }
 
-        public virtual string ToOsbString(bool group = false)
-        {
-            using (var sw = new StringWriter())
-            {
-                WriteOsbString(sw, group);
-                return sw.ToString();
-            }
-        }
 
         public abstract void WriteOsbString(TextWriter sw, bool group = false);
+        protected abstract string Header { get; }
     }
 }

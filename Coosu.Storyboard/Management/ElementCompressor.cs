@@ -1,11 +1,11 @@
-﻿using Coosu.Storyboard.Events;
-using Coosu.Storyboard.Utils;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Coosu.Storyboard.Events;
+using Coosu.Storyboard.Utils;
 
 namespace Coosu.Storyboard.Management
 {
@@ -38,9 +38,9 @@ namespace Coosu.Storyboard.Management
             this._elements = elements;
         }
 
-        public ElementCompressor(ElementGroup elementGroup)
+        public ElementCompressor(VirtualLayer layer)
         {
-            _elements = elementGroup.ElementList.Where(k => k is Element).Cast<Element>().ToList();
+            _elements = layer.Elements.Where(k => k is Element).Cast<Element>().ToList();
         }
 
         public string BackgroundPath { get; set; }
@@ -215,13 +215,13 @@ namespace Coosu.Storyboard.Management
             // 4.排除第一行误加的情况 (defaultParams)
             var errorList = new List<string>();
 
-            element.OnErrorOccured += (sender, args) =>
+            element.OnErrorOccurred += (sender, args) =>
             {
                 errorList.Add(args.Message);
             };
 
             element.Examine();
-            element.OnErrorOccured = null;
+            element.OnErrorOccurred = null;
 
             if (errorList.Count > 0)
             {
@@ -348,7 +348,7 @@ namespace Coosu.Storyboard.Management
                                 {
                                     for (var j = 0; j < nowE.End.Length; j++)
                                     {
-                                        if (nowE.End[j].ToInvariantString().Length > nowE.Start[j].ToInvariantString().Length)
+                                        if (nowE.End[j].ToIcString().Length > nowE.Start[j].ToIcString().Length)
                                         {
                                             RaiseSituationEvent(container, SituationType.ThisLastSingleInLastObsoleteToFixTail,
                                                 () => { nowE.End[j] = nowE.Start[j]; },

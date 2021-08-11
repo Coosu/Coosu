@@ -17,10 +17,10 @@ namespace Coosu.Storyboard.OsbX
             Register.RegisterSubject(new Camera2Handler());
         }
 
-        public static async Task<string> SerializeObjectAsync(ElementManager manager)
+        public static async Task<string> SerializeObjectAsync(VirtualLayerManager manager)
         {
             var sb = new StringBuilder();
-            foreach (var @group in manager.GroupList.Values)
+            foreach (var @group in manager.Layers.Values)
             {
                 var result = await SerializeObjectAsync(group);
                 sb.AppendLine(result);
@@ -29,10 +29,10 @@ namespace Coosu.Storyboard.OsbX
             return sb.ToString().TrimEnd('\n', '\r'); ;
         }
 
-        public static async Task<string> SerializeObjectAsync(ElementGroup group)
+        public static async Task<string> SerializeObjectAsync(VirtualLayer group)
         {
             var sb = new StringBuilder();
-            foreach (var element in group.ElementList)
+            foreach (var element in group.Elements)
             {
                 var result = await SerializeObjectAsync(element);
                 sb.AppendLine(result);
@@ -92,7 +92,7 @@ namespace Coosu.Storyboard.OsbX
             return sb.ToString().TrimEnd('\n', '\r');
         }
 
-        public static async Task<ElementManager> DeserializeObjectAsync(TextReader reader)
+        public static async Task<VirtualLayerManager> DeserializeObjectAsync(TextReader reader)
         {
             ISubjectParsingHandler lastSubjectHandler = null;
             EventContainer lastSubject = null;
@@ -100,7 +100,7 @@ namespace Coosu.Storyboard.OsbX
             var line = await reader.ReadLineAsync();
             int l = 0;
 
-            var em = new ElementManager();
+            var em = new VirtualLayerManager();
 
             while (line != null)
             {
@@ -127,7 +127,7 @@ namespace Coosu.Storyboard.OsbX
                             try
                             {
                                 var subject = handler.Deserialize(split);
-                                var eg = em.GetOrAddGroup(subject.ZDistance);
+                                var eg = em.GetOrAddLayer(subject.ZDistance);
                                 eg.AddSubject(subject);
 
                                 lastSubject = subject;

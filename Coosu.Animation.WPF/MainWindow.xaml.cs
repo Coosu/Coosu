@@ -100,16 +100,16 @@ namespace Coosu.Animation.WPF
             var folder = System.IO.Path.GetDirectoryName(file);
             _group = _canvasHost.CreateStoryboardGroup();
             //var folder = @"D:\Games\osu!\Songs\ok";
-            var eg = ElementGroup.ParseFromFile(file);
+            var eg = VirtualLayer.ParseFromFile(file);
 
-            var min = eg.ElementList.Min(k => k.MinTime);
+            var min = eg.Elements.Min(k => k.MinTime);
             if (min > 0)
             {
                 min = 0;
             }
 
             int i = int.MinValue;
-            foreach (var ec in eg.ElementList)
+            foreach (var ec in eg.Elements)
             {
                 if (ec is AnimatedElement) continue;
                 if (!(ec is Element element)) continue;

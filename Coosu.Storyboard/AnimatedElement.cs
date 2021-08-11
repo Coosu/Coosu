@@ -6,7 +6,7 @@ namespace Coosu.Storyboard
 {
     public sealed class AnimatedElement : Element
     {
-        protected override string Head =>
+        protected override string Header =>
             $"{ElementTypeSign.GetString(Type)},{Layer},{Origin},\"{ImagePath}\",{DefaultX},{DefaultY},{FrameCount},{FrameDelay},{LoopType}";
 
         public int FrameCount { get; set; }
@@ -53,7 +53,6 @@ namespace Coosu.Storyboard
             LoopType = (LoopType)Enum.Parse(typeof(LoopType), loopType);
         }
 
-        public override string ToString() => Head;
 
         public override void WriteOsbString(TextWriter sw, bool group = false)
         {

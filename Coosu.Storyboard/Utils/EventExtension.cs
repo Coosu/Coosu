@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using Coosu.Storyboard.Events;
 
 namespace Coosu.Storyboard.Utils
@@ -42,5 +43,24 @@ namespace Coosu.Storyboard.Utils
                 ? UnworthyDictionary[e.EventType]
                 : null;
         }
+
+        public static IEnumerable<Fade> GetFadeList(this EventContainer ec) =>
+            ec.EventList.Where(k => k.EventType == EventTypes.Fade).Select(k => (Fade)k);
+        public static IEnumerable<Color> GetColorList(this EventContainer ec) =>
+            ec.EventList.Where(k => k.EventType == EventTypes.Color).Select(k => (Color)k);
+        public static IEnumerable<Move> GetMoveList(this EventContainer ec) =>
+            ec.EventList.Where(k => k.EventType == EventTypes.Move).Select(k => (Move)k);
+        public static IEnumerable<MoveX> GetMoveXList(this EventContainer ec) =>
+            ec.EventList.Where(k => k.EventType == EventTypes.MoveX).Select(k => (MoveX)k);
+        public static IEnumerable<MoveY> GetMoveYList(this EventContainer ec) =>
+            ec.EventList.Where(k => k.EventType == EventTypes.MoveY).Select(k => (MoveY)k);
+        public static IEnumerable<Parameter> GetParameterList(this EventContainer ec) =>
+            ec.EventList.Where(k => k.EventType == EventTypes.Parameter).Select(k => (Parameter)k);
+        public static IEnumerable<Rotate> GetRotateList(this EventContainer ec) =>
+            ec.EventList.Where(k => k.EventType == EventTypes.Rotate).Select(k => (Rotate)k);
+        public static IEnumerable<Scale> GetScaleList(this EventContainer ec) =>
+            ec.EventList.Where(k => k.EventType == EventTypes.Scale).Select(k => (Scale)k);
+        public static IEnumerable<Vector> GetVectorList(this EventContainer ec) =>
+            ec.EventList.Where(k => k.EventType == EventTypes.Vector).Select(k => (Vector)k);
     }
 }

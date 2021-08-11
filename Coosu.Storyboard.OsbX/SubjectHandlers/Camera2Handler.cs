@@ -2,8 +2,13 @@
 using Coosu.Storyboard.OsbX.ActionHandlers;
 using Coosu.Storyboard.Utils;
 using System;
+﻿using System;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
+using Coosu.Storyboard.Extensibility;
+using Coosu.Storyboard.OsbX.ActionHandlers;
+using Coosu.Storyboard.Utils;
 
 namespace Coosu.Storyboard.OsbX.SubjectHandlers
 {
@@ -55,7 +60,7 @@ namespace Coosu.Storyboard.OsbX.SubjectHandlers
 
     public class Camera2Element : EventContainer
     {
-        protected override string Head => $"{ElementTypeSign.GetString(Type)},{CameraId}";
+        protected override string Header => $"{ElementTypeSign.GetString(Type)},{CameraId}";
 
         static Camera2Element()
         {

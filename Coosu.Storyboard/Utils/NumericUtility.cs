@@ -24,12 +24,12 @@ namespace Coosu.Storyboard.Utils
                 .Min();
         }
 
-        public static string ToInvariantString(this float value)
+        public static string ToIcString(this float value)
         {
             return value.ToString(CultureInfo.InvariantCulture);
         }
 
-        public static string ToInvariantString(this double value)
+        public static string ToIcString(this double value)
         {
             return value.ToString(CultureInfo.InvariantCulture);
         }

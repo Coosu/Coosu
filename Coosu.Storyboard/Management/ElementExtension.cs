@@ -8,22 +8,22 @@ namespace Coosu.Storyboard.Management
 {
     public static class ElementExtension
     {
-        public static async Task ExpandAsync(this ElementGroup eleG)
+        public static async Task ExpandAsync(this VirtualLayer eleG)
         {
             await Task.Run(() => { Expand(eleG); });
         }
 
-        public static void ExpandAndFillFadeout(this ElementGroup eleG)
+        public static void ExpandAndFillFadeout(this VirtualLayer eleG)
         {
             eleG.InnerFix(true, true);
         }
 
-        public static void Expand(this ElementGroup eleG)
+        public static void Expand(this VirtualLayer eleG)
         {
             eleG.InnerFix(true, false);
         }
 
-        public static void FillObsoleteList(this ElementGroup eleG)
+        public static void FillObsoleteList(this VirtualLayer eleG)
         {
             eleG.InnerFix(false, true);
         }
@@ -201,7 +201,7 @@ namespace Coosu.Storyboard.Management
                         {
                             Message = info
                         };
-                        container.OnErrorOccured?.Invoke(container, arg);
+                        container.OnErrorOccurred?.Invoke(container, arg);
                         if (!arg.Continue)
                         {
                             return;
@@ -215,7 +215,7 @@ namespace Coosu.Storyboard.Management
                         {
                             Message = info
                         };
-                        container.OnErrorOccured?.Invoke(container, arg);
+                        container.OnErrorOccurred?.Invoke(container, arg);
                         if (!arg.Continue)
                         {
                             return;
@@ -238,11 +238,11 @@ namespace Coosu.Storyboard.Management
             }
         }
 
-        private static void InnerFix(this ElementGroup eleG, bool expand, bool fillFadeout)
+        private static void InnerFix(this VirtualLayer eleG, bool expand, bool fillFadeout)
         {
             if (!expand && !fillFadeout)
                 return;
-            foreach (var ec in eleG.ElementList)
+            foreach (var ec in eleG.Elements)
             {
                 if (!(ec is Element ele)) continue;
 

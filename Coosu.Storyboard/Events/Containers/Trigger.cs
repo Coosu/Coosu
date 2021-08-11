@@ -7,7 +7,7 @@ namespace Coosu.Storyboard.Events.Containers
 {
     public sealed class Trigger : EventContainer, IEvent
     {
-        protected override string Head => $"T,{TriggerName},{StartTime},{EndTime}";
+        protected override string Header => $"T,{TriggerName},{StartTime},{EndTime}";
         private const string HitSound = "HitSound";
 
         public float StartTime { get; set; }
@@ -56,8 +56,6 @@ namespace Coosu.Storyboard.Events.Containers
         {
             sb.WriteTrigger(this, group);
         }
-
-        public override string ToString() => Head;
 
         private static string GetTriggerString(TriggerType triggerType, bool listenSample, uint? customSampleSet)
         {

@@ -6,14 +6,9 @@ namespace Coosu.Storyboard.Extensibility
 {
     public static class Register
     {
-        private static readonly Dictionary<EventType, AddEventDelegate> EventTransformationDictionary
-            = new Dictionary<EventType, AddEventDelegate>();
-
-        private static readonly Dictionary<string, ISubjectParsingHandler> SubjectHandlerDic
-            = new Dictionary<string, ISubjectParsingHandler>();
-
-        private static readonly Dictionary<Type, IActionParsingHandler> ActionHandlerInstances
-            = new Dictionary<Type, IActionParsingHandler>();
+        private static readonly Dictionary<EventType, AddEventDelegate> EventTransformationDictionary = new();
+        private static readonly Dictionary<string, ISubjectParsingHandler> SubjectHandlerDic = new();
+        private static readonly Dictionary<Type, IActionParsingHandler> ActionHandlerInstances = new();
 
         public static ISubjectParsingHandler RegisterSubject(ISubjectParsingHandler handler)
         {
@@ -21,7 +16,7 @@ namespace Coosu.Storyboard.Extensibility
             return handler;
         }
 
-        public static ISubjectParsingHandler GetSubjectHandler(string magicWord)
+        public static ISubjectParsingHandler? GetSubjectHandler(string magicWord)
         {
             return SubjectHandlerDic.ContainsKey(magicWord) ? SubjectHandlerDic[magicWord] : null;
         }
@@ -31,7 +26,7 @@ namespace Coosu.Storyboard.Extensibility
             EventTransformationDictionary.Add(eventType, @delegate);
         }
 
-        public static AddEventDelegate GetEventTransformation(EventType eventType)
+        public static AddEventDelegate? GetEventTransformation(EventType eventType)
         {
             if (EventTransformationDictionary.ContainsKey(eventType))
                 return EventTransformationDictionary[eventType];

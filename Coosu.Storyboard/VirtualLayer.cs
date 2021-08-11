@@ -1,24 +1,24 @@
-﻿using Coosu.Storyboard.Events;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Coosu.Storyboard.Events;
 
-namespace Coosu.Storyboard.Management
+namespace Coosu.Storyboard
 {
-    public class ElementGroup : IDisposable
+    public class VirtualLayer : IDisposable, IScriptable
     {
         public void Dispose() { }
 
         public float ZDistance { get; set; }
-        public ElementGroup(float zDistance) => ZDistance = zDistance;
+        public VirtualLayer(float zDistance) => ZDistance = zDistance;
 
-        public List<EventContainer> ElementList { get; set; } = new List<EventContainer>();
+        public List<EventContainer> Elements { get; set; } = new();
 
-        public EventContainer this[int index] => ElementList[index];
+        public EventContainer this[int index] => Elements[index];
 
-        public IEnumerable<EventContainer> this[Func<EventContainer, bool> predicate] => ElementList.Where(predicate);
+        public IEnumerable<EventContainer> this[Func<EventContainer, bool> predicate] => Elements.Where(predicate);
 
         /// <summary>
         /// Create a storyboard element by a static image.
@@ -114,22 +114,22 @@ namespace Coosu.Storyboard.Management
 
         public void AddSubject(EventContainer element)
         {
-            ElementList.Add(element);
+            Elements.Add(element);
         }
 
         public void AddSubject(params EventContainer[] elements)
         {
-            ElementList.AddRange(elements);
+            Elements.AddRange(elements);
         }
 
         public void AddElement(Element element)
         {
-            ElementList.Add(element);
+            Elements.Add(element);
         }
 
         public void AddElement(params Element[] elements)
         {
-            ElementList.AddRange(elements);
+            Elements.AddRange(elements);
         }
 
         //public void ExecuteBrew(StoryboardLayer layParsed)
@@ -141,58 +141,69 @@ namespace Coosu.Storyboard.Management
         //    }
         //}
 
-        public string ToOsbString(bool group = false)
+        public async Task WriteScriptAsync(TextWriter sw)
         {
-            using (var sw = new StringWriter())
+            foreach (var obj in Elements)
             {
-                WriteOsbString(sw, group);
-                return sw.ToString();
-            }
-
-        }
-
-        public void WriteOsbString(TextWriter sw, bool group = false)
-        {
-            foreach (var obj in ElementList)
-            {
-                obj.WriteOsbString(sw, group);
+                await obj.WriteScriptAsync(sw);
             }
         }
 
-        public static async Task<ElementGroup> ParseAsyncTextAsync(string osbString)
+        public async Task WriteFullScriptAsync(TextWriter sw)
+        {
+            await sw.WriteLineAsync("[Events]");
+            await sw.WriteLineAsync("//Background and Video events");
+            await sw.WriteLineAsync("//Storyboard Layer 0 (Background)");
+            await sw.WriteLineAsync("//Storyboard Layer 0 (Background)");
+            await sw.WriteLineAsync("//Storyboard Layer 1 (Fail)");
+            await sw.WriteLineAsync("//Storyboard Layer 3 (Foreground)");
+            await WriteScriptAsync(sw);
+            await sw.WriteLineAsync("//Storyboard Sound Samples");
+        }
+
+        public async Task<string> ToScriptStringAsync()
+        {
+            using var sw = new StringWriter();
+            await WriteFullScriptAsync(sw);
+            return sw.ToString();
+        }
+
+        public async Task SaveScriptAsync(string path)
+        {
+            using var sw = new StreamWriter(path, false);
+            await WriteFullScriptAsync(sw);
+        }
+
+        public static async Task<VirtualLayer> ParseAsyncTextAsync(string osbString)
         {
             return await Task.Run(() => ParseFromText(osbString));
         }
 
-        public static async Task<ElementGroup> ParseFromFileAsync(string filePath)
+        public static async Task<VirtualLayer> ParseFromFileAsync(string filePath)
         {
             return await Task.Run(() => ParseFromFile(filePath));
         }
 
-        public static async Task<ElementGroup> ParseAsync(TextReader textReader)
+        public static async Task<VirtualLayer> ParseAsync(TextReader textReader)
         {
             return await Task.Run(() => Parse(textReader));
         }
 
-        public static ElementGroup ParseFromText(string osbString)
+        public static VirtualLayer ParseFromText(string osbString)
         {
-            using (var sr = new StringReader(osbString))
-            {
-                return Parse(sr);
-            }
+            using var sr = new StringReader(osbString);
+            return Parse(sr);
         }
 
-        public static ElementGroup ParseFromFile(string filePath)
+        public static VirtualLayer ParseFromFile(string filePath)
         {
-            using (var sr = new StreamReader(filePath))
-            {
-                return Parse(sr);
-            }
+            using var sr = new StreamReader(filePath);
+            return Parse(sr);
         }
 
-        public static ElementGroup Parse(TextReader textReader)
+        public static VirtualLayer Parse(TextReader textReader)
         {
-            ElementGroup group = new ElementGroup(0);
+            VirtualLayer group = new VirtualLayer(0);
             Element currentObj = null;
             //0 = isLooping, 1 = isTriggering, 2 = isBlank
             bool[] options = { false, false, false };
@@ -241,7 +252,7 @@ namespace Coosu.Storyboard.Management
         private static Element ParseElement(string line,
             int rowIndex,
             Element currentObj,
-            ElementGroup @group,
+            VirtualLayer @group,
             bool[] options)
         {
             ref bool isLooping = ref options[0];
@@ -395,7 +406,7 @@ namespace Coosu.Storyboard.Management
                     throw new Exception($"Unknown event: \"{eventStr}\"");
             }
 
-            unsafe void AddEvent(int paramLength)
+            void AddEvent(int paramLength)
             {
                 if (paramLength != 0)
                 {
@@ -404,29 +415,20 @@ namespace Coosu.Storyboard.Management
                     if (rawLength == paramLength + baseLength)
                     {
                         int length = paramLength * 2;
-                        float* array = stackalloc float[length];
-                        float* p = array;
-                        for (int i = 0; i < paramLength; i++, p++)
-                        {
-                            *p = float.Parse(rawParams[baseLength + i]);
-                        }
-
-                        for (int i = 0; i < paramLength; i++, p++)
-                        {
-                            *p = float.Parse(rawParams[baseLength + i]);
-                        }
+                        Span<float> array = stackalloc float[length];
+                        for (int i = 0; i < paramLength; i++)
+                            array[i] = float.Parse(rawParams[baseLength + i]);
+                        for (int i = 0; i < paramLength; i++)
+                            array[i + paramLength] = float.Parse(rawParams[baseLength + i]);
 
                         InjectEvent(array);
                     }
                     else if (rawLength == paramLength * 2 + baseLength)
                     {
                         int length = paramLength * 2;
-                        float* array = stackalloc float[length];
-                        float* p = array;
-                        for (int i = 0; i < length; i++, p++)
-                        {
-                            *p = float.Parse(rawParams[baseLength + i]);
-                        }
+                        Span<float> array = stackalloc float[length];
+                        for (int i = 0; i < length; i++)
+                            array[i] = float.Parse(rawParams[baseLength + i]);
 
                         InjectEvent(array);
                     }
@@ -501,7 +503,7 @@ namespace Coosu.Storyboard.Management
                     throw new Exception($"Wrong parameter for event: \"{eventStr}\"");
                 }
 
-                void InjectEvent(float* array)
+                void InjectEvent(Span<float> array)
                 {
                     switch (eventStr)
                     {
@@ -581,26 +583,6 @@ namespace Coosu.Storyboard.Management
             var obj = new AnimatedElement(type, layer, origin, imagePath, defaultX, defaultY, frameCount, frameDelay, loopType);
             AddElement(obj);
             return obj;
-        }
-
-        public async Task SaveOsbFileAsync(string path)
-        {
-            await Task.Run(() => SaveOsbFile(path));
-        }
-
-        public void SaveOsbFile(string path)
-        {
-            using (StreamWriter sw = new StreamWriter(path, false))
-            {
-                sw.WriteLine("[Events]");
-                sw.WriteLine("//Background and Video events");
-                sw.WriteLine("//Storyboard Layer 0 (Background)");
-                sw.WriteLine("//Storyboard Layer 0 (Background)");
-                sw.WriteLine("//Storyboard Layer 1 (Fail)");
-                sw.WriteLine("//Storyboard Layer 3 (Foreground)");
-                WriteOsbString(sw, true);
-                sw.WriteLine("//Storyboard Sound Samples");
-            }
         }
     }
 }

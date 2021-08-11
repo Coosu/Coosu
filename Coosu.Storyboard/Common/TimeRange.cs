@@ -7,9 +7,8 @@ namespace Coosu.Storyboard.Common
     public class TimeRange
     {
         private readonly SortedSet<TimingPoint> _timingPoints = new SortedSet<TimingPoint>(new TimingPointComparer());
-        private List<RangeValue<float>> _timingList;
-
-        public List<RangeValue<float>> TimingList => _timingList ?? (_timingList = GetTimingList());
+        private List<RangeValue<float>>? _timingList;
+        public List<RangeValue<float>> TimingList => _timingList ??= GetTimingList();
 
         public float MinStartTime => TimingList.First().StartTime;
         public float MinEndTime => TimingList.First().EndTime;
@@ -81,7 +80,7 @@ namespace Coosu.Storyboard.Common
             int i = 0;
             foreach (var range in TimingList)
             {
-                if (timingPoint == range.StartTime || timingPoint == range.EndTime)
+                if (timingPoint.Equals(range.StartTime) || timingPoint.Equals(range.EndTime))
                 {
                     patterned = range;
                     return true;

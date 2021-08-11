@@ -1,12 +1,13 @@
-﻿using Coosu.Storyboard.Utils;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
+using Coosu.Storyboard.Utils;
 
 namespace Coosu.Storyboard.Events.Containers
 {
     public sealed class Loop : EventContainer, IEvent
     {
-        protected override string Head => $"L,{StartTime},{LoopCount}";
+        protected override string Header => $"L,{StartTime},{LoopCount}";
 
         public float StartTime { get; set; }
         public float EndTime => OuterMaxTime;
@@ -35,7 +36,5 @@ namespace Coosu.Storyboard.Events.Containers
         {
             sb.WriteLoop(this, group);
         }
-
-        public override string ToString() => Head;
     }
 }
