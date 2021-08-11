@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Coosu.Storyboard.Events;
-using Coosu.Storyboard.Events.Containers;
+using Coosu.Storyboard.Events.EventHosts;
+using Coosu.Storyboard.Management;
 using Coosu.Storyboard.Utils;
 
 namespace Coosu.Storyboard
@@ -12,76 +12,55 @@ namespace Coosu.Storyboard
     /// <summary>
     /// Represents a storyboard element. This class cannot be inherited.
     /// </summary>
-    public partial class Sprite : EventContainer
+    public partial class Sprite : EventHost, ISceneObject
     {
         protected override string Header =>
-            $"{SpriteTypeManager.GetString(Type)},{LayerType},{OriginType},\"{ImagePath}\",{DefaultX},{DefaultY}";
+            $"{ObjectTypeManager.GetString(ObjectType)},{LayerType},{OriginType},\"{ImagePath}\",{DefaultX},{DefaultY}";
+        public OsbObjectType ObjectType { get; protected set; }
         public LayerType LayerType { get; }
         public OriginType OriginType { get; }
         public string ImagePath { get; }
-        public float DefaultY { get; internal set; }
-        public float DefaultX { get; internal set; }
+        public float DefaultY { get; set; }
+        public float DefaultX { get; set; }
 
-        // Containers
+        public float ZDistance { get; set; }
+        public int CameraId { get; set; }
+
+        // EventHosts
         public List<Loop> LoopList { get; } = new();
         public List<Trigger> TriggerList { get; } = new();
 
-        public override Sprite? BaseElement => null;
-
         public override float MaxTime =>
              NumericUtility.GetMaxValue(
-                 EventList.Select(k => k.EndTime),
+                 Events.Select(k => k.EndTime),
                  LoopList.Select(k => k.OuterMaxTime),
                  TriggerList.Select(k => k.MaxTime)
              );
 
         public override float MinTime =>
             NumericUtility.GetMinValue(
-                EventList.Select(k => k.StartTime),
+                Events.Select(k => k.StartTime),
                 LoopList.Select(k => k.OuterMinTime),
                 TriggerList.Select(k => k.MinTime)
             );
 
         public override float MaxStartTime =>
             NumericUtility.GetMaxValue(
-                EventList.Select(k => k.StartTime),
+                Events.Select(k => k.StartTime),
                 LoopList.Select(k => k.OuterMinTime),
                 TriggerList.Select(k => k.MinTime)
             );
 
         public override float MinEndTime =>
             NumericUtility.GetMinValue(
-                EventList.Select(k => k.EndTime),
+                Events.Select(k => k.EndTime),
                 LoopList.Select(k => k.OuterMaxTime),
                 TriggerList.Select(k => k.MaxTime)
             );
 
-        public bool IsWorthy => !MinTime.Equals(MaxTime) || IsBackground;
-
-        public override int MaxTimeCount
-        {
-            get
-            {
-                var maxTime = MaxTime;
-                return EventList.Count(k => k.EndTime.Equals(maxTime)) +
-                       LoopList.Count(k => k.OuterMaxTime.Equals(maxTime)) +
-                       TriggerList.Count(k => k.MaxTime.Equals(maxTime));
-            }
-        }
-
-        public override int MinTimeCount
-        {
-            get
-            {
-                var minTime = MinTime;
-                return EventList.Count(k => k.StartTime.Equals(minTime)) +
-                       LoopList.Count(k => k.OuterMinTime.Equals(minTime)) +
-                       TriggerList.Count(k => k.MinTime.Equals(minTime));
-            }
-        }
-
-        public bool IsBackground { get; internal set; }
-        public int RowInSource { get; internal set; }
+        //public bool IsWorthy => !MinTime.Equals(MaxTime) || IsBackground;
+        //public bool IsBackground { get; internal set; }
+        //public int RowInSource { get; internal set; }
 
         // Loop control
         private bool _isTriggering = false;
@@ -96,9 +75,9 @@ namespace Coosu.Storyboard
         /// <param name="imagePath">Set image path.</param>
         /// <param name="defaultX">Set default x-coordinate of location.</param>
         /// <param name="defaultY">Set default x-coordinate of location.</param>
-        public Sprite(SpriteType type, LayerType layerType, OriginType originType, string imagePath, float defaultX, float defaultY)
+        public Sprite(OsbObjectType type, LayerType layerType, OriginType originType, string imagePath, float defaultX, float defaultY)
         {
-            Type = type;
+            ObjectType = type;
             LayerType = layerType;
             OriginType = originType;
             ImagePath = imagePath;
@@ -108,7 +87,7 @@ namespace Coosu.Storyboard
 
         public Sprite(string type, string layer, string origin, string imagePath, float defaultX, float defaultY)
         {
-            Type = SpriteType.Parse(type);
+            ObjectType = OsbObjectType.Parse(type);
             LayerType = (LayerType)Enum.Parse(typeof(LayerType), layer);
             OriginType = (OriginType)Enum.Parse(typeof(OriginType), origin);
             ImagePath = imagePath;
@@ -183,25 +162,11 @@ namespace Coosu.Storyboard
 
         public override async Task WriteScriptAsync(TextWriter sw)
         {
-            if (!IsWorthy) return;
+            //if (!IsWorthy) return;
             await sw.WriteLineAsync(Header);
-            await sw.WriteElementEventsAsync(this, Group);
+            await sw.WriteElementEventsAsync(this, EnableGroupedSerialization);
         }
 
         public Sprite Clone() => throw new NotImplementedException();
-
-        public override void Adjust(float offsetX, float offsetY, int offsetTiming)
-        {
-            DefaultX += offsetX;
-            DefaultY += offsetY;
-
-            foreach (var loop in LoopList)
-                loop.Adjust(offsetX, offsetY, offsetTiming);
-
-            foreach (var trigger in TriggerList)
-                trigger.Adjust(offsetX, offsetY, offsetTiming);
-
-            base.Adjust(offsetX, offsetY, offsetTiming);
-        }
     }
 }

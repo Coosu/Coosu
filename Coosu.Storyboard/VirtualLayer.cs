@@ -14,11 +14,11 @@ namespace Coosu.Storyboard
         public float ZDistance { get; set; }
         public VirtualLayer(float zDistance) => ZDistance = zDistance;
 
-        public List<EventContainer> Elements { get; set; } = new();
+        public List<ISceneObject> SceneObjects { get; set; } = new();
 
-        public EventContainer this[int index] => Elements[index];
+        public ISceneObject this[int index] => SceneObjects[index];
 
-        public IEnumerable<EventContainer> this[Func<EventContainer, bool> predicate] => Elements.Where(predicate);
+        public IEnumerable<ISceneObject> this[Func<ISceneObject, bool> predicate] => SceneObjects.Where(predicate);
 
         /// <summary>
         /// Create a storyboard element by a static image.
@@ -27,8 +27,8 @@ namespace Coosu.Storyboard
         /// <returns></returns>
         public Sprite CreateSprite(string filePath)
         {
-            var obj = new Sprite(SpriteTypes.Sprite, LayerType.Foreground, OriginType.Centre, filePath, 320, 240);
-            AddElement(obj);
+            var obj = new Sprite(ObjectTypes.Sprite, LayerType.Foreground, OriginType.Centre, filePath, 320, 240);
+            AddSprite(obj);
             return obj;
         }
 
@@ -40,8 +40,8 @@ namespace Coosu.Storyboard
         /// <returns></returns>
         public Sprite CreateSprite(OriginType originType, string filePath)
         {
-            var obj = new Sprite(SpriteTypes.Sprite, LayerType.Foreground, originType, filePath, 320, 240);
-            AddElement(obj);
+            var obj = new Sprite(ObjectTypes.Sprite, LayerType.Foreground, originType, filePath, 320, 240);
+            AddSprite(obj);
             return obj;
         }
 
@@ -54,8 +54,8 @@ namespace Coosu.Storyboard
         /// <returns></returns>
         public Sprite CreateSprite(LayerType layerType, OriginType originType, string filePath)
         {
-            var obj = new Sprite(SpriteTypes.Sprite, layerType, originType, filePath, 320, 240);
-            AddElement(obj);
+            var obj = new Sprite(ObjectTypes.Sprite, layerType, originType, filePath, 320, 240);
+            AddSprite(obj);
             return obj;
         }
 
@@ -69,8 +69,8 @@ namespace Coosu.Storyboard
         /// <returns></returns>
         public Sprite CreateSprite(LayerType layerType, OriginType originType, string filePath, System.Drawing.Point defaultLocation)
         {
-            var obj = new Sprite(SpriteTypes.Sprite, layerType, originType, filePath, defaultLocation.X, defaultLocation.Y);
-            AddElement(obj);
+            var obj = new Sprite(ObjectTypes.Sprite, layerType, originType, filePath, defaultLocation.X, defaultLocation.Y);
+            AddSprite(obj);
             return obj;
         }
 
@@ -85,8 +85,8 @@ namespace Coosu.Storyboard
         /// <returns></returns>
         public Sprite CreateSprite(LayerType layerType, OriginType originType, string filePath, float defaultX, float defaultY)
         {
-            var obj = new Sprite(SpriteTypes.Sprite, layerType, originType, filePath, defaultX, defaultY);
-            AddElement(obj);
+            var obj = new Sprite(ObjectTypes.Sprite, layerType, originType, filePath, defaultX, defaultY);
+            AddSprite(obj);
             return obj;
         }
 
@@ -98,7 +98,7 @@ namespace Coosu.Storyboard
             int frameCount, float frameDelay, LoopType loopType)
         {
             var obj = new Animation(
-                SpriteTypes.Sprite,
+                ObjectTypes.Sprite,
                 layerType,
                 originType,
                 filePath,
@@ -108,28 +108,18 @@ namespace Coosu.Storyboard
                 frameDelay,
                 loopType
             );
-            AddElement(obj);
+            AddSprite(obj);
             return obj;
         }
 
-        public void AddSubject(EventContainer element)
+        public void AddSprite(ISceneObject sprite)
         {
-            Elements.Add(element);
+            SceneObjects.Add(sprite);
         }
 
-        public void AddSubject(params EventContainer[] elements)
+        public void AddSprite(params ISceneObject[] sprites)
         {
-            Elements.AddRange(elements);
-        }
-
-        public void AddElement(Sprite sprite)
-        {
-            Elements.Add(sprite);
-        }
-
-        public void AddElement(params Sprite[] elements)
-        {
-            Elements.AddRange(elements);
+            SceneObjects.AddRange(sprites);
         }
 
         //public void ExecuteBrew(StoryboardLayer layParsed)
@@ -143,7 +133,7 @@ namespace Coosu.Storyboard
 
         public async Task WriteScriptAsync(TextWriter sw)
         {
-            foreach (var obj in Elements)
+            foreach (var obj in SceneObjects)
             {
                 await obj.WriteScriptAsync(sw);
             }
@@ -238,7 +228,7 @@ namespace Coosu.Storyboard
 
         private const char SplitChar = ',';
         private const char QuoteChar = '\"';
-        private static readonly string[] Sprites = { "Sprite", "Animation", "4", "6" };
+        private static readonly string[] SpriteDefinitions = { "Sprite", "Animation", "4", "6" };
         private static readonly char[] PrefixChars = { ' ', '_' };
         private static readonly string[] Prefixes = { " ", "_" };
         private static readonly string[] DoublePrefixes = { "  ", "__" };
@@ -261,7 +251,7 @@ namespace Coosu.Storyboard
 
             //int count = line.Count(k => k == ',') + 1;
             var @params = line.Split(SplitChar);
-            if (Sprites.Contains(@params[0]))
+            if (SpriteDefinitions.Contains(@params[0]))
             {
                 currentObj?.TryEndLoop();
 
@@ -573,7 +563,7 @@ namespace Coosu.Storyboard
         private Sprite CreateSprite(string type, string layer, string origin, string imagePath, float defaultX, float defaultY)
         {
             var obj = new Sprite(type, layer, origin, imagePath, defaultX, defaultY);
-            AddElement(obj);
+            AddSprite(obj);
             return obj;
         }
 
@@ -581,7 +571,7 @@ namespace Coosu.Storyboard
             float defaultY, int frameCount, float frameDelay, string loopType)
         {
             var obj = new Animation(type, layer, origin, imagePath, defaultX, defaultY, frameCount, frameDelay, loopType);
-            AddElement(obj);
+            AddSprite(obj);
             return obj;
         }
     }

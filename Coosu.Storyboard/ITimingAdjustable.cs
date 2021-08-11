@@ -2,6 +2,10 @@
 {
     public interface ITimingAdjustable
     {
-        void AdjustTiming(float time);
+        void AdjustTiming(float offset);
+    }
+
+    public interface IAdjustable : ITimingAdjustable, IPositionAdjustable
+    {
     }
 }

@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 
-namespace Coosu.Storyboard
+namespace Coosu.Storyboard.Management
 {
-    public static class SpriteTypeManager
+    public static class ObjectTypeManager
     {
-        private static readonly Dictionary<string, SpriteType> DictionaryStore = new();
-        private static readonly Dictionary<SpriteType, string> BackDictionaryStore = new();
+        private static readonly Dictionary<string, OsbObjectType> DictionaryStore = new();
+        private static readonly Dictionary<OsbObjectType, string> BackDictionaryStore = new();
 
-        static SpriteTypeManager()
+        static ObjectTypeManager()
         {
             SignType(0, "Background");
             SignType(1, "Video");
@@ -25,12 +25,12 @@ namespace Coosu.Storyboard
             BackDictionaryStore.Add(num, name);
         }
 
-        public static SpriteType Parse(string s)
+        public static OsbObjectType Parse(string s)
         {
             return DictionaryStore.ContainsKey(s) ? DictionaryStore[s] : default;
         }
 
-        public static string? GetString(SpriteType type)
+        public static string? GetString(OsbObjectType type)
         {
             return BackDictionaryStore.ContainsKey(type) ? BackDictionaryStore[type] : null;
         }

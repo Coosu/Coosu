@@ -102,14 +102,14 @@ namespace Coosu.Animation.WPF
             //var folder = @"D:\Games\osu!\Songs\ok";
             var eg = VirtualLayer.ParseFromFile(file);
 
-            var min = eg.Elements.Min(k => k.MinTime);
+            var min = eg.SceneObjects.Min(k => k.MinTime);
             if (min > 0)
             {
                 min = 0;
             }
 
             int i = int.MinValue;
-            foreach (var ec in eg.Elements)
+            foreach (var ec in eg.SceneObjects)
             {
                 if (ec is Storyboard.Animation) continue;
                 if (!(ec is Sprite element)) continue;
@@ -157,7 +157,7 @@ namespace Coosu.Animation.WPF
 
                 ele.ApplyAnimation(k =>
                 {
-                    foreach (var commonEvent in element.EventList)
+                    foreach (var commonEvent in element.Events)
                     {
                         double startT = commonEvent.StartTime - min, endT = commonEvent.EndTime - min;
 

@@ -10,41 +10,17 @@ using Coosu.Storyboard.Management;
 
 namespace Coosu.Storyboard
 {
-    public abstract class EventContainer : IScriptable
+    public abstract class EventHost : IScriptable, IEventHost
     {
-        public SpriteType Type { get; protected set; }
-
-        public EventHandler<ProcessErrorEventArgs>? OnErrorOccurred;
-        public SortedSet<CommonEvent> EventList { get; } = new(new EventComparer());
+        //public EventHandler<ProcessErrorEventArgs>? OnErrorOccurred;
+        public SortedSet<CommonEvent> Events { get; } = new(new EventTimingComparer());
         public abstract float MaxTime { get; }
         public abstract float MinTime { get; }
         public abstract float MaxStartTime { get; }
         public abstract float MinEndTime { get; }
 
-        public virtual int MaxTimeCount => EventList.Count(k => k.EndTime.Equals(MaxTime));
-        public virtual int MinTimeCount => EventList.Count(k => k.StartTime.Equals(MinTime));
 
-        public float ZDistance { get; set; }
-        public int CameraId { get; set; }
-
-        public virtual Sprite? BaseElement { get; internal set; }
-
-        public virtual void Adjust(float offsetX, float offsetY, int offsetTiming)
-        {
-            var events = EventList.GroupBy(k => k.EventType);
-            foreach (var kv in events)
-            {
-                foreach (var e in kv)
-                {
-                    if (e is IPositionAdjustable adjustable)
-                        adjustable.AdjustPosition(offsetX, offsetY);
-
-                    e.AdjustTiming(offsetTiming);
-                }
-            }
-        }
-
-        public TimeRange ObsoleteList { get; } = new TimeRange();
+        //public TimeRange ObsoleteList { get; } = new TimeRange();
 
         internal virtual void AddEvent(EventType e, EasingType easing, float startTime, float endTime, float[] start, float[]? end)
         {
@@ -94,18 +70,11 @@ namespace Coosu.Storyboard
                 var result = Register.GetEventTransformation(e)?.Invoke(e, easing, startTime, endTime, start, end);
                 newCommonEvent = result ?? throw new ArgumentOutOfRangeException(nameof(e), e, null);
             }
-
-            //List
-            //if (sequential)
-            //    EventList.AddSorted(newEvent);
-            //else
-            //    EventList.Add(newEvent);
-
-            //SortedSet
-            EventList.Add(newCommonEvent);
+            
+            Events.Add(newCommonEvent);
         }
 
-        protected bool Group => throw new NotImplementedException();
+        public bool EnableGroupedSerialization { get; set; }
 
         protected abstract string Header { get; }
         public abstract Task WriteScriptAsync(TextWriter writer);

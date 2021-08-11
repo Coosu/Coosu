@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Coosu.Storyboard.Events
 {
-    public class EventComparer : IComparer<CommonEvent>
+    public class EventTimingComparer : IComparer<CommonEvent>
     {
         public int Compare(CommonEvent x, CommonEvent y)
         {

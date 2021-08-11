@@ -3,11 +3,11 @@
     public interface ISubjectParsingHandler : IParsingHandler
     {
         IActionParsingHandler GetActionHandler(string magicWord);
-        new EventContainer Deserialize(string[] split);
-        string Serialize(EventContainer raw);
+        new ISceneObject Deserialize(string[] split);
+        string Serialize(ISceneObject raw);
     }
 
-    public interface ISubjectParsingHandler<T> : ISubjectParsingHandler where T : EventContainer
+    public interface ISubjectParsingHandler<T> : ISubjectParsingHandler where T : ISceneObject
     {
         new T Deserialize(string[] split);
         string Serialize(T raw);

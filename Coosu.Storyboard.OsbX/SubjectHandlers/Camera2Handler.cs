@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Coosu.Storyboard.Extensibility;
+using Coosu.Storyboard.Management;
 using Coosu.Storyboard.OsbX.ActionHandlers;
 using Coosu.Storyboard.Utils;
 
@@ -12,7 +13,7 @@ namespace Coosu.Storyboard.OsbX.SubjectHandlers
     {
         static Camera2Handler()
         {
-            SpriteTypeManager.SignType(99, "Camera2");
+            ObjectTypeManager.SignType(99, "Camera2");
         }
 
         public Camera2Handler()
@@ -40,7 +41,7 @@ namespace Coosu.Storyboard.OsbX.SubjectHandlers
         {
             if (split.Length >= 1)
             {
-                var type = SpriteTypeManager.Parse(split[0]);
+                var type = ObjectTypeManager.Parse(split[0]);
                 int cameraId = 0;
                 if (split.Length >= 2)
                 {
@@ -54,40 +55,41 @@ namespace Coosu.Storyboard.OsbX.SubjectHandlers
         }
     }
 
-    public class Camera2Element : EventContainer
+    public class Camera2Element : EventHost, IOsbObject
     {
-        protected override string Header => $"{SpriteTypeManager.GetString(Type)},{CameraId}";
+        public OsbObjectType ObjectType { get; }
+        protected override string Header => $"{ObjectTypeManager.GetString(ObjectType)},{CameraId}";
 
         static Camera2Element()
         {
-            SpriteTypeManager.SignType(99, "Camera2");
+            ObjectTypeManager.SignType(99, "Camera2");
         }
 
-        public Camera2Element(SpriteType type)
+        public Camera2Element(OsbObjectType type)
         {
-            Type = type;
+            ObjectType = type;
         }
 
         public override float MaxTime =>
-            NumericUtility.GetMaxValue(EventList.Select(k => k.EndTime));
+            NumericUtility.GetMaxValue(Events.Select(k => k.EndTime));
 
         public override float MinTime =>
-            NumericUtility.GetMinValue(EventList.Select(k => k.StartTime));
+            NumericUtility.GetMinValue(Events.Select(k => k.StartTime));
 
         public override float MaxStartTime =>
-            NumericUtility.GetMaxValue(EventList.Select(k => k.StartTime));
+            NumericUtility.GetMaxValue(Events.Select(k => k.StartTime));
 
         public override float MinEndTime =>
-            NumericUtility.GetMinValue(EventList.Select(k => k.EndTime));
+            NumericUtility.GetMinValue(Events.Select(k => k.EndTime));
 
-        public override int MaxTimeCount => EventList.Count(k => k.EndTime.Equals(MaxTime));
+        public override int MaxTimeCount => Events.Count(k => k.EndTime.Equals(MaxTime));
 
-        public override int MinTimeCount => EventList.Count(k => k.StartTime.Equals(MaxTime));
+        public override int MinTimeCount => Events.Count(k => k.StartTime.Equals(MaxTime));
 
         public override async Task WriteScriptAsync(TextWriter sw)
         {
             await sw.WriteLineAsync(Header);
-            await ScriptHelper.WriteContainerEventsAsync(sw, this, Group);
+            await ScriptHelper.WriteHostEventsAsync(sw, this, EnableGroupedSerialization);
         }
     }
 }

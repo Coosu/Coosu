@@ -1,35 +1,39 @@
-﻿using Coosu.Storyboard.Utils;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Coosu.Storyboard.Utils;
 
-namespace Coosu.Storyboard.Events.Containers
+namespace Coosu.Storyboard.Events.EventHosts
 {
-    public sealed class Trigger : EventContainer, IEvent
+    public sealed class Trigger : ISubEventHost, IEvent
     {
-        protected override string Header => $"T,{TriggerName},{StartTime},{EndTime}";
+        internal ISceneObject? _baseObject;
         private const string HitSound = "HitSound";
+        public string Header => $"T,{TriggerName},{StartTime},{EndTime}";
+        public bool EnableGroupedSerialization { get; set; }
+        public SortedSet<CommonEvent> Events { get; } = new(new EventTimingComparer());
 
         public float StartTime { get; set; }
         public float EndTime { get; set; }
         public string TriggerName { get; set; }
 
-        public override float MaxTime =>
+        public float MaxTime =>
             EndTime +
-            (EventList.Count > 0
-                ? EventList.Max(k => k.EndTime)
+            (Events.Count > 0
+                ? Events.Max(k => k.EndTime)
                 : 0);
 
-        public override float MinTime => StartTime;
+        public float MinTime => StartTime;
 
-        public override float MaxStartTime =>
+        public float MaxStartTime =>
             EndTime +
-            (EventList.Count > 0
-                ? EventList.Max(k => k.StartTime)
+            (Events.Count > 0
+                ? Events.Max(k => k.StartTime)
                 : 0); //if hitsound played at end time
 
-        public override float MinEndTime => StartTime; // if no hitsound here
+        public float MinEndTime => StartTime; // if no hitsound here
 
         public Trigger(float startTime, float endTime, TriggerType triggerType, bool listenSample = false, uint? customSampleSet = null)
         {
@@ -46,16 +50,9 @@ namespace Coosu.Storyboard.Events.Containers
             TriggerName = triggerName;
         }
 
-        public override void Adjust(float offsetX, float offsetY, int offsetTiming)
+        public async Task WriteScriptAsync(TextWriter sb)
         {
-            StartTime += offsetTiming;
-            EndTime += offsetTiming;
-            base.Adjust(offsetX, offsetY, offsetTiming);
-        }
-
-        public override async Task WriteScriptAsync(TextWriter sb)
-        {
-            await sb.WriteTriggerAsync(this, Group);
+            await sb.WriteTriggerAsync(this, EnableGroupedSerialization);
         }
 
         private static string GetTriggerString(TriggerType triggerType, bool listenSample, uint? customSampleSet)
@@ -96,6 +93,17 @@ namespace Coosu.Storyboard.Events.Containers
 
             if (customSampleSet != null) sb.Append(customSampleSet.ToString());
             return sb.ToString();
+        }
+
+        public void AdjustTiming(float offset)
+        {
+            StartTime += offset;
+        }
+
+        ISceneObject? ISubEventHost.BaseObject
+        {
+            get => _baseObject;
+            set => _baseObject = value;
         }
     }
 }

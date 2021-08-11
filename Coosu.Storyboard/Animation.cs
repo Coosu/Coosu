@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using Coosu.Storyboard.Management;
 using Coosu.Storyboard.Utils;
 
 namespace Coosu.Storyboard
@@ -8,7 +9,7 @@ namespace Coosu.Storyboard
     public sealed class Animation : Sprite
     {
         protected override string Header =>
-            $"{SpriteTypeManager.GetString(Type)},{LayerType},{OriginType},\"{ImagePath}\",{DefaultX},{DefaultY},{FrameCount},{FrameDelay},{LoopType}";
+            $"{ObjectTypeManager.GetString(ObjectType)},{LayerType},{OriginType},\"{ImagePath}\",{DefaultX},{DefaultY},{FrameCount},{FrameDelay},{LoopType}";
 
         public int FrameCount { get; set; }
         public float FrameDelay { get; set; }
@@ -26,7 +27,7 @@ namespace Coosu.Storyboard
         /// <param name="frameCount">Set frame count.</param>
         /// <param name="frameDelay">Set frame rate (frame delay).</param>
         /// <param name="loopType">Set loop type.</param>
-        public Animation(SpriteType type, LayerType layerType, OriginType originType, string imagePath, float defaultX,
+        public Animation(OsbObjectType type, LayerType layerType, OriginType originType, string imagePath, float defaultX,
             float defaultY, int frameCount, float frameDelay, LoopType loopType) : base(type, layerType, originType, imagePath, defaultX, defaultY)
         {
             FrameCount = frameCount;
@@ -56,9 +57,9 @@ namespace Coosu.Storyboard
 
         public override async Task WriteScriptAsync(TextWriter sw)
         {
-            if (!IsWorthy) return;
+            //if (!IsWorthy) return;
             await sw.WriteLineAsync(Header);
-            await sw.WriteElementEventsAsync(this, Group);
+            await sw.WriteElementEventsAsync(this, EnableGroupedSerialization);
         }
     }
 }

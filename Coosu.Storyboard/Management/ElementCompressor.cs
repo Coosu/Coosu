@@ -40,7 +40,7 @@ namespace Coosu.Storyboard.Management
 
         public ElementCompressor(VirtualLayer virtualLayer)
         {
-            _elements = virtualLayer.Elements.Where(k => k is Sprite).Cast<Sprite>().ToList();
+            _elements = virtualLayer.SceneObjects.Where(k => k is Sprite).Cast<Sprite>().ToList();
         }
 
         public string BackgroundPath { get; set; }
@@ -255,9 +255,9 @@ namespace Coosu.Storyboard.Management
         /// <summary>
         /// 预压缩
         /// </summary>
-        private void PreOptimize(EventContainer container)
+        private void PreOptimize(EventHost host)
         {
-            if (container is Sprite ele)
+            if (host is Sprite ele)
             {
                 foreach (var item in ele.LoopList)
                 {
@@ -270,16 +270,16 @@ namespace Coosu.Storyboard.Management
                 }
             }
 
-            if (container.EventList.Any())
-                RemoveByObsoletedList(container, container.EventList.ToList());
+            if (host.Events.Any())
+                RemoveByObsoletedList(host, host.Events.ToList());
         }
 
         /// <summary>
         /// 正常压缩
         /// </summary>
-        private void NormalOptimize(EventContainer container)
+        private void NormalOptimize(EventHost host)
         {
-            if (container is Sprite ele)
+            if (host is Sprite ele)
             {
                 foreach (var item in ele.LoopList)
                 {
@@ -292,18 +292,18 @@ namespace Coosu.Storyboard.Management
                 }
             }
 
-            if (container.EventList.Any())
+            if (host.Events.Any())
             {
-                RemoveByLogic(container, container.EventList.ToList());
+                RemoveByLogic(host, host.Events.ToList());
             }
         }
 
         /// <summary>
         /// 根据ObsoletedList，移除不必要的命令。
         /// </summary>
-        private void RemoveByObsoletedList(EventContainer container, List<CommonEvent> eventList)
+        private void RemoveByObsoletedList(EventHost host, List<CommonEvent> eventList)
         {
-            if (container.ObsoleteList.TimingList.Count == 0) return;
+            if (host.ObsoleteList.TimingList.Count == 0) return;
             var groups = eventList.GroupBy(k => k.EventType);
             foreach (var group in groups)
             {
@@ -318,12 +318,12 @@ namespace Coosu.Storyboard.Management
 
                     /*
                      * 若当前Event在某Obsolete Range内，且下一Event的StartTime也在此Obsolete Range内，则删除。
-                     * 若当前Event是此种类最后一个（无下一个Event），那么需要此Event在某Obsolete Range内，且此Obsolete Range持续到Container结束。
+                     * 若当前Event是此种类最后一个（无下一个Event），那么需要此Event在某Obsolete Range内，且此Obsolete Range持续到EventHost结束。
                      * 另注意：若此Event为控制Obsolete Range的Event，则将其过滤。（判断是否正好在某段Obsolete Range的StartTime或EndTime上）
                     */
 
                     // 判断是否此Event为控制Obsolete Range的Event。
-                    if (!(nowE.OnObsoleteTimingRange(container) &&
+                    if (!(nowE.OnObsoleteTimingRange(host) &&
                           EventExtension.UnworthyDictionary.ContainsKey(nowE.EventType)))
                     {
                         bool canRemove;
@@ -331,9 +331,9 @@ namespace Coosu.Storyboard.Management
                         // 若当前Event是此种类最后一个（无下一个Event)。
                         if (nextE == null)
                         {
-                            // 判断是否此Event在某Obsolete Range内，且此Obsolete Range持续到Container结束。
-                            canRemove = nowE.InObsoleteTimingRange(container, out var range) &&
-                                        range.EndTime == container.MaxTime;
+                            // 判断是否此Event在某Obsolete Range内，且此Obsolete Range持续到EventHost结束。
+                            canRemove = nowE.InObsoleteTimingRange(host, out var range) &&
+                                        range.EndTime == host.MaxTime;
 
                             if (canRemove)
                             {
@@ -350,25 +350,25 @@ namespace Coosu.Storyboard.Management
                                     {
                                         if (nowE.End[j].ToIcString().Length > nowE.Start[j].ToIcString().Length)
                                         {
-                                            RaiseSituationEvent(container, SituationType.ThisLastSingleInLastObsoleteToFixTail,
+                                            RaiseSituationEvent(host, SituationType.ThisLastSingleInLastObsoleteToFixTail,
                                                 () => { nowE.End[j] = nowE.Start[j]; },
                                                 nowE);
                                         }
                                     }
 
-                                    if (nowE.IsSmallerThenMaxTime(container))
+                                    if (nowE.IsSmallerThenMaxTime(host))
                                     {
-                                        RaiseSituationEvent(container, SituationType.ThisLastSingleInLastObsoleteToFixEndTime,
+                                        RaiseSituationEvent(host, SituationType.ThisLastSingleInLastObsoleteToFixEndTime,
                                             () => { nowE.EndTime = nowE.StartTime; },
                                             nowE);
                                     }
                                 }
                                 else
                                 {
-                                    RaiseSituationEvent(container, SituationType.ThisLastInLastObsoleteToRemove,
+                                    RaiseSituationEvent(host, SituationType.ThisLastInLastObsoleteToRemove,
                                         () =>
                                         {
-                                            RemoveEvent(container, list, nowE);
+                                            RemoveEvent(host, list, nowE);
                                             i--;
                                         },
                                         nowE);
@@ -379,15 +379,15 @@ namespace Coosu.Storyboard.Management
                         else // 若有下一个Event。
                         {
                             // 判断是否此Event在某Obsolete Range内，且下一Event的StartTime也在此Obsolete Range内。
-                            canRemove = container.ObsoleteList.ContainsTimingPoint(out _,
+                            canRemove = host.ObsoleteList.ContainsTimingPoint(out _,
                                 nowE.StartTime, nowE.EndTime, nextE.StartTime);
 
                             if (canRemove)
                             {
-                                RaiseSituationEvent(container, SituationType.NextHeadAndThisInObsoleteToRemove,
+                                RaiseSituationEvent(host, SituationType.NextHeadAndThisInObsoleteToRemove,
                                     () =>
                                     {
-                                        RemoveEvent(container, list, nowE);
+                                        RemoveEvent(host, list, nowE);
                                         i--;
                                     },
                                     nowE, nextE);
@@ -401,9 +401,9 @@ namespace Coosu.Storyboard.Management
         /// <summary>
         /// 根据逻辑，进行命令优化。
         /// </summary>
-        /// <param name="container"></param>
+        /// <param name="host"></param>
         /// <param name="eventList"></param>
-        private void RemoveByLogic(EventContainer container, List<CommonEvent> eventList)
+        private void RemoveByLogic(EventHost host, List<CommonEvent> eventList)
         {
             var groups = eventList.GroupBy(k => k.EventType);
             foreach (var group in groups)
@@ -416,7 +416,7 @@ namespace Coosu.Storyboard.Management
                 {
                     CommonEvent nowE = list[index];
 
-                    if (container is Sprite ele &&
+                    if (host is Sprite ele &&
                         ele.TriggerList.Any(k => nowE.EndTime >= k.StartTime && nowE.StartTime <= k.EndTime) &&
                         ele.LoopList.Any(k => nowE.EndTime >= k.StartTime && nowE.StartTime <= k.EndTime))
                     {
@@ -439,58 +439,58 @@ namespace Coosu.Storyboard.Management
                          */
 
                         // 唯一时
-                        if (nowE.IsTimeInRange(container) && nowE.IsStaticAndDefault() &&
+                        if (nowE.IsTimeInRange(host) && nowE.IsStaticAndDefault() &&
                             list.Count == 1)
                         {
-                            RaiseSituationEvent(container, SituationType.ThisFirstSingleIsStaticAndDefaultToRemove,
-                                () => { RemoveEvent(container, list, nowE); },
+                            RaiseSituationEvent(host, SituationType.ThisFirstSingleIsStaticAndDefaultToRemove,
+                                () => { RemoveEvent(host, list, nowE); },
                                 nowE);
                         }
                         // 不唯一时
-                        else if (nowE.IsTimeInRange(container) && nowE.IsStatic() &&
+                        else if (nowE.IsTimeInRange(host) && nowE.IsStatic() &&
                             list.Count > 1)
                         {
                             var nextE = list[1];
                             if (EventCompare.IsEventSequent(nowE, nextE))
                             {
-                                RaiseSituationEvent(container, SituationType.ThisFirstIsStaticAndSequentWithNextHeadToRemove,
-                                    () => { RemoveEvent(container, list, nowE); },
+                                RaiseSituationEvent(host, SituationType.ThisFirstIsStaticAndSequentWithNextHeadToRemove,
+                                    () => { RemoveEvent(host, list, nowE); },
                                     nowE);
                             }
                         }
                         // 当 此event为move，param固定，且唯一时
                         else if (type == EventTypes.Move
-                                 && container is Sprite element)
+                                 && host is Sprite element)
                         {
                             if (list.Count == 1 && nowE.IsStatic()
-                                                && nowE.IsTimeInRange(container)
+                                                && nowE.IsTimeInRange(host)
                                                 && eventList.Count > 1)
                             {
                                 var move = (Move)nowE;
                                 if (nowE.Start.All(k => k == (int)k)) //若为小数，不归并
                                 {
-                                    RaiseSituationEvent(container,
+                                    RaiseSituationEvent(host,
                                         SituationType.MoveSingleIsStaticToRemoveAndChangeInitial,
                                         () =>
                                         {
                                             element.DefaultX = move.StartX;
                                             element.DefaultY = move.StartY;
 
-                                            RemoveEvent(container, list, nowE);
+                                            RemoveEvent(host, list, nowE);
                                         },
                                         nowE);
                                 }
                                 else if (move.EqualsInitialPosition(element))
                                 {
-                                    RaiseSituationEvent(container, SituationType.MoveSingleEqualsInitialToRemove,
-                                        () => { RemoveEvent(container, list, nowE); },
+                                    RaiseSituationEvent(host, SituationType.MoveSingleEqualsInitialToRemove,
+                                        () => { RemoveEvent(host, list, nowE); },
                                         nowE);
                                 }
                                 else
                                 {
                                     if (element.DefaultX != 0 || element.DefaultY != 0)
                                     {
-                                        RaiseSituationEvent(container, SituationType.InitialToZero,
+                                        RaiseSituationEvent(host, SituationType.InitialToZero,
                                             () =>
                                             {
                                                 element.DefaultX = 0;
@@ -504,7 +504,7 @@ namespace Coosu.Storyboard.Management
                             {
                                 if (element.DefaultX != 0 || element.DefaultY != 0)
                                 {
-                                    RaiseSituationEvent(container, SituationType.InitialToZero,
+                                    RaiseSituationEvent(host, SituationType.InitialToZero,
                                         () =>
                                         {
                                             element.DefaultX = 0;
@@ -520,7 +520,7 @@ namespace Coosu.Storyboard.Management
                     else // 若不是首个event
                     {
                         CommonEvent preE = list[index - 1];
-                        //if (container is Element ele2 &&
+                        //if (host is Element ele2 &&
                         //    ele2.TriggerList.Any(k => preE.EndTime >= k.StartTime && preE.StartTime <= k.EndTime) &&
                         //    ele2.LoopList.Any(k => preE.EndTime >= k.StartTime && preE.StartTime <= k.EndTime))
                         //{
@@ -535,12 +535,12 @@ namespace Coosu.Storyboard.Management
                             && preE.IsStatic()
                             && EventCompare.IsEventSequent(preE, nowE))
                         {
-                            RaiseSituationEvent(container, SituationType.ThisPrevIsStaticAndSequentToCombine,
+                            RaiseSituationEvent(host, SituationType.ThisPrevIsStaticAndSequentToCombine,
                                 () =>
                                 {
                                     preE.EndTime = nowE.EndTime; // 整合至前面: 前一个命令的结束时间延伸
 
-                                    RemoveEvent(container, list, nowE);
+                                    RemoveEvent(host, list, nowE);
                                     index--;
                                 },
                                 preE, nowE);
@@ -550,15 +550,15 @@ namespace Coosu.Storyboard.Management
                          * 且 此event的param固定
                          * 且 此event当前动作 = 此event上个动作
                         */
-                        else if (nowE.IsSmallerThenMaxTime(container) /*||
+                        else if (nowE.IsSmallerThenMaxTime(host) /*||
                                  type == EventTypes.Fade && nowStartP.SequenceEqual(EventExtension.UnworthyDictionary[EventTypes.Fade]) */
                                  && nowE.IsStatic()
                                  && EventCompare.IsEventSequent(preE, nowE))
                         {
-                            RaiseSituationEvent(container, SituationType.ThisIsStaticAndSequentWithPrevToCombine,
+                            RaiseSituationEvent(host, SituationType.ThisIsStaticAndSequentWithPrevToCombine,
                                 () =>
                                 {
-                                    RemoveEvent(container, list, nowE);
+                                    RemoveEvent(host, list, nowE);
                                     index--;
                                 },
                                 preE, nowE);
@@ -577,13 +577,13 @@ namespace Coosu.Storyboard.Management
                                  preE.StartTime == preE.EndTime)
                         {
                             if (index > 1 ||
-                                preE.EqualsMultiMinTime(container) ||
+                                preE.EqualsMultiMinTime(host) ||
                                 preE.IsStatic() && EventCompare.IsEventSequent(preE, nowE))
                             {
-                                RaiseSituationEvent(container, SituationType.PrevIsStaticAndTimeOverlapWithThisStartTimeToRemove,
+                                RaiseSituationEvent(host, SituationType.PrevIsStaticAndTimeOverlapWithThisStartTimeToRemove,
                                     () =>
                                     {
-                                        RemoveEvent(container, list, preE);
+                                        RemoveEvent(host, list, preE);
                                         index--;
                                     },
                                     preE, nowE);
@@ -597,23 +597,23 @@ namespace Coosu.Storyboard.Management
             } // group的循环
         }
 
-        private static void RemoveEvent(EventContainer sourceContainer, ICollection<CommonEvent> eventList, CommonEvent e)
+        private static void RemoveEvent(EventHost sourceHost, ICollection<CommonEvent> eventList, CommonEvent e)
         {
-            sourceContainer.EventList.Remove(e);
+            sourceHost.Events.Remove(e);
             eventList.Remove(e);
         }
 
-        private void RaiseSituationEvent(EventContainer container, SituationType situationType, Action continueAction, params CommonEvent[] events)
+        private void RaiseSituationEvent(EventHost host, SituationType situationType, Action continueAction, params CommonEvent[] events)
         {
-            RaiseSituationEvent(container, situationType, continueAction, null, events);
+            RaiseSituationEvent(host, situationType, continueAction, null, events);
         }
 
-        private void RaiseSituationEvent(EventContainer container, SituationType situationType, Action continueAction, Action breakAction, params CommonEvent[] events)
+        private void RaiseSituationEvent(EventHost host, SituationType situationType, Action continueAction, Action breakAction, params CommonEvent[] events)
         {
             var args = new SituationEventArgs(Guid, situationType)
             {
-                Sprite = container is Sprite e ? e : container.BaseElement,
-                Container = container is Sprite ? null : container,
+                Sprite = host is Sprite e ? e : host._baseHost,
+                Host = host is Sprite ? null : host,
                 Events = events
             };
 

@@ -1,6 +1,7 @@
 ﻿using Coosu.Storyboard.Extensibility;
 using Coosu.Storyboard.OsbX.ActionHandlers;
 using System;
+using Coosu.Storyboard.Management;
 
 namespace Coosu.Storyboard.OsbX.SubjectHandlers
 {
@@ -29,7 +30,7 @@ namespace Coosu.Storyboard.OsbX.SubjectHandlers
         {
             if (split.Length == 8 || split.Length == 9 || split.Length == 12)
             {
-                var type = SpriteTypeManager.Parse(split[0]);
+                var type = ObjectTypeManager.Parse(split[0]);
                 var layerType = (LayerType)Enum.Parse(typeof(LayerType), split[1]);
                 var origin = (OriginType)Enum.Parse(typeof(OriginType), split[2]);
                 var path = split[3].Trim('\"');

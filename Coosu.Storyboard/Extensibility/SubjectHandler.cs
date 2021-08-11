@@ -2,10 +2,10 @@
 
 namespace Coosu.Storyboard.Extensibility
 {
-    public abstract class SubjectHandler<T> : ISubjectParsingHandler<T> where T : EventContainer
+    public abstract class SubjectHandler<T> : ISubjectParsingHandler<T> where T : ISceneObject
     {
         public abstract string Flag { get; }
-        EventContainer ISubjectParsingHandler.Deserialize(string[] split)
+        ISceneObject ISubjectParsingHandler.Deserialize(string[] split)
         {
             return Deserialize(split);
         }
@@ -15,7 +15,7 @@ namespace Coosu.Storyboard.Extensibility
             return Deserialize(split);
         }
 
-        string ISubjectParsingHandler.Serialize(EventContainer raw)
+        string ISubjectParsingHandler.Serialize(ISceneObject raw)
         {
             return Serialize((T)raw);
         }

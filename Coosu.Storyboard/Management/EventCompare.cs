@@ -1,24 +1,23 @@
-﻿using Coosu.Shared.Mathematics;
+﻿using System;
+using System.Linq;
+using Coosu.Shared.Mathematics;
 using Coosu.Storyboard.Events;
 using Coosu.Storyboard.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Coosu.Storyboard.Management
 {
     public static class EventCompare
     {
 
-        public static bool InObsoleteTimingRange(this CommonEvent e, EventContainer container, out RangeValue<float> range)
+        public static bool InObsoleteTimingRange(this CommonEvent e, EventHost host, out RangeValue<float> range)
         {
-            return container.ObsoleteList.ContainsTimingPoint(out range, e.StartTime, e.EndTime);
+            return host.ObsoleteList.ContainsTimingPoint(out range, e.StartTime, e.EndTime);
         }
 
-        public static bool OnObsoleteTimingRange(this CommonEvent e, EventContainer container)
+        public static bool OnObsoleteTimingRange(this CommonEvent e, EventHost host)
         {
-            return container.ObsoleteList.OnTimingRange(out _, e.StartTime) ||
-                   container.ObsoleteList.OnTimingRange(out _, e.EndTime);
+            return host.ObsoleteList.OnTimingRange(out _, e.StartTime) ||
+                   host.ObsoleteList.OnTimingRange(out _, e.EndTime);
         }
 
         public static bool IsEventSequent(CommonEvent previous, CommonEvent next)
@@ -55,41 +54,41 @@ namespace Coosu.Storyboard.Management
                    move.StartY.Equals(sprite.DefaultY);
         }
 
-        public static bool IsTimeInRange(this CommonEvent e, EventContainer container)
+        public static bool IsTimeInRange(this CommonEvent e, EventHost host)
         {
-            return e.IsSmallerThenMaxTime(container) && e.IsLargerThanMinTime(container);
+            return e.IsSmallerThenMaxTime(host) && e.IsLargerThanMinTime(host);
         }
 
-        public static bool IsSmallerThenMaxTime(this CommonEvent e, EventContainer container)
+        public static bool IsSmallerThenMaxTime(this CommonEvent e, EventHost host)
         {
-            return e.EndTime < container.MaxTime ||
-                   e.EqualsMultiMaxTime(container);
+            return e.EndTime < host.MaxTime ||
+                   e.EqualsMultiMaxTime(host);
         }
 
-        public static bool IsLargerThanMinTime(this CommonEvent e, EventContainer container)
+        public static bool IsLargerThanMinTime(this CommonEvent e, EventHost host)
         {
-            return e.StartTime > container.MinTime ||
-                   e.EqualsMultiMinTime(container);
+            return e.StartTime > host.MinTime ||
+                   e.EqualsMultiMinTime(host);
         }
 
-        public static bool EqualsMultiMaxTime(this CommonEvent e, EventContainer container)
+        public static bool EqualsMultiMaxTime(this CommonEvent e, EventHost host)
         {
-            return e.EqualsMaxTime(container) && container.MaxTimeCount > 1;
+            return e.EqualsMaxTime(host) && host.GetMaxTimeCount() > 1;
         }
 
-        public static bool EqualsMultiMinTime(this CommonEvent e, EventContainer container)
+        public static bool EqualsMultiMinTime(this CommonEvent e, EventHost host)
         {
-            return e.EqualsMinTime(container) && container.MinTimeCount > 1;
+            return e.EqualsMinTime(host) && host.GetMinTimeCount() > 1;
         }
 
-        public static bool EqualsMaxTime(this CommonEvent e, EventContainer container)
+        public static bool EqualsMaxTime(this CommonEvent e, EventHost host)
         {
-            return e.EndTime == container.MaxTime;
+            return e.EndTime == host.MaxTime;
         }
 
-        public static bool EqualsMinTime(this CommonEvent e, EventContainer container)
+        public static bool EqualsMinTime(this CommonEvent e, EventHost host)
         {
-            return e.StartTime == container.MinTime;
+            return e.StartTime == host.MinTime;
         }
     }
 }

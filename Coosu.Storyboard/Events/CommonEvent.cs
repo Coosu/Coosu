@@ -34,10 +34,10 @@ namespace Coosu.Storyboard.Events
         //    throw new ArgumentOutOfRangeException(nameof(other));
         //}
 
-        public void AdjustTiming(float time)
+        public void AdjustTiming(float offset)
         {
-            StartTime += time;
-            EndTime += time;
+            StartTime += offset;
+            EndTime += offset;
         }
 
         public virtual async Task WriteScriptAsync(TextWriter writer)

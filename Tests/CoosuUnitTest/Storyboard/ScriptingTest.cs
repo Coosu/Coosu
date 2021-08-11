@@ -17,7 +17,7 @@ namespace CoosuUnitTest.Storyboard
         {
             var group = new VirtualLayer(0);
             group.CreateSprite("");
-            Assert.AreEqual(1, group.Elements.Count);
+            Assert.AreEqual(1, group.SceneObjects.Count);
         }
     }
 }

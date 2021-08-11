@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Coosu.Storyboard.Events.Containers
+namespace Coosu.Storyboard.Events.EventHosts
 {
     [Flags]
     public enum TriggerType

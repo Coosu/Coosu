@@ -28,9 +28,9 @@ namespace Coosu.Storyboard.Management
             eleG.InnerFix(false, true);
         }
 
-        public static void Expand(this EventContainer container)
+        public static void Expand(this EventHost host)
         {
-            if (container is Sprite element)
+            if (host is Sprite element)
             {
                 if (element.TriggerList.Any())
                 {
@@ -48,7 +48,7 @@ namespace Coosu.Storyboard.Management
                         for (int count = 0; count < loopCount; count++)
                         {
                             var fixedStartTime = startTime + (count * loop.MaxTime);
-                            foreach (var e in loop.EventList)
+                            foreach (var e in loop.Events)
                             {
                                 element.AddEvent(
                                     e.EventType,
@@ -64,7 +64,7 @@ namespace Coosu.Storyboard.Management
                 }
             }
 
-            var events = container.EventList?.GroupBy(k => k.EventType);
+            var events = host.Events?.GroupBy(k => k.EventType);
             if (events == null) return;
             foreach (var kv in events)
             {
@@ -78,7 +78,7 @@ namespace Coosu.Storyboard.Management
 
                     if (!list[i].EndTime.Equals(list[i + 1].StartTime)) // case 2
                     {
-                        container.AddEvent(
+                        host.AddEvent(
                             list[i].EventType,
                             EasingType.Linear,
                             list[i].EndTime, list[i + 1].StartTime,
@@ -91,7 +91,7 @@ namespace Coosu.Storyboard.Management
 
         public static void FillObsoleteList(this Sprite sprite)
         {
-            var possibleList = sprite.EventList
+            var possibleList = sprite.Events
                 .Where(k => k.EventType == EventTypes.Fade ||
                             k.EventType == EventTypes.Scale ||
                             k.EventType == EventTypes.Vector);
@@ -160,14 +160,14 @@ namespace Coosu.Storyboard.Management
             {
                 if (sprite.TriggerList
                         .Where(k =>
-                            k.EventList
+                            k.Events
                                 .Any(o => EventExtension.UnworthyDictionary.ContainsKey(o.EventType))
                         )
                         .Any(k => endTime >= k.StartTime && startTime <= k.EndTime)
                     ||
                     sprite.LoopList
                         .Where(k =>
-                            k.EventList
+                            k.Events
                                 .Any(o => EventExtension.UnworthyDictionary.ContainsKey(o.EventType))
                         )
                         .Any(k => endTime >= k.StartTime && startTime <= k.EndTime))
@@ -182,9 +182,9 @@ namespace Coosu.Storyboard.Management
         /// <summary>
         /// 检查timing是否合法.
         /// </summary>
-        public static void Examine(this EventContainer container)
+        public static void Examine(this EventHost host)
         {
-            var events = container.EventList.GroupBy(k => k.EventType);
+            var events = host.Events.GroupBy(k => k.EventType);
             foreach (var kv in events)
             {
                 var list = kv.ToArray();
@@ -201,7 +201,7 @@ namespace Coosu.Storyboard.Management
                         {
                             Message = info
                         };
-                        container.OnErrorOccurred?.Invoke(container, arg);
+                        host.OnErrorOccurred?.Invoke(host, arg);
                         if (!arg.Continue)
                         {
                             return;
@@ -215,7 +215,7 @@ namespace Coosu.Storyboard.Management
                         {
                             Message = info
                         };
-                        container.OnErrorOccurred?.Invoke(container, arg);
+                        host.OnErrorOccurred?.Invoke(host, arg);
                         if (!arg.Continue)
                         {
                             return;
@@ -224,7 +224,7 @@ namespace Coosu.Storyboard.Management
                 }
             }
 
-            if (!(container is Sprite e))
+            if (!(host is Sprite e))
                 return;
 
             foreach (var item in e.LoopList)
@@ -242,7 +242,7 @@ namespace Coosu.Storyboard.Management
         {
             if (!expand && !fillFadeout)
                 return;
-            foreach (var ec in eleG.Elements)
+            foreach (var ec in eleG.SceneObjects)
             {
                 if (!(ec is Sprite ele)) continue;
 

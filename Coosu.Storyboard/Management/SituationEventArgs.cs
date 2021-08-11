@@ -6,8 +6,8 @@ namespace Coosu.Storyboard.Management
     public class SituationEventArgs : CompressorEventArgs
     {
         public SituationType SituationType { get; }
-        public Sprite Sprite { get; set; }
-        public EventContainer Container { get; set; }
+        public ISceneObject Sprite { get; set; }
+        public EventHost Host { get; set; }
         public CommonEvent[] Events { get; set; }
         public override bool Continue { get; set; } = true;
 

@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Coosu.Storyboard.Events;
-using Coosu.Storyboard.Events.Containers;
+using Coosu.Storyboard.Events.EventHosts;
 
 namespace Coosu.Storyboard.Utils
 {
@@ -25,20 +25,20 @@ namespace Coosu.Storyboard.Utils
                 await sw.WriteLineAsync(indent + e);
         }
 
-        public static async Task WriteContainerEventsAsync(TextWriter sw, EventContainer container, bool group)
+        public static async Task WriteHostEventsAsync(TextWriter sw, EventHost host, bool group)
         {
             if (group)
-                await sw.WriteGroupedEventAsync(container.EventList, 1);
+                await sw.WriteGroupedEventAsync(host.Events, 1);
             else
-                await sw.WriteSequentialEventAsync(container.EventList, 1);
+                await sw.WriteSequentialEventAsync(host.Events, 1);
         }
 
         public static async Task WriteElementEventsAsync(this TextWriter sw, Sprite sprite, bool group)
         {
             if (group)
-                await sw.WriteGroupedEventAsync(sprite.EventList, 1);
+                await sw.WriteGroupedEventAsync(sprite.Events, 1);
             else
-                await sw.WriteSequentialEventAsync(sprite.EventList, 1);
+                await sw.WriteSequentialEventAsync(sprite.Events, 1);
 
             foreach (var loop in sprite.LoopList)
                 await sw.WriteLoopAsync(loop, group);
@@ -52,9 +52,9 @@ namespace Coosu.Storyboard.Utils
             await sw.WriteLineAsync(head);
 
             if (group)
-                await sw.WriteGroupedEventAsync(trigger.EventList, 2);
+                await sw.WriteGroupedEventAsync(trigger.Events, 2);
             else
-                await sw.WriteSequentialEventAsync(trigger.EventList, 2);
+                await sw.WriteSequentialEventAsync(trigger.Events, 2);
         }
 
         public static async Task WriteLoopAsync(this TextWriter sw, Loop loop, bool group)
@@ -63,9 +63,9 @@ namespace Coosu.Storyboard.Utils
             await sw.WriteLineAsync(head);
 
             if (group)
-                await sw.WriteGroupedEventAsync(loop.EventList, 2);
+                await sw.WriteGroupedEventAsync(loop.Events, 2);
             else
-                await sw.WriteSequentialEventAsync(loop.EventList, 2);
+                await sw.WriteSequentialEventAsync(loop.Events, 2);
         }
     }
 }

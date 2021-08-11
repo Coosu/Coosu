@@ -32,7 +32,7 @@ namespace Coosu.Storyboard.OsbX
         public static async Task<string> SerializeObjectAsync(VirtualLayer group)
         {
             var sb = new StringBuilder();
-            foreach (var element in group.Elements)
+            foreach (var element in group.SceneObjects)
             {
                 var result = await SerializeObjectAsync(element);
                 sb.AppendLine(result);
@@ -41,14 +41,14 @@ namespace Coosu.Storyboard.OsbX
             return sb.ToString().TrimEnd('\n', '\r'); ;
         }
 
-        public static async Task<string> SerializeObjectAsync(EventContainer element)
+        public static async Task<string> SerializeObjectAsync(Sprite element)
         {
             var sb = new StringBuilder();
-            var subjectHandler = Register.GetSubjectHandler(SpriteTypeManager.GetString(element.Type));
+            var subjectHandler = Register.GetSubjectHandler(ObjectTypeManager.GetString(element.ObjectType));
             if (subjectHandler == null)
             {
                 Console.WriteLine(
-                    $"Cannot find subject handler for `{SpriteTypeManager.GetString(element.Type)}`: Skipped.");
+                    $"Cannot find subject handler for `{ObjectTypeManager.GetString(element.ObjectType)}`: Skipped.");
                 return "";
             }
 
@@ -60,11 +60,11 @@ namespace Coosu.Storyboard.OsbX
             catch (Exception ex)
             {
                 Console.WriteLine(
-                    $"Error while serializing element: `{SpriteTypeManager.GetString(element.Type)}`\r\n{ex}");
+                    $"Error while serializing element: `{ObjectTypeManager.GetString(element.ObjectType)}`\r\n{ex}");
                 return "";
             }
 
-            foreach (var commonEvent in element.EventList)
+            foreach (var commonEvent in element.Events)
             {
                 var actionHandler = subjectHandler.GetActionHandler(commonEvent.EventType.Flag);
                 if (actionHandler == null)
@@ -95,7 +95,7 @@ namespace Coosu.Storyboard.OsbX
         public static async Task<VirtualLayerManager> DeserializeObjectAsync(TextReader reader)
         {
             ISubjectParsingHandler lastSubjectHandler = null;
-            EventContainer lastSubject = null;
+            EventHost lastSubject = null;
             //int lastDeep = 0;
             var line = await reader.ReadLineAsync();
             int l = 0;
@@ -118,7 +118,7 @@ namespace Coosu.Storyboard.OsbX
                         var handler = Register.GetSubjectHandler(mahou);
                         if (handler == null && int.TryParse(mahou, out var flag))
                         {
-                            var magicWord = SpriteTypeManager.GetString(flag);
+                            var magicWord = ObjectTypeManager.GetString(flag);
                             if (magicWord != null) handler = Register.GetSubjectHandler(magicWord);
                         }
 
@@ -126,11 +126,11 @@ namespace Coosu.Storyboard.OsbX
                         {
                             try
                             {
-                                var subject = handler.Deserialize(split);
-                                var eg = em.GetOrAddLayer(subject.ZDistance);
-                                eg.AddSubject(subject);
+                                var sprite = handler.Deserialize(split);
+                                var eg = em.GetOrAddLayer(sprite.ZDistance);
+                                eg.AddSprite(sprite);
 
-                                lastSubject = subject;
+                                lastSubject = sprite;
                             }
                             catch (Exception ex)
                             {
