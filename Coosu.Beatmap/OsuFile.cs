@@ -201,11 +201,7 @@ namespace Coosu.Beatmap
 
         protected OsuFile() { }
 
-        private string Path => Shared.IO.File.EscapeFileName(string.Format("{0} - {1} ({2}){3}.osu",
-            Metadata.Artist,
-            Metadata.Title,
-            Metadata.Creator,
-            Metadata.Version != "" ? $" [{Metadata.Version}]" : ""));
+        private string Path => GetPath(Metadata.Version);
 
         public string GetPath(string newDiffName)
         {
@@ -213,7 +209,7 @@ namespace Coosu.Beatmap
                 Metadata.Artist,
                 Metadata.Title,
                 Metadata.Creator,
-                Metadata.Version != "" ? $" [{newDiffName}]" : ""));
+                newDiffName != "" ? $" [{newDiffName}]" : ""));
         }
     }
 }

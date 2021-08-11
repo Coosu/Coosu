@@ -8,13 +8,20 @@
     <PackageProjectUrl>https://github.com/Coosu/Coosu</PackageProjectUrl>
     <Description>Coosu.Beatmap is library to read and write osu!beatmap data of .osu file.</Description>
     <PackageTags>osu, osu!</PackageTags>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Copyright>Copyright © Coosu 2020</Copyright>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+  <PropertyGroup Label="MinVerSetting">
+    <MinVerTagPrefix>beatmap-v</MinVerTagPrefix>
+    <MinVerMinimumMajorMinor>1.0</MinVerMinimumMajorMinor>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MinVer" Version="2.5.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Coosu.Storyboard\Coosu.Storyboard.csproj" />
