@@ -1,13 +1,12 @@
-﻿using Coosu.Storyboard.Events;
-using System;
-using System.Collections.Generic;
+﻿using System;
+using Coosu.Storyboard.Events;
 
-namespace Coosu.Storyboard
+namespace Coosu.Storyboard.Management
 {
     public class SituationEventArgs : CompressorEventArgs
     {
         public SituationType SituationType { get; }
-        public Element Element { get; set; }
+        public Sprite Sprite { get; set; }
         public EventContainer Container { get; set; }
         public CommonEvent[] Events { get; set; }
         public override bool Continue { get; set; } = true;

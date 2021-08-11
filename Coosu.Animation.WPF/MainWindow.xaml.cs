@@ -111,15 +111,15 @@ namespace Coosu.Animation.WPF
             int i = int.MinValue;
             foreach (var ec in eg.Elements)
             {
-                if (ec is AnimatedElement) continue;
-                if (!(ec is Element element)) continue;
+                if (ec is Storyboard.Animation) continue;
+                if (!(ec is Sprite element)) continue;
                 var imagePath = System.IO.Path.Combine(folder, element.ImagePath);
                 if (!element.ImagePath.Contains("."))
                 {
                     imagePath += ".jpg";
                 }
 
-                var origin = ParseOrigin(element.Origin);
+                var origin = ParseOrigin(element.OriginType);
                 var x = element.DefaultX;
                 var y = element.DefaultY;
                 if (!System.IO.File.Exists(imagePath))
@@ -249,9 +249,9 @@ namespace Coosu.Animation.WPF
             Console.WriteLine(sw.ElapsedMilliseconds);
         }
 
-        private Origin<double> ParseOrigin(OriginType elementOrigin)
+        private Origin<double> ParseOrigin(OriginType originType)
         {
-            switch (elementOrigin)
+            switch (originType)
             {
                 case OriginType.TopLeft:
                     return Origins.TopLeft;
@@ -272,7 +272,7 @@ namespace Coosu.Animation.WPF
                 case OriginType.BottomRight:
                     return Origins.BottomRight;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(elementOrigin), elementOrigin, null);
+                    throw new ArgumentOutOfRangeException(nameof(originType), originType, null);
             }
         }
 

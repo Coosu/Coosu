@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Coosu.Storyboard
+namespace Coosu.Storyboard.Management
 {
     public class ProgressEventArgs : CompressorEventArgs
     {

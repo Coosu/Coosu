@@ -49,10 +49,10 @@ namespace Coosu.Storyboard.Management
             return e.Start.SequenceEqual(e.End);
         }
 
-        public static bool EqualsInitialPosition(this Move move, Element element)
+        public static bool EqualsInitialPosition(this Move move, Sprite sprite)
         {
-            return move.StartX.Equals(element.DefaultX) &&
-                   move.StartY.Equals(element.DefaultY);
+            return move.StartX.Equals(sprite.DefaultX) &&
+                   move.StartY.Equals(sprite.DefaultY);
         }
 
         public static bool IsTimeInRange(this CommonEvent e, EventContainer container)

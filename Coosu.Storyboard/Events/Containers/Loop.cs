@@ -34,7 +34,7 @@ namespace Coosu.Storyboard.Events.Containers
 
         public override async Task WriteScriptAsync(TextWriter sb)
         {
-            await sb.WriteLoopAsync(this, group);
+            await sb.WriteLoopAsync(this, Group);
         }
     }
 }

@@ -3,7 +3,7 @@ using Coosu.Storyboard.Events;
 
 namespace Coosu.Storyboard
 {
-    partial class Element
+    partial class Sprite
     {
         // Move
         public void Move(int startTime, Vector2 point) =>

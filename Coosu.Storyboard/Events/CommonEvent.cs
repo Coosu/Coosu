@@ -1,13 +1,14 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using Coosu.Storyboard.Management;
 using Coosu.Storyboard.Utils;
 
 namespace Coosu.Storyboard.Events
 {
     public abstract class CommonEvent : ICommonEvent,
         IScriptable,
-        IAdjustableTimingEvent
+        ITimingAdjustable
     //,IComparable<CommonEvent>
     {
         public abstract EventType EventType { get; }

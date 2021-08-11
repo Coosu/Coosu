@@ -27,14 +27,14 @@ namespace Coosu.Storyboard.Management
             return elementGroup;
         }
 
-        public void AddLayer(VirtualLayer layer)
+        public void AddLayer(VirtualLayer virtualLayer)
         {
-            Layers.Add(layer.ZDistance, layer);
+            Layers.Add(virtualLayer.ZDistance, virtualLayer);
         }
 
-        public void DeleteLayer(VirtualLayer layer)
+        public void DeleteLayer(VirtualLayer virtualLayer)
         {
-            Layers.Remove(layer.ZDistance);
+            Layers.Remove(virtualLayer.ZDistance);
         }
 
         public void DeleteLayer(float z)

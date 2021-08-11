@@ -30,7 +30,7 @@ namespace Coosu.Storyboard.Management
 
         public static void Expand(this EventContainer container)
         {
-            if (container is Element element)
+            if (container is Sprite element)
             {
                 if (element.TriggerList.Any())
                 {
@@ -89,9 +89,9 @@ namespace Coosu.Storyboard.Management
             }
         }
 
-        public static void FillObsoleteList(this Element element)
+        public static void FillObsoleteList(this Sprite sprite)
         {
-            var possibleList = element.EventList
+            var possibleList = sprite.EventList
                 .Where(k => k.EventType == EventTypes.Fade ||
                             k.EventType == EventTypes.Scale ||
                             k.EventType == EventTypes.Vector);
@@ -114,9 +114,9 @@ namespace Coosu.Storyboard.Management
                     // 最早的event晚于最小开始时间，默认加这一段
                     if (dic[e.EventType].Count == 1 &&
                         e.Start.SequenceEqual(e.GetUnworthyValue()) &&
-                        e.StartTime > element.MinTime)
+                        e.StartTime > sprite.MinTime)
                     {
-                        dic[e.EventType].StartTime = element.MinTime;
+                        dic[e.EventType].StartTime = sprite.MinTime;
                         dic[e.EventType].IsFadingOut = true;
                     }
 
@@ -148,24 +148,24 @@ namespace Coosu.Storyboard.Management
 
                 // 可能存在遍历完后所有event后，仍存在某一项>0（后面还有别的event，算无用）
                 foreach (var pair in dic
-                    .Where(k => k.Value.IsFadingOut && !k.Value.StartTime.Equals(element.MaxTime))
+                    .Where(k => k.Value.IsFadingOut && !k.Value.StartTime.Equals(sprite.MaxTime))
                     .OrderBy(k => k.Value.StartTime))
                 {
-                    AddTimeRage(pair.Value.StartTime, element.MaxTime);
+                    AddTimeRage(pair.Value.StartTime, sprite.MaxTime);
                     break;
                 }
             }
 
             void AddTimeRage(float startTime, float endTime)
             {
-                if (element.TriggerList
+                if (sprite.TriggerList
                         .Where(k =>
                             k.EventList
                                 .Any(o => EventExtension.UnworthyDictionary.ContainsKey(o.EventType))
                         )
                         .Any(k => endTime >= k.StartTime && startTime <= k.EndTime)
                     ||
-                    element.LoopList
+                    sprite.LoopList
                         .Where(k =>
                             k.EventList
                                 .Any(o => EventExtension.UnworthyDictionary.ContainsKey(o.EventType))
@@ -175,7 +175,7 @@ namespace Coosu.Storyboard.Management
                     return;
                 }
 
-                element.ObsoleteList.Add(startTime, endTime);
+                sprite.ObsoleteList.Add(startTime, endTime);
             }
         }
 
@@ -197,7 +197,7 @@ namespace Coosu.Storyboard.Management
                         var info = $"{{{objNow}}}:\r\n" +
                                    $"Start time should not be larger than end time.";
 
-                        var arg = new ErrorEventArgs()
+                        var arg = new ProcessErrorEventArgs()
                         {
                             Message = info
                         };
@@ -211,7 +211,7 @@ namespace Coosu.Storyboard.Management
                     {
                         var info = $"{{{objNow}}} to {{{objNext}}}:\r\n" +
                                    $"The previous object's end time should be larger than the next object's start time.";
-                        var arg = new ErrorEventArgs
+                        var arg = new ProcessErrorEventArgs
                         {
                             Message = info
                         };
@@ -224,7 +224,7 @@ namespace Coosu.Storyboard.Management
                 }
             }
 
-            if (!(container is Element e))
+            if (!(container is Sprite e))
                 return;
 
             foreach (var item in e.LoopList)
@@ -244,7 +244,7 @@ namespace Coosu.Storyboard.Management
                 return;
             foreach (var ec in eleG.Elements)
             {
-                if (!(ec is Element ele)) continue;
+                if (!(ec is Sprite ele)) continue;
 
                 if (expand) ele.Expand();
                 if (fillFadeout) ele.FillObsoleteList();

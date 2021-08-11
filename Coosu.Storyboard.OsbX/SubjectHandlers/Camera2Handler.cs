@@ -12,7 +12,7 @@ namespace Coosu.Storyboard.OsbX.SubjectHandlers
     {
         static Camera2Handler()
         {
-            ElementTypeSign.SignType(99, "Camera2");
+            SpriteTypeManager.SignType(99, "Camera2");
         }
 
         public Camera2Handler()
@@ -40,7 +40,7 @@ namespace Coosu.Storyboard.OsbX.SubjectHandlers
         {
             if (split.Length >= 1)
             {
-                var type = ElementTypeSign.Parse(split[0]);
+                var type = SpriteTypeManager.Parse(split[0]);
                 int cameraId = 0;
                 if (split.Length >= 2)
                 {
@@ -56,14 +56,14 @@ namespace Coosu.Storyboard.OsbX.SubjectHandlers
 
     public class Camera2Element : EventContainer
     {
-        protected override string Header => $"{ElementTypeSign.GetString(Type)},{CameraId}";
+        protected override string Header => $"{SpriteTypeManager.GetString(Type)},{CameraId}";
 
         static Camera2Element()
         {
-            ElementTypeSign.SignType(99, "Camera2");
+            SpriteTypeManager.SignType(99, "Camera2");
         }
 
-        public Camera2Element(ElementType type)
+        public Camera2Element(SpriteType type)
         {
             Type = type;
         }
@@ -87,7 +87,7 @@ namespace Coosu.Storyboard.OsbX.SubjectHandlers
         public override async Task WriteScriptAsync(TextWriter sw)
         {
             await sw.WriteLineAsync(Header);
-            await ScriptHelper.WriteContainerEventsAsync(sw, this, @group);
+            await ScriptHelper.WriteContainerEventsAsync(sw, this, Group);
         }
     }
 }

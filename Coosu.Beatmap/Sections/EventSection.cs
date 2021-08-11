@@ -18,7 +18,7 @@ namespace Coosu.Beatmap.Sections
         public VideoData VideoInfo { get; set; }
         public List<StoryboardSampleData> SampleInfo { get; set; } = new List<StoryboardSampleData>();
         public List<RangeValue<int>> Breaks { get; set; } = new List<RangeValue<int>>();
-        public VirtualLayer Layer { get; set; }
+        public VirtualLayer VirtualLayer { get; set; }
 
         public EventSection(OsuFile osuFile)
         {
@@ -49,7 +49,7 @@ namespace Coosu.Beatmap.Sections
                         _currentSection = SectionBreak;
                         break;
                     case SectionSbSamples:
-                        if (!_options.StoryboardIgnored) Layer = VirtualLayer.ParseFromText(_sbInfo.ToString().Trim('\r', '\n'));
+                        if (!_options.StoryboardIgnored) VirtualLayer = VirtualLayer.ParseFromText(_sbInfo.ToString().Trim('\r', '\n'));
                         _currentSection = SectionSbSamples;
                         break;
                     default:

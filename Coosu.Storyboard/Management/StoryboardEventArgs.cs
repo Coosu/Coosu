@@ -1,10 +1,10 @@
 ﻿using System;
 
-namespace Coosu.Storyboard
+namespace Coosu.Storyboard.Management
 {
     public class StoryboardEventArgs : EventArgs
     {
-        public string Message { get; set; }
+        public string? Message { get; set; }
         public virtual bool Continue { get; set; }
     }
 }

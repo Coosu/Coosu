@@ -4,7 +4,7 @@ using System;
 
 namespace Coosu.Storyboard.OsbX.SubjectHandlers
 {
-    public class SpriteHandler : SubjectHandler<Element>
+    public class SpriteHandler : SubjectHandler<Sprite>
     {
         public SpriteHandler()
         {
@@ -21,16 +21,16 @@ namespace Coosu.Storyboard.OsbX.SubjectHandlers
         public override string Flag => "Sprite";
 
         //Sprite,0,Centre,"",320,240
-        public override string Serialize(Element raw)
+        public override string Serialize(Sprite raw)
         {
-            return $"{Flag},{raw.Layer},{raw.Origin},\"{raw.ImagePath}\",{raw.DefaultX},{raw.DefaultY},{raw.CameraId},{raw.ZDistance},0";
+            return $"{Flag},{raw.LayerType},{raw.OriginType},\"{raw.ImagePath}\",{raw.DefaultX},{raw.DefaultY},{raw.CameraId},{raw.ZDistance},0";
         }
 
-        public override Element Deserialize(string[] split)
+        public override Sprite Deserialize(string[] split)
         {
             if (split.Length == 6 || split.Length == 9)
             {
-                var type = ElementTypeSign.Parse(split[0]);
+                var type = SpriteTypeManager.Parse(split[0]);
                 var layerType = (LayerType)Enum.Parse(typeof(LayerType), split[1]);
                 var origin = (OriginType)Enum.Parse(typeof(OriginType), split[2]);
                 var path = split[3].Trim('\"');
@@ -50,7 +50,7 @@ namespace Coosu.Storyboard.OsbX.SubjectHandlers
                     }
                 }
 
-                return new Element(type, layerType, origin, path, defX, defY)
+                return new Sprite(type, layerType, origin, path, defX, defY)
                 {
                     ZDistance = zDistance,
                     CameraId = cameraId

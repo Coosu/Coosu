@@ -44,11 +44,11 @@ namespace Coosu.Storyboard.OsbX
         public static async Task<string> SerializeObjectAsync(EventContainer element)
         {
             var sb = new StringBuilder();
-            var subjectHandler = Register.GetSubjectHandler(ElementTypeSign.GetString(element.Type));
+            var subjectHandler = Register.GetSubjectHandler(SpriteTypeManager.GetString(element.Type));
             if (subjectHandler == null)
             {
                 Console.WriteLine(
-                    $"Cannot find subject handler for `{ElementTypeSign.GetString(element.Type)}`: Skipped.");
+                    $"Cannot find subject handler for `{SpriteTypeManager.GetString(element.Type)}`: Skipped.");
                 return "";
             }
 
@@ -60,7 +60,7 @@ namespace Coosu.Storyboard.OsbX
             catch (Exception ex)
             {
                 Console.WriteLine(
-                    $"Error while serializing element: `{ElementTypeSign.GetString(element.Type)}`\r\n{ex}");
+                    $"Error while serializing element: `{SpriteTypeManager.GetString(element.Type)}`\r\n{ex}");
                 return "";
             }
 
@@ -118,7 +118,7 @@ namespace Coosu.Storyboard.OsbX
                         var handler = Register.GetSubjectHandler(mahou);
                         if (handler == null && int.TryParse(mahou, out var flag))
                         {
-                            var magicWord = ElementTypeSign.GetString(flag);
+                            var magicWord = SpriteTypeManager.GetString(flag);
                             if (magicWord != null) handler = Register.GetSubjectHandler(magicWord);
                         }
 

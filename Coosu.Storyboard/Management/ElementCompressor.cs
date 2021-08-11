@@ -13,7 +13,7 @@ namespace Coosu.Storyboard.Management
     {
         public EventHandler<CompressorEventArgs> OperationStart;
         public EventHandler<CompressorEventArgs> OperationEnd;
-        public EventHandler<ErrorEventArgs> ErrorOccured; //lock
+        public EventHandler<ProcessErrorEventArgs> ErrorOccured; //lock
         //public EventHandler<SituationEventArgs> ElementFound; //lock
         public EventHandler<SituationEventArgs> SituationFound; //lock
         public EventHandler<SituationEventArgs> SituationChanged; //lock
@@ -22,7 +22,7 @@ namespace Coosu.Storyboard.Management
         private int _threadCount = 1;
         private int _pauseThreadCount = 0;
 
-        private readonly ICollection<Element> _elements;
+        private readonly ICollection<Sprite> _elements;
 
         private object _runLock = new object();
         private object _pauseThreadLock = new object();
@@ -33,14 +33,14 @@ namespace Coosu.Storyboard.Management
 
         public Guid Guid { get; } = Guid.NewGuid();
 
-        public ElementCompressor(ICollection<Element> elements)
+        public ElementCompressor(ICollection<Sprite> elements)
         {
             this._elements = elements;
         }
 
-        public ElementCompressor(VirtualLayer layer)
+        public ElementCompressor(VirtualLayer virtualLayer)
         {
-            _elements = layer.Elements.Where(k => k is Element).Cast<Element>().ToList();
+            _elements = virtualLayer.Elements.Where(k => k is Sprite).Cast<Sprite>().ToList();
         }
 
         public string BackgroundPath { get; set; }
@@ -81,7 +81,7 @@ namespace Coosu.Storyboard.Management
                 OperationStart?.Invoke(this, new CompressorEventArgs(Guid));
             }
 
-            var queue = new ConcurrentQueue<Element>();
+            var queue = new ConcurrentQueue<Sprite>();
 
             var emptyToken = new CancellationTokenSource();
             _cancelToken = new CancellationTokenSource();
@@ -123,7 +123,7 @@ namespace Coosu.Storyboard.Management
             _elements?.Clear();
         }
 
-        private void RunEnqueueTask(ConcurrentQueue<Element> queue, CancellationTokenSource emptyToken)
+        private void RunEnqueueTask(ConcurrentQueue<Sprite> queue, CancellationTokenSource emptyToken)
         {
             var enqueueTask = new Task(() =>
             {
@@ -148,7 +148,7 @@ namespace Coosu.Storyboard.Management
             enqueueTask.Start();
         }
 
-        private Task[] RunDequeueTasks(ConcurrentQueue<Element> queue, CancellationTokenSource emptyToken)
+        private Task[] RunDequeueTasks(ConcurrentQueue<Sprite> queue, CancellationTokenSource emptyToken)
         {
             var tasks = new Task[ThreadCount];
             object indexLock = new object();
@@ -160,11 +160,11 @@ namespace Coosu.Storyboard.Management
                 {
                     while (!emptyToken.IsCancellationRequested && !_cancelToken.IsCancellationRequested)
                     {
-                        Element element;
+                        Sprite sprite;
 
                         if (!queue.IsEmpty)
                         {
-                            if (!queue.TryDequeue(out element))
+                            if (!queue.TryDequeue(out sprite))
                             {
                                 continue;
                             }
@@ -179,7 +179,7 @@ namespace Coosu.Storyboard.Management
                             Thread.Sleep(1);
                         }
 
-                        InnerCompress(element);
+                        InnerCompress(sprite);
 
                         lock (indexLock)
                         {
@@ -200,12 +200,12 @@ namespace Coosu.Storyboard.Management
 
         #region Compress Logic
 
-        private void InnerCompress(Element element)
+        private void InnerCompress(Sprite sprite)
         {
-            if (element.ImagePath == BackgroundPath &&
-                element.Layer == LayerType.Background)
+            if (sprite.ImagePath == BackgroundPath &&
+                sprite.LayerType == LayerType.Background)
             {
-                element.IsBackground = true;
+                sprite.IsBackground = true;
             }
 
             // 每个类型压缩从后往前
@@ -215,19 +215,19 @@ namespace Coosu.Storyboard.Management
             // 4.排除第一行误加的情况 (defaultParams)
             var errorList = new List<string>();
 
-            element.OnErrorOccurred += (sender, args) =>
+            sprite.OnErrorOccurred += (sender, args) =>
             {
                 errorList.Add(args.Message);
             };
 
-            element.Examine();
-            element.OnErrorOccurred = null;
+            sprite.Examine();
+            sprite.OnErrorOccurred = null;
 
             if (errorList.Count > 0)
             {
-                var arg = new ErrorEventArgs
+                var arg = new ProcessErrorEventArgs
                 {
-                    Message = $"{element.RowInSource} - Examine failed. Found {errorList.Count} error(s):\r\n" +
+                    Message = $"{sprite.RowInSource} - Examine failed. Found {errorList.Count} error(s):\r\n" +
                               string.Join("\r\n", errorList)
                 };
 
@@ -239,7 +239,7 @@ namespace Coosu.Storyboard.Management
                     }
 
                     _pauseThreadCount++;
-                    ErrorOccured?.Invoke(element, arg);
+                    ErrorOccured?.Invoke(sprite, arg);
                     _pauseThreadCount--;
                 }
 
@@ -247,9 +247,9 @@ namespace Coosu.Storyboard.Management
                     return;
             }
 
-            element.FillObsoleteList();
-            PreOptimize(element);
-            NormalOptimize(element);
+            sprite.FillObsoleteList();
+            PreOptimize(sprite);
+            NormalOptimize(sprite);
         }
 
         /// <summary>
@@ -257,7 +257,7 @@ namespace Coosu.Storyboard.Management
         /// </summary>
         private void PreOptimize(EventContainer container)
         {
-            if (container is Element ele)
+            if (container is Sprite ele)
             {
                 foreach (var item in ele.LoopList)
                 {
@@ -279,7 +279,7 @@ namespace Coosu.Storyboard.Management
         /// </summary>
         private void NormalOptimize(EventContainer container)
         {
-            if (container is Element ele)
+            if (container is Sprite ele)
             {
                 foreach (var item in ele.LoopList)
                 {
@@ -416,7 +416,7 @@ namespace Coosu.Storyboard.Management
                 {
                     CommonEvent nowE = list[index];
 
-                    if (container is Element ele &&
+                    if (container is Sprite ele &&
                         ele.TriggerList.Any(k => nowE.EndTime >= k.StartTime && nowE.StartTime <= k.EndTime) &&
                         ele.LoopList.Any(k => nowE.EndTime >= k.StartTime && nowE.StartTime <= k.EndTime))
                     {
@@ -460,7 +460,7 @@ namespace Coosu.Storyboard.Management
                         }
                         // 当 此event为move，param固定，且唯一时
                         else if (type == EventTypes.Move
-                                 && container is Element element)
+                                 && container is Sprite element)
                         {
                             if (list.Count == 1 && nowE.IsStatic()
                                                 && nowE.IsTimeInRange(container)
@@ -612,8 +612,8 @@ namespace Coosu.Storyboard.Management
         {
             var args = new SituationEventArgs(Guid, situationType)
             {
-                Element = container is Element e ? e : container.BaseElement,
-                Container = container is Element ? null : container,
+                Sprite = container is Sprite e ? e : container.BaseElement,
+                Container = container is Sprite ? null : container,
                 Events = events
             };
 

@@ -1,6 +1,8 @@
-﻿namespace Coosu.Storyboard.Events
+﻿using Coosu.Storyboard.Management;
+
+namespace Coosu.Storyboard.Events
 {
-    public sealed class MoveX : CommonEvent, IAdjustablePositionEvent
+    public sealed class MoveX : CommonEvent, IPositionAdjustable
     {
         public override EventType EventType => EventTypes.MoveX;
 

@@ -33,16 +33,16 @@ namespace Coosu.Storyboard.Utils
                 await sw.WriteSequentialEventAsync(container.EventList, 1);
         }
 
-        public static async Task WriteElementEventsAsync(this TextWriter sw, Element element, bool group)
+        public static async Task WriteElementEventsAsync(this TextWriter sw, Sprite sprite, bool group)
         {
             if (group)
-                await sw.WriteGroupedEventAsync(element.EventList, 1);
+                await sw.WriteGroupedEventAsync(sprite.EventList, 1);
             else
-                await sw.WriteSequentialEventAsync(element.EventList, 1);
+                await sw.WriteSequentialEventAsync(sprite.EventList, 1);
 
-            foreach (var loop in element.LoopList)
+            foreach (var loop in sprite.LoopList)
                 await sw.WriteLoopAsync(loop, group);
-            foreach (var trigger in element.TriggerList)
+            foreach (var trigger in sprite.TriggerList)
                 await sw.WriteTriggerAsync(trigger, group);
         }
 

@@ -1,19 +1,20 @@
-﻿using Coosu.Storyboard.Common;
-using Coosu.Storyboard.Events;
-using Coosu.Storyboard.Extensibility;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Coosu.Storyboard.Common;
+using Coosu.Storyboard.Events;
+using Coosu.Storyboard.Extensibility;
+using Coosu.Storyboard.Management;
 
 namespace Coosu.Storyboard
 {
     public abstract class EventContainer : IScriptable
     {
-        public ElementType Type { get; protected set; }
+        public SpriteType Type { get; protected set; }
 
-        public EventHandler<ErrorEventArgs>? OnErrorOccurred;
+        public EventHandler<ProcessErrorEventArgs>? OnErrorOccurred;
         public SortedSet<CommonEvent> EventList { get; } = new(new EventComparer());
         public abstract float MaxTime { get; }
         public abstract float MinTime { get; }
@@ -26,7 +27,7 @@ namespace Coosu.Storyboard
         public float ZDistance { get; set; }
         public int CameraId { get; set; }
 
-        public virtual Element? BaseElement { get; internal set; }
+        public virtual Sprite? BaseElement { get; internal set; }
 
         public virtual void Adjust(float offsetX, float offsetY, int offsetTiming)
         {
@@ -35,7 +36,7 @@ namespace Coosu.Storyboard
             {
                 foreach (var e in kv)
                 {
-                    if (e is IAdjustablePositionEvent adjustable)
+                    if (e is IPositionAdjustable adjustable)
                         adjustable.AdjustPosition(offsetX, offsetY);
 
                     e.AdjustTiming(offsetTiming);
@@ -104,7 +105,7 @@ namespace Coosu.Storyboard
             EventList.Add(newCommonEvent);
         }
 
-        protected bool group = false;
+        protected bool Group => throw new NotImplementedException();
 
         protected abstract string Header { get; }
         public abstract Task WriteScriptAsync(TextWriter writer);

@@ -12,12 +12,12 @@ namespace Coosu.Storyboard
     /// <summary>
     /// Represents a storyboard element. This class cannot be inherited.
     /// </summary>
-    public partial class Element : EventContainer
+    public partial class Sprite : EventContainer
     {
         protected override string Header =>
-            $"{ElementTypeSign.GetString(Type)},{Layer},{Origin},\"{ImagePath}\",{DefaultX},{DefaultY}";
-        public LayerType Layer { get; }
-        public OriginType Origin { get; }
+            $"{SpriteTypeManager.GetString(Type)},{LayerType},{OriginType},\"{ImagePath}\",{DefaultX},{DefaultY}";
+        public LayerType LayerType { get; }
+        public OriginType OriginType { get; }
         public string ImagePath { get; }
         public float DefaultY { get; internal set; }
         public float DefaultX { get; internal set; }
@@ -26,7 +26,7 @@ namespace Coosu.Storyboard
         public List<Loop> LoopList { get; } = new();
         public List<Trigger> TriggerList { get; } = new();
 
-        public override Element? BaseElement => null;
+        public override Sprite? BaseElement => null;
 
         public override float MaxTime =>
              NumericUtility.GetMaxValue(
@@ -91,26 +91,26 @@ namespace Coosu.Storyboard
         /// Create a storyboard element by a static image.
         /// </summary>
         /// <param name="type">Set element type.</param>
-        /// <param name="layer">Set element layer.</param>
-        /// <param name="origin">Set element origin.</param>
+        /// <param name="layerType">Set element layer.</param>
+        /// <param name="originType">Set element origin.</param>
         /// <param name="imagePath">Set image path.</param>
         /// <param name="defaultX">Set default x-coordinate of location.</param>
         /// <param name="defaultY">Set default x-coordinate of location.</param>
-        public Element(ElementType type, LayerType layer, OriginType origin, string imagePath, float defaultX, float defaultY)
+        public Sprite(SpriteType type, LayerType layerType, OriginType originType, string imagePath, float defaultX, float defaultY)
         {
             Type = type;
-            Layer = layer;
-            Origin = origin;
+            LayerType = layerType;
+            OriginType = originType;
             ImagePath = imagePath;
             DefaultX = defaultX;
             DefaultY = defaultY;
         }
 
-        public Element(string type, string layer, string origin, string imagePath, float defaultX, float defaultY)
+        public Sprite(string type, string layer, string origin, string imagePath, float defaultX, float defaultY)
         {
-            Type = ElementType.Parse(type);
-            Layer = (LayerType)Enum.Parse(typeof(LayerType), layer);
-            Origin = (OriginType)Enum.Parse(typeof(OriginType), origin);
+            Type = SpriteType.Parse(type);
+            LayerType = (LayerType)Enum.Parse(typeof(LayerType), layer);
+            OriginType = (OriginType)Enum.Parse(typeof(OriginType), origin);
             ImagePath = imagePath;
             DefaultX = defaultX;
             DefaultY = defaultY;
@@ -185,10 +185,10 @@ namespace Coosu.Storyboard
         {
             if (!IsWorthy) return;
             await sw.WriteLineAsync(Header);
-            await sw.WriteElementEventsAsync(this, @group);
+            await sw.WriteElementEventsAsync(this, Group);
         }
 
-        public Element Clone() => throw new NotImplementedException();
+        public Sprite Clone() => throw new NotImplementedException();
 
         public override void Adjust(float offsetX, float offsetY, int offsetTiming)
         {

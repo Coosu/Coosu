@@ -55,7 +55,7 @@ namespace Coosu.Storyboard.Events.Containers
 
         public override async Task WriteScriptAsync(TextWriter sb)
         {
-            await sb.WriteTriggerAsync(this, group);
+            await sb.WriteTriggerAsync(this, Group);
         }
 
         private static string GetTriggerString(TriggerType triggerType, bool listenSample, uint? customSampleSet)

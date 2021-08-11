@@ -25,9 +25,9 @@ namespace Coosu.Storyboard
         /// </summary>
         /// <param name="filePath">File path of the image.</param>
         /// <returns></returns>
-        public Element CreateSprite(string filePath)
+        public Sprite CreateSprite(string filePath)
         {
-            var obj = new Element(ElementTypes.Sprite, LayerType.Foreground, OriginType.Centre, filePath, 320, 240);
+            var obj = new Sprite(SpriteTypes.Sprite, LayerType.Foreground, OriginType.Centre, filePath, 320, 240);
             AddElement(obj);
             return obj;
         }
@@ -35,12 +35,12 @@ namespace Coosu.Storyboard
         /// <summary>
         /// Create a storyboard element by a static image.
         /// </summary>
-        /// <param name="origin">Origin of the image.</param>
+        /// <param name="originType">Origin of the image.</param>
         /// <param name="filePath">File path of the image.</param>
         /// <returns></returns>
-        public Element CreateSprite(OriginType origin, string filePath)
+        public Sprite CreateSprite(OriginType originType, string filePath)
         {
-            var obj = new Element(ElementTypes.Sprite, LayerType.Foreground, origin, filePath, 320, 240);
+            var obj = new Sprite(SpriteTypes.Sprite, LayerType.Foreground, originType, filePath, 320, 240);
             AddElement(obj);
             return obj;
         }
@@ -48,13 +48,13 @@ namespace Coosu.Storyboard
         /// <summary>
         /// Create a storyboard element by a static image.
         /// </summary>
-        /// <param name="layer">Layer of the image.</param>
-        /// <param name="origin">Origin of the image.</param>
+        /// <param name="layerType">Layer of the image.</param>
+        /// <param name="originType">Origin of the image.</param>
         /// <param name="filePath">File path of the image.</param>
         /// <returns></returns>
-        public Element CreateSprite(LayerType layer, OriginType origin, string filePath)
+        public Sprite CreateSprite(LayerType layerType, OriginType originType, string filePath)
         {
-            var obj = new Element(ElementTypes.Sprite, layer, origin, filePath, 320, 240);
+            var obj = new Sprite(SpriteTypes.Sprite, layerType, originType, filePath, 320, 240);
             AddElement(obj);
             return obj;
         }
@@ -62,14 +62,14 @@ namespace Coosu.Storyboard
         /// <summary>
         /// Create a storyboard element by a static image.
         /// </summary>
-        /// <param name="layer">Layer of the image.</param>
-        /// <param name="origin">Origin of the image.</param>
+        /// <param name="layerType">Layer of the image.</param>
+        /// <param name="originType">Origin of the image.</param>
         /// <param name="filePath">File path of the image.</param>
         /// <param name="defaultLocation">Default location of the image.</param>
         /// <returns></returns>
-        public Element CreateSprite(LayerType layer, OriginType origin, string filePath, System.Drawing.Point defaultLocation)
+        public Sprite CreateSprite(LayerType layerType, OriginType originType, string filePath, System.Drawing.Point defaultLocation)
         {
-            var obj = new Element(ElementTypes.Sprite, layer, origin, filePath, defaultLocation.X, defaultLocation.Y);
+            var obj = new Sprite(SpriteTypes.Sprite, layerType, originType, filePath, defaultLocation.X, defaultLocation.Y);
             AddElement(obj);
             return obj;
         }
@@ -77,30 +77,30 @@ namespace Coosu.Storyboard
         /// <summary>
         /// Create a storyboard element by a static image.
         /// </summary>
-        /// <param name="layer">Layer of the image.</param>
-        /// <param name="origin">Origin of the image.</param>
+        /// <param name="layerType">Layer of the image.</param>
+        /// <param name="originType">Origin of the image.</param>
         /// <param name="filePath">File path of the image.</param>
         /// <param name="defaultX">Default x-coordinate of the image.</param>
         /// <param name="defaultY">Default y-coordinate of the image.</param>
         /// <returns></returns>
-        public Element CreateSprite(LayerType layer, OriginType origin, string filePath, float defaultX, float defaultY)
+        public Sprite CreateSprite(LayerType layerType, OriginType originType, string filePath, float defaultX, float defaultY)
         {
-            var obj = new Element(ElementTypes.Sprite, layer, origin, filePath, defaultX, defaultY);
+            var obj = new Sprite(SpriteTypes.Sprite, layerType, originType, filePath, defaultX, defaultY);
             AddElement(obj);
             return obj;
         }
 
-        public AnimatedElement CreateAnimation(
-            LayerType layer,
-            OriginType origin,
+        public Animation CreateAnimation(
+            LayerType layerType,
+            OriginType originType,
             string filePath,
             int defaultX, int defaultY,
             int frameCount, float frameDelay, LoopType loopType)
         {
-            var obj = new AnimatedElement(
-                ElementTypes.Sprite,
-                layer,
-                origin,
+            var obj = new Animation(
+                SpriteTypes.Sprite,
+                layerType,
+                originType,
                 filePath,
                 defaultX,
                 defaultY,
@@ -122,12 +122,12 @@ namespace Coosu.Storyboard
             Elements.AddRange(elements);
         }
 
-        public void AddElement(Element element)
+        public void AddElement(Sprite sprite)
         {
-            Elements.Add(element);
+            Elements.Add(sprite);
         }
 
-        public void AddElement(params Element[] elements)
+        public void AddElement(params Sprite[] elements)
         {
             Elements.AddRange(elements);
         }
@@ -204,7 +204,7 @@ namespace Coosu.Storyboard
         public static VirtualLayer Parse(TextReader textReader)
         {
             VirtualLayer group = new VirtualLayer(0);
-            Element currentObj = null;
+            Sprite currentObj = null;
             //0 = isLooping, 1 = isTriggering, 2 = isBlank
             bool[] options = { false, false, false };
 
@@ -249,9 +249,9 @@ namespace Coosu.Storyboard
             P = "P",
             L = "L", T = "T";
 
-        private static Element ParseElement(string line,
+        private static Sprite ParseElement(string line,
             int rowIndex,
-            Element currentObj,
+            Sprite currentObj,
             VirtualLayer @group,
             bool[] options)
         {
@@ -377,7 +377,7 @@ namespace Coosu.Storyboard
             return currentObj;
         }
 
-        private static void ParseEvent(Element currentObj, bool[] options, string[] rawParams,
+        private static void ParseEvent(Sprite currentObj, bool[] options, string[] rawParams,
             string eventStr, int easing, int startTime, int endTime)
         {
             int rawLength = rawParams.Length;
@@ -570,17 +570,17 @@ namespace Coosu.Storyboard
             }
         }
 
-        private Element CreateSprite(string type, string layer, string origin, string imagePath, float defaultX, float defaultY)
+        private Sprite CreateSprite(string type, string layer, string origin, string imagePath, float defaultX, float defaultY)
         {
-            var obj = new Element(type, layer, origin, imagePath, defaultX, defaultY);
+            var obj = new Sprite(type, layer, origin, imagePath, defaultX, defaultY);
             AddElement(obj);
             return obj;
         }
 
-        private Element CreateAnimation(string type, string layer, string origin, string imagePath, float defaultX,
+        private Sprite CreateAnimation(string type, string layer, string origin, string imagePath, float defaultX,
             float defaultY, int frameCount, float frameDelay, string loopType)
         {
-            var obj = new AnimatedElement(type, layer, origin, imagePath, defaultX, defaultY, frameCount, frameDelay, loopType);
+            var obj = new Animation(type, layer, origin, imagePath, defaultX, defaultY, frameCount, frameDelay, loopType);
             AddElement(obj);
             return obj;
         }

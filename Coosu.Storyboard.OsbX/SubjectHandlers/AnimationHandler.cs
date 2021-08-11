@@ -4,7 +4,7 @@ using System;
 
 namespace Coosu.Storyboard.OsbX.SubjectHandlers
 {
-    public class AnimationHandler : SubjectHandler<AnimatedElement>
+    public class AnimationHandler : SubjectHandler<Animation>
     {
         public AnimationHandler()
         {
@@ -19,17 +19,17 @@ namespace Coosu.Storyboard.OsbX.SubjectHandlers
         }
 
         public override string Flag => "Animation";
-        public override string Serialize(AnimatedElement raw)
+        public override string Serialize(Animation raw)
         {
-            return string.Format("{0},{1},{2},\"{3}\",{4},{5},{6},{7},{8},{9},{10},{11}", Flag, raw.Layer, raw.Origin, raw.ImagePath,
+            return string.Format("{0},{1},{2},\"{3}\",{4},{5},{6},{7},{8},{9},{10},{11}", Flag, raw.LayerType, raw.OriginType, raw.ImagePath,
                     raw.DefaultX, raw.DefaultY, raw.FrameCount, raw.FrameDelay, raw.LoopType, raw.CameraId, raw.ZDistance, 0);
         }
 
-        public override AnimatedElement Deserialize(string[] split)
+        public override Animation Deserialize(string[] split)
         {
             if (split.Length == 8 || split.Length == 9 || split.Length == 12)
             {
-                var type = ElementTypeSign.Parse(split[0]);
+                var type = SpriteTypeManager.Parse(split[0]);
                 var layerType = (LayerType)Enum.Parse(typeof(LayerType), split[1]);
                 var origin = (OriginType)Enum.Parse(typeof(OriginType), split[2]);
                 var path = split[3].Trim('\"');
@@ -54,7 +54,7 @@ namespace Coosu.Storyboard.OsbX.SubjectHandlers
                     }
                 }
 
-                return new AnimatedElement(type, layerType, origin, path, defX, defY, frameCount, frameDelay, loopType)
+                return new Animation(type, layerType, origin, path, defX, defY, frameCount, frameDelay, loopType)
                 {
                     ZDistance = zDistance,
                     CameraId = cameraId
