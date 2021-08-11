@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Coosu.Storyboard.Events.Containers
 {
@@ -52,9 +53,9 @@ namespace Coosu.Storyboard.Events.Containers
             base.Adjust(offsetX, offsetY, offsetTiming);
         }
 
-        public override void WriteOsbString(TextWriter sb, bool @group = false)
+        public override async Task WriteScriptAsync(TextWriter sb)
         {
-            sb.WriteTrigger(this, group);
+            await sb.WriteTriggerAsync(this, group);
         }
 
         private static string GetTriggerString(TriggerType triggerType, bool listenSample, uint? customSampleSet)

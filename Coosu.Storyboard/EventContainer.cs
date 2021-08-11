@@ -104,8 +104,9 @@ namespace Coosu.Storyboard
             EventList.Add(newCommonEvent);
         }
 
+        protected bool group = false;
 
-        public abstract void WriteOsbString(TextWriter sw, bool group = false);
         protected abstract string Header { get; }
+        public abstract Task WriteScriptAsync(TextWriter writer);
     }
 }

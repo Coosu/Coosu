@@ -1,9 +1,14 @@
 ﻿using System;
-using System.Globalization;
+using System.IO;
+using System.Threading.Tasks;
+using Coosu.Storyboard.Utils;
 
 namespace Coosu.Storyboard.Events
 {
-    public abstract class CommonEvent : ICommonEvent, IAdjustableTimingEvent, IComparable<CommonEvent>
+    public abstract class CommonEvent : ICommonEvent,
+        IScriptable,
+        IAdjustableTimingEvent
+    //,IComparable<CommonEvent>
     {
         public abstract EventType EventType { get; }
         public EasingType Easing { get; set; }
@@ -12,61 +17,43 @@ namespace Coosu.Storyboard.Events
         public float[] Start { get; set; }
         public float[] End { get; set; }
 
-        protected virtual string Script
-        {
-            get
-            {
-                bool sequenceEqual = true;
-                int count = Start.Length;
-                for (int i = 0; i < count; i++)
-                {
-                    if (Start[i] != End[i])
-                    {
-                        sequenceEqual = false;
-                        break;
-                    }
-                }
-
-                if (sequenceEqual)
-                {
-                    if (count == 1)
-                        return Start[0].ToString(CultureInfo.InvariantCulture);
-                    if (count == 2)
-                        return Start[0].ToString(CultureInfo.InvariantCulture) + "," +
-                               Start[1].ToString(CultureInfo.InvariantCulture);
-                    if (count == 3)
-                        return Start[0].ToString(CultureInfo.InvariantCulture) + "," +
-                               Start[1].ToString(CultureInfo.InvariantCulture) + "," +
-                               Start[2].ToString(CultureInfo.InvariantCulture);
-                    return string.Join(",", Start);
-                }
-                else
-                {
-                    if (count == 1)
-                        return Start[0].ToString(CultureInfo.InvariantCulture) + "," +
-                               End[0].ToString(CultureInfo.InvariantCulture);
-                    if (count == 2)
-                        return Start[0].ToString(CultureInfo.InvariantCulture) + "," +
-                               Start[1].ToString(CultureInfo.InvariantCulture) + "," +
-                               End[0].ToString(CultureInfo.InvariantCulture) + "," +
-                               End[1].ToString(CultureInfo.InvariantCulture);
-                    if (count == 3)
-                        return Start[0].ToString(CultureInfo.InvariantCulture) + "," +
-                               Start[1].ToString(CultureInfo.InvariantCulture) + "," +
-                               Start[2].ToString(CultureInfo.InvariantCulture) + "," +
-                               End[0].ToString(CultureInfo.InvariantCulture) + "," +
-                               End[1].ToString(CultureInfo.InvariantCulture) + "," +
-                               End[2].ToString(CultureInfo.InvariantCulture);
-                    return $"{string.Join(",", Start)},{string.Join(",", End)}";
-                }
-            }
-        }
-
         public virtual int ParamLength => Start.Length;
         public virtual bool IsStatic => Start.Equals(End);
 
-        public CommonEvent()
+        //public int CompareTo(CommonEvent? other)
+        //{
+        //    if (other == null)
+        //        return 1;
+        //    if (StartTime > other.StartTime)
+        //        return 1;
+        //    if (StartTime.Equals(other.StartTime))
+        //        return 0;
+        //    if (StartTime < other.StartTime)
+        //        return -1;
+        //    throw new ArgumentOutOfRangeException(nameof(other));
+        //}
+
+        public void AdjustTiming(float time)
         {
+            StartTime += time;
+            EndTime += time;
+        }
+
+        public virtual async Task WriteScriptAsync(TextWriter writer)
+        {
+            string e = EventType.ToShortString();
+            string easing = ((int)Easing).ToString();
+            string startT = Math.Round(StartTime).ToIcString();
+            string endT = StartTime.Equals(EndTime)
+                ? ""
+                : Math.Round(EndTime).ToIcString();
+            await writer.WriteAsync($"{e},{easing},{startT},{endT},");
+            await WriteExtraScriptAsync(writer);
+        }
+        protected CommonEvent()
+        {
+            Start = Array.Empty<float>();
+            End = Array.Empty<float>();
         }
 
         protected CommonEvent(EasingType easing, float startTime, float endTime, float[] start, float[] end)
@@ -78,43 +65,43 @@ namespace Coosu.Storyboard.Events
             End = end;
         }
 
-        public int CompareTo(CommonEvent other)
+        protected virtual async Task WriteExtraScriptAsync(TextWriter textWriter)
         {
-            if (other == null)
-                return 1;
+            bool sequenceEqual = true;
+            int count = Start.Length;
+            for (int i = 0; i < count; i++)
+            {
+                if (Start[i].Equals(End[i]))
+                {
+                    sequenceEqual = false;
+                    break;
+                }
+            }
 
-            if (StartTime > other.StartTime)
-                return 1;
-
-            if (StartTime.Equals(other.StartTime))
-                return 0;
-
-            if (StartTime < other.StartTime)
-                return -1;
-
-            throw new ArgumentOutOfRangeException(nameof(other));
+            if (sequenceEqual)
+                await WriteStartAsync(textWriter, count);
+            else
+                await WriteFullAsync(textWriter, count);
         }
 
-        public override string ToString()
+        private async Task WriteStartAsync(TextWriter textWriter, int count)
         {
-            return ToOsbString();
+            for (int i = 0; i < count; i++)
+            {
+                await textWriter.WriteAsync(Start[i].ToIcString());
+                if (i != count - 1) await textWriter.WriteAsync(',');
+            }
         }
 
-        public virtual string ToOsbString()
+        private async Task WriteFullAsync(TextWriter textWriter, int count)
         {
-            string e = EventType.ToShortString();
-            string easing = ((int)Easing).ToString();
-            string startT = Math.Round(StartTime).ToString(CultureInfo.InvariantCulture);
-            string endT = StartTime.Equals(EndTime)
-                ? ""
-                : Math.Round(EndTime).ToString(CultureInfo.InvariantCulture);
-            return $"{e},{easing},{startT},{endT},{Script}";
-        }
-
-        public void AdjustTiming(float time)
-        {
-            StartTime += time;
-            EndTime += time;
+            for (int i = 0; i < count; i++)
+            {
+                await textWriter.WriteAsync(Start[i].ToIcString());
+                await textWriter.WriteAsync(',');
+                await textWriter.WriteAsync(End[i].ToIcString());
+                if (i != count - 1) await textWriter.WriteAsync(',');
+            }
         }
     }
 }

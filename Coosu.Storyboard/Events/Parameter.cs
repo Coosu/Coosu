@@ -1,5 +1,5 @@
-﻿using System;
-using System.Globalization;
+﻿using System.IO;
+using System.Threading.Tasks;
 
 namespace Coosu.Storyboard.Events
 {
@@ -20,7 +20,10 @@ namespace Coosu.Storyboard.Events
             }
         }
 
-        protected override string Script => Type.ToShortString();
+        protected override async Task WriteExtraScriptAsync(TextWriter writer)
+        {
+            await writer.WriteAsync(Type.ToShortString());
+        }
 
         public Parameter(EasingType easing, float startTime, float endTime, ParameterType type) :
             base(easing, startTime, endTime, new float[] { (int)type }, new float[] { (int)type })

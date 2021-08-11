@@ -32,9 +32,9 @@ namespace Coosu.Storyboard.Events.Containers
             base.Adjust(offsetX, offsetY, offsetTiming);
         }
 
-        public override void WriteOsbString(TextWriter sb, bool group = false)
+        public override async Task WriteScriptAsync(TextWriter sb)
         {
-            sb.WriteLoop(this, group);
+            await sb.WriteLoopAsync(this, group);
         }
     }
 }

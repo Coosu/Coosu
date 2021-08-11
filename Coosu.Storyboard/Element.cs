@@ -181,11 +181,11 @@ namespace Coosu.Storyboard
             return true;
         }
 
-        public override void WriteOsbString(TextWriter sw, bool group = false)
+        public override async Task WriteScriptAsync(TextWriter sw)
         {
             if (!IsWorthy) return;
-            sw.WriteLine(Head);
-            sw.WriteElementEvents(this, group);
+            await sw.WriteLineAsync(Header);
+            await sw.WriteElementEventsAsync(this, @group);
         }
 
         public Element Clone() => throw new NotImplementedException();

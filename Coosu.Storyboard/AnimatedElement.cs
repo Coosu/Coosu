@@ -1,6 +1,7 @@
 ﻿using Coosu.Storyboard.Utils;
 using System;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace Coosu.Storyboard
 {
@@ -53,12 +54,11 @@ namespace Coosu.Storyboard
             LoopType = (LoopType)Enum.Parse(typeof(LoopType), loopType);
         }
 
-
-        public override void WriteOsbString(TextWriter sw, bool group = false)
+        public override async Task WriteScriptAsync(TextWriter sw)
         {
             if (!IsWorthy) return;
-            sw.WriteLine(Head);
-            sw.WriteElementEvents(this, group);
+            await sw.WriteLineAsync(Header);
+            await sw.WriteElementEventsAsync(this, group);
         }
     }
 }

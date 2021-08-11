@@ -1,7 +1,3 @@
-﻿using Coosu.Storyboard.Extensibility;
-using Coosu.Storyboard.OsbX.ActionHandlers;
-using Coosu.Storyboard.Utils;
-using System;
 ﻿using System;
 using System.IO;
 using System.Linq;
@@ -88,10 +84,10 @@ namespace Coosu.Storyboard.OsbX.SubjectHandlers
 
         public override int MinTimeCount => EventList.Count(k => k.StartTime.Equals(MaxTime));
 
-        public override void WriteOsbString(TextWriter sw, bool @group = false)
+        public override async Task WriteScriptAsync(TextWriter sw)
         {
-            sw.WriteLine(Head);
-            StringUtility.WriteContainerEvents(sw, this, group);
+            await sw.WriteLineAsync(Header);
+            await ScriptHelper.WriteContainerEventsAsync(sw, this, @group);
         }
     }
 }
