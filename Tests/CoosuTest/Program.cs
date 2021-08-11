@@ -6,13 +6,15 @@ using System.Threading.Tasks;
 using Coosu.Api.HttpClient;
 using Coosu.Api.V2;
 using Coosu.Api.V2.ResponseModels;
+using Coosu.Beatmap;
 
-namespace CoosuTestCore
+namespace CoosuTest
 {
     class Program
     {
         static async Task Main(string[] args)
         {
+            TestOsu();
             //var redirectUri = new Uri("");
             //var sb = new AuthorizationLinkBuilder(5044, redirectUri);
             //var uri = sb.BuildAuthorizationLink("2241521134", AuthorizationScope.Public
@@ -52,6 +54,36 @@ namespace CoosuTestCore
                 {
 
                 }
+            }
+        }
+
+        private static void TestOsu()
+        {
+            var o = OsuFile.ReadFromFileAsync(@"D:\ValveUnhandledExceptionFilter.txt").Result;
+
+            var fileName = "op.avi";
+            var fi = new FileInfo(@"F:\项目\GitHub\CoosuLocal\folder \" + fileName);
+            if (fi.Exists)
+            {
+                Console.WriteLine(fi.FullName);
+            }
+
+            var directDirName = fi.DirectoryName;
+            var dir = fi.Directory;
+            var dirFullName = dir.FullName;
+            var dirName = dir.Name;
+            var toStringResult = dir.ToString();
+            var pathWithCombine = Path.Combine(dirFullName, fi.Name);
+            var pathWithCombine2 = Path.Combine(toStringResult, fi.Name);
+            Console.WriteLine(pathWithCombine);
+            Console.WriteLine(pathWithCombine2);
+
+            var sb = OsuFile.ReadFromFileAsync(
+                @"D:\Games\osu!\Songs\EastNewSound - Gensoukyou Matsuribayashi (Aki)\EastNewSound - Gensoukyou Matsuribayashi (Aki) (yf_bmp) [test].osu").Result;
+            foreach (var rawHitObject in sb.HitObjects.HitObjectList)
+            {
+                var ticks = rawHitObject.SliderInfo.Ticks;
+                var slids = rawHitObject.SliderInfo.BallTrail;
             }
         }
     }
