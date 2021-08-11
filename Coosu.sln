@@ -5,13 +5,11 @@ VisualStudioVersion = 16.0.29006.145
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Coosu.Api", "Coosu.Api\Coosu.Api.csproj", "{3108AE4A-DE35-40AE-A449-1EFB9719367D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoosuTest", "CoosuTest\CoosuTest.csproj", "{0F9D1E52-1B4B-4B82-A30F-0E0AECA6F9B9}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Coosu.Storyboard", "Coosu.Storyboard\Coosu.Storyboard.csproj", "{F00C90FF-1F1A-45C3-BE84-EA675D026364}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Coosu.Beatmap", "Coosu.Beatmap\Coosu.Beatmap.csproj", "{ECD686A3-083E-4BAD-967E-40F7467D7CF0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoosuUnitTest", "CoosuUnitTest\CoosuUnitTest.csproj", "{0D4E6714-6953-4463-A8DA-EFD9EBD0E581}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoosuUnitTest", "Tests\CoosuUnitTest\CoosuUnitTest.csproj", "{0D4E6714-6953-4463-A8DA-EFD9EBD0E581}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Coosu.Shared", "Coosu.Shared\Coosu.Shared.csproj", "{14A79D62-96D7-4A1C-92B1-5148558C1108}"
 EndProject
@@ -19,9 +17,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Coosu.Animation", "Coosu.An
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Coosu.Animation.WPF", "Coosu.Animation.WPF\Coosu.Animation.WPF.csproj", "{D4FE7218-975E-40FC-BDE7-67AA16AF4840}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoosuTestCore", "CoosuTestCore\CoosuTestCore.csproj", "{10177DA6-386D-46E9-B991-716A67773240}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoosuTest", "Tests\CoosuTest\CoosuTest.csproj", "{10177DA6-386D-46E9-B991-716A67773240}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Coosu.Storyboard.OsbX", "Coosu.Storyboard.OsbX\Coosu.Storyboard.OsbX.csproj", "{4851D011-B66F-422B-B7E1-C12E3E0C2E22}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{020FD699-A91C-4AD7-9AC7-FC69BD65D51E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,10 +33,6 @@ Global
 		{3108AE4A-DE35-40AE-A449-1EFB9719367D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3108AE4A-DE35-40AE-A449-1EFB9719367D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3108AE4A-DE35-40AE-A449-1EFB9719367D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0F9D1E52-1B4B-4B82-A30F-0E0AECA6F9B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0F9D1E52-1B4B-4B82-A30F-0E0AECA6F9B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0F9D1E52-1B4B-4B82-A30F-0E0AECA6F9B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0F9D1E52-1B4B-4B82-A30F-0E0AECA6F9B9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F00C90FF-1F1A-45C3-BE84-EA675D026364}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F00C90FF-1F1A-45C3-BE84-EA675D026364}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F00C90FF-1F1A-45C3-BE84-EA675D026364}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -72,6 +68,10 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{0D4E6714-6953-4463-A8DA-EFD9EBD0E581} = {020FD699-A91C-4AD7-9AC7-FC69BD65D51E}
+		{10177DA6-386D-46E9-B991-716A67773240} = {020FD699-A91C-4AD7-9AC7-FC69BD65D51E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1E82D4BA-E134-4C4A-A48B-F02A601C59CF}
