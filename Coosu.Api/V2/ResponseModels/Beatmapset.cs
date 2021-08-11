@@ -57,7 +57,7 @@ namespace Coosu.Api.V2.ResponseModels
         public Availability Availability { get; set; }
 
         [JsonProperty("bpm")]
-        public double Bpm { get; set; }
+        public double? Bpm { get; set; }
 
         [JsonProperty("can_be_hyped")]
         public bool CanBeHyped { get; set; }

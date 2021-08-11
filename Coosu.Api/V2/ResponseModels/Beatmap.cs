@@ -33,7 +33,7 @@ namespace Coosu.Api.V2.ResponseModels
         public long BeatmapsetId { get; set; }
 
         [JsonProperty("bpm")]
-        public double Bpm { get; set; }
+        public double? Bpm { get; set; }
 
         [JsonProperty("convert")]
         public bool Convert { get; set; }
