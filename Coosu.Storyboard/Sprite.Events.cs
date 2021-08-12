@@ -125,35 +125,25 @@ namespace Coosu.Storyboard
         public void AddEvent(EventType e, EasingType easing, float startTime, float endTime,
             float x1, float x2)
         {
-            AddEvent(e, easing, startTime, endTime, new[] { x1 }, new[] { x2 });
+            AddEvent(CommonEvent.Create(e, easing, startTime, endTime, new[] { x1 }, new[] { x2 }));
         }
 
         public void AddEvent(EventType e, EasingType easing, float startTime, float endTime,
             float x1, float y1, float x2, float y2)
         {
-            AddEvent(e, easing, startTime, endTime, new[] { x1, y1 }, new[] { x2, y2 });
+            AddEvent(CommonEvent.Create(e, easing, startTime, endTime, new[] { x1, y1 }, new[] { x2, y2 }));
         }
 
         public void AddEvent(EventType e, EasingType easing, float startTime, float endTime,
             float x1, float y1, float z1, float x2, float y2, float z2)
         {
-            AddEvent(e, easing, startTime, endTime, new[] { x1, y1, z1 }, new[] { x2, y2, z2 });
+            AddEvent(CommonEvent.Create(e, easing, startTime, endTime, new[] { x1, y1, z1 }, new[] { x2, y2, z2 }));
         }
 
         public void AddEvent(EasingType easing, float startTime, float endTime, ParameterType p)
         {
-            AddEvent(EventTypes.Parameter, easing, startTime, endTime,
-                new[] { (float)(int)p }, new[] { (float)(int)p });
-        }
-
-        internal override void AddEvent(EventType e, EasingType easing, float startTime, float endTime, float[] start, float[]? end)
-        {
-            if (_isLooping)
-                LoopList[LoopList.Count - 1].AddEvent(e, easing, startTime, endTime, start, end);
-            else if (_isTriggering)
-                TriggerList[TriggerList.Count - 1].AddEvent(e, easing, startTime, endTime, start, end);
-            else
-                base.AddEvent(e, easing, startTime, endTime, start, end);
+            AddEvent(CommonEvent.Create(EventTypes.Parameter, easing, startTime, endTime,
+                new[] { (float)(int)p }, new[] { (float)(int)p }));
         }
     }
 }

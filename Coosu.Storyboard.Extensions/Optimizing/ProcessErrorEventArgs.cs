@@ -1,4 +1,4 @@
-﻿namespace Coosu.Storyboard.Management
+﻿namespace Coosu.Storyboard.Extensions.Optimizing
 {
     public class ProcessErrorEventArgs : StoryboardEventArgs
     {

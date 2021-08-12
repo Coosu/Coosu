@@ -12,9 +12,9 @@ namespace Coosu.Storyboard.OsbX
     {
         static OsbxConvert()
         {
-            Register.RegisterSubject(new SpriteHandler());
-            Register.RegisterSubject(new AnimationHandler());
-            Register.RegisterSubject(new Camera2Handler());
+            HandlerRegister.RegisterSubject(new SpriteHandler());
+            HandlerRegister.RegisterSubject(new AnimationHandler());
+            HandlerRegister.RegisterSubject(new Camera2Handler());
         }
 
         public static async Task<string> SerializeObjectAsync(VirtualLayerManager manager)
@@ -41,10 +41,10 @@ namespace Coosu.Storyboard.OsbX
             return sb.ToString().TrimEnd('\n', '\r'); ;
         }
 
-        public static async Task<string> SerializeObjectAsync(Sprite element)
+        public static async Task<string> SerializeObjectAsync(ISceneObject element)
         {
             var sb = new StringBuilder();
-            var subjectHandler = Register.GetSubjectHandler(ObjectTypeManager.GetString(element.ObjectType));
+            var subjectHandler = HandlerRegister.GetSubjectHandler(ObjectTypeManager.GetString(element.ObjectType));
             if (subjectHandler == null)
             {
                 Console.WriteLine(
@@ -95,7 +95,7 @@ namespace Coosu.Storyboard.OsbX
         public static async Task<VirtualLayerManager> DeserializeObjectAsync(TextReader reader)
         {
             ISubjectParsingHandler lastSubjectHandler = null;
-            EventHost lastSubject = null;
+            IEventHost lastSubject = null;
             //int lastDeep = 0;
             var line = await reader.ReadLineAsync();
             int l = 0;
@@ -115,11 +115,11 @@ namespace Coosu.Storyboard.OsbX
                     var deep = split[0].Length - mahou.Length;
                     if (deep == 0)
                     {
-                        var handler = Register.GetSubjectHandler(mahou);
+                        var handler = HandlerRegister.GetSubjectHandler(mahou);
                         if (handler == null && int.TryParse(mahou, out var flag))
                         {
                             var magicWord = ObjectTypeManager.GetString(flag);
-                            if (magicWord != null) handler = Register.GetSubjectHandler(magicWord);
+                            if (magicWord != null) handler = HandlerRegister.GetSubjectHandler(magicWord);
                         }
 
                         if (handler != null)

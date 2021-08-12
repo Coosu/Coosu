@@ -12,7 +12,7 @@ namespace Coosu.Storyboard.Extensibility
             int count = raw.Start.Length;
             if (raw.End.Length != count)
             {
-                throw new Exception("wtf");
+                throw new Exception("The starting parameter's count should equal to the ending parameter's count");
             }
 
             for (int i = 0; i < count; i++)
@@ -107,17 +107,6 @@ namespace Coosu.Storyboard.Extensibility
             }
 
             return new T { Easing = easing, StartTime = startTime, EndTime = endTime, Start = start, End = end };
-        }
-    }
-
-    public class EasingConvert
-    {
-        public static EasingType ToEasing(string s)
-        {
-            var easing = int.Parse(s);
-            if (easing > 34 || easing < 0)
-                throw new FormatException("Unknown easing");
-            return (EasingType)easing;
         }
     }
 }

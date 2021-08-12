@@ -8,13 +8,19 @@ namespace Coosu.Storyboard.Events.EventHosts
 {
     public sealed class Loop : ISubEventHost, IEvent
     {
+        public EventType EventType { get; } = EventTypes.Loop;
+
         internal ISceneObject? _baseObject;
         public string Header => $"L,{StartTime},{LoopCount}";
         public bool EnableGroupedSerialization { get; set; }
-        public SortedSet<CommonEvent> Events { get; } = new(new EventTimingComparer());
+        public SortedSet<ICommonEvent> Events { get; } = new(new EventTimingComparer());
 
         public float StartTime { get; set; }
-        public float EndTime => OuterMaxTime;
+        public float EndTime
+        {
+            get => OuterMaxTime;
+            set => throw new System.NotSupportedException();
+        }
 
         public int LoopCount { get; set; }
         public float OuterMaxTime => StartTime + MaxTime * LoopCount;
@@ -30,14 +36,19 @@ namespace Coosu.Storyboard.Events.EventHosts
             LoopCount = loopCount;
         }
 
-        public async Task WriteScriptAsync(TextWriter sb)
+        public async Task WriteScriptAsync(TextWriter writer)
         {
-            await sb.WriteLoopAsync(this, EnableGroupedSerialization);
+            await ScriptHelper.WriteLoopAsync(writer, this, EnableGroupedSerialization);
         }
 
         public void AdjustTiming(float offset)
         {
             StartTime += offset;
+        }
+
+        public void AddEvent(ICommonEvent @event)
+        {
+            Events.Add(@event);
         }
 
         ISceneObject? ISubEventHost.BaseObject

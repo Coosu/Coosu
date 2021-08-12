@@ -1,13 +1,14 @@
 ﻿using System;
 using Coosu.Storyboard.Events;
+using Coosu.Storyboard.Management;
 
-namespace Coosu.Storyboard.Management
+namespace Coosu.Storyboard.Extensions.Optimizing
 {
     public class SituationEventArgs : CompressorEventArgs
     {
         public SituationType SituationType { get; }
         public ISceneObject Sprite { get; set; }
-        public EventHost Host { get; set; }
+        public IEventHost Host { get; set; }
         public CommonEvent[] Events { get; set; }
         public override bool Continue { get; set; } = true;
 

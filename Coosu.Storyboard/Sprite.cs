@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Coosu.Storyboard.Events;
 using Coosu.Storyboard.Events.EventHosts;
 using Coosu.Storyboard.Management;
 using Coosu.Storyboard.Utils;
@@ -12,11 +13,12 @@ namespace Coosu.Storyboard
     /// <summary>
     /// Represents a storyboard element. This class cannot be inherited.
     /// </summary>
-    public partial class Sprite : EventHost, ISceneObject
+    public partial class Sprite : IEventHost, ISceneObject
     {
-        protected override string Header =>
+        protected virtual string Header =>
             $"{ObjectTypeManager.GetString(ObjectType)},{LayerType},{OriginType},\"{ImagePath}\",{DefaultX},{DefaultY}";
-        public OsbObjectType ObjectType { get; protected set; }
+
+        public virtual OsbObjectType ObjectType { get; } = ObjectTypes.Sprite;
         public LayerType LayerType { get; }
         public OriginType OriginType { get; }
         public string ImagePath { get; }
@@ -27,40 +29,43 @@ namespace Coosu.Storyboard
         public int CameraId { get; set; }
 
         // EventHosts
+        public SortedSet<ICommonEvent> Events { get; } = new(new EventTimingComparer());
+        // ISceneObject
         public List<Loop> LoopList { get; } = new();
         public List<Trigger> TriggerList { get; } = new();
 
-        public override float MaxTime =>
-             NumericUtility.GetMaxValue(
+        public float MaxTime =>
+             NumericHelper.GetMaxValue(
                  Events.Select(k => k.EndTime),
                  LoopList.Select(k => k.OuterMaxTime),
                  TriggerList.Select(k => k.MaxTime)
              );
 
-        public override float MinTime =>
-            NumericUtility.GetMinValue(
+        public float MinTime =>
+            NumericHelper.GetMinValue(
                 Events.Select(k => k.StartTime),
                 LoopList.Select(k => k.OuterMinTime),
                 TriggerList.Select(k => k.MinTime)
             );
 
-        public override float MaxStartTime =>
-            NumericUtility.GetMaxValue(
+        public float MaxStartTime =>
+            NumericHelper.GetMaxValue(
                 Events.Select(k => k.StartTime),
                 LoopList.Select(k => k.OuterMinTime),
                 TriggerList.Select(k => k.MinTime)
             );
 
-        public override float MinEndTime =>
-            NumericUtility.GetMinValue(
+        public float MinEndTime =>
+            NumericHelper.GetMinValue(
                 Events.Select(k => k.EndTime),
                 LoopList.Select(k => k.OuterMaxTime),
                 TriggerList.Select(k => k.MaxTime)
             );
+        public bool EnableGroupedSerialization { get; set; }
 
         //public bool IsWorthy => !MinTime.Equals(MaxTime) || IsBackground;
         //public bool IsBackground { get; internal set; }
-        //public int RowInSource { get; internal set; }
+        public int? RowInSource { get; internal set; }
 
         // Loop control
         private bool _isTriggering = false;
@@ -69,15 +74,13 @@ namespace Coosu.Storyboard
         /// <summary>
         /// Create a storyboard element by a static image.
         /// </summary>
-        /// <param name="type">Set element type.</param>
         /// <param name="layerType">Set element layer.</param>
         /// <param name="originType">Set element origin.</param>
         /// <param name="imagePath">Set image path.</param>
         /// <param name="defaultX">Set default x-coordinate of location.</param>
         /// <param name="defaultY">Set default x-coordinate of location.</param>
-        public Sprite(OsbObjectType type, LayerType layerType, OriginType originType, string imagePath, float defaultX, float defaultY)
+        public Sprite(LayerType layerType, OriginType originType, string imagePath, float defaultX, float defaultY)
         {
-            ObjectType = type;
             LayerType = layerType;
             OriginType = originType;
             ImagePath = imagePath;
@@ -85,9 +88,9 @@ namespace Coosu.Storyboard
             DefaultY = defaultY;
         }
 
-        public Sprite(string type, string layer, string origin, string imagePath, float defaultX, float defaultY)
+        public Sprite(string layer, string origin, string imagePath, float defaultX, float defaultY)
         {
-            ObjectType = OsbObjectType.Parse(type);
+            //ObjectType = OsbObjectType.Parse(type);
             LayerType = (LayerType)Enum.Parse(typeof(LayerType), layer);
             OriginType = (OriginType)Enum.Parse(typeof(OriginType), origin);
             ImagePath = imagePath;
@@ -160,11 +163,21 @@ namespace Coosu.Storyboard
             return true;
         }
 
-        public override async Task WriteScriptAsync(TextWriter sw)
+        public async Task WriteScriptAsync(TextWriter writer)
         {
             //if (!IsWorthy) return;
-            await sw.WriteLineAsync(Header);
-            await sw.WriteElementEventsAsync(this, EnableGroupedSerialization);
+            await writer.WriteLineAsync(Header);
+            await ScriptHelper.WriteElementEventsAsync(writer, this, EnableGroupedSerialization);
+        }
+
+        public void AddEvent(ICommonEvent @event)
+        {
+            if (_isLooping)
+                LoopList[LoopList.Count - 1].AddEvent(@event);
+            else if (_isTriggering)
+                TriggerList[TriggerList.Count - 1].AddEvent(@event);
+            else
+                Events.Add(@event);
         }
 
         public Sprite Clone() => throw new NotImplementedException();

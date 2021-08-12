@@ -2,7 +2,8 @@
 {
     public interface IEvent : ITimingAdjustable
     {
+        EventType EventType { get; }
         float StartTime { get; }
-        float EndTime { get; }
+        float EndTime { set; get; }
     }
 }

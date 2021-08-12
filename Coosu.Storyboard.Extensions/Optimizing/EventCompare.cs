@@ -1,49 +1,49 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using Coosu.Shared.Mathematics;
 using Coosu.Storyboard.Events;
+using Coosu.Storyboard.Management;
 using Coosu.Storyboard.Utils;
 
-namespace Coosu.Storyboard.Management
+namespace Coosu.Storyboard.Extensions.Optimizing
 {
     public static class EventCompare
     {
 
-        public static bool InObsoleteTimingRange(this CommonEvent e, EventHost host, out RangeValue<float> range)
+        public static bool InObsoleteTimingRange(this ICommonEvent e, IEventHost host, out RangeValue<float> range)
         {
             return host.ObsoleteList.ContainsTimingPoint(out range, e.StartTime, e.EndTime);
         }
 
-        public static bool OnObsoleteTimingRange(this CommonEvent e, EventHost host)
+        public static bool OnObsoleteTimingRange(this ICommonEvent e, IEventHost host)
         {
             return host.ObsoleteList.OnTimingRange(out _, e.StartTime) ||
                    host.ObsoleteList.OnTimingRange(out _, e.EndTime);
         }
 
-        public static bool IsEventSequent(CommonEvent previous, CommonEvent next)
+        public static bool IsEventSequent(ICommonEvent previous, ICommonEvent next)
         {
             return previous.End.SequenceEqual(next.Start);
         }
 
-        public static bool EndsWithUnworthy(this CommonEvent e)
+        public static bool EndsWithUnworthy(this ICommonEvent e)
         {
-            return EventExtension.UnworthyDictionary.ContainsKey(e.EventType) &&
-                   EventExtension.UnworthyDictionary[e.EventType].SequenceEqual(e.End);
+            return EventExtensions.UnworthyDictionary.ContainsKey(e.EventType) &&
+                   EventExtensions.UnworthyDictionary[e.EventType].SequenceEqual(e.End);
         }
 
-        public static bool IsStaticAndDefault(this CommonEvent e)
+        public static bool IsStaticAndDefault(this ICommonEvent e)
         {
             return e.IsDefault() &&
                    e.IsStatic();
         }
 
-        public static bool IsDefault(this CommonEvent e)
+        public static bool IsDefault(this ICommonEvent e)
         {
-            return EventExtension.DefaultDictionary.ContainsKey(e.EventType) &&
-                   e.Start.SequenceEqual(EventExtension.DefaultDictionary[e.EventType]);
+            return EventExtensions.DefaultDictionary.ContainsKey(e.EventType) &&
+                   e.Start.SequenceEqual(EventExtensions.DefaultDictionary[e.EventType]);
         }
 
-        public static bool IsStatic(this CommonEvent e)
+        public static bool IsStatic(this ICommonEvent e)
         {
             return e.Start.SequenceEqual(e.End);
         }
@@ -54,39 +54,39 @@ namespace Coosu.Storyboard.Management
                    move.StartY.Equals(sprite.DefaultY);
         }
 
-        public static bool IsTimeInRange(this CommonEvent e, EventHost host)
+        public static bool IsTimeInRange(this ICommonEvent e, IEventHost host)
         {
             return e.IsSmallerThenMaxTime(host) && e.IsLargerThanMinTime(host);
         }
 
-        public static bool IsSmallerThenMaxTime(this CommonEvent e, EventHost host)
+        public static bool IsSmallerThenMaxTime(this ICommonEvent e, IEventHost host)
         {
             return e.EndTime < host.MaxTime ||
                    e.EqualsMultiMaxTime(host);
         }
 
-        public static bool IsLargerThanMinTime(this CommonEvent e, EventHost host)
+        public static bool IsLargerThanMinTime(this ICommonEvent e, IEventHost host)
         {
             return e.StartTime > host.MinTime ||
                    e.EqualsMultiMinTime(host);
         }
 
-        public static bool EqualsMultiMaxTime(this CommonEvent e, EventHost host)
+        public static bool EqualsMultiMaxTime(this ICommonEvent e, IEventHost host)
         {
             return e.EqualsMaxTime(host) && host.GetMaxTimeCount() > 1;
         }
 
-        public static bool EqualsMultiMinTime(this CommonEvent e, EventHost host)
+        public static bool EqualsMultiMinTime(this ICommonEvent e, IEventHost host)
         {
             return e.EqualsMinTime(host) && host.GetMinTimeCount() > 1;
         }
 
-        public static bool EqualsMaxTime(this CommonEvent e, EventHost host)
+        public static bool EqualsMaxTime(this ICommonEvent e, IEventHost host)
         {
             return e.EndTime == host.MaxTime;
         }
 
-        public static bool EqualsMinTime(this CommonEvent e, EventHost host)
+        public static bool EqualsMinTime(this ICommonEvent e, IEventHost host)
         {
             return e.StartTime == host.MinTime;
         }

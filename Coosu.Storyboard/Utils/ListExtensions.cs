@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Coosu.Storyboard.Utils
 {
-    public static class ListExtension
+    public static class ListExtensions
     {
         public static void AddSorted<T>(this List<T> list, T item) where T : IComparable<T>
         {

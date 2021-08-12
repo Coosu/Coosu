@@ -1,10 +1,10 @@
-﻿using Coosu.Storyboard.Events;
-using Coosu.Storyboard.Utils;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Coosu.Storyboard.Events;
+using Coosu.Storyboard.Utils;
 
-namespace Coosu.Storyboard.Management
+namespace Coosu.Storyboard.Extensions.Optimizing
 {
     public static class ElementExtension
     {
@@ -28,7 +28,7 @@ namespace Coosu.Storyboard.Management
             eleG.InnerFix(false, true);
         }
 
-        public static void Expand(this EventHost host)
+        public static void Expand(this IEventHost host)
         {
             if (host is Sprite element)
             {
@@ -51,10 +51,10 @@ namespace Coosu.Storyboard.Management
                             foreach (var e in loop.Events)
                             {
                                 element.AddEvent(
-                                    e.EventType,
-                                    e.Easing,
-                                    fixedStartTime + e.StartTime, fixedStartTime + e.EndTime,
-                                    e.Start, e.End
+                                    CommonEvent.Create(e.EventType,
+                                        e.Easing,
+                                        fixedStartTime + e.StartTime, fixedStartTime + e.EndTime,
+                                        e.Start, e.End)
                                 );
                             }
                         }
@@ -68,7 +68,7 @@ namespace Coosu.Storyboard.Management
             if (events == null) return;
             foreach (var kv in events)
             {
-                List<CommonEvent> list = kv.ToList();
+                List<ICommonEvent> list = kv.ToList();
                 for (var i = 0; i < list.Count - 1; i++)
                 {
                     if (list[i].Start == list[i].End) // case 1
@@ -79,10 +79,10 @@ namespace Coosu.Storyboard.Management
                     if (!list[i].EndTime.Equals(list[i + 1].StartTime)) // case 2
                     {
                         host.AddEvent(
-                            list[i].EventType,
-                            EasingType.Linear,
-                            list[i].EndTime, list[i + 1].StartTime,
-                            list[i].End, list[i].End
+                            CommonEvent.Create(list[i].EventType,
+                                EasingType.Linear,
+                                list[i].EndTime, list[i + 1].StartTime,
+                                list[i].End, list[i].End)
                         );
                     }
                 }
@@ -161,14 +161,14 @@ namespace Coosu.Storyboard.Management
                 if (sprite.TriggerList
                         .Where(k =>
                             k.Events
-                                .Any(o => EventExtension.UnworthyDictionary.ContainsKey(o.EventType))
+                                .Any(o => EventExtensions.UnworthyDictionary.ContainsKey(o.EventType))
                         )
                         .Any(k => endTime >= k.StartTime && startTime <= k.EndTime)
                     ||
                     sprite.LoopList
                         .Where(k =>
                             k.Events
-                                .Any(o => EventExtension.UnworthyDictionary.ContainsKey(o.EventType))
+                                .Any(o => EventExtensions.UnworthyDictionary.ContainsKey(o.EventType))
                         )
                         .Any(k => endTime >= k.StartTime && startTime <= k.EndTime))
                 {
@@ -182,7 +182,7 @@ namespace Coosu.Storyboard.Management
         /// <summary>
         /// 检查timing是否合法.
         /// </summary>
-        public static void Examine(this EventHost host)
+        public static void Examine(this IEventHost host)
         {
             var events = host.Events.GroupBy(k => k.EventType);
             foreach (var kv in events)
@@ -190,8 +190,8 @@ namespace Coosu.Storyboard.Management
                 var list = kv.ToArray();
                 for (var i = 0; i < list.Length - 1; i++)
                 {
-                    CommonEvent objNext = list[i + 1];
-                    CommonEvent objNow = list[i];
+                    ICommonEvent objNext = list[i + 1];
+                    ICommonEvent objNow = list[i];
                     if (objNow.StartTime > objNow.EndTime)
                     {
                         var info = $"{{{objNow}}}:\r\n" +

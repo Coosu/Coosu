@@ -27,7 +27,7 @@ namespace Coosu.Storyboard
         /// <returns></returns>
         public Sprite CreateSprite(string filePath)
         {
-            var obj = new Sprite(ObjectTypes.Sprite, LayerType.Foreground, OriginType.Centre, filePath, 320, 240);
+            var obj = new Sprite(LayerType.Foreground, OriginType.Centre, filePath, 320, 240);
             AddSprite(obj);
             return obj;
         }
@@ -40,7 +40,7 @@ namespace Coosu.Storyboard
         /// <returns></returns>
         public Sprite CreateSprite(OriginType originType, string filePath)
         {
-            var obj = new Sprite(ObjectTypes.Sprite, LayerType.Foreground, originType, filePath, 320, 240);
+            var obj = new Sprite(LayerType.Foreground, originType, filePath, 320, 240);
             AddSprite(obj);
             return obj;
         }
@@ -54,7 +54,7 @@ namespace Coosu.Storyboard
         /// <returns></returns>
         public Sprite CreateSprite(LayerType layerType, OriginType originType, string filePath)
         {
-            var obj = new Sprite(ObjectTypes.Sprite, layerType, originType, filePath, 320, 240);
+            var obj = new Sprite(layerType, originType, filePath, 320, 240);
             AddSprite(obj);
             return obj;
         }
@@ -69,7 +69,7 @@ namespace Coosu.Storyboard
         /// <returns></returns>
         public Sprite CreateSprite(LayerType layerType, OriginType originType, string filePath, System.Drawing.Point defaultLocation)
         {
-            var obj = new Sprite(ObjectTypes.Sprite, layerType, originType, filePath, defaultLocation.X, defaultLocation.Y);
+            var obj = new Sprite(layerType, originType, filePath, defaultLocation.X, defaultLocation.Y);
             AddSprite(obj);
             return obj;
         }
@@ -85,7 +85,7 @@ namespace Coosu.Storyboard
         /// <returns></returns>
         public Sprite CreateSprite(LayerType layerType, OriginType originType, string filePath, float defaultX, float defaultY)
         {
-            var obj = new Sprite(ObjectTypes.Sprite, layerType, originType, filePath, defaultX, defaultY);
+            var obj = new Sprite(layerType, originType, filePath, defaultX, defaultY);
             AddSprite(obj);
             return obj;
         }
@@ -98,7 +98,6 @@ namespace Coosu.Storyboard
             int frameCount, float frameDelay, LoopType loopType)
         {
             var obj = new Animation(
-                ObjectTypes.Sprite,
                 layerType,
                 originType,
                 filePath,
@@ -149,13 +148,6 @@ namespace Coosu.Storyboard
             await sw.WriteLineAsync("//Storyboard Layer 3 (Foreground)");
             await WriteScriptAsync(sw);
             await sw.WriteLineAsync("//Storyboard Sound Samples");
-        }
-
-        public async Task<string> ToScriptStringAsync()
-        {
-            using var sw = new StringWriter();
-            await WriteFullScriptAsync(sw);
-            return sw.ToString();
         }
 
         public async Task SaveScriptAsync(string path)
@@ -258,7 +250,7 @@ namespace Coosu.Storyboard
                 if (@params.Length == 6)
                 {
                     currentObj = group.CreateSprite(
-                        @params[0],
+                        //@params[0],
                         @params[1],
                         @params[2],
                         @params[3].Trim(QuoteChar),
@@ -273,7 +265,7 @@ namespace Coosu.Storyboard
                 else if (@params.Length == 8)
                 {
                     currentObj = group.CreateAnimation(
-                        @params[0],
+                        //@params[0],
                         @params[1],
                         @params[2],
                         @params[3].Trim(QuoteChar),
@@ -291,7 +283,7 @@ namespace Coosu.Storyboard
                 else if (@params.Length == 9)
                 {
                     currentObj = group.CreateAnimation(
-                        @params[0],
+                        //@params[0],
                         @params[1],
                         @params[2],
                         @params[3].Trim(QuoteChar),
@@ -560,17 +552,17 @@ namespace Coosu.Storyboard
             }
         }
 
-        private Sprite CreateSprite(string type, string layer, string origin, string imagePath, float defaultX, float defaultY)
+        private Sprite CreateSprite(string layer, string origin, string imagePath, float defaultX, float defaultY)
         {
-            var obj = new Sprite(type, layer, origin, imagePath, defaultX, defaultY);
+            var obj = new Sprite(layer, origin, imagePath, defaultX, defaultY);
             AddSprite(obj);
             return obj;
         }
 
-        private Sprite CreateAnimation(string type, string layer, string origin, string imagePath, float defaultX,
+        private Sprite CreateAnimation(string layer, string origin, string imagePath, float defaultX,
             float defaultY, int frameCount, float frameDelay, string loopType)
         {
-            var obj = new Animation(type, layer, origin, imagePath, defaultX, defaultY, frameCount, frameDelay, loopType);
+            var obj = new Animation(layer, origin, imagePath, defaultX, defaultY, frameCount, frameDelay, loopType);
             AddSprite(obj);
             return obj;
         }

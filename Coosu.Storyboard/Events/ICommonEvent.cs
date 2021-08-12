@@ -2,10 +2,9 @@
 {
     public interface ICommonEvent : IEvent
     {
-        EventType EventType { get; }
         EasingType Easing { get; set; }
-        float[] Start { get; }
-        float[] End { get; }
+        float[] Start { get; set; }
+        float[] End { get; set; }
         int ParamLength { get; }
         bool IsStatic { get; }
     }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Coosu.Storyboard.Events;
 using Coosu.Storyboard.Utils;
 
-namespace Coosu.Storyboard.Management
+namespace Coosu.Storyboard.Extensions.Optimizing
 {
     public class ElementCompressor : IDisposable
     {
@@ -255,7 +255,7 @@ namespace Coosu.Storyboard.Management
         /// <summary>
         /// 预压缩
         /// </summary>
-        private void PreOptimize(EventHost host)
+        private void PreOptimize(IEventHost host)
         {
             if (host is Sprite ele)
             {
@@ -277,7 +277,7 @@ namespace Coosu.Storyboard.Management
         /// <summary>
         /// 正常压缩
         /// </summary>
-        private void NormalOptimize(EventHost host)
+        private void NormalOptimize(IEventHost host)
         {
             if (host is Sprite ele)
             {
@@ -301,7 +301,7 @@ namespace Coosu.Storyboard.Management
         /// <summary>
         /// 根据ObsoletedList，移除不必要的命令。
         /// </summary>
-        private void RemoveByObsoletedList(EventHost host, List<CommonEvent> eventList)
+        private void RemoveByObsoletedList(IEventHost host, List<ICommonEvent> eventList)
         {
             if (host.ObsoleteList.TimingList.Count == 0) return;
             var groups = eventList.GroupBy(k => k.EventType);
@@ -310,8 +310,8 @@ namespace Coosu.Storyboard.Management
                 var list = group.ToList();
                 for (int i = 0; i < list.Count; i++)
                 {
-                    CommonEvent nowE = list[i];
-                    CommonEvent nextE =
+                    ICommonEvent nowE = list[i];
+                    ICommonEvent nextE =
                         i == list.Count - 1
                             ? null
                             : list[i + 1];
@@ -324,7 +324,7 @@ namespace Coosu.Storyboard.Management
 
                     // 判断是否此Event为控制Obsolete Range的Event。
                     if (!(nowE.OnObsoleteTimingRange(host) &&
-                          EventExtension.UnworthyDictionary.ContainsKey(nowE.EventType)))
+                          EventExtensions.UnworthyDictionary.ContainsKey(nowE.EventType)))
                     {
                         bool canRemove;
 
@@ -403,7 +403,7 @@ namespace Coosu.Storyboard.Management
         /// </summary>
         /// <param name="host"></param>
         /// <param name="eventList"></param>
-        private void RemoveByLogic(EventHost host, List<CommonEvent> eventList)
+        private void RemoveByLogic(IEventHost host, List<ICommonEvent> eventList)
         {
             var groups = eventList.GroupBy(k => k.EventType);
             foreach (var group in groups)
@@ -414,7 +414,7 @@ namespace Coosu.Storyboard.Management
                 int index = list.Count - 1;
                 while (index >= 0)
                 {
-                    CommonEvent nowE = list[index];
+                    ICommonEvent nowE = list[index];
 
                     if (host is Sprite ele &&
                         ele.TriggerList.Any(k => nowE.EndTime >= k.StartTime && nowE.StartTime <= k.EndTime) &&
@@ -519,7 +519,7 @@ namespace Coosu.Storyboard.Management
                     } // 若是首个event
                     else // 若不是首个event
                     {
-                        CommonEvent preE = list[index - 1];
+                        ICommonEvent preE = list[index - 1];
                         //if (host is Element ele2 &&
                         //    ele2.TriggerList.Any(k => preE.EndTime >= k.StartTime && preE.StartTime <= k.EndTime) &&
                         //    ele2.LoopList.Any(k => preE.EndTime >= k.StartTime && preE.StartTime <= k.EndTime))
@@ -597,22 +597,22 @@ namespace Coosu.Storyboard.Management
             } // group的循环
         }
 
-        private static void RemoveEvent(EventHost sourceHost, ICollection<CommonEvent> eventList, CommonEvent e)
+        private static void RemoveEvent(IEventHost sourceHost, ICollection<ICommonEvent> eventList, ICommonEvent e)
         {
             sourceHost.Events.Remove(e);
             eventList.Remove(e);
         }
 
-        private void RaiseSituationEvent(EventHost host, SituationType situationType, Action continueAction, params CommonEvent[] events)
+        private void RaiseSituationEvent(IEventHost host, SituationType situationType, Action continueAction, params ICommonEvent[] events)
         {
             RaiseSituationEvent(host, situationType, continueAction, null, events);
         }
 
-        private void RaiseSituationEvent(EventHost host, SituationType situationType, Action continueAction, Action breakAction, params CommonEvent[] events)
+        private void RaiseSituationEvent(IEventHost host, SituationType situationType, Action continueAction, Action breakAction, params ICommonEvent[] events)
         {
             var args = new SituationEventArgs(Guid, situationType)
             {
-                Sprite = host is Sprite e ? e : host._baseHost,
+                Sprite = host is ISubEventHost e ? e.BaseObject : host,
                 Host = host is Sprite ? null : host,
                 Events = events
             };

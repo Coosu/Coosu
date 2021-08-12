@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Coosu.Storyboard.Events;
+using Coosu.Storyboard.Events.EventHosts;
 using Coosu.Storyboard.Extensibility;
 using Coosu.Storyboard.Management;
 using Coosu.Storyboard.OsbX.ActionHandlers;
@@ -18,16 +21,16 @@ namespace Coosu.Storyboard.OsbX.SubjectHandlers
 
         public Camera2Handler()
         {
-            RegisterAction(Register.GetActionHandlerInstance<MoveActionHandler>());
-            RegisterAction(Register.GetActionHandlerInstance<MoveXActionHandler>());
-            RegisterAction(Register.GetActionHandlerInstance<MoveYActionHandler>());
-            RegisterAction(Register.GetActionHandlerInstance<FadeActionHandler>());
-            RegisterAction(Register.GetActionHandlerInstance<ScaleActionHandler>());
-            RegisterAction(Register.GetActionHandlerInstance<RotateActionHandler>());
-            RegisterAction(Register.GetActionHandlerInstance<VectorActionHandler>());
-            RegisterAction(Register.GetActionHandlerInstance<OriginActionHandler>());
-            RegisterAction(Register.GetActionHandlerInstance<ZoomInActionHandler>());
-            RegisterAction(Register.GetActionHandlerInstance<ZoomOutActionHandler>());
+            RegisterAction(HandlerRegister.GetActionHandlerInstance<MoveActionHandler>());
+            RegisterAction(HandlerRegister.GetActionHandlerInstance<MoveXActionHandler>());
+            RegisterAction(HandlerRegister.GetActionHandlerInstance<MoveYActionHandler>());
+            RegisterAction(HandlerRegister.GetActionHandlerInstance<FadeActionHandler>());
+            RegisterAction(HandlerRegister.GetActionHandlerInstance<ScaleActionHandler>());
+            RegisterAction(HandlerRegister.GetActionHandlerInstance<RotateActionHandler>());
+            RegisterAction(HandlerRegister.GetActionHandlerInstance<VectorActionHandler>());
+            RegisterAction(HandlerRegister.GetActionHandlerInstance<OriginActionHandler>());
+            RegisterAction(HandlerRegister.GetActionHandlerInstance<ZoomInActionHandler>());
+            RegisterAction(HandlerRegister.GetActionHandlerInstance<ZoomOutActionHandler>());
         }
 
         public override string Flag => "Camera2";
@@ -39,57 +42,52 @@ namespace Coosu.Storyboard.OsbX.SubjectHandlers
 
         public override Camera2Element Deserialize(string[] split)
         {
-            if (split.Length >= 1)
+            if (split.Length < 1) throw new ArgumentOutOfRangeException();
+            
+            //var type = ObjectTypeManager.Parse(split[0]);
+            int cameraId = 0;
+            if (split.Length >= 2)
             {
-                var type = ObjectTypeManager.Parse(split[0]);
-                int cameraId = 0;
-                if (split.Length >= 2)
-                {
-                    cameraId = int.Parse(split[1]);
-                }
-
-                return new Camera2Element(type) { CameraId = cameraId };
+                cameraId = int.Parse(split[1]);
             }
 
-            throw new ArgumentOutOfRangeException();
+            return new Camera2Element() { CameraId = cameraId };
+
         }
     }
 
-    public class Camera2Element : EventHost, IOsbObject
+    public class Camera2Element : ISceneObject, IOsbObject
     {
-        public OsbObjectType ObjectType { get; }
-        protected override string Header => $"{ObjectTypeManager.GetString(ObjectType)},{CameraId}";
+        public OsbObjectType ObjectType { get; } = 99;
+        protected string Header => $"{ObjectTypeManager.GetString(ObjectType)},{CameraId}";
+        public float DefaultY { get; set; }
+        public float DefaultX { get; set; }
+        public float ZDistance { get; set; }
+        public int CameraId { get; set; }
+        public List<Loop> LoopList { get; } = new();
+        public List<Trigger> TriggerList { get; } = new();
+        public float MaxTime => Events.Count > 0 ? Events.Max(k => k.EndTime) : 0;
+        public float MinTime => Events.Count > 0 ? Events.Min(k => k.StartTime) : 0;
+        public float MaxStartTime => Events.Count > 0 ? Events.Max(k => k.StartTime) : 0;
+        public float MinEndTime => Events.Count > 0 ? Events.Min(k => k.EndTime) : 0;
+        public bool EnableGroupedSerialization { get; set; }
+
+        // EventHosts
+        public SortedSet<ICommonEvent> Events { get; } = new(new EventTimingComparer());
+        public void AddEvent(ICommonEvent @event)
+        {
+            Events.Add(@event);
+        }
 
         static Camera2Element()
         {
             ObjectTypeManager.SignType(99, "Camera2");
         }
 
-        public Camera2Element(OsbObjectType type)
+        public async Task WriteScriptAsync(TextWriter writer)
         {
-            ObjectType = type;
-        }
-
-        public override float MaxTime =>
-            NumericUtility.GetMaxValue(Events.Select(k => k.EndTime));
-
-        public override float MinTime =>
-            NumericUtility.GetMinValue(Events.Select(k => k.StartTime));
-
-        public override float MaxStartTime =>
-            NumericUtility.GetMaxValue(Events.Select(k => k.StartTime));
-
-        public override float MinEndTime =>
-            NumericUtility.GetMinValue(Events.Select(k => k.EndTime));
-
-        public override int MaxTimeCount => Events.Count(k => k.EndTime.Equals(MaxTime));
-
-        public override int MinTimeCount => Events.Count(k => k.StartTime.Equals(MaxTime));
-
-        public override async Task WriteScriptAsync(TextWriter sw)
-        {
-            await sw.WriteLineAsync(Header);
-            await ScriptHelper.WriteHostEventsAsync(sw, this, EnableGroupedSerialization);
+            await writer.WriteLineAsync(Header);
+            await ScriptHelper.WriteElementEventsAsync(writer, this, EnableGroupedSerialization);
         }
     }
 }

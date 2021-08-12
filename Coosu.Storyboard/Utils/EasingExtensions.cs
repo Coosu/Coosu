@@ -1,9 +1,9 @@
 ﻿using System;
 using Coosu.Storyboard.Events;
 
-namespace Coosu.Storyboard.Common
+namespace Coosu.Storyboard.Utils
 {
-    public static class EasingExtension
+    public static class EasingExtensions
     {
         public static double Reverse(Func<double, double> function, double value) => 1 - function(1 - value);
         public static double ToInOut(Func<double, double> function, double value) => .5 * (value < .5 ? function(2 * value) : (2 - function(2 - 2 * value)));

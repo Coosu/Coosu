@@ -4,9 +4,9 @@ using Coosu.Storyboard.Events;
 
 namespace Coosu.Storyboard.Extensibility
 {
-    public static class Register
+    public static class HandlerRegister
     {
-        private static readonly Dictionary<EventType, AddEventDelegate> EventTransformationDictionary = new();
+        private static readonly Dictionary<EventType, EventCreationDelegate> EventTransformationDictionary = new();
         private static readonly Dictionary<string, ISubjectParsingHandler> SubjectHandlerDic = new();
         private static readonly Dictionary<Type, IActionParsingHandler> ActionHandlerInstances = new();
 
@@ -21,12 +21,12 @@ namespace Coosu.Storyboard.Extensibility
             return SubjectHandlerDic.ContainsKey(magicWord) ? SubjectHandlerDic[magicWord] : null;
         }
 
-        public static void RegisterEventTransformation(EventType eventType, AddEventDelegate @delegate)
+        public static void RegisterEventTransformation(EventType eventType, EventCreationDelegate @delegate)
         {
             EventTransformationDictionary.Add(eventType, @delegate);
         }
 
-        public static AddEventDelegate? GetEventTransformation(EventType eventType)
+        public static EventCreationDelegate? GetEventTransformation(EventType eventType)
         {
             if (EventTransformationDictionary.ContainsKey(eventType))
                 return EventTransformationDictionary[eventType];

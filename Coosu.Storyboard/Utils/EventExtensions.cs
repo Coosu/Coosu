@@ -5,7 +5,7 @@ using Coosu.Storyboard.Events;
 
 namespace Coosu.Storyboard.Utils
 {
-    public static class EventExtension
+    public static class EventExtensions
     {
         public static readonly ReadOnlyDictionary<EventType, float[]> DefaultDictionary =
             new ReadOnlyDictionary<EventType, float[]>(
@@ -30,37 +30,37 @@ namespace Coosu.Storyboard.Utils
                 }
             );
 
-        public static float[] GetDefaultValue(this CommonEvent e)
+        public static float[] GetDefaultValue(this ICommonEvent e)
         {
             return DefaultDictionary.ContainsKey(e.EventType)
                 ? DefaultDictionary[e.EventType]
                 : null;
         }
 
-        public static float[] GetUnworthyValue(this CommonEvent e)
+        public static float[] GetUnworthyValue(this ICommonEvent e)
         {
             return UnworthyDictionary.ContainsKey(e.EventType)
                 ? UnworthyDictionary[e.EventType]
                 : null;
         }
 
-        public static IEnumerable<Fade> GetFadeList(this EventHost ec) =>
+        public static IEnumerable<Fade> GetFadeList(this IEventHost ec) =>
             ec.Events.Where(k => k.EventType == EventTypes.Fade).Select(k => (Fade)k);
-        public static IEnumerable<Color> GetColorList(this EventHost ec) =>
+        public static IEnumerable<Color> GetColorList(this IEventHost ec) =>
             ec.Events.Where(k => k.EventType == EventTypes.Color).Select(k => (Color)k);
-        public static IEnumerable<Move> GetMoveList(this EventHost ec) =>
+        public static IEnumerable<Move> GetMoveList(this IEventHost ec) =>
             ec.Events.Where(k => k.EventType == EventTypes.Move).Select(k => (Move)k);
-        public static IEnumerable<MoveX> GetMoveXList(this EventHost ec) =>
+        public static IEnumerable<MoveX> GetMoveXList(this IEventHost ec) =>
             ec.Events.Where(k => k.EventType == EventTypes.MoveX).Select(k => (MoveX)k);
-        public static IEnumerable<MoveY> GetMoveYList(this EventHost ec) =>
+        public static IEnumerable<MoveY> GetMoveYList(this IEventHost ec) =>
             ec.Events.Where(k => k.EventType == EventTypes.MoveY).Select(k => (MoveY)k);
-        public static IEnumerable<Parameter> GetParameterList(this EventHost ec) =>
+        public static IEnumerable<Parameter> GetParameterList(this IEventHost ec) =>
             ec.Events.Where(k => k.EventType == EventTypes.Parameter).Select(k => (Parameter)k);
-        public static IEnumerable<Rotate> GetRotateList(this EventHost ec) =>
+        public static IEnumerable<Rotate> GetRotateList(this IEventHost ec) =>
             ec.Events.Where(k => k.EventType == EventTypes.Rotate).Select(k => (Rotate)k);
-        public static IEnumerable<Scale> GetScaleList(this EventHost ec) =>
+        public static IEnumerable<Scale> GetScaleList(this IEventHost ec) =>
             ec.Events.Where(k => k.EventType == EventTypes.Scale).Select(k => (Scale)k);
-        public static IEnumerable<Vector> GetVectorList(this EventHost ec) =>
+        public static IEnumerable<Vector> GetVectorList(this IEventHost ec) =>
             ec.Events.Where(k => k.EventType == EventTypes.Vector).Select(k => (Vector)k);
     }
 }

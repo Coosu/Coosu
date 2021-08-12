@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 
 namespace Coosu.Storyboard.Utils
 {
-    public static class NumericUtility
+    public static class NumericHelper
     {
         public static float GetMaxValue(params IEnumerable<float>[] floatLists)
         {
@@ -24,14 +23,5 @@ namespace Coosu.Storyboard.Utils
                 .Min();
         }
 
-        public static string ToIcString(this float value)
-        {
-            return value.ToString(CultureInfo.InvariantCulture);
-        }
-
-        public static string ToIcString(this double value)
-        {
-            return value.ToString(CultureInfo.InvariantCulture);
-        }
     }
 }

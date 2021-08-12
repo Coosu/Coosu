@@ -1,15 +1,15 @@
 ﻿using System;
-using System.IO;
-using System.Threading.Tasks;
 using Coosu.Storyboard.Management;
-using Coosu.Storyboard.Utils;
 
 namespace Coosu.Storyboard
 {
     public sealed class Animation : Sprite
     {
+        public override OsbObjectType ObjectType { get; } = ObjectTypes.Animation;
+
         protected override string Header =>
-            $"{ObjectTypeManager.GetString(ObjectType)},{LayerType},{OriginType},\"{ImagePath}\",{DefaultX},{DefaultY},{FrameCount},{FrameDelay},{LoopType}";
+            $"{ObjectTypeManager.GetString(ObjectType)},{LayerType},{OriginType},\"{ImagePath}\"," +
+            $"{DefaultX},{DefaultY},{FrameCount},{FrameDelay},{LoopType}";
 
         public int FrameCount { get; set; }
         public float FrameDelay { get; set; }
@@ -27,8 +27,9 @@ namespace Coosu.Storyboard
         /// <param name="frameCount">Set frame count.</param>
         /// <param name="frameDelay">Set frame rate (frame delay).</param>
         /// <param name="loopType">Set loop type.</param>
-        public Animation(OsbObjectType type, LayerType layerType, OriginType originType, string imagePath, float defaultX,
-            float defaultY, int frameCount, float frameDelay, LoopType loopType) : base(type, layerType, originType, imagePath, defaultX, defaultY)
+        public Animation(LayerType layerType, OriginType originType, string imagePath, float defaultX,
+            float defaultY, int frameCount, float frameDelay, LoopType loopType)
+            : base(layerType, originType, imagePath, defaultX, defaultY)
         {
             FrameCount = frameCount;
             FrameDelay = frameDelay;
@@ -47,19 +48,13 @@ namespace Coosu.Storyboard
         /// <param name="frameCount">Set frame count.</param>
         /// <param name="frameDelay">Set frame rate (frame delay).</param>
         /// <param name="loopType">Set loop type.</param>
-        public Animation(string type, string layer, string origin, string imagePath, float defaultX,
-            float defaultY, int frameCount, float frameDelay, string loopType) : base(type, layer, origin, imagePath, defaultX, defaultY)
+        public Animation(string layer, string origin, string imagePath, float defaultX,
+            float defaultY, int frameCount, float frameDelay, string loopType)
+            : base(layer, origin, imagePath, defaultX, defaultY)
         {
             FrameCount = frameCount;
             FrameDelay = frameDelay;
             LoopType = (LoopType)Enum.Parse(typeof(LoopType), loopType);
-        }
-
-        public override async Task WriteScriptAsync(TextWriter sw)
-        {
-            //if (!IsWorthy) return;
-            await sw.WriteLineAsync(Header);
-            await sw.WriteElementEventsAsync(this, EnableGroupedSerialization);
         }
     }
 }

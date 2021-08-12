@@ -9,11 +9,13 @@ namespace Coosu.Storyboard.Events.EventHosts
 {
     public sealed class Trigger : ISubEventHost, IEvent
     {
+        public EventType EventType { get; } = EventTypes.Trigger;
+
         internal ISceneObject? _baseObject;
         private const string HitSound = "HitSound";
         public string Header => $"T,{TriggerName},{StartTime},{EndTime}";
         public bool EnableGroupedSerialization { get; set; }
-        public SortedSet<CommonEvent> Events { get; } = new(new EventTimingComparer());
+        public SortedSet<ICommonEvent> Events { get; } = new(new EventTimingComparer());
 
         public float StartTime { get; set; }
         public float EndTime { get; set; }
@@ -50,9 +52,9 @@ namespace Coosu.Storyboard.Events.EventHosts
             TriggerName = triggerName;
         }
 
-        public async Task WriteScriptAsync(TextWriter sb)
+        public async Task WriteScriptAsync(TextWriter writer)
         {
-            await sb.WriteTriggerAsync(this, EnableGroupedSerialization);
+            await ScriptHelper.WriteTriggerAsync(writer, this, EnableGroupedSerialization);
         }
 
         private static string GetTriggerString(TriggerType triggerType, bool listenSample, uint? customSampleSet)
@@ -98,6 +100,10 @@ namespace Coosu.Storyboard.Events.EventHosts
         public void AdjustTiming(float offset)
         {
             StartTime += offset;
+        }
+        public void AddEvent(ICommonEvent @event)
+        {
+            Events.Add(@event);
         }
 
         ISceneObject? ISubEventHost.BaseObject
