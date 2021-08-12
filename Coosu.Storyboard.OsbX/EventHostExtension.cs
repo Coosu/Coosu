@@ -1,4 +1,5 @@
-﻿using Coosu.Storyboard.Events;
+﻿using Coosu.Storyboard.Common;
+using Coosu.Storyboard.Events;
 
 namespace Coosu.Storyboard.OsbX
 {

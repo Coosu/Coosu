@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Events;
 using Coosu.Storyboard.Events.EventHosts;
 using Coosu.Storyboard.Extensibility;
@@ -56,9 +57,9 @@ namespace Coosu.Storyboard.OsbX.SubjectHandlers
         }
     }
 
-    public class Camera2Element : ISceneObject, IOsbObject
+    public class Camera2Element : ISceneObject, IDefinedObject
     {
-        public OsbObjectType ObjectType { get; } = 99;
+        public ObjectType ObjectType { get; } = 99;
         protected string Header => $"{ObjectTypeManager.GetString(ObjectType)},{CameraId}";
         public float DefaultY { get; set; }
         public float DefaultX { get; set; }

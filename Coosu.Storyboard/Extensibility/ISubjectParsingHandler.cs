@@ -1,4 +1,6 @@
-﻿namespace Coosu.Storyboard.Extensibility
+﻿using Coosu.Storyboard.Common;
+
+namespace Coosu.Storyboard.Extensibility
 {
     public interface ISubjectParsingHandler : IParsingHandler
     {

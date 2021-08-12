@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Coosu.Storyboard.Events;
 
-namespace Coosu.Storyboard
+namespace Coosu.Storyboard.Common
 {
     public interface IEventHost : IScriptable
     {

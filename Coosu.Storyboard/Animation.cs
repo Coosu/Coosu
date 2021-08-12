@@ -5,7 +5,7 @@ namespace Coosu.Storyboard
 {
     public sealed class Animation : Sprite
     {
-        public override OsbObjectType ObjectType { get; } = ObjectTypes.Animation;
+        public override ObjectType ObjectType { get; } = ObjectTypes.Animation;
 
         protected override string Header =>
             $"{ObjectTypeManager.GetString(ObjectType)},{LayerType},{OriginType},\"{ImagePath}\"," +

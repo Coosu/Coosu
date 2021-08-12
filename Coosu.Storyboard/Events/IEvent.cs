@@ -1,4 +1,6 @@
-﻿namespace Coosu.Storyboard.Events
+﻿using Coosu.Storyboard.Common;
+
+namespace Coosu.Storyboard.Events
 {
     public interface IEvent : ITimingAdjustable
     {

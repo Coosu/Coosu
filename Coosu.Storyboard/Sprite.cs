@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Events;
 using Coosu.Storyboard.Events.EventHosts;
 using Coosu.Storyboard.Management;
@@ -18,7 +19,7 @@ namespace Coosu.Storyboard
         protected virtual string Header =>
             $"{ObjectTypeManager.GetString(ObjectType)},{LayerType},{OriginType},\"{ImagePath}\",{DefaultX},{DefaultY}";
 
-        public virtual OsbObjectType ObjectType { get; } = ObjectTypes.Sprite;
+        public virtual ObjectType ObjectType { get; } = ObjectTypes.Sprite;
         public LayerType LayerType { get; }
         public OriginType OriginType { get; }
         public string ImagePath { get; }

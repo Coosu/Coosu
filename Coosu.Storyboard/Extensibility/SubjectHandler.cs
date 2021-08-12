@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Coosu.Storyboard.Common;
 
 namespace Coosu.Storyboard.Extensibility
 {

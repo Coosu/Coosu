@@ -4,8 +4,8 @@ namespace Coosu.Storyboard.Management
 {
     public static class ObjectTypeManager
     {
-        private static readonly Dictionary<string, OsbObjectType> DictionaryStore = new();
-        private static readonly Dictionary<OsbObjectType, string> BackDictionaryStore = new();
+        private static readonly Dictionary<string, ObjectType> DictionaryStore = new();
+        private static readonly Dictionary<ObjectType, string> BackDictionaryStore = new();
 
         static ObjectTypeManager()
         {
@@ -25,12 +25,12 @@ namespace Coosu.Storyboard.Management
             BackDictionaryStore.Add(num, name);
         }
 
-        public static OsbObjectType Parse(string s)
+        public static ObjectType Parse(string s)
         {
             return DictionaryStore.ContainsKey(s) ? DictionaryStore[s] : default;
         }
 
-        public static string? GetString(OsbObjectType type)
+        public static string? GetString(ObjectType type)
         {
             return BackDictionaryStore.ContainsKey(type) ? BackDictionaryStore[type] : null;
         }

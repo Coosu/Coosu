@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using Coosu.Storyboard.Events.EventHosts;
 
-namespace Coosu.Storyboard
+namespace Coosu.Storyboard.Common
 {
-    public interface ISceneObject : IOsbObject, IEventHost
+    public interface ISceneObject : IDefinedObject, IEventHost
     {
         public float DefaultY { get; set; }
         public float DefaultX { get; set; }

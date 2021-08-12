@@ -1,4 +1,4 @@
-﻿namespace Coosu.Storyboard
+﻿namespace Coosu.Storyboard.Common
 {
     public interface ISubEventHost : IEventHost
     {

@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
 
-namespace Coosu.Storyboard
+namespace Coosu.Storyboard.Common
 {
     public interface IScriptable
     {
