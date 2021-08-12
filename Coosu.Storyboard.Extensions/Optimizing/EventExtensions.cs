@@ -9,37 +9,37 @@ namespace Coosu.Storyboard.Extensions.Optimizing
 {
     public static class EventExtensions
     {
-        public static readonly ReadOnlyDictionary<EventType, float[]> DefaultDictionary = new(
-            new Dictionary<EventType, float[]>
+        public static readonly ReadOnlyDictionary<EventType, double[]> DefaultDictionary = new(
+            new Dictionary<EventType, double[]>
             {
-                [EventTypes.Fade] = new[] { 1f },
-                [EventTypes.Scale] = new[] { 1f },
-                [EventTypes.Vector] = new[] { 1f, 1f },
-                [EventTypes.Rotate] = new[] { 0f },
-                [EventTypes.Color] = new[] { 255f, 255f, 255f },
+                [EventTypes.Fade] = new[] { 1d },
+                [EventTypes.Scale] = new[] { 1d },
+                [EventTypes.Vector] = new[] { 1d, 1d },
+                [EventTypes.Rotate] = new[] { 0d },
+                [EventTypes.Color] = new[] { 255d, 255d, 255d },
             });
 
-        public static readonly ReadOnlyDictionary<EventType, float[]> UnworthyDictionary = new(
-            new Dictionary<EventType, float[]>
+        public static readonly ReadOnlyDictionary<EventType, double[]> UnworthyDictionary = new(
+            new Dictionary<EventType, double[]>
             {
-                [EventTypes.Fade] = new[] { 0f },
-                [EventTypes.Scale] = new[] { 0f },
-                [EventTypes.Vector] = new[] { 0f, 0f },
-                [EventTypes.Color] = new[] { 0f, 0f, 0f },
+                [EventTypes.Fade] = new[] { 0d },
+                [EventTypes.Scale] = new[] { 0d },
+                [EventTypes.Vector] = new[] { 0d, 0d },
+                [EventTypes.Color] = new[] { 0d, 0d, 0d },
             });
 
-        public static float[]? GetDefaultValue(this ICommonEvent e)
+        public static double[]? GetDefaultValue(this ICommonEvent e)
         {
             return DefaultDictionary.ContainsKey(e.EventType)
                 ? DefaultDictionary[e.EventType]
                 : null;
         }
 
-        public static float[] GetUnworthyValue(this ICommonEvent e)
+        public static double[] GetUnworthyValue(this ICommonEvent e)
         {
             return UnworthyDictionary.ContainsKey(e.EventType)
                 ? UnworthyDictionary[e.EventType]
-                : Array.Empty<float>();
+                : Array.Empty<double>();
         }
 
         public static IEnumerable<Fade> GetFadeList(this IEventHost ec) =>

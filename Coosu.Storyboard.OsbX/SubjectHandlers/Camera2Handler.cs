@@ -59,16 +59,16 @@ namespace Coosu.Storyboard.OsbX.SubjectHandlers
     {
         public ObjectType ObjectType { get; } = 99;
         public int? RowInSource { get; set; }
-        public float DefaultY { get; set; }
-        public float DefaultX { get; set; }
-        public float ZDistance { get; set; }
+        public double DefaultY { get; set; }
+        public double DefaultX { get; set; }
+        public double ZDistance { get; set; }
         public int CameraId { get; set; }
         public List<Loop> LoopList { get; } = new();
         public List<Trigger> TriggerList { get; } = new();
-        public float MaxTime => Events.Count > 0 ? Events.Max(k => k.EndTime) : 0;
-        public float MinTime => Events.Count > 0 ? Events.Min(k => k.StartTime) : 0;
-        public float MaxStartTime => Events.Count > 0 ? Events.Max(k => k.StartTime) : 0;
-        public float MinEndTime => Events.Count > 0 ? Events.Min(k => k.EndTime) : 0;
+        public double MaxTime => Events.Count > 0 ? Events.Max(k => k.EndTime) : 0;
+        public double MinTime => Events.Count > 0 ? Events.Min(k => k.StartTime) : 0;
+        public double MaxStartTime => Events.Count > 0 ? Events.Max(k => k.StartTime) : 0;
+        public double MinEndTime => Events.Count > 0 ? Events.Min(k => k.EndTime) : 0;
         public bool EnableGroupedSerialization { get; set; }
 
         // EventHosts

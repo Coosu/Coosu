@@ -3,7 +3,7 @@
     public interface IEvent : ITimingAdjustable
     {
         EventType EventType { get; }
-        float StartTime { get; }
-        float EndTime { set; get; }
+        double StartTime { get; }
+        double EndTime { set; get; }
     }
 }

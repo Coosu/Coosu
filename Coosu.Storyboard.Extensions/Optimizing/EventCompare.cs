@@ -9,7 +9,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
     public static class EventCompare
     {
 
-        public static bool InObsoleteTimingRange(this ICommonEvent e, TimeRange obsoleteList, out RangeValue<float> range)
+        public static bool InObsoleteTimingRange(this ICommonEvent e, TimeRange obsoleteList, out RangeValue<double> range)
         {
             return obsoleteList.ContainsTimingPoint(out range, e.StartTime, e.EndTime);
         }

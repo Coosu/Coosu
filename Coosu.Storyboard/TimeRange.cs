@@ -8,17 +8,17 @@ namespace Coosu.Storyboard
     public class TimeRange
     {
         private readonly SortedSet<TimingPoint> _timingPoints = new(new TimingPointComparer());
-        private List<RangeValue<float>>? _timingList;
-        public List<RangeValue<float>> TimingList => _timingList ??= GetTimingList();
+        private List<RangeValue<double>>? _timingList;
+        public List<RangeValue<double>> TimingList => _timingList ??= GetTimingList();
 
-        public float MinStartTime => TimingList.First().StartTime;
-        public float MinEndTime => TimingList.First().EndTime;
-        public float MaxStartTime => TimingList.Last().StartTime;
-        public float MaxEndTime => TimingList.Last().EndTime;
+        public double MinStartTime => TimingList.First().StartTime;
+        public double MinEndTime => TimingList.First().EndTime;
+        public double MaxStartTime => TimingList.Last().StartTime;
+        public double MaxEndTime => TimingList.Last().EndTime;
 
         public int Count => TimingList.Count;
 
-        public void Add(float startTime, float endTime)
+        public void Add(double startTime, double endTime)
         {
             if (startTime.Equals(endTime)) return;
             _timingPoints.Add(new TimingPoint(startTime, true));
@@ -26,10 +26,10 @@ namespace Coosu.Storyboard
             _timingList = null;
         }
 
-        private List<RangeValue<float>> GetTimingList()
+        private List<RangeValue<double>> GetTimingList()
         {
-            var list = new List<RangeValue<float>>();
-            float? tmpStart = null, tmpEnd = null;
+            var list = new List<RangeValue<double>>();
+            double? tmpStart = null, tmpEnd = null;
             var array = _timingPoints.ToArray();
             for (var i = 0; i < array.Length; i++)
             {
@@ -51,7 +51,7 @@ namespace Coosu.Storyboard
                         i == array.Length - 1)
                     {
                         tmpEnd = timingPoint.Timing;
-                        list.Add(new RangeValue<float>(tmpStart!.Value, tmpEnd.Value));
+                        list.Add(new RangeValue<double>(tmpStart!.Value, tmpEnd.Value));
                         tmpStart = null;
                         tmpEnd = null;
                     }
@@ -61,9 +61,9 @@ namespace Coosu.Storyboard
             return list;
         }
 
-        public bool ContainsTimingPoint(float time, out RangeValue<float> patterned,
-            float offsetStart = 0,
-            float offsetEnd = 0)
+        public bool ContainsTimingPoint(double time, out RangeValue<double> patterned,
+            double offsetStart = 0,
+            double offsetEnd = 0)
         {
             foreach (var range in TimingList)
                 if (time >= range.StartTime + offsetStart && time <= range.EndTime + offsetEnd)
@@ -76,7 +76,7 @@ namespace Coosu.Storyboard
             return false;
         }
 
-        public bool OnTimingRange(out RangeValue<float> patterned, float timingPoint)
+        public bool OnTimingRange(out RangeValue<double> patterned, double timingPoint)
         {
             //int i = 0;
             foreach (var range in TimingList)
@@ -94,7 +94,7 @@ namespace Coosu.Storyboard
             return false;
         }
 
-        public bool ContainsTimingPoint(out RangeValue<float> patterned, params float[] time)
+        public bool ContainsTimingPoint(out RangeValue<double> patterned, params double[] time)
         {
             //int i = 0;
             foreach (var range in TimingList)

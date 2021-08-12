@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
-using Coosu.Storyboard.Extensibility;
 using Coosu.Storyboard.Utils;
 
 namespace Coosu.Storyboard
@@ -12,7 +11,7 @@ namespace Coosu.Storyboard
 
 
         public int FrameCount { get; set; }
-        public float FrameDelay { get; set; }
+        public double FrameDelay { get; set; }
         public LoopType LoopType { get; set; }
 
         /// <summary>
@@ -26,8 +25,8 @@ namespace Coosu.Storyboard
         /// <param name="frameCount">Set frame count.</param>
         /// <param name="frameDelay">Set frame rate (frame delay).</param>
         /// <param name="loopType">Set loop type.</param>
-        public Animation(LayerType layerType, OriginType originType, string imagePath, float defaultX,
-            float defaultY, int frameCount, float frameDelay, LoopType loopType)
+        public Animation(LayerType layerType, OriginType originType, string imagePath, double defaultX,
+            double defaultY, int frameCount, double frameDelay, LoopType loopType)
             : base(layerType, originType, imagePath, defaultX, defaultY)
         {
             FrameCount = frameCount;
@@ -46,15 +45,15 @@ namespace Coosu.Storyboard
         /// <param name="frameCount">Set frame count.</param>
         /// <param name="frameDelay">Set frame rate (frame delay).</param>
         /// <param name="loopType">Set loop type.</param>
-        public Animation(string layer, string origin, string imagePath, float defaultX,
-            float defaultY, int frameCount, float frameDelay, string loopType)
+        public Animation(string layer, string origin, string imagePath, double defaultX,
+            double defaultY, int frameCount, double frameDelay, string loopType)
             : base(layer, origin, imagePath, defaultX, defaultY)
         {
             FrameCount = frameCount;
             FrameDelay = frameDelay;
             LoopType = (LoopType)Enum.Parse(typeof(LoopType), loopType);
         }
-        
+
         public override async Task WriteHeaderAsync(TextWriter writer)
         {
             await writer.WriteAsync(ObjectType.GetString(ObjectType));

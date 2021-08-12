@@ -19,27 +19,27 @@ namespace Coosu.Storyboard.Events
         public bool EnableGroupedSerialization { get; set; }
         public SortedSet<ICommonEvent> Events { get; } = new(new EventTimingComparer());
 
-        public float StartTime { get; set; }
-        public float EndTime { get; set; }
+        public double StartTime { get; set; }
+        public double EndTime { get; set; }
         public string TriggerName { get; set; }
 
-        public float MaxTime =>
+        public double MaxTime =>
             EndTime +
             (Events.Count > 0
                 ? Events.Max(k => k.EndTime)
                 : 0);
 
-        public float MinTime => StartTime;
+        public double MinTime => StartTime;
 
-        public float MaxStartTime =>
+        public double MaxStartTime =>
             EndTime +
             (Events.Count > 0
                 ? Events.Max(k => k.StartTime)
                 : 0); //if hitsound played at end time
 
-        public float MinEndTime => StartTime; // if no hitsound here
+        public double MinEndTime => StartTime; // if no hitsound here
 
-        public Trigger(float startTime, float endTime, TriggerType triggerType, bool listenSample = false, uint? customSampleSet = null)
+        public Trigger(double startTime, double endTime, TriggerType triggerType, bool listenSample = false, uint? customSampleSet = null)
         {
             StartTime = startTime;
             EndTime = endTime;
@@ -47,7 +47,7 @@ namespace Coosu.Storyboard.Events
             TriggerName = GetTriggerString(triggerType, listenSample, customSampleSet);
         }
 
-        public Trigger(float startTime, float endTime, string triggerName)
+        public Trigger(double startTime, double endTime, string triggerName)
         {
             StartTime = startTime;
             EndTime = endTime;
@@ -110,7 +110,7 @@ namespace Coosu.Storyboard.Events
             return sb.ToString();
         }
 
-        public void AdjustTiming(float offset)
+        public void AdjustTiming(double offset)
         {
             StartTime += offset;
         }

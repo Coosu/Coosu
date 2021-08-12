@@ -4,19 +4,19 @@
     {
         public override EventType EventType => EventTypes.Scale; 
        
-        public float StartScale
+        public double StartScale
         {
             get => Start[0];
             set => Start[0] = value;
         }
 
-        public float EndScale
+        public double EndScale
         {
             get => End[0];
             set => End[0] = value;
         }
 
-        public Scale(EasingType easing, float startTime, float endTime, float s1, float s2):
+        public Scale(EasingType easing, double startTime, double endTime, double s1, double s2):
             base(easing, startTime, endTime, new[] { s1 }, new[] { s2 })
         {
         }

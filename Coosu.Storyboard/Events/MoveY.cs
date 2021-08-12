@@ -6,19 +6,19 @@ namespace Coosu.Storyboard.Events
     {
         public override EventType EventType => EventTypes.MoveY;
 
-        public float StartY
+        public double StartY
         {
             get => Start[0];
             set => Start[0] = value;
         }
 
-        public float EndY
+        public double EndY
         {
             get => End[0];
             set => End[0] = value;
         }
 
-        public MoveY(EasingType easing, float startTime, float endTime, float y1, float y2) :
+        public MoveY(EasingType easing, double startTime, double endTime, double y1, double y2) :
             base(easing, startTime, endTime, new[] { y1 }, new[] { y2 })
         {
         }
@@ -27,7 +27,7 @@ namespace Coosu.Storyboard.Events
         {
         }
 
-        public void AdjustPosition(float x, float y)
+        public void AdjustPosition(double x, double y)
         {
             Start[0] += y;
             End[0] += y;

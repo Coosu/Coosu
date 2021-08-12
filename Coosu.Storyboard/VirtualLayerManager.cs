@@ -7,21 +7,21 @@ namespace Coosu.Storyboard
 {
     public class VirtualLayerManager
     {
-        public Dictionary<float, VirtualLayer> Layers { get; } = new();
+        public Dictionary<double, VirtualLayer> Layers { get; } = new();
 
-        public bool ContainsLayer(float z)
+        public bool ContainsLayer(double z)
         {
             return Layers.ContainsKey(z);
         }
 
-        public VirtualLayer GetOrAddLayer(float z)
+        public VirtualLayer GetOrAddLayer(double z)
         {
             if (ContainsLayer(z))
                 return Layers[z];
             return CreateLayer(z);
         }
 
-        public VirtualLayer CreateLayer(float z)
+        public VirtualLayer CreateLayer(double z)
         {
             var elementGroup = new VirtualLayer(z);
             Layers.Add(z, elementGroup);
@@ -38,12 +38,12 @@ namespace Coosu.Storyboard
             Layers.Remove(virtualLayer.ZDistance);
         }
 
-        public void DeleteLayer(float z)
+        public void DeleteLayer(double z)
         {
             Layers.Remove(z);
         }
 
-        //public static Layer Adjust(Layer layer, float offsetX, float offsetY, int offsetTiming)
+        //public static Layer Adjust(Layer layer, double offsetX, double offsetY, int offsetTiming)
         //{
         //    foreach (var obj in layer.Elements)
         //    {

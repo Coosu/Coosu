@@ -79,17 +79,17 @@ namespace Coosu.Storyboard.Extensibility
             }
 
             var easing = EasingConvert.ToEasing(split[1]);
-            var startTime = float.Parse(split[2]);
-            var endTime = string.IsNullOrWhiteSpace(split[3]) ? startTime : float.Parse(split[3]);
+            var startTime = double.Parse(split[2]);
+            var endTime = string.IsNullOrWhiteSpace(split[3]) ? startTime : double.Parse(split[3]);
 
-            var start = new float[ParameterDimension];
-            var end = new float[ParameterDimension];
+            var start = new double[ParameterDimension];
+            var end = new double[ParameterDimension];
             if (paramLength == ParameterDimension)
             {
                 int j = 4;
                 for (int i = 0; i < ParameterDimension; i++, j++)
                 {
-                    start[i] = float.Parse(split[j]);
+                    start[i] = double.Parse(split[j]);
                 }
 
                 start.CopyTo(end, 0);
@@ -99,12 +99,12 @@ namespace Coosu.Storyboard.Extensibility
                 int j = 4;
                 for (int i = 0; i < ParameterDimension; i++, j++)
                 {
-                    start[i] = float.Parse(split[j]);
+                    start[i] = double.Parse(split[j]);
                 }
 
                 for (int i = 0; i < ParameterDimension; i++, j++)
                 {
-                    end[i] = float.Parse(split[j]);
+                    end[i] = double.Parse(split[j]);
                 }
             }
 

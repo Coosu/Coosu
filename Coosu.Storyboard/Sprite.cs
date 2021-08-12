@@ -21,10 +21,10 @@ namespace Coosu.Storyboard
         public LayerType LayerType { get; }
         public OriginType OriginType { get; }
         public string ImagePath { get; }
-        public float DefaultY { get; set; }
-        public float DefaultX { get; set; }
+        public double DefaultY { get; set; }
+        public double DefaultX { get; set; }
 
-        public float ZDistance { get; set; }
+        public double ZDistance { get; set; }
         public int CameraId { get; set; }
 
         // EventHosts
@@ -33,28 +33,28 @@ namespace Coosu.Storyboard
         public List<Loop> LoopList { get; } = new();
         public List<Trigger> TriggerList { get; } = new();
 
-        public float MaxTime =>
+        public double MaxTime =>
              NumericHelper.GetMaxValue(
                  Events.Select(k => k.EndTime),
                  LoopList.Select(k => k.OuterMaxTime),
                  TriggerList.Select(k => k.MaxTime)
              );
 
-        public float MinTime =>
+        public double MinTime =>
             NumericHelper.GetMinValue(
                 Events.Select(k => k.StartTime),
                 LoopList.Select(k => k.OuterMinTime),
                 TriggerList.Select(k => k.MinTime)
             );
 
-        public float MaxStartTime =>
+        public double MaxStartTime =>
             NumericHelper.GetMaxValue(
                 Events.Select(k => k.StartTime),
                 LoopList.Select(k => k.OuterMinTime),
                 TriggerList.Select(k => k.MinTime)
             );
 
-        public float MinEndTime =>
+        public double MinEndTime =>
             NumericHelper.GetMinValue(
                 Events.Select(k => k.EndTime),
                 LoopList.Select(k => k.OuterMaxTime),
@@ -77,7 +77,7 @@ namespace Coosu.Storyboard
         /// <param name="imagePath">Set image path.</param>
         /// <param name="defaultX">Set default x-coordinate of location.</param>
         /// <param name="defaultY">Set default x-coordinate of location.</param>
-        public Sprite(LayerType layerType, OriginType originType, string imagePath, float defaultX, float defaultY)
+        public Sprite(LayerType layerType, OriginType originType, string imagePath, double defaultX, double defaultY)
         {
             LayerType = layerType;
             OriginType = originType;
@@ -86,7 +86,7 @@ namespace Coosu.Storyboard
             DefaultY = defaultY;
         }
 
-        public Sprite(string layer, string origin, string imagePath, float defaultX, float defaultY)
+        public Sprite(string layer, string origin, string imagePath, double defaultX, double defaultY)
         {
             //ObjectType = OsbObjectType.Parse(type);
             LayerType = (LayerType)Enum.Parse(typeof(LayerType), layer);

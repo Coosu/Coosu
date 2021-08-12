@@ -2,6 +2,6 @@
 {
     public interface IPositionAdjustable
     {
-        void AdjustPosition(float x, float y);
+        void AdjustPosition(double x, double y);
     }
 }

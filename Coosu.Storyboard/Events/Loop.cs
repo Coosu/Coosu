@@ -16,22 +16,22 @@ namespace Coosu.Storyboard.Events
         public bool EnableGroupedSerialization { get; set; }
         public SortedSet<ICommonEvent> Events { get; } = new(new EventTimingComparer());
 
-        public float StartTime { get; set; }
-        public float EndTime
+        public double StartTime { get; set; }
+        public double EndTime
         {
             get => OuterMaxTime;
             set => throw new System.NotSupportedException();
         }
 
         public int LoopCount { get; set; }
-        public float OuterMaxTime => StartTime + MaxTime * LoopCount;
-        public float OuterMinTime => StartTime + MinTime;
-        public float MaxTime => Events.Count > 0 ? Events.Max(k => k.EndTime) : 0;
-        public float MinTime => Events.Count > 0 ? Events.Min(k => k.StartTime) : 0;
-        public float MaxStartTime => Events.Count > 0 ? Events.Max(k => k.StartTime) : 0;
-        public float MinEndTime => Events.Count > 0 ? Events.Min(k => k.EndTime) : 0;
+        public double OuterMaxTime => StartTime + MaxTime * LoopCount;
+        public double OuterMinTime => StartTime + MinTime;
+        public double MaxTime => Events.Count > 0 ? Events.Max(k => k.EndTime) : 0;
+        public double MinTime => Events.Count > 0 ? Events.Min(k => k.StartTime) : 0;
+        public double MaxStartTime => Events.Count > 0 ? Events.Max(k => k.StartTime) : 0;
+        public double MinEndTime => Events.Count > 0 ? Events.Min(k => k.EndTime) : 0;
 
-        public Loop(float startTime, int loopCount)
+        public Loop(double startTime, int loopCount)
         {
             StartTime = startTime;
             LoopCount = loopCount;
@@ -51,7 +51,7 @@ namespace Coosu.Storyboard.Events
             await ScriptHelper.WriteSubEventHostAsync(writer, this, EnableGroupedSerialization);
         }
 
-        public void AdjustTiming(float offset)
+        public void AdjustTiming(double offset)
         {
             StartTime += offset;
         }

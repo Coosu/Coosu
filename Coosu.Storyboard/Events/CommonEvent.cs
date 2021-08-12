@@ -12,10 +12,10 @@ namespace Coosu.Storyboard.Events
     {
         public abstract EventType EventType { get; }
         public EasingType Easing { get; set; }
-        public float StartTime { get; set; }
-        public float EndTime { get; set; }
-        public float[] Start { get; set; }
-        public float[] End { get; set; }
+        public double StartTime { get; set; }
+        public double EndTime { get; set; }
+        public double[] Start { get; set; }
+        public double[] End { get; set; }
 
         public virtual int ParamLength => Start.Length;
         public virtual bool IsStatic => Start.SequenceEqual(End);
@@ -33,7 +33,7 @@ namespace Coosu.Storyboard.Events
         //    throw new ArgumentOutOfRangeException(nameof(other));
         //}
 
-        public void AdjustTiming(float offset)
+        public void AdjustTiming(double offset)
         {
             StartTime += offset;
             EndTime += offset;
@@ -58,11 +58,11 @@ namespace Coosu.Storyboard.Events
 
         protected CommonEvent()
         {
-            Start = Array.Empty<float>();
-            End = Array.Empty<float>();
+            Start = Array.Empty<double>();
+            End = Array.Empty<double>();
         }
 
-        protected CommonEvent(EasingType easing, float startTime, float endTime, float[] start, float[] end)
+        protected CommonEvent(EasingType easing, double startTime, double endTime, double[] start, double[] end)
         {
             Easing = easing;
             StartTime = startTime;
@@ -103,7 +103,7 @@ namespace Coosu.Storyboard.Events
 
         //todo: use Span<T>
         public static ICommonEvent Create(EventType e, EasingType easing,
-            float startTime, float endTime, int size, params float[] parameters)
+            double startTime, double endTime, int size, params double[] parameters)
         {
             if (parameters.Length != size * 2) throw new ArgumentException();
             return Create(e, easing, startTime, endTime,
@@ -112,7 +112,7 @@ namespace Coosu.Storyboard.Events
         }
 
         public static ICommonEvent Create(EventType e, EasingType easing,
-            float startTime, float endTime, float[] start, float[]? end)
+            double startTime, double endTime, double[] start, double[]? end)
         {
             ICommonEvent commonEvent;
             if (end == null || end.Length == 0)

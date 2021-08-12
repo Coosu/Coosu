@@ -4,13 +4,13 @@ namespace Coosu.Storyboard
 {
     public struct TimingPoint : IComparable<TimingPoint>
     {
-        public TimingPoint(float timing, bool isStart) : this()
+        public TimingPoint(double timing, bool isStart) : this()
         {
             Timing = timing;
             IsStart = isStart;
         }
 
-        public float Timing { get; set; }
+        public double Timing { get; set; }
         public bool IsStart { get; set; }
         public int CompareTo(TimingPoint other)
         {

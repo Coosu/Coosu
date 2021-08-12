@@ -12,8 +12,8 @@ namespace Coosu.Storyboard
     {
         public void Dispose() { }
 
-        public float ZDistance { get; set; }
-        public VirtualLayer(float zDistance) => ZDistance = zDistance;
+        public double ZDistance { get; set; }
+        public VirtualLayer(double zDistance) => ZDistance = zDistance;
 
         public List<ISceneObject> SceneObjects { get; set; } = new();
 
@@ -84,7 +84,7 @@ namespace Coosu.Storyboard
         /// <param name="defaultX">Default x-coordinate of the image.</param>
         /// <param name="defaultY">Default y-coordinate of the image.</param>
         /// <returns></returns>
-        public Sprite CreateSprite(LayerType layerType, OriginType originType, string filePath, float defaultX, float defaultY)
+        public Sprite CreateSprite(LayerType layerType, OriginType originType, string filePath, double defaultX, double defaultY)
         {
             var obj = new Sprite(layerType, originType, filePath, defaultX, defaultY);
             AddSprite(obj);
@@ -96,7 +96,7 @@ namespace Coosu.Storyboard
             OriginType originType,
             string filePath,
             int defaultX, int defaultY,
-            int frameCount, float frameDelay, LoopType loopType)
+            int frameCount, double frameDelay, LoopType loopType)
         {
             var obj = new Animation(
                 layerType,
@@ -262,8 +262,8 @@ namespace Coosu.Storyboard
                         @params[1],
                         @params[2],
                         @params[3].Trim(QuoteChar),
-                        float.Parse(@params[4]),
-                        float.Parse(@params[5])
+                        double.Parse(@params[4]),
+                        double.Parse(@params[5])
                     );
                     currentObj.RowInSource = rowIndex;
                     isLooping = false;
@@ -277,10 +277,10 @@ namespace Coosu.Storyboard
                         @params[1],
                         @params[2],
                         @params[3].Trim(QuoteChar),
-                        float.Parse(@params[4]),
-                        float.Parse(@params[5]),
+                        double.Parse(@params[4]),
+                        double.Parse(@params[5]),
                         int.Parse(@params[6]),
-                        float.Parse(@params[7]),
+                        double.Parse(@params[7]),
                         "LoopForever"
                     );
                     currentObj.RowInSource = rowIndex;
@@ -295,10 +295,10 @@ namespace Coosu.Storyboard
                         @params[1],
                         @params[2],
                         @params[3].Trim(QuoteChar),
-                        float.Parse(@params[4]),
-                        float.Parse(@params[5]),
+                        double.Parse(@params[4]),
+                        double.Parse(@params[5]),
                         int.Parse(@params[6]),
-                        float.Parse(@params[7]),
+                        double.Parse(@params[7]),
                         @params[8]
                     );
                     currentObj.RowInSource = rowIndex;
@@ -406,20 +406,20 @@ namespace Coosu.Storyboard
                     if (rawLength == paramLength + baseLength)
                     {
                         int length = paramLength * 2;
-                        Span<float> array = stackalloc float[length];
+                        Span<double> array = stackalloc double[length];
                         for (int i = 0; i < paramLength; i++)
-                            array[i] = float.Parse(rawParams[baseLength + i]!);
+                            array[i] = double.Parse(rawParams[baseLength + i]!);
                         for (int i = 0; i < paramLength; i++)
-                            array[i + paramLength] = float.Parse(rawParams[baseLength + i]!);
+                            array[i + paramLength] = double.Parse(rawParams[baseLength + i]!);
 
                         InjectEvent(array);
                     }
                     else if (rawLength == paramLength * 2 + baseLength)
                     {
                         int length = paramLength * 2;
-                        Span<float> array = stackalloc float[length];
+                        Span<double> array = stackalloc double[length];
                         for (int i = 0; i < length; i++)
-                            array[i] = float.Parse(rawParams[baseLength + i]!);
+                            array[i] = double.Parse(rawParams[baseLength + i]!);
 
                         InjectEvent(array);
                     }
@@ -494,7 +494,7 @@ namespace Coosu.Storyboard
                     throw new Exception($"Wrong parameter for event: \"{eventStr}\"");
                 }
 
-                void InjectEvent(Span<float> array)
+                void InjectEvent(Span<double> array)
                 {
                     switch (eventStr)
                     {
@@ -561,15 +561,15 @@ namespace Coosu.Storyboard
             }
         }
 
-        private Sprite CreateSprite(string layer, string origin, string imagePath, float defaultX, float defaultY)
+        private Sprite CreateSprite(string layer, string origin, string imagePath, double defaultX, double defaultY)
         {
             var obj = new Sprite(layer, origin, imagePath, defaultX, defaultY);
             AddSprite(obj);
             return obj;
         }
 
-        private Sprite CreateAnimation(string layer, string origin, string imagePath, float defaultX,
-            float defaultY, int frameCount, float frameDelay, string loopType)
+        private Sprite CreateAnimation(string layer, string origin, string imagePath, double defaultX,
+            double defaultY, int frameCount, double frameDelay, string loopType)
         {
             var obj = new Animation(layer, origin, imagePath, defaultX, defaultY, frameCount, frameDelay, loopType);
             AddSprite(obj);

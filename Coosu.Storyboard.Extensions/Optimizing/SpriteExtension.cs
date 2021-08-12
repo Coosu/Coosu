@@ -147,7 +147,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                         continue;
                     AddTimeRage(dic[e.EventType].StartTime, e.StartTime);
                     dic[e.EventType].IsFadingOut = false;
-                    dic[e.EventType].StartTime = float.MinValue;
+                    dic[e.EventType].StartTime = double.MinValue;
                 }
             }
 
@@ -160,7 +160,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                 break;
             }
 
-            void AddTimeRage(float startTime, float endTime)
+            void AddTimeRage(double startTime, double endTime)
             {
                 if (sprite.TriggerList
                         .Where(k =>
@@ -261,7 +261,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
         {
             public int Count { get; set; } = 0;
             public bool IsFadingOut { get; set; } = false;
-            public float StartTime { get; set; } = float.MinValue;
+            public double StartTime { get; set; } = double.MinValue;
         }
     }
 }
