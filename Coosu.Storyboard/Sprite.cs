@@ -16,11 +16,7 @@ namespace Coosu.Storyboard
     {
         public virtual ObjectType ObjectType { get; } = ObjectTypes.Sprite;
 
-        int? IDefinedObject.RowInSource
-        {
-            get => _rowInSource;
-            set => _rowInSource = value;
-        }
+        public int? RowInSource { get; set; }
 
         public LayerType LayerType { get; }
         public OriginType OriginType { get; }
@@ -72,7 +68,6 @@ namespace Coosu.Storyboard
         // Loop control
         private bool _isTriggering;
         private bool _isLooping;
-        private int? _rowInSource;
 
         /// <summary>
         /// Create a storyboard sprite by a static image.

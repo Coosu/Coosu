@@ -3,6 +3,7 @@ using System.IO;
 using System.Security.Cryptography;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Running;
 using Coosu.Storyboard;
 using Coosu.Storyboard.Management;
@@ -13,10 +14,19 @@ namespace ParsingPerformanceTest
     {
         static void Main(string[] args)
         {
-            var summary = BenchmarkRunner.Run<ParsingTask>(new DebugBuildConfig());
+            var xp = new HtmlExporter()
+            {
+
+            };
+
+            var summary = BenchmarkRunner.Run<ParsingTask>(ManualConfig
+                .Create(new DebugBuildConfig())
+                .AddExporter(xp)
+            );
         }
     }
 
+    //[HtmlExporter]
     [MemoryDiagnoser]
     public class ParsingTask
     {

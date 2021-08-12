@@ -9,15 +9,15 @@ namespace Coosu.Storyboard.Extensions.Optimizing
     public static class EventCompare
     {
 
-        public static bool InObsoleteTimingRange(this ICommonEvent e, IEventHost host, out RangeValue<float> range)
+        public static bool InObsoleteTimingRange(this ICommonEvent e, TimeRange obsoleteList, out RangeValue<float> range)
         {
-            return host.ObsoleteList.ContainsTimingPoint(out range, e.StartTime, e.EndTime);
+            return obsoleteList.ContainsTimingPoint(out range, e.StartTime, e.EndTime);
         }
 
-        public static bool OnObsoleteTimingRange(this ICommonEvent e, IEventHost host)
+        public static bool OnObsoleteTimingRange(this ICommonEvent e, TimeRange obsoleteList)
         {
-            return host.ObsoleteList.OnTimingRange(out _, e.StartTime) ||
-                   host.ObsoleteList.OnTimingRange(out _, e.EndTime);
+            return obsoleteList.OnTimingRange(out _, e.StartTime) ||
+                   obsoleteList.OnTimingRange(out _, e.EndTime);
         }
 
         public static bool IsEventSequent(ICommonEvent previous, ICommonEvent next)

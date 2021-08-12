@@ -3,6 +3,6 @@
     public interface IDefinedObject
     {
         ObjectType ObjectType { get; }
-        int? RowInSource { get; internal set; }
+        int? RowInSource { get; set; }
     }
 }

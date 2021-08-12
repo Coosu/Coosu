@@ -58,6 +58,7 @@ namespace Coosu.Storyboard.OsbX.SubjectHandlers
     public class Camera2Object : ISceneObject, IDefinedObject
     {
         public ObjectType ObjectType { get; } = 99;
+        public int? RowInSource { get; set; }
         public float DefaultY { get; set; }
         public float DefaultX { get; set; }
         public float ZDistance { get; set; }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Coosu.Storyboard.Common;
@@ -89,8 +90,10 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             }
         }
 
-        public static void FillObsoleteList(this Sprite sprite)
+        public static TimeRange GetObsoleteList(this Sprite sprite)
         {
+            var obsoleteList = new TimeRange();
+
             var possibleList = sprite.Events
                 .Where(k => k.EventType == EventTypes.Fade ||
                             k.EventType == EventTypes.Scale ||
@@ -98,7 +101,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                 .ToArray();
 
             if (possibleList.Length <= 0)
-                return;
+                return obsoleteList;
 
             var dic = new Dictionary<EventType, EventContext>
             {
@@ -176,14 +179,16 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                     return;
                 }
 
-                sprite.ObsoleteList.Add(startTime, endTime);
+                obsoleteList.Add(startTime, endTime);
             }
+
+            return obsoleteList;
         }
 
         /// <summary>
         /// 检查timing是否合法.
         /// </summary>
-        public static void Examine(this IEventHost host)
+        public static void Examine(this IEventHost host, EventHandler<ProcessErrorEventArgs>? onError)
         {
             var events = host.Events.GroupBy(k => k.EventType);
             foreach (var kv in events)
@@ -198,11 +203,11 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                         var info = $"{{{objNow}}}:\r\n" +
                                    $"Start time should not be larger than end time.";
 
-                        var arg = new ProcessErrorEventArgs()
+                        var arg = new ProcessErrorEventArgs(host)
                         {
                             Message = info
                         };
-                        host.OnErrorOccurred?.Invoke(host, arg);
+                        onError?.Invoke(host, arg);
                         if (!arg.Continue)
                         {
                             return;
@@ -212,11 +217,11 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                     {
                         var info = $"{{{objNow}}} to {{{objNext}}}:\r\n" +
                                    $"The previous object's end time should be larger than the next object's start time.";
-                        var arg = new ProcessErrorEventArgs
+                        var arg = new ProcessErrorEventArgs(host)
                         {
                             Message = info
                         };
-                        host.OnErrorOccurred?.Invoke(host, arg);
+                        onError?.Invoke(host, arg);
                         if (!arg.Continue)
                         {
                             return;
@@ -230,12 +235,12 @@ namespace Coosu.Storyboard.Extensions.Optimizing
 
             foreach (var item in e.LoopList)
             {
-                Examine(item);
+                Examine(item, onError);
             }
 
             foreach (var item in e.TriggerList)
             {
-                Examine(item);
+                Examine(item, onError);
             }
         }
 
@@ -248,7 +253,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                 if (ec is not Sprite ele) continue;
 
                 if (expand) ele.Expand();
-                if (fillFadeout) ele.FillObsoleteList();
+                if (fillFadeout) ele.GetObsoleteList();
             }
         }
 

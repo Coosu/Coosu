@@ -7,9 +7,9 @@ namespace Coosu.Storyboard.Extensions.Optimizing
     public class SituationEventArgs : CompressorEventArgs
     {
         public SituationType SituationType { get; }
-        public ISceneObject Sprite { get; set; }
+        public Sprite? Sprite { get; set; }
         public IEventHost Host { get; set; }
-        public CommonEvent[] Events { get; set; }
+        public ICommonEvent[] Events { get; set; }
         public override bool Continue { get; set; } = true;
 
         public SituationEventArgs(Guid compressorGuid, SituationType situationType) : base(compressorGuid)

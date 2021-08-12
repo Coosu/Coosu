@@ -89,8 +89,8 @@ namespace Coosu.Storyboard.Extensions.Optimizing
 
             var emptyToken = new CancellationTokenSource();
             _cancelToken = new CancellationTokenSource();
-
-            Task[] tasks = RunDequeueTasks(queue, emptyToken);
+            var uselessSprites = new ConcurrentBag<Sprite>();// todo: how to use it
+            Task[] tasks = RunDequeueTasks(queue, uselessSprites, emptyToken);
 
             RunEnqueueTask(queue, emptyToken);
 
@@ -152,7 +152,9 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             enqueueTask.Start();
         }
 
-        private Task[] RunDequeueTasks(ConcurrentQueue<Sprite> queue, CancellationTokenSource emptyToken)
+        private Task[] RunDequeueTasks(ConcurrentQueue<Sprite> queue,
+            ConcurrentBag<Sprite> uselessSprites,
+            CancellationTokenSource emptyToken)
         {
             var tasks = new Task[ThreadCount];
             object indexLock = new object();
@@ -183,8 +185,8 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                             Thread.Sleep(1);
                         }
 
-                        InnerCompress(sprite);
-
+                        var preserve = InnerCompress(sprite);
+                        if (!preserve) uselessSprites.Add(sprite);
                         lock (indexLock)
                         {
                             index++;
@@ -204,32 +206,27 @@ namespace Coosu.Storyboard.Extensions.Optimizing
 
         #region Compress Logic
 
-        private void InnerCompress(Sprite sprite)
+        private bool InnerCompress(Sprite sprite)
         {
-            if (sprite.ImagePath == BackgroundPath &&
-                sprite.LayerType == LayerType.Background)
-            {
-                sprite.IsBackground = true;
-            }
-
             // 每个类型压缩从后往前
             // 1.删除没用的
             // 2.整合能整合的
             // 3.考虑单event情况
             // 4.排除第一行误加的情况 (defaultParams)
-            var errorList = new List<string>();
+            var errorList = new List<string?>();
 
-            sprite.OnErrorOccurred += (sender, args) =>
+            void OnErrorOccured(object sender, ProcessErrorEventArgs args)
             {
                 errorList.Add(args.Message);
-            };
+            }
 
-            sprite.Examine();
-            sprite.OnErrorOccurred = null;
+            ErrorOccured += OnErrorOccured;
+            sprite.Examine(ErrorOccured);
+            ErrorOccured -= OnErrorOccured;
 
             if (errorList.Count > 0)
             {
-                var arg = new ProcessErrorEventArgs
+                var arg = new ProcessErrorEventArgs(sprite)
                 {
                     Message = $"{sprite.RowInSource} - Examine failed. Found {errorList.Count} error(s):\r\n" +
                               string.Join("\r\n", errorList)
@@ -239,7 +236,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                 {
                     if (_cancelToken?.IsCancellationRequested != false)
                     {
-                        return;
+                        return true;
                     }
 
                     _pauseThreadCount++;
@@ -248,34 +245,42 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                 }
 
                 if (!arg.Continue)
-                    return;
+                    return true;
             }
 
-            sprite.FillObsoleteList();
-            PreOptimize(sprite);
+            var obsoleteList = sprite.GetObsoleteList();
+            PreOptimize(sprite, obsoleteList);
             NormalOptimize(sprite);
+
+            if (sprite.ImagePath != BackgroundPath ||
+                sprite.LayerType != LayerType.Background)
+            {
+                if (sprite.MaxTime.Equals(sprite.MinTime)) return false;
+            }
+
+            return true;
         }
 
         /// <summary>
         /// 预压缩
         /// </summary>
-        private void PreOptimize(IEventHost host)
+        private void PreOptimize(IEventHost host, TimeRange obsoleteList)
         {
             if (host is Sprite ele)
             {
                 foreach (var item in ele.LoopList)
                 {
-                    PreOptimize(item);
+                    PreOptimize(item, obsoleteList);
                 }
 
                 foreach (var item in ele.TriggerList)
                 {
-                    PreOptimize(item);
+                    PreOptimize(item, obsoleteList);
                 }
             }
 
             if (host.Events.Any())
-                RemoveByObsoletedList(host, host.Events.ToList());
+                RemoveByObsoletedList(host, obsoleteList);
         }
 
         /// <summary>
@@ -305,10 +310,10 @@ namespace Coosu.Storyboard.Extensions.Optimizing
         /// <summary>
         /// 根据ObsoletedList，移除不必要的命令。
         /// </summary>
-        private void RemoveByObsoletedList(IEventHost host, List<ICommonEvent> eventList)
+        private void RemoveByObsoletedList(IEventHost host, TimeRange obsoleteList)
         {
-            if (host.ObsoleteList.TimingList.Count == 0) return;
-            var groups = eventList.GroupBy(k => k.EventType);
+            if (obsoleteList.TimingList.Count == 0) return;
+            var groups = host.Events.GroupBy(k => k.EventType);
             foreach (var group in groups)
             {
                 var list = group.ToList();
@@ -327,7 +332,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                     */
 
                     // 判断是否此Event为控制Obsolete Range的Event。
-                    if (!(nowE.OnObsoleteTimingRange(host) &&
+                    if (!(nowE.OnObsoleteTimingRange(obsoleteList) &&
                           EventExtensions.UnworthyDictionary.ContainsKey(nowE.EventType)))
                     {
                         bool canRemove;
@@ -336,7 +341,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                         if (nextE == null)
                         {
                             // 判断是否此Event在某Obsolete Range内，且此Obsolete Range持续到EventHost结束。
-                            canRemove = nowE.InObsoleteTimingRange(host, out var range) &&
+                            canRemove = nowE.InObsoleteTimingRange(obsoleteList, out var range) &&
                                         range.EndTime.Equals(host.MaxTime);
                             if (!canRemove) continue;
 
@@ -381,7 +386,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                         else // 若有下一个Event。
                         {
                             // 判断是否此Event在某Obsolete Range内，且下一Event的StartTime也在此Obsolete Range内。
-                            canRemove = host.ObsoleteList.ContainsTimingPoint(out _,
+                            canRemove = obsoleteList.ContainsTimingPoint(out _,
                                 nowE.StartTime, nowE.EndTime, nextE.StartTime);
 
                             if (canRemove)
@@ -613,10 +618,11 @@ namespace Coosu.Storyboard.Extensions.Optimizing
         private void RaiseSituationEvent(IEventHost host, SituationType situationType, Action continueAction,
             Action? breakAction, params ICommonEvent[] events)
         {
+            var sprite = host is ISubEventHost e ? e.BaseObject as Sprite : host as Sprite;
             var args = new SituationEventArgs(Guid, situationType)
             {
-                Sprite = host is ISubEventHost e ? e.BaseObject : host,
-                Host = host is Sprite ? null : host,
+                Sprite = sprite,
+                Host = host,
                 Events = events
             };
 
