@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -10,11 +11,11 @@ namespace Coosu.Storyboard.Events
 {
     public sealed class Trigger : ISubEventHost, IEvent
     {
-        public EventType EventType { get; } = EventTypes.Trigger;
-
         internal ISceneObject? _baseObject;
         private const string HitSound = "HitSound";
-        public string Header => $"T,{TriggerName},{StartTime},{EndTime}";
+
+        public EventType EventType { get; } = EventTypes.Trigger;
+
         public bool EnableGroupedSerialization { get; set; }
         public SortedSet<ICommonEvent> Events { get; } = new(new EventTimingComparer());
 
@@ -53,9 +54,20 @@ namespace Coosu.Storyboard.Events
             TriggerName = triggerName;
         }
 
+        public async Task WriteHeaderAsync(TextWriter writer)
+        {
+            await writer.WriteAsync(EventType.Flag);
+            await writer.WriteAsync(',');
+            await writer.WriteAsync(TriggerName);
+            await writer.WriteAsync(',');
+            await writer.WriteAsync(Math.Round(StartTime));
+            await writer.WriteAsync(',');
+            await writer.WriteAsync(Math.Round(EndTime));
+        }
+
         public async Task WriteScriptAsync(TextWriter writer)
         {
-            await ScriptHelper.WriteTriggerAsync(writer, this, EnableGroupedSerialization);
+            await ScriptHelper.WriteSubEventHostAsync(writer, this, EnableGroupedSerialization);
         }
 
         private static string GetTriggerString(TriggerType triggerType, bool listenSample, uint? customSampleSet)

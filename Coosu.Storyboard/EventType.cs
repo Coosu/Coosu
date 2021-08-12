@@ -51,7 +51,7 @@ namespace Coosu.Storyboard
             return string.Compare(Flag, other.Flag, StringComparison.Ordinal);
         }
 
-        public int CompareTo(object obj)
+        public int CompareTo(object? obj)
         {
             if (ReferenceEquals(null, obj)) return 1;
             return obj is EventType other ? CompareTo(other) : throw new ArgumentException($"Object must be of type {nameof(EventType)}");

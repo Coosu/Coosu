@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Coosu.Storyboard.Events;
 
 namespace Coosu.Storyboard.Extensibility
 {

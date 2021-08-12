@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Coosu.Storyboard.Common;
-using Coosu.Storyboard.Events;
 using Coosu.Storyboard.Utils;
 
 namespace Coosu.Storyboard
@@ -132,24 +131,30 @@ namespace Coosu.Storyboard
         //    }
         //}
 
-        public async Task WriteScriptAsync(TextWriter sw)
+        public async Task WriteHeaderAsync(TextWriter writer)
+        {
+            await writer.WriteAsync("Layer: ");
+            await writer.WriteAsync(ZDistance);
+        }
+
+        public async Task WriteScriptAsync(TextWriter writer)
         {
             foreach (var obj in SceneObjects)
             {
-                await obj.WriteScriptAsync(sw);
+                await obj.WriteScriptAsync(writer);
             }
         }
 
-        public async Task WriteFullScriptAsync(TextWriter sw)
+        public async Task WriteFullScriptAsync(TextWriter writer)
         {
-            await sw.WriteLineAsync("[Events]");
-            await sw.WriteLineAsync("//Background and Video events");
-            await sw.WriteLineAsync("//Storyboard Layer 0 (Background)");
-            await sw.WriteLineAsync("//Storyboard Layer 0 (Background)");
-            await sw.WriteLineAsync("//Storyboard Layer 1 (Fail)");
-            await sw.WriteLineAsync("//Storyboard Layer 3 (Foreground)");
-            await WriteScriptAsync(sw);
-            await sw.WriteLineAsync("//Storyboard Sound Samples");
+            await writer.WriteLineAsync("[Events]");
+            await writer.WriteLineAsync("//Background and Video events");
+            await writer.WriteLineAsync("//Storyboard Layer 0 (Background)");
+            await writer.WriteLineAsync("//Storyboard Layer 0 (Background)");
+            await writer.WriteLineAsync("//Storyboard Layer 1 (Fail)");
+            await writer.WriteLineAsync("//Storyboard Layer 3 (Foreground)");
+            await WriteScriptAsync(writer);
+            await writer.WriteLineAsync("//Storyboard Sound Samples");
         }
 
         public async Task SaveScriptAsync(string path)
@@ -188,12 +193,12 @@ namespace Coosu.Storyboard
         public static VirtualLayer Parse(TextReader textReader)
         {
             VirtualLayer group = new VirtualLayer(0);
-            Sprite currentObj = null;
+            Sprite? currentObj = null;
             //0 = isLooping, 1 = isTriggering, 2 = isBlank
             bool[] options = { false, false, false };
 
             int rowIndex = 0;
-            string line = textReader.ReadLine();
+            string? line = textReader.ReadLine();
             while (line != null)
             {
                 rowIndex++;
@@ -227,7 +232,7 @@ namespace Coosu.Storyboard
         private static readonly string[] Prefixes = { " ", "_" };
         private static readonly string[] DoublePrefixes = { "  ", "__" };
         private const string
-            F = "F", S = "S", R = "R", MX = "MX", MY = "MY",
+            F = "F", S = "S", R = "R", Mx = "MX", My = "MY",
             M = "M", V = "V",
             C = "C",
             P = "P",
@@ -235,8 +240,8 @@ namespace Coosu.Storyboard
 
         private static Sprite ParseElement(string line,
             int rowIndex,
-            Sprite currentObj,
-            VirtualLayer @group,
+            Sprite? currentObj,
+            VirtualLayer layer,
             bool[] options)
         {
             ref bool isLooping = ref options[0];
@@ -251,7 +256,7 @@ namespace Coosu.Storyboard
 
                 if (@params.Length == 6)
                 {
-                    currentObj = group.CreateSprite(
+                    currentObj = layer.CreateSprite(
                         //@params[0],
                         @params[1],
                         @params[2],
@@ -266,7 +271,7 @@ namespace Coosu.Storyboard
                 }
                 else if (@params.Length == 8)
                 {
-                    currentObj = group.CreateAnimation(
+                    currentObj = layer.CreateAnimation(
                         //@params[0],
                         @params[1],
                         @params[2],
@@ -284,7 +289,7 @@ namespace Coosu.Storyboard
                 }
                 else if (@params.Length == 9)
                 {
-                    currentObj = group.CreateAnimation(
+                    currentObj = layer.CreateAnimation(
                         //@params[0],
                         @params[1],
                         @params[2],
@@ -341,13 +346,13 @@ namespace Coosu.Storyboard
                 // 开始验证event类别
                 @params[0] = @params[0].TrimStart(PrefixChars);
 
-                string _event = @params[0];
+                string thisEvent = @params[0];
                 int easing = int.MinValue, startTime = int.MinValue, endTime = int.MinValue;
 
-                if (_event != T && _event != L)
+                if (thisEvent != T && thisEvent != L)
                 {
                     easing = int.Parse(@params[1]);
-                    if (easing > 34 || easing < 0)
+                    if (easing is > 34 or < 0)
                         throw new FormatException("Unknown easing");
                     startTime = int.Parse(@params[2]);
                     endTime = @params[3] == ""
@@ -355,13 +360,13 @@ namespace Coosu.Storyboard
                         : int.Parse(@params[3]);
                 }
 
-                ParseEvent(currentObj, options, @params, _event, easing, startTime, endTime);
+                ParseEvent(currentObj, options, @params, thisEvent, easing, startTime, endTime);
             }
 
-            return currentObj;
+            return currentObj!;
         }
 
-        private static void ParseEvent(Sprite currentObj, bool[] options, string[] rawParams,
+        private static void ParseEvent(Sprite currentObj, bool[] options, string?[] rawParams,
             string eventStr, int easing, int startTime, int endTime)
         {
             int rawLength = rawParams.Length;
@@ -370,8 +375,8 @@ namespace Coosu.Storyboard
                 case F:
                 case S:
                 case R:
-                case MX:
-                case MY:
+                case Mx:
+                case My:
                     AddEvent(1);
                     break;
                 case M:
@@ -401,9 +406,9 @@ namespace Coosu.Storyboard
                         int length = paramLength * 2;
                         Span<float> array = stackalloc float[length];
                         for (int i = 0; i < paramLength; i++)
-                            array[i] = float.Parse(rawParams[baseLength + i]);
+                            array[i] = float.Parse(rawParams[baseLength + i]!);
                         for (int i = 0; i < paramLength; i++)
-                            array[i + paramLength] = float.Parse(rawParams[baseLength + i]);
+                            array[i + paramLength] = float.Parse(rawParams[baseLength + i]!);
 
                         InjectEvent(array);
                     }
@@ -412,7 +417,7 @@ namespace Coosu.Storyboard
                         int length = paramLength * 2;
                         Span<float> array = stackalloc float[length];
                         for (int i = 0; i < length; i++)
-                            array[i] = float.Parse(rawParams[baseLength + i]);
+                            array[i] = float.Parse(rawParams[baseLength + i]!);
 
                         InjectEvent(array);
                     }
@@ -451,7 +456,7 @@ namespace Coosu.Storyboard
                                     (EasingType)easing,
                                     startTime,
                                     endTime,
-                                    rawParams[4].ToParameterEnum());
+                                    rawParams[4]!.ToParameterEnum());
                                 return;
                             }
 
@@ -459,8 +464,8 @@ namespace Coosu.Storyboard
                         case L:
                             if (rawLength == 3)
                             {
-                                startTime = int.Parse(rawParams[1]);
-                                int loopCount = int.Parse(rawParams[2]);
+                                startTime = int.Parse(rawParams[1]!);
+                                int loopCount = int.Parse(rawParams[2]!);
                                 currentObj.StartLoop(startTime, loopCount);
 
                                 options[0] = true; // isLooping
@@ -471,10 +476,10 @@ namespace Coosu.Storyboard
                         case T:
                             if (rawLength == 4)
                             {
-                                startTime = int.Parse(rawParams[2]);
-                                endTime = int.Parse(rawParams[3]);
+                                startTime = int.Parse(rawParams[2]!);
+                                endTime = int.Parse(rawParams[3]!);
 
-                                currentObj.StartTrigger(startTime, endTime, rawParams[1]); // rawParams[1]: triggerType
+                                currentObj.StartTrigger(startTime, endTime, rawParams[1]!); // rawParams[1]: triggerType
                                 options[1] = true; // isTriggering
                                 return;
                             }
@@ -512,14 +517,14 @@ namespace Coosu.Storyboard
                                 array[1]
                             );
                             break;
-                        case MX:
+                        case Mx:
                             currentObj.MoveX((EasingType)easing,
                                 startTime, endTime,
                                 array[0],
                                 array[1]
                             );
                             break;
-                        case MY:
+                        case My:
                             currentObj.MoveY((EasingType)easing,
                                 startTime, endTime,
                                 array[0],

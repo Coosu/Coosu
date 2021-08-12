@@ -17,7 +17,7 @@ namespace Coosu.Storyboard.Extensibility
 
             for (int i = 0; i < count; i++)
             {
-                if (raw.Start[i] != raw.End[i])
+                if (!raw.Start[i].Equals(raw.End[i]))
                 {
                     sequenceEqual = false;
                     break;
@@ -30,33 +30,35 @@ namespace Coosu.Storyboard.Extensibility
             {
                 if (count == 1)
                     script = raw.Start[0].ToString(cultureInfo);
-                if (count == 2)
+                else if (count == 2)
                     script = raw.Start[0].ToString(cultureInfo) + "," +
                              raw.Start[1].ToString(cultureInfo);
-                if (count == 3)
+                else if (count == 3)
                     script = raw.Start[0].ToString(cultureInfo) + "," +
                              raw.Start[1].ToString(cultureInfo) + "," +
                              raw.Start[2].ToString(cultureInfo);
-                script = string.Join(",", raw.Start);
+                else
+                    script = string.Join(",", raw.Start);
             }
             else
             {
                 if (count == 1)
                     script = raw.Start[0].ToString(cultureInfo) + "," +
                              raw.End[0].ToString(cultureInfo);
-                if (count == 2)
+                else if (count == 2)
                     script = raw.Start[0].ToString(cultureInfo) + "," +
                              raw.Start[1].ToString(cultureInfo) + "," +
                              raw.End[0].ToString(cultureInfo) + "," +
                              raw.End[1].ToString(cultureInfo);
-                if (count == 3)
+                else if (count == 3)
                     script = raw.Start[0].ToString(cultureInfo) + "," +
                              raw.Start[1].ToString(cultureInfo) + "," +
                              raw.Start[2].ToString(cultureInfo) + "," +
                              raw.End[0].ToString(cultureInfo) + "," +
                              raw.End[1].ToString(cultureInfo) + "," +
                              raw.End[2].ToString(cultureInfo);
-                script = $"{string.Join(",", raw.Start)},{string.Join(",", raw.End)}";
+                else
+                    script = $"{string.Join(",", raw.Start)},{string.Join(",", raw.End)}";
             }
 
             var e = raw.EventType.Flag;

@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Coosu.Storyboard.Events;
 
 namespace Coosu.Storyboard.Common
 {
     public class EventTimingComparer : IComparer<ICommonEvent>
     {
-        public int Compare(ICommonEvent x, ICommonEvent y)
+        public int Compare(ICommonEvent? x, ICommonEvent? y)
         {
             if (y == null && x == null)
                 return 0;

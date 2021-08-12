@@ -7,32 +7,24 @@ namespace Coosu.Storyboard.Utils
     {
         public static string ToShortString(this ParameterType pType)
         {
-            switch (pType)
+            return pType switch
             {
-                case ParameterType.Horizontal:
-                    return "H";
-                case ParameterType.Vertical:
-                    return "V";
-                case ParameterType.Additive:
-                    return "A";
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(pType), pType, null);
-            }
+                ParameterType.Horizontal => "H",
+                ParameterType.Vertical => "V",
+                ParameterType.Additive => "A",
+                _ => throw new ArgumentOutOfRangeException(nameof(pType), pType, null)
+            };
         }
 
         public static ParameterType ToParameterEnum(this string str)
         {
-            switch (str)
+            return str switch
             {
-                case "H":
-                    return ParameterType.Horizontal;
-                case "V":
-                    return ParameterType.Vertical;
-                case "A":
-                    return ParameterType.Additive;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(str), str, null);
-            }
+                "H" => ParameterType.Horizontal,
+                "V" => ParameterType.Vertical,
+                "A" => ParameterType.Additive,
+                _ => throw new ArgumentOutOfRangeException(nameof(str), str, null)
+            };
         }
     }
 }

@@ -22,6 +22,5 @@ namespace Coosu.Storyboard.Utils
                 .Concat(new[] { float.MaxValue })
                 .Min();
         }
-
     }
 }

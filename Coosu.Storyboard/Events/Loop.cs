@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,7 +13,6 @@ namespace Coosu.Storyboard.Events
         public EventType EventType { get; } = EventTypes.Loop;
 
         internal ISceneObject? _baseObject;
-        public string Header => $"L,{StartTime},{LoopCount}";
         public bool EnableGroupedSerialization { get; set; }
         public SortedSet<ICommonEvent> Events { get; } = new(new EventTimingComparer());
 
@@ -37,9 +37,18 @@ namespace Coosu.Storyboard.Events
             LoopCount = loopCount;
         }
 
+        public async Task WriteHeaderAsync(TextWriter writer)
+        {
+            await writer.WriteAsync(EventType.Flag);
+            await writer.WriteAsync(',');
+            await writer.WriteAsync(Math.Round(StartTime));
+            await writer.WriteAsync(',');
+            await writer.WriteAsync(LoopCount);
+        }
+
         public async Task WriteScriptAsync(TextWriter writer)
         {
-            await ScriptHelper.WriteLoopAsync(writer, this, EnableGroupedSerialization);
+            await ScriptHelper.WriteSubEventHostAsync(writer, this, EnableGroupedSerialization);
         }
 
         public void AdjustTiming(float offset)

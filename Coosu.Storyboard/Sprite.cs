@@ -12,11 +12,8 @@ namespace Coosu.Storyboard
     /// <summary>
     /// Represents a storyboard element. This class cannot be inherited.
     /// </summary>
-    public partial class Sprite : IEventHost, ISceneObject
+    public partial class Sprite : ISceneObject
     {
-        protected virtual string Header =>
-            $"{ObjectTypeManager.GetString(ObjectType)},{LayerType},{OriginType},\"{ImagePath}\",{DefaultX},{DefaultY}";
-
         public virtual ObjectType ObjectType { get; } = ObjectTypes.Sprite;
         public LayerType LayerType { get; }
         public OriginType OriginType { get; }
@@ -67,8 +64,8 @@ namespace Coosu.Storyboard
         public int? RowInSource { get; internal set; }
 
         // Loop control
-        private bool _isTriggering = false;
-        private bool _isLooping = false;
+        private bool _isTriggering;
+        private bool _isLooping;
 
         /// <summary>
         /// Create a storyboard element by a static image.
@@ -162,10 +159,26 @@ namespace Coosu.Storyboard
             return true;
         }
 
+        public virtual async Task WriteHeaderAsync(TextWriter writer)
+        {
+            await writer.WriteAsync(ObjectTypeManager.GetString(ObjectType));
+            await writer.WriteAsync(',');
+            await writer.WriteAsync(LayerType);
+            await writer.WriteAsync(',');
+            await writer.WriteAsync(OriginType);
+            await writer.WriteAsync(",\"");
+            await writer.WriteAsync(ImagePath);
+            await writer.WriteAsync("\",");
+            await writer.WriteAsync((int)DefaultX);
+            await writer.WriteAsync(',');
+            await writer.WriteAsync((int)DefaultY);
+        }
+
         public async Task WriteScriptAsync(TextWriter writer)
         {
             //if (!IsWorthy) return;
-            await writer.WriteLineAsync(Header);
+            await WriteHeaderAsync(writer);
+            await writer.WriteLineAsync();
             await ScriptHelper.WriteElementEventsAsync(writer, this, EnableGroupedSerialization);
         }
 

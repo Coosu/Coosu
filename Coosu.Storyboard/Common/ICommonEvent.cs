@@ -1,8 +1,6 @@
-﻿using Coosu.Storyboard.Events;
-
-namespace Coosu.Storyboard.Common
+﻿namespace Coosu.Storyboard.Common
 {
-    public interface ICommonEvent : IEvent
+    public interface ICommonEvent : IEvent, IScriptable
     {
         EasingType Easing { get; set; }
         float[] Start { get; set; }

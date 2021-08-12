@@ -1,4 +1,7 @@
 ﻿using System;
+using System.IO;
+using System.Threading.Tasks;
+using Coosu.Storyboard.Utils;
 
 namespace Coosu.Storyboard
 {
@@ -6,9 +9,6 @@ namespace Coosu.Storyboard
     {
         public override ObjectType ObjectType { get; } = ObjectTypes.Animation;
 
-        protected override string Header =>
-            $"{ObjectTypeManager.GetString(ObjectType)},{LayerType},{OriginType},\"{ImagePath}\"," +
-            $"{DefaultX},{DefaultY},{FrameCount},{FrameDelay},{LoopType}";
 
         public int FrameCount { get; set; }
         public float FrameDelay { get; set; }
@@ -17,7 +17,6 @@ namespace Coosu.Storyboard
         /// <summary>
         /// Create a storyboard element by dynamic images.
         /// </summary>
-        /// <param name="type">Set element type.</param>
         /// <param name="layerType">Set element layer.</param>
         /// <param name="originType">Set element origin.</param>
         /// <param name="imagePath">Set image path.</param>
@@ -38,7 +37,6 @@ namespace Coosu.Storyboard
         /// <summary>
         /// Create a storyboard element by dynamic images.
         /// </summary>
-        /// <param name="type">Set element type.</param>
         /// <param name="layer">Set element layer.</param>
         /// <param name="origin">Set element origin.</param>
         /// <param name="imagePath">Set image path.</param>
@@ -54,6 +52,27 @@ namespace Coosu.Storyboard
             FrameCount = frameCount;
             FrameDelay = frameDelay;
             LoopType = (LoopType)Enum.Parse(typeof(LoopType), loopType);
+        }
+        
+        public override async Task WriteHeaderAsync(TextWriter writer)
+        {
+            await writer.WriteAsync(ObjectTypeManager.GetString(ObjectType));
+            await writer.WriteAsync(',');
+            await writer.WriteAsync(LayerType);
+            await writer.WriteAsync(',');
+            await writer.WriteAsync(OriginType);
+            await writer.WriteAsync(",\"");
+            await writer.WriteAsync(ImagePath);
+            await writer.WriteAsync("\",");
+            await writer.WriteAsync((int)DefaultX);
+            await writer.WriteAsync(',');
+            await writer.WriteAsync((int)DefaultY);
+            await writer.WriteAsync(',');
+            await writer.WriteAsync(FrameCount);
+            await writer.WriteAsync(',');
+            await writer.WriteAsync((int)FrameDelay);
+            await writer.WriteAsync(',');
+            await writer.WriteAsync(LoopType);
         }
     }
 }

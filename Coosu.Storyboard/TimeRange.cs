@@ -20,7 +20,7 @@ namespace Coosu.Storyboard
 
         public void Add(float startTime, float endTime)
         {
-            if (startTime == endTime) return;
+            if (startTime.Equals(endTime)) return;
             _timingPoints.Add(new TimingPoint(startTime, true));
             _timingPoints.Add(new TimingPoint(endTime, false));
             _timingList = null;
@@ -51,7 +51,7 @@ namespace Coosu.Storyboard
                         i == array.Length - 1)
                     {
                         tmpEnd = timingPoint.Timing;
-                        list.Add(new RangeValue<float>(tmpStart.Value, tmpEnd.Value));
+                        list.Add(new RangeValue<float>(tmpStart!.Value, tmpEnd.Value));
                         tmpStart = null;
                         tmpEnd = null;
                     }
@@ -78,7 +78,7 @@ namespace Coosu.Storyboard
 
         public bool OnTimingRange(out RangeValue<float> patterned, float timingPoint)
         {
-            int i = 0;
+            //int i = 0;
             foreach (var range in TimingList)
             {
                 if (timingPoint.Equals(range.StartTime) || timingPoint.Equals(range.EndTime))
@@ -87,7 +87,7 @@ namespace Coosu.Storyboard
                     return true;
                 }
 
-                i++;
+                //i++;
             }
 
             patterned = default;
@@ -96,7 +96,7 @@ namespace Coosu.Storyboard
 
         public bool ContainsTimingPoint(out RangeValue<float> patterned, params float[] time)
         {
-            int i = 0;
+            //int i = 0;
             foreach (var range in TimingList)
             {
                 if (time.All(t => t >= range.StartTime && t <= range.EndTime))
@@ -105,7 +105,7 @@ namespace Coosu.Storyboard
                     return true;
                 }
 
-                i++;
+                //i++;
             }
 
             patterned = default;

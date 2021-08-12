@@ -8,9 +8,7 @@ using Coosu.Storyboard.Utils;
 
 namespace Coosu.Storyboard.Events
 {
-    public abstract class CommonEvent : ICommonEvent,
-            IScriptable
-    //,IComparable<CommonEvent>
+    public abstract class CommonEvent : ICommonEvent //,IComparable<CommonEvent>
     {
         public abstract EventType EventType { get; }
         public EasingType Easing { get; set; }
@@ -41,17 +39,23 @@ namespace Coosu.Storyboard.Events
             EndTime += offset;
         }
 
-        public virtual async Task WriteScriptAsync(TextWriter writer)
+        public async Task WriteHeaderAsync(TextWriter writer)
         {
-            string e = EventType.Flag;
-            string easing = ((int)Easing).ToString();
-            string startT = Math.Round(StartTime).ToIcString();
-            string endT = StartTime.Equals(EndTime)
-                ? ""
-                : Math.Round(EndTime).ToIcString();
-            await writer.WriteAsync($"{e},{easing},{startT},{endT},");
+            await writer.WriteAsync(EventType.Flag);
+            await writer.WriteAsync(',');
+            await writer.WriteAsync((int)Easing);
+            await writer.WriteAsync(',');
+            await writer.WriteAsync(Math.Round(StartTime));
+            await writer.WriteAsync(',');
+            if (!EndTime.Equals(StartTime))
+                await writer.WriteAsync(Math.Round(EndTime));
+            await writer.WriteAsync(',');
             await WriteExtraScriptAsync(writer);
         }
+
+        public virtual async Task WriteScriptAsync(TextWriter writer) =>
+            await WriteHeaderAsync(writer);
+
         protected CommonEvent()
         {
             Start = Array.Empty<float>();
@@ -69,40 +73,31 @@ namespace Coosu.Storyboard.Events
 
         protected virtual async Task WriteExtraScriptAsync(TextWriter textWriter)
         {
-            bool sequenceEqual = true;
-            int count = Start.Length;
-            for (int i = 0; i < count; i++)
-            {
-                if (Start[i].Equals(End[i]))
-                {
-                    sequenceEqual = false;
-                    break;
-                }
-            }
+            bool sequenceEqual = Start.SequenceEqual(End);
 
             if (sequenceEqual)
-                await WriteStartAsync(textWriter, count);
+                await WriteStartAsync(textWriter);
             else
-                await WriteFullAsync(textWriter, count);
+                await WriteFullAsync(textWriter);
         }
 
-        private async Task WriteStartAsync(TextWriter textWriter, int count)
+        private async Task WriteStartAsync(TextWriter textWriter)
         {
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i < ParamLength; i++)
             {
                 await textWriter.WriteAsync(Start[i].ToIcString());
-                if (i != count - 1) await textWriter.WriteAsync(',');
+                if (i != ParamLength - 1) await textWriter.WriteAsync(',');
             }
         }
 
-        private async Task WriteFullAsync(TextWriter textWriter, int count)
+        private async Task WriteFullAsync(TextWriter textWriter)
         {
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i < ParamLength; i++)
             {
                 await textWriter.WriteAsync(Start[i].ToIcString());
                 await textWriter.WriteAsync(',');
                 await textWriter.WriteAsync(End[i].ToIcString());
-                if (i != count - 1) await textWriter.WriteAsync(',');
+                if (i != ParamLength - 1) await textWriter.WriteAsync(',');
             }
         }
 

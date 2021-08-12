@@ -36,11 +36,11 @@ namespace Coosu.Storyboard.Extensibility
             return handler;
         }
 
-        public IActionParsingHandler GetActionHandler(string magicWord)
+        public IActionParsingHandler? GetActionHandler(string magicWord)
         {
             return _actionHandlerDic.ContainsKey(magicWord) ? _actionHandlerDic[magicWord] : null;
         }
 
-        private readonly Dictionary<string, IActionParsingHandler> _actionHandlerDic = new Dictionary<string, IActionParsingHandler>();
+        private readonly Dictionary<string, IActionParsingHandler> _actionHandlerDic = new();
     }
 }

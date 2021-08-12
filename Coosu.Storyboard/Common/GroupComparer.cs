@@ -4,7 +4,7 @@ namespace Coosu.Storyboard.Common
 {
     public class GroupComparer : IComparer<VirtualLayer>
     {
-        public int Compare(VirtualLayer x, VirtualLayer y)
+        public int Compare(VirtualLayer? x, VirtualLayer? y)
         {
             if (x == null && y == null)
                 return 0;

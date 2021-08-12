@@ -4,7 +4,7 @@ namespace Coosu.Storyboard.Extensibility
 {
     public interface ISubjectParsingHandler : IParsingHandler
     {
-        IActionParsingHandler GetActionHandler(string magicWord);
+        IActionParsingHandler? GetActionHandler(string magicWord);
         new ISceneObject Deserialize(string[] split);
         string Serialize(ISceneObject raw);
     }

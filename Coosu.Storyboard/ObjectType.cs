@@ -14,7 +14,7 @@ namespace Coosu.Storyboard
         public static ObjectType Parse(string s)
         {
             var foo = ObjectTypeManager.Parse(s);
-            return foo == default ? (ObjectType) int.Parse(s) : foo;
+            return foo == default ? (ObjectType)int.Parse(s) : foo;
         }
 
         public bool Equals(ObjectType other)
@@ -47,7 +47,7 @@ namespace Coosu.Storyboard
             return Flag.CompareTo(other.Flag);
         }
 
-        public int CompareTo(object obj)
+        public int CompareTo(object? obj)
         {
             if (ReferenceEquals(null, obj)) return 1;
             return obj is ObjectType other
