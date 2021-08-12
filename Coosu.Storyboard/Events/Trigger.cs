@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Utils;
 
-namespace Coosu.Storyboard.Events.EventHosts
+namespace Coosu.Storyboard.Events
 {
     public sealed class Trigger : ISubEventHost, IEvent
     {

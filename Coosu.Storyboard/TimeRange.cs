@@ -1,12 +1,13 @@
-﻿using Coosu.Shared.Mathematics;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using Coosu.Shared.Mathematics;
+using Coosu.Storyboard.Common;
 
-namespace Coosu.Storyboard.Common
+namespace Coosu.Storyboard
 {
     public class TimeRange
     {
-        private readonly SortedSet<TimingPoint> _timingPoints = new SortedSet<TimingPoint>(new TimingPointComparer());
+        private readonly SortedSet<TimingPoint> _timingPoints = new(new TimingPointComparer());
         private List<RangeValue<float>>? _timingList;
         public List<RangeValue<float>> TimingList => _timingList ??= GetTimingList();
 

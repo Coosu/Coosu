@@ -43,7 +43,7 @@ namespace Coosu.Storyboard.Events
 
         public virtual async Task WriteScriptAsync(TextWriter writer)
         {
-            string e = EventType.ToShortString();
+            string e = EventType.Flag;
             string easing = ((int)Easing).ToString();
             string startT = Math.Round(StartTime).ToIcString();
             string endT = StartTime.Equals(EndTime)

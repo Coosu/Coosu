@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Coosu.Storyboard.Events.EventHosts;
+using Coosu.Storyboard.Events;
 
 namespace Coosu.Storyboard.Common
 {

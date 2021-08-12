@@ -1,20 +1,8 @@
-﻿using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using Coosu.Storyboard.Common;
 
 namespace Coosu.Storyboard.Utils
 {
-    public static class ScriptableExtensions
-    {
-        public static async Task<string> ToScriptStringAsync(this IScriptable scriptable)
-        {
-            using var sw = new StringWriter();
-            await scriptable.WriteScriptAsync(sw);
-            return sw.ToString();
-        }
-    }
-
     public static class EventHostExtensions
     {
         public static void Adjust(this IEventHost eventHost, float offsetX, float offsetY, int offsetTiming)

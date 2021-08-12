@@ -59,7 +59,7 @@ namespace Coosu.Storyboard.Extensibility
                 script = $"{string.Join(",", raw.Start)},{string.Join(",", raw.End)}";
             }
 
-            var e = raw.EventType.ToShortString();
+            var e = raw.EventType.Flag;
             var easing = ((int)raw.Easing).ToString();
             var startT = Math.Round(raw.StartTime).ToString(cultureInfo);
             var endT = raw.StartTime.Equals(raw.EndTime) ? "" : Math.Round(raw.EndTime).ToString(cultureInfo);

@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Coosu.Storyboard.Events;
 
-namespace Coosu.Storyboard.Events
+namespace Coosu.Storyboard.Common
 {
     public class EventTimingComparer : IComparer<ICommonEvent>
     {

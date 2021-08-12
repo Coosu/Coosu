@@ -1,4 +1,6 @@
-﻿namespace Coosu.Storyboard.Events
+﻿using Coosu.Storyboard.Events;
+
+namespace Coosu.Storyboard.Common
 {
     public interface ICommonEvent : IEvent
     {

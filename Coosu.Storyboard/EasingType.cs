@@ -1,4 +1,4 @@
-﻿namespace Coosu.Storyboard.Events
+﻿namespace Coosu.Storyboard
 {
     public enum EasingType
     {

@@ -1,6 +1,7 @@
 ﻿using System;
+using Coosu.Storyboard.Events;
 
-namespace Coosu.Storyboard.Events
+namespace Coosu.Storyboard.Utils
 {
     public static class ParameterExtension
     {

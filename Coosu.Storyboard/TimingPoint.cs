@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Coosu.Storyboard.Common
+namespace Coosu.Storyboard
 {
     public struct TimingPoint : IComparable<TimingPoint>
     {
