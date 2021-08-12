@@ -10,41 +10,44 @@ using Coosu.Storyboard.Utils;
 
 namespace Coosu.Storyboard.Extensions.Optimizing
 {
-    public class ElementCompressor : IDisposable
+    public class SpriteCompressor : IDisposable
     {
-        public EventHandler<CompressorEventArgs> OperationStart;
-        public EventHandler<CompressorEventArgs> OperationEnd;
-        public EventHandler<ProcessErrorEventArgs> ErrorOccured; //lock
+        public EventHandler<CompressorEventArgs>? OperationStart;
+        public EventHandler<CompressorEventArgs>? OperationEnd;
+        public EventHandler<ProcessErrorEventArgs>? ErrorOccured; //lock
         //public EventHandler<SituationEventArgs> ElementFound; //lock
-        public EventHandler<SituationEventArgs> SituationFound; //lock
-        public EventHandler<SituationEventArgs> SituationChanged; //lock
-        public EventHandler<ProgressEventArgs> ProgressChanged;
+        public EventHandler<SituationEventArgs>? SituationFound; //lock
+        public EventHandler<SituationEventArgs>? SituationChanged; //lock
+        public EventHandler<ProgressEventArgs>? ProgressChanged;
 
         private int _threadCount = 1;
         private int _pauseThreadCount = 0;
 
-        private readonly ICollection<Sprite> _elements;
+        private readonly ICollection<Sprite> _sprites;
 
-        private object _runLock = new object();
-        private object _pauseThreadLock = new object();
-        private object _situationFoundLock = new object();
-        private object _situationChangedLock = new object();
+        private readonly object _runLock = new();
+        private readonly object _pauseThreadLock = new();
+        private readonly object _situationFoundLock = new();
+        private readonly object _situationChangedLock = new();
 
-        private CancellationTokenSource _cancelToken;
+        private CancellationTokenSource? _cancelToken;
 
         public Guid Guid { get; } = Guid.NewGuid();
 
-        public ElementCompressor(ICollection<Sprite> elements)
+        public SpriteCompressor(ICollection<Sprite> sprites)
         {
-            this._elements = elements;
+            _sprites = sprites;
         }
 
-        public ElementCompressor(VirtualLayer virtualLayer)
+        public SpriteCompressor(VirtualLayer virtualLayer)
         {
-            _elements = virtualLayer.SceneObjects.Where(k => k is Sprite).Cast<Sprite>().ToList();
+            _sprites = virtualLayer.SceneObjects
+                .Where(k => k is Sprite)
+                .Cast<Sprite>()
+                .ToList();
         }
 
-        public string BackgroundPath { get; set; }
+        public string? BackgroundPath { get; set; }
 
         public int ThreadCount
         {
@@ -102,7 +105,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
 
         public async Task CancelTask()
         {
-            _cancelToken.Cancel();
+            _cancelToken?.Cancel();
             await Task.Run(() =>
             {
                 while (IsRunning)
@@ -117,28 +120,28 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             ErrorOccured = null;
             ProgressChanged = null;
 
-            _runLock = null;
-            _pauseThreadLock = null;
+            //_runLock = null;
+            //_pauseThreadLock = null;
             _cancelToken?.Dispose();
 
-            _elements?.Clear();
+            _sprites?.Clear();
         }
 
         private void RunEnqueueTask(ConcurrentQueue<Sprite> queue, CancellationTokenSource emptyToken)
         {
             var enqueueTask = new Task(() =>
             {
-                foreach (var element in _elements)
+                foreach (var sprite in _sprites)
                 {
-                    if (_cancelToken.IsCancellationRequested)
+                    if (_cancelToken?.IsCancellationRequested != false)
                     {
                         break;
                     }
 
-                    queue.Enqueue(element);
+                    queue.Enqueue(sprite);
                 }
 
-                while (!queue.IsEmpty && !_cancelToken.IsCancellationRequested)
+                while (!queue.IsEmpty && _cancelToken?.IsCancellationRequested != true)
                 {
                     Thread.Sleep(1);
                 }
@@ -154,12 +157,12 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             var tasks = new Task[ThreadCount];
             object indexLock = new object();
             int index = 0; //
-            int total = _elements.Count();
+            int total = _sprites.Count();
             for (var i = 0; i < tasks.Length; i++)
             {
                 tasks[i] = Task.Run(() =>
                 {
-                    while (!emptyToken.IsCancellationRequested && !_cancelToken.IsCancellationRequested)
+                    while (!emptyToken.IsCancellationRequested && _cancelToken?.IsCancellationRequested != true)
                     {
                         Sprite sprite;
 
@@ -234,7 +237,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
 
                 lock (_pauseThreadLock)
                 {
-                    if (_cancelToken.IsCancellationRequested)
+                    if (_cancelToken?.IsCancellationRequested != false)
                     {
                         return;
                     }
@@ -312,7 +315,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                 for (int i = 0; i < list.Count; i++)
                 {
                     ICommonEvent nowE = list[i];
-                    ICommonEvent nextE =
+                    ICommonEvent? nextE =
                         i == list.Count - 1
                             ? null
                             : list[i + 1];
@@ -334,46 +337,44 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                         {
                             // 判断是否此Event在某Obsolete Range内，且此Obsolete Range持续到EventHost结束。
                             canRemove = nowE.InObsoleteTimingRange(host, out var range) &&
-                                        range.EndTime == host.MaxTime;
+                                        range.EndTime.Equals(host.MaxTime);
+                            if (!canRemove) continue;
 
-                            if (canRemove)
+                            // M,1,86792,87127,350.1588,489.5946,350.1588,339.5946
+                            // M,2,87881,87965,343.8464,333.9836,350.1588,339.5946
+                            // F,0,87127,,1
+                            // F,0,87713,,0
+                            // R,2,87881,87965,-0.04208252,0
+
+                            // R should be kept, but can be optimized
+                            if (list.Count == 1)
                             {
-                                // M,1,86792,87127,350.1588,489.5946,350.1588,339.5946
-                                // M,2,87881,87965,343.8464,333.9836,350.1588,339.5946
-                                // F,0,87127,,1
-                                // F,0,87713,,0
-                                // R,2,87881,87965,-0.04208252,0
-
-                                // R should be kept, but can be optimized
-                                if (list.Count == 1)
+                                for (var j = 0; j < nowE.End.Length; j++)
                                 {
-                                    for (var j = 0; j < nowE.End.Length; j++)
+                                    if (nowE.End[j].ToIcString().Length > nowE.Start[j].ToIcString().Length)
                                     {
-                                        if (nowE.End[j].ToIcString().Length > nowE.Start[j].ToIcString().Length)
-                                        {
-                                            RaiseSituationEvent(host, SituationType.ThisLastSingleInLastObsoleteToFixTail,
-                                                () => { nowE.End[j] = nowE.Start[j]; },
-                                                nowE);
-                                        }
-                                    }
-
-                                    if (nowE.IsSmallerThenMaxTime(host))
-                                    {
-                                        RaiseSituationEvent(host, SituationType.ThisLastSingleInLastObsoleteToFixEndTime,
-                                            () => { nowE.EndTime = nowE.StartTime; },
+                                        RaiseSituationEvent(host, SituationType.ThisLastSingleInLastObsoleteToFixTail,
+                                            () => { nowE.End[j] = nowE.Start[j]; },
                                             nowE);
                                     }
                                 }
-                                else
+
+                                if (nowE.IsSmallerThenMaxTime(host))
                                 {
-                                    RaiseSituationEvent(host, SituationType.ThisLastInLastObsoleteToRemove,
-                                        () =>
-                                        {
-                                            RemoveEvent(host, list, nowE);
-                                            i--;
-                                        },
+                                    RaiseSituationEvent(host, SituationType.ThisLastSingleInLastObsoleteToFixEndTime,
+                                        () => { nowE.EndTime = nowE.StartTime; },
                                         nowE);
                                 }
+                            }
+                            else
+                            {
+                                RaiseSituationEvent(host, SituationType.ThisLastInLastObsoleteToRemove,
+                                    () =>
+                                    {
+                                        RemoveEvent(host, list, nowE);
+                                        i--;
+                                    },
+                                    nowE);
                             }
 
                         } // 若当前Event是此种类最后一个（无下一个Event)。
@@ -461,27 +462,27 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                         }
                         // 当 此event为move，param固定，且唯一时
                         else if (type == EventTypes.Move
-                                 && host is Sprite element)
+                                 && host is Sprite sprite)
                         {
                             if (list.Count == 1 && nowE.IsStatic()
                                                 && nowE.IsTimeInRange(host)
                                                 && eventList.Count > 1)
                             {
                                 var move = (Move)nowE;
-                                if (nowE.Start.All(k => k == (int)k)) //若为小数，不归并
+                                if (nowE.Start.All(k => k.Equals((int)k))) //若为小数，不归并
                                 {
                                     RaiseSituationEvent(host,
                                         SituationType.MoveSingleIsStaticToRemoveAndChangeInitial,
                                         () =>
                                         {
-                                            element.DefaultX = move.StartX;
-                                            element.DefaultY = move.StartY;
+                                            sprite.DefaultX = move.StartX;
+                                            sprite.DefaultY = move.StartY;
 
                                             RemoveEvent(host, list, nowE);
                                         },
                                         nowE);
                                 }
-                                else if (move.EqualsInitialPosition(element))
+                                else if (move.EqualsInitialPosition(sprite))
                                 {
                                     RaiseSituationEvent(host, SituationType.MoveSingleEqualsInitialToRemove,
                                         () => { RemoveEvent(host, list, nowE); },
@@ -489,13 +490,13 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                                 }
                                 else
                                 {
-                                    if (element.DefaultX != 0 || element.DefaultY != 0)
+                                    if (sprite.DefaultX != 0 || sprite.DefaultY != 0)
                                     {
                                         RaiseSituationEvent(host, SituationType.InitialToZero,
                                             () =>
                                             {
-                                                element.DefaultX = 0;
-                                                element.DefaultY = 0;
+                                                sprite.DefaultX = 0;
+                                                sprite.DefaultY = 0;
                                             },
                                             nowE);
                                     }
@@ -503,13 +504,13 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                             }
                             else
                             {
-                                if (element.DefaultX != 0 || element.DefaultY != 0)
+                                if (sprite.DefaultX != 0 || sprite.DefaultY != 0)
                                 {
                                     RaiseSituationEvent(host, SituationType.InitialToZero,
                                         () =>
                                         {
-                                            element.DefaultX = 0;
-                                            element.DefaultY = 0;
+                                            sprite.DefaultX = 0;
+                                            sprite.DefaultY = 0;
                                         },
                                         nowE);
                                 }
@@ -574,8 +575,8 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                         // F,0,1000,5000,1
                         // S,0,0,,0.5,0.8
                         // 此时，第二行的F可被删除。
-                        else if (nowE.StartTime == preE.EndTime &&
-                                 preE.StartTime == preE.EndTime)
+                        else if (nowE.StartTime.Equals(preE.EndTime) &&
+                                 preE.StartTime.Equals(preE.EndTime))
                         {
                             if (index > 1 ||
                                 preE.EqualsMultiMinTime(host) ||
@@ -609,7 +610,8 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             RaiseSituationEvent(host, situationType, continueAction, null, events);
         }
 
-        private void RaiseSituationEvent(IEventHost host, SituationType situationType, Action continueAction, Action breakAction, params ICommonEvent[] events)
+        private void RaiseSituationEvent(IEventHost host, SituationType situationType, Action continueAction,
+            Action? breakAction, params ICommonEvent[] events)
         {
             var args = new SituationEventArgs(Guid, situationType)
             {

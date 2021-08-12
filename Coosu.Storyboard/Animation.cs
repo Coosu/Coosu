@@ -18,8 +18,8 @@ namespace Coosu.Storyboard
         /// <summary>
         /// Create a storyboard element by dynamic images.
         /// </summary>
-        /// <param name="layerType">Set element layer.</param>
-        /// <param name="originType">Set element origin.</param>
+        /// <param name="layerType">Set sprite layer.</param>
+        /// <param name="originType">Set sprite origin.</param>
         /// <param name="imagePath">Set image path.</param>
         /// <param name="defaultX">Set default x-coordinate of location.</param>
         /// <param name="defaultY">Set default x-coordinate of location.</param>
@@ -38,8 +38,8 @@ namespace Coosu.Storyboard
         /// <summary>
         /// Create a storyboard element by dynamic images.
         /// </summary>
-        /// <param name="layer">Set element layer.</param>
-        /// <param name="origin">Set element origin.</param>
+        /// <param name="layer">Set sprite layer.</param>
+        /// <param name="origin">Set sprite origin.</param>
         /// <param name="imagePath">Set image path.</param>
         /// <param name="defaultX">Set default x-coordinate of location.</param>
         /// <param name="defaultY">Set default x-coordinate of location.</param>

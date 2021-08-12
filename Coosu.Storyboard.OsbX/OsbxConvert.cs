@@ -32,39 +32,39 @@ namespace Coosu.Storyboard.OsbX
         public static async Task<string> SerializeObjectAsync(VirtualLayer group)
         {
             var sb = new StringBuilder();
-            foreach (var element in group.SceneObjects)
+            foreach (var sceneObject in group.SceneObjects)
             {
-                var result = await SerializeObjectAsync(element);
+                var result = await SerializeObjectAsync(sceneObject);
                 sb.AppendLine(result);
             }
 
             return sb.ToString().TrimEnd('\n', '\r'); ;
         }
 
-        public static async Task<string> SerializeObjectAsync(ISceneObject element)
+        public static async Task<string> SerializeObjectAsync(ISceneObject sceneObject)
         {
             var sb = new StringBuilder();
-            var subjectHandler = HandlerRegister.GetSubjectHandler(ObjectType.GetString(element.ObjectType));
+            var subjectHandler = HandlerRegister.GetSubjectHandler(ObjectType.GetString(sceneObject.ObjectType));
             if (subjectHandler == null)
             {
                 Console.WriteLine(
-                    $"Cannot find subject handler for `{ObjectType.GetString(element.ObjectType)}`: Skipped.");
+                    $"Cannot find subject handler for `{ObjectType.GetString(sceneObject.ObjectType)}`: Skipped.");
                 return "";
             }
 
             try
             {
-                var text = subjectHandler.Serialize(element);
+                var text = subjectHandler.Serialize(sceneObject);
                 sb.AppendLine(text);
             }
             catch (Exception ex)
             {
                 Console.WriteLine(
-                    $"Error while serializing element: `{ObjectType.GetString(element.ObjectType)}`\r\n{ex}");
+                    $"Error while serializing element: `{ObjectType.GetString(sceneObject.ObjectType)}`\r\n{ex}");
                 return "";
             }
 
-            foreach (var commonEvent in element.Events)
+            foreach (var commonEvent in sceneObject.Events)
             {
                 var actionHandler = subjectHandler.GetActionHandler(commonEvent.EventType.Flag);
                 if (actionHandler == null)
@@ -86,7 +86,7 @@ namespace Coosu.Storyboard.OsbX
 
             //else
             //{
-            //    Console.WriteLine($"Unknown type of EventContainer: `{element.ToOsbString()}`");
+            //    Console.WriteLine($"Unknown type of EventContainer: `{sceneObject.ToOsbString()}`");
             //}
 
             return sb.ToString().TrimEnd('\n', '\r');

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Coosu.Storyboard.Common;
@@ -34,11 +35,11 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                 : null;
         }
 
-        public static float[]? GetUnworthyValue(this ICommonEvent e)
+        public static float[] GetUnworthyValue(this ICommonEvent e)
         {
             return UnworthyDictionary.ContainsKey(e.EventType)
                 ? UnworthyDictionary[e.EventType]
-                : null;
+                : Array.Empty<float>();
         }
 
         public static IEnumerable<Fade> GetFadeList(this IEventHost ec) =>

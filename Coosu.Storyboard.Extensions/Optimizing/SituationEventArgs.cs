@@ -42,13 +42,13 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             switch (situationType)
             {
                 case SituationType.ThisLastSingleInLastObsoleteToFixTail:
-                    return "The only event for its category in the obsolete range which range equals to the element's end time " +
+                    return "The only event for its category in the obsolete range which range equals to the sprite's end time " +
                            "can be optimized when string value of end parameters is longer than the start parameters. ";
                 case SituationType.ThisLastSingleInLastObsoleteToFixEndTime:
-                    return "The only event for its category in the obsolete range which range equals to the element's end time " +
+                    return "The only event for its category in the obsolete range which range equals to the sprite's end time " +
                            "can be optimized when string value of end time is longer than the start time. ";
                 case SituationType.ThisLastInLastObsoleteToRemove:
-                    return "The event in the obsolete range which range's end time equals to the element's end time " +
+                    return "The event in the obsolete range which range's end time equals to the sprite's end time " +
                            "is useless and can be safely removed.";
                 case SituationType.NextHeadAndThisInObsoleteToRemove:
                     return "When one event is in an obsolete range and the next event's start time is in the same obsolete range, " +

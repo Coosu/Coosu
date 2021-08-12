@@ -11,11 +11,18 @@ using Coosu.Storyboard.Utils;
 namespace Coosu.Storyboard
 {
     /// <summary>
-    /// Represents a storyboard element. This class cannot be inherited.
+    /// Represents a storyboard sprite. This class cannot be inherited.
     /// </summary>
     public partial class Sprite : ISceneObject
     {
         public virtual ObjectType ObjectType { get; } = ObjectTypes.Sprite;
+
+        int? IDefinedObject.RowInSource
+        {
+            get => _rowInSource;
+            set => _rowInSource = value;
+        }
+
         public LayerType LayerType { get; }
         public OriginType OriginType { get; }
         public string ImagePath { get; }
@@ -62,17 +69,17 @@ namespace Coosu.Storyboard
 
         //public bool IsWorthy => !MinTime.Equals(MaxTime) || IsBackground;
         //public bool IsBackground { get; internal set; }
-        public int? RowInSource { get; internal set; }
 
         // Loop control
         private bool _isTriggering;
         private bool _isLooping;
+        private int? _rowInSource;
 
         /// <summary>
-        /// Create a storyboard element by a static image.
+        /// Create a storyboard sprite by a static image.
         /// </summary>
-        /// <param name="layerType">Set element layer.</param>
-        /// <param name="originType">Set element origin.</param>
+        /// <param name="layerType">Set sprite layer.</param>
+        /// <param name="originType">Set sprite origin.</param>
         /// <param name="imagePath">Set image path.</param>
         /// <param name="defaultX">Set default x-coordinate of location.</param>
         /// <param name="defaultY">Set default x-coordinate of location.</param>

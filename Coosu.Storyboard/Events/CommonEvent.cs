@@ -101,6 +101,16 @@ namespace Coosu.Storyboard.Events
             }
         }
 
+        //todo: use Span<T>
+        public static ICommonEvent Create(EventType e, EasingType easing,
+            float startTime, float endTime, int size, params float[] parameters)
+        {
+            if (parameters.Length != size * 2) throw new ArgumentException();
+            return Create(e, easing, startTime, endTime,
+                parameters.Take(size).ToArray(),
+                parameters.Skip(size).ToArray());
+        }
+
         public static ICommonEvent Create(EventType e, EasingType easing,
             float startTime, float endTime, float[] start, float[]? end)
         {

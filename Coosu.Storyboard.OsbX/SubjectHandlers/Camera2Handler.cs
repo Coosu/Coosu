@@ -11,7 +11,7 @@ using Coosu.Storyboard.Utils;
 
 namespace Coosu.Storyboard.OsbX.SubjectHandlers
 {
-    public class Camera2Handler : SubjectHandler<Camera2Element>
+    public class Camera2Handler : SubjectHandler<Camera2Object>
     {
         static Camera2Handler()
         {
@@ -34,15 +34,15 @@ namespace Coosu.Storyboard.OsbX.SubjectHandlers
 
         public override string Flag => "Camera2";
         // Camera
-        public override string Serialize(Camera2Element raw)
+        public override string Serialize(Camera2Object raw)
         {
             return $"{Flag},{raw.CameraId}";
         }
 
-        public override Camera2Element Deserialize(string[] split)
+        public override Camera2Object Deserialize(string[] split)
         {
             if (split.Length < 1) throw new ArgumentOutOfRangeException();
-            
+
             //var type = ObjectTypeManager.Parse(split[0]);
             int cameraId = 0;
             if (split.Length >= 2)
@@ -50,15 +50,14 @@ namespace Coosu.Storyboard.OsbX.SubjectHandlers
                 cameraId = int.Parse(split[1]);
             }
 
-            return new Camera2Element() { CameraId = cameraId };
+            return new Camera2Object { CameraId = cameraId };
 
         }
     }
 
-    public class Camera2Element : ISceneObject, IDefinedObject
+    public class Camera2Object : ISceneObject, IDefinedObject
     {
         public ObjectType ObjectType { get; } = 99;
-        protected string Header => $"{ObjectType.GetString(ObjectType)},{CameraId}";
         public float DefaultY { get; set; }
         public float DefaultX { get; set; }
         public float ZDistance { get; set; }
@@ -78,14 +77,20 @@ namespace Coosu.Storyboard.OsbX.SubjectHandlers
             Events.Add(@event);
         }
 
-        static Camera2Element()
+        static Camera2Object()
         {
             ObjectType.SignType(99, "Camera2");
         }
 
+        public async Task WriteHeaderAsync(TextWriter writer)
+        {
+            await writer.WriteAsync($"{ObjectType.GetString(ObjectType)},{CameraId}");
+        }
+
         public async Task WriteScriptAsync(TextWriter writer)
         {
-            await writer.WriteLineAsync(Header);
+            await WriteHeaderAsync(writer);
+            await writer.WriteLineAsync();
             await ScriptHelper.WriteElementEventsAsync(writer, this, EnableGroupedSerialization);
         }
     }

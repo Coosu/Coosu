@@ -22,7 +22,7 @@ namespace Coosu.Storyboard
         public IEnumerable<ISceneObject> this[Func<ISceneObject, bool> predicate] => SceneObjects.Where(predicate);
 
         /// <summary>
-        /// Create a storyboard element by a static image.
+        /// Create a storyboard sprite by a static image.
         /// </summary>
         /// <param name="filePath">File path of the image.</param>
         /// <returns></returns>
@@ -34,7 +34,7 @@ namespace Coosu.Storyboard
         }
 
         /// <summary>
-        /// Create a storyboard element by a static image.
+        /// Create a storyboard sprite by a static image.
         /// </summary>
         /// <param name="originType">Origin of the image.</param>
         /// <param name="filePath">File path of the image.</param>
@@ -47,7 +47,7 @@ namespace Coosu.Storyboard
         }
 
         /// <summary>
-        /// Create a storyboard element by a static image.
+        /// Create a storyboard sprite by a static image.
         /// </summary>
         /// <param name="layerType">Layer of the image.</param>
         /// <param name="originType">Origin of the image.</param>
@@ -61,7 +61,7 @@ namespace Coosu.Storyboard
         }
 
         /// <summary>
-        /// Create a storyboard element by a static image.
+        /// Create a storyboard sprite by a static image.
         /// </summary>
         /// <param name="layerType">Layer of the image.</param>
         /// <param name="originType">Origin of the image.</param>
@@ -76,7 +76,7 @@ namespace Coosu.Storyboard
         }
 
         /// <summary>
-        /// Create a storyboard element by a static image.
+        /// Create a storyboard sprite by a static image.
         /// </summary>
         /// <param name="layerType">Layer of the image.</param>
         /// <param name="originType">Origin of the image.</param>
@@ -193,7 +193,7 @@ namespace Coosu.Storyboard
         public static VirtualLayer Parse(TextReader textReader)
         {
             VirtualLayer group = new VirtualLayer(0);
-            Sprite? currentObj = null;
+            IDefinedObject? currentObj = null;
             //0 = isLooping, 1 = isTriggering, 2 = isBlank
             bool[] options = { false, false, false };
 
@@ -211,7 +211,7 @@ namespace Coosu.Storyboard
                 {
                     try
                     {
-                        currentObj = ParseElement(line, rowIndex, currentObj, group, options);
+                        currentObj = ParseObject(line, rowIndex, currentObj, group, options);
                     }
                     catch (Exception e)
                     {
@@ -238,12 +238,13 @@ namespace Coosu.Storyboard
             P = "P",
             L = "L", T = "T";
 
-        private static Sprite ParseElement(string line,
+        private static IDefinedObject ParseObject(string line,
             int rowIndex,
-            Sprite? currentObj,
+            IDefinedObject? currentObj,
             VirtualLayer layer,
             bool[] options)
         {
+            var sprite = currentObj as Sprite;
             ref bool isLooping = ref options[0];
             ref bool isTriggering = ref options[1];
             ref bool isBlank = ref options[2];
@@ -252,7 +253,7 @@ namespace Coosu.Storyboard
             var @params = line.Split(SplitChar);
             if (SpriteDefinitions.Contains(@params[0]))
             {
-                currentObj?.TryEndLoop();
+                sprite?.TryEndLoop();
 
                 if (@params.Length == 6)
                 {
@@ -333,7 +334,7 @@ namespace Coosu.Storyboard
                 {
                     if (isLooping || isTriggering)
                     {
-                        currentObj.EndLoop();
+                        sprite?.EndLoop();
                         isLooping = false;
                         isTriggering = false;
                     }
@@ -360,7 +361,8 @@ namespace Coosu.Storyboard
                         : int.Parse(@params[3]);
                 }
 
-                ParseEvent(currentObj, options, @params, thisEvent, easing, startTime, endTime);
+                if (sprite != null)
+                    ParseEvent(sprite, options, @params, thisEvent, easing, startTime, endTime);
             }
 
             return currentObj!;

@@ -111,16 +111,16 @@ namespace Coosu.Animation.WPF
             foreach (var ec in eg.SceneObjects)
             {
                 if (ec is Storyboard.Animation) continue;
-                if (!(ec is Sprite element)) continue;
-                var imagePath = System.IO.Path.Combine(folder, element.ImagePath);
-                if (!element.ImagePath.Contains("."))
+                if (ec is not Sprite sprite) continue;
+                var imagePath = System.IO.Path.Combine(folder, sprite.ImagePath);
+                if (!sprite.ImagePath.Contains("."))
                 {
                     imagePath += ".jpg";
                 }
 
-                var origin = ParseOrigin(element.OriginType);
-                var x = element.DefaultX;
-                var y = element.DefaultY;
+                var origin = ParseOrigin(sprite.OriginType);
+                var x = sprite.DefaultX;
+                var y = sprite.DefaultY;
                 if (!System.IO.File.Exists(imagePath))
                 {
                     var withoutExt = System.IO.Path.GetFileNameWithoutExtension(imagePath);
@@ -156,7 +156,7 @@ namespace Coosu.Animation.WPF
 
                 ele.ApplyAnimation(k =>
                 {
-                    foreach (var commonEvent in element.Events)
+                    foreach (var commonEvent in sprite.Events)
                     {
                         double startT = commonEvent.StartTime - min, endT = commonEvent.EndTime - min;
 
@@ -275,10 +275,10 @@ namespace Coosu.Animation.WPF
             }
         }
 
-        private Random _rnd = new Random();
+        private Random _rnd = new();
         private StoryboardCanvasHost _canvasHost;
-        private List<BitmapImage> _bitmaps = new List<BitmapImage>();
-        private List<ImageObject> _list = new List<ImageObject>();
+        private readonly List<BitmapImage> _bitmaps = new();
+        private readonly List<ImageObject> _list = new();
         private StoryboardGroup _group;
 
         private void Button_Click(object sender, RoutedEventArgs e)
