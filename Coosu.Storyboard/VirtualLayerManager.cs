@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Coosu.Storyboard.Utils;
 
-namespace Coosu.Storyboard.Management
+namespace Coosu.Storyboard
 {
     public class VirtualLayerManager
     {

@@ -1,7 +1,6 @@
 ﻿using System;
 using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Events;
-using Coosu.Storyboard.Management;
 
 namespace Coosu.Storyboard.Extensions.Optimizing
 {

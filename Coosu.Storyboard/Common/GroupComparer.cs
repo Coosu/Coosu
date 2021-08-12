@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Coosu.Storyboard.Management
+namespace Coosu.Storyboard.Common
 {
     public class GroupComparer : IComparer<VirtualLayer>
     {

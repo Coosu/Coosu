@@ -15,7 +15,6 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Coosu.Storyboard;
 using Coosu.Storyboard.Events;
-using Coosu.Storyboard.Management;
 
 namespace Coosu.Animation.WPF
 {

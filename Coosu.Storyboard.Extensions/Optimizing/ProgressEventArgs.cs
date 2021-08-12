@@ -1,5 +1,4 @@
 ﻿using System;
-using Coosu.Storyboard.Management;
 
 namespace Coosu.Storyboard.Extensions.Optimizing
 {

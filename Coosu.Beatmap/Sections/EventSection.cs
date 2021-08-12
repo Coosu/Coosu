@@ -1,7 +1,6 @@
 ﻿using Coosu.Beatmap.Configurable;
 using Coosu.Beatmap.Sections.Event;
 using Coosu.Shared.Mathematics;
-using Coosu.Storyboard.Management;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;

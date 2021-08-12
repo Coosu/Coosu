@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Events;
 using Coosu.Storyboard.Events.EventHosts;
-using Coosu.Storyboard.Management;
 using Coosu.Storyboard.Utils;
 
 namespace Coosu.Storyboard

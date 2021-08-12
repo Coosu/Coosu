@@ -4,7 +4,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Extensibility;
-using Coosu.Storyboard.Management;
 using Coosu.Storyboard.OsbX.SubjectHandlers;
 
 namespace Coosu.Storyboard.OsbX

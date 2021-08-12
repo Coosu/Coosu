@@ -1,5 +1,4 @@
 ﻿using Coosu.Storyboard.Common;
-using Coosu.Storyboard.Management;
 
 namespace Coosu.Storyboard.Events
 {
