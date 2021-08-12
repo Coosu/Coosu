@@ -44,11 +44,11 @@ namespace Coosu.Storyboard.OsbX
         public static async Task<string> SerializeObjectAsync(ISceneObject element)
         {
             var sb = new StringBuilder();
-            var subjectHandler = HandlerRegister.GetSubjectHandler(ObjectTypeRegister.GetString(element.ObjectType));
+            var subjectHandler = HandlerRegister.GetSubjectHandler(ObjectType.GetString(element.ObjectType));
             if (subjectHandler == null)
             {
                 Console.WriteLine(
-                    $"Cannot find subject handler for `{ObjectTypeRegister.GetString(element.ObjectType)}`: Skipped.");
+                    $"Cannot find subject handler for `{ObjectType.GetString(element.ObjectType)}`: Skipped.");
                 return "";
             }
 
@@ -60,7 +60,7 @@ namespace Coosu.Storyboard.OsbX
             catch (Exception ex)
             {
                 Console.WriteLine(
-                    $"Error while serializing element: `{ObjectTypeRegister.GetString(element.ObjectType)}`\r\n{ex}");
+                    $"Error while serializing element: `{ObjectType.GetString(element.ObjectType)}`\r\n{ex}");
                 return "";
             }
 
@@ -118,7 +118,7 @@ namespace Coosu.Storyboard.OsbX
                         var handler = HandlerRegister.GetSubjectHandler(mahou);
                         if (handler == null && int.TryParse(mahou, out var flag))
                         {
-                            var magicWord = ObjectTypeRegister.GetString(flag);
+                            var magicWord = ObjectType.GetString(flag);
                             if (magicWord != null) handler = HandlerRegister.GetSubjectHandler(magicWord);
                         }
 

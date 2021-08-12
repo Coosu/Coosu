@@ -15,7 +15,7 @@ namespace Coosu.Storyboard.OsbX.SubjectHandlers
     {
         static Camera2Handler()
         {
-            ObjectTypeRegister.SignType(99, "Camera2");
+            ObjectType.SignType(99, "Camera2");
         }
 
         public Camera2Handler()
@@ -58,7 +58,7 @@ namespace Coosu.Storyboard.OsbX.SubjectHandlers
     public class Camera2Element : ISceneObject, IDefinedObject
     {
         public ObjectType ObjectType { get; } = 99;
-        protected string Header => $"{ObjectTypeRegister.GetString(ObjectType)},{CameraId}";
+        protected string Header => $"{ObjectType.GetString(ObjectType)},{CameraId}";
         public float DefaultY { get; set; }
         public float DefaultX { get; set; }
         public float ZDistance { get; set; }
@@ -80,7 +80,7 @@ namespace Coosu.Storyboard.OsbX.SubjectHandlers
 
         static Camera2Element()
         {
-            ObjectTypeRegister.SignType(99, "Camera2");
+            ObjectType.SignType(99, "Camera2");
         }
 
         public async Task WriteScriptAsync(TextWriter writer)

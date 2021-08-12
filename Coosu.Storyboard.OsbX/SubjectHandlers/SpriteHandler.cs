@@ -29,8 +29,8 @@ namespace Coosu.Storyboard.OsbX.SubjectHandlers
         public override Sprite Deserialize(string[] split)
         {
             if (split.Length is not (6 or 9)) throw new ArgumentOutOfRangeException();
-            
-            var type = ObjectTypeRegister.Parse(split[0]);
+
+            var type = ObjectType.Parse(split[0]);
             var layerType = (LayerType)Enum.Parse(typeof(LayerType), split[1]);
             var origin = (OriginType)Enum.Parse(typeof(OriginType), split[2]);
             var path = split[3].Trim('\"');

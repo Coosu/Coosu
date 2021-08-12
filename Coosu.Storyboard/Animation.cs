@@ -57,7 +57,7 @@ namespace Coosu.Storyboard
         
         public override async Task WriteHeaderAsync(TextWriter writer)
         {
-            await writer.WriteAsync(ObjectTypeRegister.GetString(ObjectType));
+            await writer.WriteAsync(ObjectType.GetString(ObjectType));
             await writer.WriteAsync(',');
             await writer.WriteAsync(LayerType);
             await writer.WriteAsync(',');

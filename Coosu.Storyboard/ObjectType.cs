@@ -1,21 +1,50 @@
 ﻿using System;
-using Coosu.Storyboard.Extensibility;
+using System.Collections.Generic;
 
 namespace Coosu.Storyboard
 {
     public struct ObjectType : IEquatable<ObjectType>, IComparable<ObjectType>, IComparable
     {
+        #region static members
+
+        private static readonly Dictionary<string, ObjectType> DictionaryStore = new();
+        private static readonly Dictionary<ObjectType, string> BackDictionaryStore = new();
+
+        static ObjectType()
+        {
+            SignType(0, "Background");
+            SignType(1, "Video");
+            SignType(2, "Break");
+            SignType(3, "Color");
+            SignType(4, "Sprite");
+            SignType(5, "Sample");
+            SignType(6, "Animation");
+        }
+
+        public static void SignType(int num, string name)
+        {
+            if (DictionaryStore.ContainsKey(name)) return;
+            DictionaryStore.Add(name, num);
+            BackDictionaryStore.Add(num, name);
+        }
+
+        public static ObjectType Parse(string s)
+        {
+            return DictionaryStore.ContainsKey(s) ? DictionaryStore[s] : int.Parse(s);
+        }
+
+        public static string? GetString(ObjectType type)
+        {
+            return BackDictionaryStore.ContainsKey(type) ? BackDictionaryStore[type] : null;
+        }
+
+        #endregion
+
         public int Flag { get; }
 
         public ObjectType(int flag)
         {
             Flag = flag;
-        }
-
-        public static ObjectType Parse(string s)
-        {
-            var foo = ObjectTypeRegister.Parse(s);
-            return foo == default ? (ObjectType)int.Parse(s) : foo;
         }
 
         public bool Equals(ObjectType other)
