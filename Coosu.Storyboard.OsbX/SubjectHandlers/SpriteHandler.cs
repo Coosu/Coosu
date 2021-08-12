@@ -30,7 +30,7 @@ namespace Coosu.Storyboard.OsbX.SubjectHandlers
         {
             if (split.Length is not (6 or 9)) throw new ArgumentOutOfRangeException();
             
-            var type = ObjectTypeManager.Parse(split[0]);
+            var type = ObjectTypeRegister.Parse(split[0]);
             var layerType = (LayerType)Enum.Parse(typeof(LayerType), split[1]);
             var origin = (OriginType)Enum.Parse(typeof(OriginType), split[2]);
             var path = split[3].Trim('\"');

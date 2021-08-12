@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 
-namespace Coosu.Storyboard
+namespace Coosu.Storyboard.Extensibility
 {
-    public static class ObjectTypeManager
+    public static class ObjectTypeRegister
     {
         private static readonly Dictionary<string, ObjectType> DictionaryStore = new();
         private static readonly Dictionary<ObjectType, string> BackDictionaryStore = new();
 
-        static ObjectTypeManager()
+        static ObjectTypeRegister()
         {
             SignType(0, "Background");
             SignType(1, "Video");

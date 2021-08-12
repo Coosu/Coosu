@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using Coosu.Storyboard.Extensibility;
 using Coosu.Storyboard.Utils;
 
 namespace Coosu.Storyboard
@@ -56,7 +57,7 @@ namespace Coosu.Storyboard
         
         public override async Task WriteHeaderAsync(TextWriter writer)
         {
-            await writer.WriteAsync(ObjectTypeManager.GetString(ObjectType));
+            await writer.WriteAsync(ObjectTypeRegister.GetString(ObjectType));
             await writer.WriteAsync(',');
             await writer.WriteAsync(LayerType);
             await writer.WriteAsync(',');

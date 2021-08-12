@@ -1,4 +1,5 @@
 ﻿using System;
+using Coosu.Storyboard.Extensibility;
 
 namespace Coosu.Storyboard
 {
@@ -13,7 +14,7 @@ namespace Coosu.Storyboard
 
         public static ObjectType Parse(string s)
         {
-            var foo = ObjectTypeManager.Parse(s);
+            var foo = ObjectTypeRegister.Parse(s);
             return foo == default ? (ObjectType)int.Parse(s) : foo;
         }
 
