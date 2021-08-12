@@ -89,12 +89,17 @@ namespace Coosu.Storyboard.Extensions.Optimizing
 
             var emptyToken = new CancellationTokenSource();
             _cancelToken = new CancellationTokenSource();
-            var uselessSprites = new ConcurrentBag<Sprite>();// todo: how to use it
+            var uselessSprites = new ConcurrentBag<Sprite>();
             Task[] tasks = RunDequeueTasks(queue, uselessSprites, emptyToken);
 
             RunEnqueueTask(queue, emptyToken);
 
             await Task.WhenAll(tasks);
+
+            foreach (var uselessSprite in uselessSprites)
+            {
+                _sprites.Remove(uselessSprite);
+            }
 
             lock (_runLock)
             {
