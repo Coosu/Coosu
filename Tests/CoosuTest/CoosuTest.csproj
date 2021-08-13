@@ -10,6 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Coosu.Storyboard.Extensions\Coosu.Storyboard.Extensions.csproj" />
     <ProjectReference Include="..\..\Coosu.Storyboard\Coosu.Storyboard.csproj" />
   </ItemGroup>
 

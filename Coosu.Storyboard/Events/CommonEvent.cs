@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,8 +9,11 @@ using Coosu.Storyboard.Utils;
 
 namespace Coosu.Storyboard.Events
 {
+    [DebuggerDisplay("Expression = {DebuggerDisplay}")]
     public abstract class CommonEvent : ICommonEvent //,IComparable<CommonEvent>
     {
+        private string DebuggerDisplay => this.GetHeaderString();
+
         public abstract EventType EventType { get; }
         public EasingType Easing { get; set; }
         public double StartTime { get; set; }

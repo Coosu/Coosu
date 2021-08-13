@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Coosu.Storyboard
 {
+    [DebuggerDisplay("Flag = {Flag}")]
     public struct EventType : IEquatable<EventType>, IComparable<EventType>, IComparable
     {
         #region static members

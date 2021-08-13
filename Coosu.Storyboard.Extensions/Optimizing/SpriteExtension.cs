@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Events;
+using Coosu.Storyboard.Utils;
 
 namespace Coosu.Storyboard.Extensions.Optimizing
 {
@@ -90,10 +91,10 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             }
         }
 
-        public static TimeRange GetObsoleteList(this Sprite sprite)
+        public static (TimeRange ObsoleteList, HashSet<ICommonEvent> ControlNode) GetObsoleteList(this Sprite sprite)
         {
             var obsoleteList = new TimeRange();
-
+            var controlNode = new HashSet<ICommonEvent>();
             var possibleList = sprite.Events
                 .Where(k => k.EventType == EventTypes.Fade ||
                             k.EventType == EventTypes.Scale ||
@@ -101,7 +102,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                 .ToArray();
 
             if (possibleList.Length <= 0)
-                return obsoleteList;
+                return (obsoleteList, controlNode);
 
             var dic = new Dictionary<EventType, EventContext>
             {
@@ -109,11 +110,14 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                 [EventTypes.Scale] = new(),
                 [EventTypes.Vector] = new()
             };
+
             foreach (var e in possibleList)
             {
+#if DEBUG
                 if (e.EventType == EventTypes.Fade)
                 {
                 }
+#endif
 
                 dic[e.EventType].Count++;
                 // 最早的event晚于最小开始时间，默认加这一段
@@ -121,8 +125,10 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                     e.Start.SequenceEqual(e.GetUnworthyValue()) &&
                     e.StartTime > sprite.MinTime)
                 {
+                    e.AdjustTiming(sprite.MinTime - e.StartTime); // todo: stop changing here
                     dic[e.EventType].StartTime = sprite.MinTime;
                     dic[e.EventType].IsFadingOut = true;
+                    controlNode.Add(e);
                 }
 
                 // event.Start和End都为无用值时，开始计时
@@ -132,6 +138,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                 {
                     dic[e.EventType].StartTime = e.StartTime;
                     dic[e.EventType].IsFadingOut = true;
+                    controlNode.Add(e);
                 }
                 // event.End为无用值时，开始计时
                 else if (e.End.SequenceEqual(e.GetUnworthyValue()) &&
@@ -139,6 +146,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                 {
                     dic[e.EventType].StartTime = e.EndTime;
                     dic[e.EventType].IsFadingOut = true;
+                    controlNode.Add(e);
                 }
                 else if (dic[e.EventType].IsFadingOut)
                 {
@@ -148,6 +156,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                     AddTimeRage(dic[e.EventType].StartTime, e.StartTime);
                     dic[e.EventType].IsFadingOut = false;
                     dic[e.EventType].StartTime = double.MinValue;
+                    controlNode.Add(e);
                 }
             }
 
@@ -182,7 +191,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                 obsoleteList.Add(startTime, endTime);
             }
 
-            return obsoleteList;
+            return (obsoleteList, controlNode);
         }
 
         /// <summary>
@@ -200,7 +209,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                     ICommonEvent objNow = list[i];
                     if (objNow.StartTime > objNow.EndTime)
                     {
-                        var info = $"{{{objNow}}}:\r\n" +
+                        var info = $"{{{objNow.GetHeaderString()}}}:\r\n" +
                                    $"Start time should not be larger than end time.";
 
                         var arg = new ProcessErrorEventArgs(host)
@@ -215,7 +224,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                     }
                     if (objNext.StartTime < objNow.EndTime)
                     {
-                        var info = $"{{{objNow}}} to {{{objNext}}}:\r\n" +
+                        var info = $"{{{objNow.GetHeaderString()}}} to {{{objNext.GetHeaderString()}}}:\r\n" +
                                    $"The previous object's end time should be larger than the next object's start time.";
                         var arg = new ProcessErrorEventArgs(host)
                         {
@@ -230,7 +239,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                 }
             }
 
-            if (!(host is Sprite e))
+            if (host is not Sprite e)
                 return;
 
             foreach (var item in e.LoopList)

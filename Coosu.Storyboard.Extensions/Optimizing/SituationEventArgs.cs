@@ -54,21 +54,21 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                     return "When one event is in an obsolete range and the next event's start time is in the same obsolete range, " +
                            "the event is useless and can be safely removed.";
                 case SituationType.ThisFirstSingleIsStaticAndDefaultToRemove:
-                    return "no description.";
+                    return "ThisFirstSingleIsStaticAndDefaultToRemove.";
                 case SituationType.ThisFirstIsStaticAndSequentWithNextHeadToRemove:
-                    return "no description.";
+                    return "ThisFirstIsStaticAndSequentWithNextHeadToRemove.";
                 case SituationType.MoveSingleIsStaticToRemoveAndChangeInitial:
-                    return "no description.";
+                    return "MoveSingleIsStaticToRemoveAndChangeInitial.";
                 case SituationType.MoveSingleEqualsInitialToRemove:
-                    return "no description.";
+                    return "MoveSingleEqualsInitialToRemove.";
                 case SituationType.InitialToZero:
-                    return "no description.";
+                    return "InitialToZero.";
                 case SituationType.ThisPrevIsStaticAndSequentToCombine:
-                    return "no description.";
+                    return "ThisPrevIsStaticAndSequentToCombine.";
                 case SituationType.ThisIsStaticAndSequentWithPrevToCombine:
-                    return "no description.";
+                    return "ThisIsStaticAndSequentWithPrevToCombine.";
                 case SituationType.PrevIsStaticAndTimeOverlapWithThisStartTimeToRemove:
-                    return "no description.";
+                    return "PrevIsStaticAndTimeOverlapWithThisStartTimeToRemove.";
                 default:
                     throw new ArgumentOutOfRangeException(nameof(situationType), situationType, null);
             }

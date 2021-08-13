@@ -10,7 +10,7 @@ namespace Coosu.Storyboard.Common
         double MinEndTime { get; }
 
         bool EnableGroupedSerialization { get; set; }
-        SortedSet<ICommonEvent> Events { get; }
+        ICollection<ICommonEvent> Events { get; set; }
         void AddEvent(ICommonEvent @event);
     }
 }

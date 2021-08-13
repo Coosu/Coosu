@@ -253,10 +253,12 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                     return true;
             }
 
-            var obsoleteList = sprite.GetObsoleteList();
-            PreOptimize(sprite, obsoleteList);
+            sprite.Events = new HashSet<ICommonEvent>(sprite.Events);
+            var (obsoleteList, controlNodes) = sprite.GetObsoleteList();
+            PreOptimize(sprite, obsoleteList, controlNodes);
             NormalOptimize(sprite);
-
+            sprite.Events =
+                new SortedSet<ICommonEvent>(sprite.Events, new EventTimingComparer());
             if (sprite.ImagePath != BackgroundPath ||
                 sprite.LayerType != LayerType.Background)
             {
@@ -269,23 +271,23 @@ namespace Coosu.Storyboard.Extensions.Optimizing
         /// <summary>
         /// 预压缩
         /// </summary>
-        private void PreOptimize(IEventHost host, TimeRange obsoleteList)
+        private void PreOptimize(IEventHost host, TimeRange obsoleteList, HashSet<ICommonEvent> controlNodes)
         {
             if (host is Sprite ele)
             {
                 foreach (var item in ele.LoopList)
                 {
-                    PreOptimize(item, obsoleteList);
+                    PreOptimize(item, obsoleteList, controlNodes);
                 }
 
                 foreach (var item in ele.TriggerList)
                 {
-                    PreOptimize(item, obsoleteList);
+                    PreOptimize(item, obsoleteList, controlNodes);
                 }
             }
 
             if (host.Events.Any())
-                RemoveByObsoletedList(host, obsoleteList);
+                RemoveByObsoletedList(host, obsoleteList, controlNodes);
         }
 
         /// <summary>
@@ -315,7 +317,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
         /// <summary>
         /// 根据ObsoletedList，移除不必要的命令。
         /// </summary>
-        private void RemoveByObsoletedList(IEventHost host, TimeRange obsoleteList)
+        private void RemoveByObsoletedList(IEventHost host, TimeRange obsoleteList, HashSet<ICommonEvent> controlNodes)
         {
             if (obsoleteList.TimingList.Count == 0) return;
             var groups = host.Events.GroupBy(k => k.EventType);
@@ -392,7 +394,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                         {
                             // 判断是否此Event在某Obsolete Range内，且下一Event的StartTime也在此Obsolete Range内。
                             canRemove = obsoleteList.ContainsTimingPoint(out _,
-                                nowE.StartTime, nowE.EndTime, nextE.StartTime);
+                                nowE.StartTime, nowE.EndTime, nextE.StartTime) /*&& !controlNodes.Contains(nowE)*/;
 
                             if (canRemove)
                             {
@@ -427,7 +429,6 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                 while (index >= 0)
                 {
                     ICommonEvent nowE = list[index];
-
                     if (host is Sprite ele &&
                         ele.TriggerList.Any(k => nowE.EndTime >= k.StartTime && nowE.StartTime <= k.EndTime) &&
                         ele.LoopList.Any(k => nowE.EndTime >= k.StartTime && nowE.StartTime <= k.EndTime))
@@ -611,7 +612,19 @@ namespace Coosu.Storyboard.Extensions.Optimizing
 
         private static void RemoveEvent(IEventHost sourceHost, ICollection<ICommonEvent> eventList, ICommonEvent e)
         {
-            sourceHost.Events.Remove(e);
+            var success = sourceHost.Events.Remove(e);
+            if (!success)
+            {
+                //var count = sourceHost.Events.RemoveWhere(k =>
+                //    k.Start.SequenceEqual(e.Start) &&
+                //    k.End.SequenceEqual(e.End) &&
+                //    k.StartTime.Equals(e.StartTime) &&
+                //    k.EndTime.Equals(e.EndTime));
+                //if (count <= 0)
+                //{
+                //    throw new Exception("Failed to delete event");
+                //}
+            }
             eventList.Remove(e);
         }
 

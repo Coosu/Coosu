@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,8 +13,11 @@ namespace Coosu.Storyboard
     /// <summary>
     /// Represents a storyboard sprite. This class cannot be inherited.
     /// </summary>
+    [DebuggerDisplay("Header = {DebuggerDisplay}")]
     public partial class Sprite : ISceneObject
     {
+        private string DebuggerDisplay => this.GetHeaderString();
+
         public virtual ObjectType ObjectType { get; } = ObjectTypes.Sprite;
 
         public int? RowInSource { get; set; }
@@ -28,7 +32,9 @@ namespace Coosu.Storyboard
         public int CameraId { get; set; }
 
         // EventHosts
-        public SortedSet<ICommonEvent> Events { get; } = new(new EventTimingComparer());
+        public ICollection<ICommonEvent> Events { get; set; } =
+            new SortedSet<ICommonEvent>(new EventTimingComparer());
+
         // ISceneObject
         public List<Loop> LoopList { get; } = new();
         public List<Trigger> TriggerList { get; } = new();

@@ -17,7 +17,8 @@ namespace Coosu.Storyboard.Events
         public EventType EventType { get; } = EventTypes.Trigger;
 
         public bool EnableGroupedSerialization { get; set; } = true;
-        public SortedSet<ICommonEvent> Events { get; } = new(new EventTimingComparer());
+        public ICollection<ICommonEvent> Events { get; set; } =
+            new SortedSet<ICommonEvent>(new EventTimingComparer());
 
         public double StartTime { get; set; }
         public double EndTime { get; set; }

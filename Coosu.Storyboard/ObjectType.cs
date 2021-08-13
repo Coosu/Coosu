@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Coosu.Storyboard
 {
+    [DebuggerDisplay("Name = {DebuggerDisplay}")]
     public struct ObjectType : IEquatable<ObjectType>, IComparable<ObjectType>, IComparable
     {
+        private string? DebuggerDisplay => ObjectType.GetString(this);
+        
         #region static members
 
         private static readonly Dictionary<string, ObjectType> DictionaryStore = new(StringComparer.OrdinalIgnoreCase);
