@@ -7,7 +7,7 @@ namespace Coosu.Storyboard
     {
         #region static members
 
-        private static readonly Dictionary<string, ObjectType> DictionaryStore = new();
+        private static readonly Dictionary<string, ObjectType> DictionaryStore = new(StringComparer.OrdinalIgnoreCase);
         private static readonly Dictionary<ObjectType, string> BackDictionaryStore = new();
 
         static ObjectType()
@@ -25,6 +25,7 @@ namespace Coosu.Storyboard
         {
             if (DictionaryStore.ContainsKey(name)) return;
             DictionaryStore.Add(name, num);
+            DictionaryStore.Add(num.ToString(), num);
             BackDictionaryStore.Add(num, name);
         }
 
@@ -36,6 +37,11 @@ namespace Coosu.Storyboard
         public static string? GetString(ObjectType type)
         {
             return BackDictionaryStore.ContainsKey(type) ? BackDictionaryStore[type] : null;
+        }
+
+        public static bool Contains(string name)
+        {
+            return DictionaryStore.ContainsKey(name);
         }
 
         #endregion

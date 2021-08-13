@@ -96,8 +96,8 @@ namespace Coosu.Storyboard.Events
             {
                 await textWriter.WriteAsync(Start[i].ToIcString());
                 await textWriter.WriteAsync(',');
-            }  
-            
+            }
+
             for (int i = 0; i < ParamLength; i++)
             {
                 await textWriter.WriteAsync(End[i].ToIcString());
@@ -106,9 +106,10 @@ namespace Coosu.Storyboard.Events
         }
 
         //todo: use Span<T>
-        public static ICommonEvent Create(EventType e, EasingType easing,
-            double startTime, double endTime, int size, params double[] parameters)
+        public static ICommonEvent Create(EventType e, EasingType easing, double startTime, double endTime,
+            params double[] parameters)
         {
+            var size = e.Size;
             if (parameters.Length != size * 2) throw new ArgumentException();
             return Create(e, easing, startTime, endTime,
                 parameters.Take(size).ToArray(),

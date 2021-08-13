@@ -13,9 +13,9 @@ namespace CoosuTest
         static async Task Main(string[] args)
         {
             var text = await File.ReadAllTextAsync(
-                @"D:\GitHub\ReOsuStoryboardPlayer\ReOsuStoryboardPlayer.Core.UnitTest\TestData\NOMA - LOUDER MACHINE (Skystar).osb");
-            await OutputOldOsb(text);
+                @"D:\GitHub\ReOsuStoryboardPlayer\ReOsuStoryboardPlayer.Core.UnitTest\TestData\Denkishiki Karen Ongaku Shuudan - Gareki no Yume (Dored).osb");
             await OutputNewOsb(text);
+            await OutputOldOsb(text);
         }
 
         private static async Task OutputNewOsb(string text)

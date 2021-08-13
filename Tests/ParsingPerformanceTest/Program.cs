@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Globalization;
 using System.IO;
 using System.Reflection;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Running;
 
 namespace ParsingPerformanceTest
@@ -15,25 +14,25 @@ namespace ParsingPerformanceTest
     {
         static void Main(string[] args)
         {
-            var xp = new HtmlExporter()
+            var xp = new CsvExporter(CsvSeparator.CurrentCulture)
             {
 
             };
 
-            var summary2 = BenchmarkRunner.Run<SavingTask>(ManualConfig
-                .Create(new DebugBuildConfig())
-                .AddExporter(xp)
-            );
+            //var summary2 = BenchmarkRunner.Run<SavingTask>(ManualConfig
+            //    .Create(new DebugBuildConfig())
+            //    .AddExporter(xp)
+            //    .AddDiagnoser(new MemoryDiagnoser(new MemoryDiagnoserConfig()))
+            //);
 
             var summary = BenchmarkRunner.Run<ParsingTask>(ManualConfig
                 .Create(new DebugBuildConfig())
                 .AddExporter(xp)
+                .AddDiagnoser(new MemoryDiagnoser(new MemoryDiagnoserConfig()))
             );
         }
     }
 
-    [HtmlExporter]
-    [MemoryDiagnoser]
     public class SavingTask
     {
         private readonly string _text;
@@ -88,8 +87,6 @@ namespace ParsingPerformanceTest
         }
     }
 
-    [HtmlExporter]
-    [MemoryDiagnoser]
     public class ParsingTask
     {
         private readonly string _text;

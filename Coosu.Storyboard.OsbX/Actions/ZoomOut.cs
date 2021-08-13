@@ -13,6 +13,6 @@ namespace Coosu.Storyboard.OsbX.Actions
         {
         }
 
-        public override EventType EventType => "ZO";
+        public override EventType EventType { get; } = new("ZO", 1);
     }
 }

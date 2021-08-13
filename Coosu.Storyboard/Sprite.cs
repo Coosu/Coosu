@@ -171,9 +171,9 @@ namespace Coosu.Storyboard
             await writer.WriteAsync(",\"");
             await writer.WriteAsync(ImagePath);
             await writer.WriteAsync("\",");
-            await writer.WriteAsync((int)DefaultX);
+            await writer.WriteAsync(DefaultX);
             await writer.WriteAsync(',');
-            await writer.WriteAsync((int)DefaultY);
+            await writer.WriteAsync(DefaultY);
         }
 
         public async Task WriteScriptAsync(TextWriter writer)

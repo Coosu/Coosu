@@ -4,19 +4,19 @@ namespace Coosu.Storyboard.Utils
 {
     public static class StringExtensions
     {
-        public static LineSplitEnumerator SpanSplit(this string str, char c)
+        public static CharSplitEnumerator SpanSplit(this string str, char c)
         {
             // LineSplitEnumerator is a struct so there is no allocation here
-            return new LineSplitEnumerator(str.AsSpan(), c);
+            return new CharSplitEnumerator(str.AsSpan(), c);
         }
 
         // Must be a ref struct as it contains a ReadOnlySpan<char>
-        public ref struct LineSplitEnumerator
+        public ref struct CharSplitEnumerator
         {
             private ReadOnlySpan<char> _str;
             private readonly char _c;
 
-            public LineSplitEnumerator(ReadOnlySpan<char> str, char c)
+            public CharSplitEnumerator(ReadOnlySpan<char> str, char c)
             {
                 _str = str;
                 _c = c;
@@ -24,7 +24,7 @@ namespace Coosu.Storyboard.Utils
             }
 
             // Needed to be compatible with the foreach operator
-            public LineSplitEnumerator GetEnumerator() => this;
+            public CharSplitEnumerator GetEnumerator() => this;
 
             public bool MoveNext()
             {

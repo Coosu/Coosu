@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Coosu.Storyboard.Common;
+using Coosu.Storyboard.Events;
 using Coosu.Storyboard.Utils;
 
 namespace Coosu.Storyboard
@@ -150,8 +151,8 @@ namespace Coosu.Storyboard
             await writer.WriteLineAsync("[Events]");
             await writer.WriteLineAsync("//Background and Video events");
             await writer.WriteLineAsync("//Storyboard Layer 0 (Background)");
-            await writer.WriteLineAsync("//Storyboard Layer 0 (Background)");
             await writer.WriteLineAsync("//Storyboard Layer 1 (Fail)");
+            await writer.WriteLineAsync("//Storyboard Layer 2 (Pass)");
             await writer.WriteLineAsync("//Storyboard Layer 3 (Foreground)");
             await WriteScriptAsync(writer);
             await writer.WriteLineAsync("//Storyboard Sound Samples");
@@ -227,16 +228,16 @@ namespace Coosu.Storyboard
 
         private const char SplitChar = ',';
         private const char QuoteChar = '\"';
-        private static readonly string[] SpriteDefinitions = { "Sprite", "Animation", "4", "6" };
+        //private static readonly string[] SpriteDefinitions = { "Sprite", "Animation", "4", "6" };
         private static readonly char[] PrefixChars = { ' ', '_' };
         private static readonly string[] Prefixes = { " ", "_" };
         private static readonly string[] DoublePrefixes = { "  ", "__" };
-        private const string
-            F = "F", S = "S", R = "R", Mx = "MX", My = "MY",
-            M = "M", V = "V",
-            C = "C",
-            P = "P",
-            L = "L", T = "T";
+        //private const string
+        //    F = "F", S = "S", R = "R", Mx = "MX", My = "MY",
+        //    M = "M", V = "V",
+        //    C = "C",
+        //    P = "P",
+        //    L = "L", T = "T";
 
         private static IDefinedObject ParseObject(string line,
             int rowIndex,
@@ -251,7 +252,9 @@ namespace Coosu.Storyboard
 
             //int count = line.Count(k => k == ',') + 1;
             var @params = line.Split(SplitChar);
-            if (SpriteDefinitions.Contains(@params[0]))
+            string identifier = @params[0];
+
+            if (ObjectType.Contains(identifier))
             {
                 sprite?.TryEndLoop();
 
@@ -321,16 +324,16 @@ namespace Coosu.Storyboard
                     throw new Exception("Events shouldn't be declared after blank line");
 
                 // 验证层次是否合法
-                if (@params[0].Length - @params[0].TrimStart(PrefixChars).Length > 2)
+                if (identifier.Length - identifier.TrimStart(PrefixChars).Length > 2)
                 {
                     throw new Exception("Unknown relation of the event");
                 }
-                else if (DoublePrefixes.Any(k => @params[0].StartsWith(k)))
+                else if (DoublePrefixes.Any(k => identifier.StartsWith(k)))
                 {
                     if (!isLooping && !isTriggering)
                         throw new Exception("The event should be looping or triggering");
                 }
-                else if (Prefixes.Any(k => @params[0].StartsWith(k)))
+                else if (Prefixes.Any(k => identifier.StartsWith(k)))
                 {
                     if (isLooping || isTriggering)
                     {
@@ -345,12 +348,11 @@ namespace Coosu.Storyboard
                 }
 
                 // 开始验证event类别
-                @params[0] = @params[0].TrimStart(PrefixChars);
+                identifier = identifier.TrimStart(PrefixChars);
 
-                string thisEvent = @params[0];
                 int easing = int.MinValue, startTime = int.MinValue, endTime = int.MinValue;
 
-                if (thisEvent != T && thisEvent != L)
+                if (EventType.IsCommonEvent(identifier))
                 {
                     easing = int.Parse(@params[1]);
                     if (easing is > 34 or < 0)
@@ -362,81 +364,58 @@ namespace Coosu.Storyboard
                 }
 
                 if (sprite != null)
-                    ParseEvent(sprite, options, @params, thisEvent, easing, startTime, endTime);
+                    ParseEvent(sprite, options, @params, identifier, easing, startTime, endTime);
             }
 
             return currentObj!;
         }
 
         private static void ParseEvent(Sprite currentObj, bool[] options, string?[] rawParams,
-            string eventStr, int easing, int startTime, int endTime)
+            string identifier, int easing, int startTime, int endTime)
         {
             int rawLength = rawParams.Length;
-            switch (rawParams[0])
+            var eventType = EventType.GetValue(identifier);
+            if (eventType != default)
             {
-                case F:
-                case S:
-                case R:
-                case Mx:
-                case My:
-                    AddEvent(1);
-                    break;
-                case M:
-                case V:
-                    AddEvent(2);
-                    return;
-                case C:
-                    AddEvent(3);
-                    break;
-                case P:
-                case L:
-                case T:
-                    AddEvent(0);
-                    break;
-                default:
-                    throw new Exception($"Unknown event: \"{eventStr}\"");
-            }
-
-            void AddEvent(int paramLength)
-            {
-                if (paramLength != 0)
+                var size = eventType.Size;
+                if (size >= 1)
                 {
                     const int baseLength = 4;
                     // 验证是否存在缺省
-                    if (rawLength == paramLength + baseLength)
+                    if (rawLength == size + baseLength)
                     {
-                        int length = paramLength * 2;
+                        int length = size * 2;
                         Span<double> array = stackalloc double[length];
-                        for (int i = 0; i < paramLength; i++)
+                        for (int i = 0; i < size; i++)
                             array[i] = double.Parse(rawParams[baseLength + i]!);
-                        for (int i = 0; i < paramLength; i++)
-                            array[i + paramLength] = double.Parse(rawParams[baseLength + i]!);
+                        for (int i = 0; i < size; i++)
+                            array[i + size] = double.Parse(rawParams[baseLength + i]!);
 
                         InjectEvent(array);
                     }
-                    else if (rawLength == paramLength * 2 + baseLength)
+                    else if (rawLength == size * 2 + baseLength)
                     {
-                        int length = paramLength * 2;
+                        int length = size * 2;
                         Span<double> array = stackalloc double[length];
                         for (int i = 0; i < length; i++)
                             array[i] = double.Parse(rawParams[baseLength + i]!);
 
                         InjectEvent(array);
                     }
-                    else if (rawLength > paramLength * 2 + baseLength && (rawLength - baseLength) % paramLength == 0)
+                    else if (rawLength > size * 2 + baseLength && (rawLength - baseLength) % size == 0)
                     {
                         var duration = endTime - startTime;
-                        for (int i = baseLength, j = 0; i < rawParams.Length - paramLength; i += paramLength, j++)
+                        for (int i = baseLength, j = 0; i < rawParams.Length - size; i += size, j++)
                         {
                             ParseEvent(currentObj, options,
                                 new[] { rawParams[0], null, null, null }
                                     .Concat(
                                         rawParams
                                             .Skip(i)
-                                            .Take(paramLength * 2)
+                                            .Take(size * 2)
                                     )
                                     .ToArray(),
-                                eventStr,
+                                identifier,
                                 easing,
                                 startTime + duration * j,
                                 endTime + duration * j);
@@ -444,120 +423,65 @@ namespace Coosu.Storyboard
                     }
                     else
                     {
-                        throw new Exception($"Wrong parameter for event: \"{eventStr}\"");
+                        throw new Exception($"Wrong parameter for event: \"{identifier}\"");
                     }
                 }
                 else
                 {
-                    switch (eventStr)
+                    if (identifier == EventTypes.Parameter.Flag)
                     {
-                        case P:
-                            if (rawLength == 5)
-                            {
-                                currentObj.Parameter(
-                                    (EasingType)easing,
-                                    startTime,
-                                    endTime,
-                                    rawParams[4]!.ToParameterEnum());
-                                return;
-                            }
+                        if (rawLength == 5)
+                        {
+                            currentObj.Parameter(
+                                (EasingType)easing,
+                                startTime,
+                                endTime,
+                                rawParams[4]!.ToParameterEnum());
+                            return;
+                        }
+                    }
+                    else if (identifier == EventTypes.Loop.Flag)
+                    {
+                        if (rawLength == 3)
+                        {
+                            startTime = int.Parse(rawParams[1]!);
+                            int loopCount = int.Parse(rawParams[2]!);
+                            currentObj.StartLoop(startTime, loopCount);
 
-                            break;
-                        case L:
-                            if (rawLength == 3)
-                            {
-                                startTime = int.Parse(rawParams[1]!);
-                                int loopCount = int.Parse(rawParams[2]!);
-                                currentObj.StartLoop(startTime, loopCount);
+                            options[0] = true; // isLooping
+                            return;
+                        }
+                    }
+                    else if (identifier == EventTypes.Trigger.Flag)
+                    {
+                        if (rawLength == 4)
+                        {
+                            startTime = int.Parse(rawParams[2]!);
+                            endTime = int.Parse(rawParams[3]!);
 
-                                options[0] = true; // isLooping
-                                return;
-                            }
-
-                            break;
-                        case T:
-                            if (rawLength == 4)
-                            {
-                                startTime = int.Parse(rawParams[2]!);
-                                endTime = int.Parse(rawParams[3]!);
-
-                                currentObj.StartTrigger(startTime, endTime, rawParams[1]!); // rawParams[1]: triggerType
-                                options[1] = true; // isTriggering
-                                return;
-                            }
-
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException(nameof(eventStr));
+                            currentObj.StartTrigger(startTime, endTime, rawParams[1]!); // rawParams[1]: triggerType
+                            options[1] = true; // isTriggering
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        throw new ArgumentOutOfRangeException(nameof(identifier));
                     }
 
-                    throw new Exception($"Wrong parameter for event: \"{eventStr}\"");
+                    throw new Exception($"Wrong parameter for event: \"{identifier}\"");
                 }
+            }
+            else
+            {
+                throw new Exception($"Unknown event: \"{identifier}\"");
+            }
 
-                void InjectEvent(Span<double> array)
-                {
-                    switch (eventStr)
-                    {
-                        case F:
-                            currentObj.Fade((EasingType)easing,
-                                startTime, endTime,
-                                array[0],
-                                array[1]
-                            );
-                            break;
-                        case S:
-                            currentObj.Scale((EasingType)easing,
-                                startTime, endTime,
-                                array[0],
-                                array[1]
-                            );
-                            break;
-                        case R:
-                            currentObj.Rotate((EasingType)easing,
-                                startTime, endTime,
-                                array[0],
-                                array[1]
-                            );
-                            break;
-                        case Mx:
-                            currentObj.MoveX((EasingType)easing,
-                                startTime, endTime,
-                                array[0],
-                                array[1]
-                            );
-                            break;
-                        case My:
-                            currentObj.MoveY((EasingType)easing,
-                                startTime, endTime,
-                                array[0],
-                                array[1]
-                            );
-                            break;
-                        case M:
-                            currentObj.Move((EasingType)easing,
-                                startTime, endTime,
-                                array[0], array[1],
-                                array[2], array[3]
-                            );
-                            break;
-                        case V:
-                            currentObj.Vector((EasingType)easing,
-                                startTime, endTime,
-                                array[0], array[1],
-                                array[2], array[3]
-                            );
-                            break;
-                        case C:
-                            currentObj.Color((EasingType)easing,
-                                startTime, endTime,
-                                array[0], array[1], array[2],
-                                array[3], array[4], array[5]
-                            );
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException(nameof(eventStr));
-                    }
-                }
+
+            void InjectEvent(Span<double> array)
+            {
+                var commonEvent = CommonEvent.Create(eventType, (EasingType)easing, startTime, endTime, array.ToArray());
+                currentObj.AddEvent(commonEvent);
             }
         }
 
