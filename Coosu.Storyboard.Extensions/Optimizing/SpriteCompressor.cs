@@ -395,7 +395,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                             // 判断是否此Event在某Obsolete Range内，且下一Event的StartTime也在此Obsolete Range内。
                             canRemove = obsoleteList.ContainsTimingPoint(out _,
                                 nowE.StartTime, nowE.EndTime, nextE.StartTime) /*&& !controlNodes.Contains(nowE)*/;
-
+                            //目前限制：多个fadoutlist的控制节点不能删的只剩一个
                             if (canRemove)
                             {
                                 RaiseSituationEvent(host, SituationType.NextHeadAndThisInObsoleteToRemove,

@@ -13,12 +13,14 @@ namespace CoosuTest
     {
         static async Task Main(string[] args)
         {
-            //var text = await File.ReadAllTextAsync(
-            //    @"D:\GitHub\ReOsuStoryboardPlayer\ReOsuStoryboardPlayer.Core.UnitTest\TestData\Denkishiki Karen Ongaku Shuudan - Gareki no Yume (Dored).osb");
             var text = await File.ReadAllTextAsync(
-                @"C:\Users\milkitic\Desktop\optimizer not well\huge timing.txt");
+                @"D:\GitHub\ReOsuStoryboardPlayer\ReOsuStoryboardPlayer.Core.UnitTest\TestData\Denkishiki Karen Ongaku Shuudan - Gareki no Yume (Dored).osb");
+            //var text = await File.ReadAllTextAsync(
+            //    @"C:\Users\milkitic\Desktop\optimizer not well\huge timing.txt");
             //var text = await File.ReadAllTextAsync(
             //    @"C:\Users\milkitic\Desktop\optimizer not well\should not del first F.txt");
+            //var text = await File.ReadAllTextAsync(
+            //    @"C:\Users\milkitic\Desktop\optimizer not well\wtf.txt");
             await OutputNewOsb(text);
             await OutputOldOsb(text);
         }
