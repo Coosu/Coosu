@@ -60,7 +60,7 @@ namespace Coosu.Storyboard
                 LoopList.Select(k => k.OuterMaxTime),
                 TriggerList.Select(k => k.MaxTime)
             );
-        public bool EnableGroupedSerialization { get; set; }
+        public bool EnableGroupedSerialization { get; set; } = true;
 
         //public bool IsWorthy => !MinTime.Equals(MaxTime) || IsBackground;
         //public bool IsBackground { get; internal set; }

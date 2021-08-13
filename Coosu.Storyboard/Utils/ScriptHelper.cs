@@ -17,6 +17,7 @@ namespace Coosu.Storyboard.Utils
                 {
                     await writer.WriteAsync(indent);
                     await e.WriteScriptAsync(writer);
+                    await writer.WriteLineAsync();
                 }
         }
 
@@ -27,6 +28,7 @@ namespace Coosu.Storyboard.Utils
             {
                 await writer.WriteAsync(indent);
                 await e.WriteScriptAsync(writer);
+                await writer.WriteLineAsync();
             }
         }
 

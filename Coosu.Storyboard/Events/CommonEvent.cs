@@ -96,6 +96,10 @@ namespace Coosu.Storyboard.Events
             {
                 await textWriter.WriteAsync(Start[i].ToIcString());
                 await textWriter.WriteAsync(',');
+            }  
+            
+            for (int i = 0; i < ParamLength; i++)
+            {
                 await textWriter.WriteAsync(End[i].ToIcString());
                 if (i != ParamLength - 1) await textWriter.WriteAsync(',');
             }

@@ -13,7 +13,7 @@ namespace Coosu.Storyboard.Events
         public EventType EventType { get; } = EventTypes.Loop;
 
         internal ISceneObject? _baseObject;
-        public bool EnableGroupedSerialization { get; set; }
+        public bool EnableGroupedSerialization { get; set; } = true;
         public SortedSet<ICommonEvent> Events { get; } = new(new EventTimingComparer());
 
         public double StartTime { get; set; }
