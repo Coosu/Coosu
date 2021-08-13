@@ -14,6 +14,13 @@ namespace Coosu.Storyboard.Management
         public float ZDistance { get; set; }
         public ElementGroup(float zDistance) => ZDistance = zDistance;
 
+        public ElementGroup(string parseFilePath)
+        {
+            var parse = ElementGroup.ParseFromFile(parseFilePath);
+            this.ElementList = parse.ElementList;
+            this.ZDistance = parse.ZDistance;
+        }
+
         public List<EventContainer> ElementList { get; set; } = new List<EventContainer>();
 
         public EventContainer this[int index] => ElementList[index];
