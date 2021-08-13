@@ -25,7 +25,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{020FD699
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Coosu.Storyboard.Extensions", "Coosu.Storyboard.Extensions\Coosu.Storyboard.Extensions.csproj", "{7B7C3BF2-72E5-4D18-99B7-EE33AD516F80}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParsingPerformanceTest", "Tests\ParsingPerformanceTest\ParsingPerformanceTest.csproj", "{EB1E4AF8-5C13-450D-9B61-64AA11021695}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ParsingPerformanceTest", "Tests\ParsingPerformanceTest\ParsingPerformanceTest.csproj", "{EB1E4AF8-5C13-450D-9B61-64AA11021695}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
