@@ -155,6 +155,7 @@ namespace Coosu.Storyboard
             await writer.WriteLineAsync("//Storyboard Layer 2 (Pass)");
             await writer.WriteLineAsync("//Storyboard Layer 3 (Foreground)");
             await WriteScriptAsync(writer);
+            await writer.WriteLineAsync("//Storyboard Layer 4 (Overlay)");
             await writer.WriteLineAsync("//Storyboard Sound Samples");
         }
 
