@@ -2,9 +2,9 @@
 
 namespace Coosu.Storyboard.Common
 {
-    public class GroupComparer : IComparer<VirtualLayer>
+    public class GroupComparer : IComparer<Layer>
     {
-        public int Compare(VirtualLayer? x, VirtualLayer? y)
+        public int Compare(Layer? x, Layer? y)
         {
             if (x == null && y == null)
                 return 0;

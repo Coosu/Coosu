@@ -7,35 +7,35 @@ namespace Coosu.Storyboard
 {
     public class VirtualLayerManager
     {
-        public Dictionary<double, VirtualLayer> Layers { get; } = new();
+        public Dictionary<double, Layer> Layers { get; } = new();
 
         public bool ContainsLayer(double z)
         {
             return Layers.ContainsKey(z);
         }
 
-        public VirtualLayer GetOrAddLayer(double z)
+        public Layer GetOrAddLayer(double z)
         {
             if (ContainsLayer(z))
                 return Layers[z];
             return CreateLayer(z);
         }
 
-        public VirtualLayer CreateLayer(double z)
+        public Layer CreateLayer(double z)
         {
-            var elementGroup = new VirtualLayer(z);
+            var elementGroup = new Layer(z);
             Layers.Add(z, elementGroup);
             return elementGroup;
         }
 
-        public void AddLayer(VirtualLayer virtualLayer)
+        public void AddLayer(Layer layer)
         {
-            Layers.Add(virtualLayer.ZDistance, virtualLayer);
+            Layers.Add(layer.ZDistance, layer);
         }
 
-        public void DeleteLayer(VirtualLayer virtualLayer)
+        public void DeleteLayer(Layer layer)
         {
-            Layers.Remove(virtualLayer.ZDistance);
+            Layers.Remove(layer.ZDistance);
         }
 
         public void DeleteLayer(double z)

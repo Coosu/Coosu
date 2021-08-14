@@ -29,7 +29,7 @@ namespace Coosu.Storyboard.OsbX
             return sb.ToString().TrimEnd('\n', '\r'); ;
         }
 
-        public static async Task<string> SerializeObjectAsync(VirtualLayer group)
+        public static async Task<string> SerializeObjectAsync(Layer group)
         {
             var sb = new StringBuilder();
             foreach (var sceneObject in group.SceneObjects)

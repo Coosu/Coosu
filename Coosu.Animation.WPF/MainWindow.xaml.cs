@@ -99,7 +99,7 @@ namespace Coosu.Animation.WPF
             var folder = System.IO.Path.GetDirectoryName(file);
             _group = _canvasHost.CreateStoryboardGroup();
             //var folder = @"D:\Games\osu!\Songs\ok";
-            var eg = VirtualLayer.ParseFromFile(file);
+            var eg = Layer.ParseFromFile(file);
 
             var min = eg.SceneObjects.Min(k => k.MinTime);
             if (min > 0)

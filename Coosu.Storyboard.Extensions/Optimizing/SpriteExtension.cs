@@ -10,22 +10,22 @@ namespace Coosu.Storyboard.Extensions.Optimizing
 {
     public static class SpriteExtension
     {
-        public static async Task ExpandAsync(this VirtualLayer eleG)
+        public static async Task ExpandAsync(this Layer eleG)
         {
             await Task.Run(() => { Expand(eleG); });
         }
 
-        public static void ExpandAndFillFadeout(this VirtualLayer eleG)
+        public static void ExpandAndFillFadeout(this Layer eleG)
         {
             eleG.InnerFix(true, true);
         }
 
-        public static void Expand(this VirtualLayer eleG)
+        public static void Expand(this Layer eleG)
         {
             eleG.InnerFix(true, false);
         }
 
-        public static void FillObsoleteList(this VirtualLayer eleG)
+        public static void FillObsoleteList(this Layer eleG)
         {
             eleG.InnerFix(false, true);
         }
@@ -254,7 +254,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             }
         }
 
-        private static void InnerFix(this VirtualLayer eleG, bool expand, bool fillFadeout)
+        private static void InnerFix(this Layer eleG, bool expand, bool fillFadeout)
         {
             if (!expand && !fillFadeout)
                 return;

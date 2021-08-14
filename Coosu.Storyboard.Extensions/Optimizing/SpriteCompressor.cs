@@ -42,13 +42,13 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             _sourceSprites = (ICollection<ISceneObject>)sprites;
         }
 
-        public SpriteCompressor(VirtualLayer virtualLayer)
+        public SpriteCompressor(Layer layer)
         {
-            _sprites = virtualLayer.SceneObjects
+            _sprites = layer.SceneObjects
                 .Where(k => k is Sprite)
                 .Cast<Sprite>()
                 .ToList();
-            _sourceSprites = virtualLayer.SceneObjects;
+            _sourceSprites = layer.SceneObjects;
         }
 
         public int ThreadCount

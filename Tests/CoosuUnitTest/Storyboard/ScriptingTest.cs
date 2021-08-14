@@ -9,13 +9,13 @@ namespace CoosuUnitTest.Storyboard
         [TestMethod]
         public void CreateElementGroup()
         {
-            var group = new VirtualLayer(0);
+            var group = new Layer(0);
         }
 
         [TestMethod]
         public void CreateSpriteFromGroup()
         {
-            var group = new VirtualLayer(0);
+            var group = new Layer(0);
             group.CreateSprite("");
             Assert.AreEqual(1, group.SceneObjects.Count);
         }

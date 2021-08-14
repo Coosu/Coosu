@@ -9,12 +9,12 @@ using Coosu.Storyboard.Utils;
 
 namespace Coosu.Storyboard
 {
-    public class VirtualLayer : IDisposable, IScriptable
+    public class Layer : IDisposable, IScriptable
     {
         public void Dispose() { }
 
         public double ZDistance { get; set; }
-        public VirtualLayer(double zDistance) => ZDistance = zDistance;
+        public Layer(double zDistance) => ZDistance = zDistance;
 
         public List<ISceneObject> SceneObjects { get; set; } = new();
 
@@ -165,36 +165,36 @@ namespace Coosu.Storyboard
             await WriteFullScriptAsync(sw);
         }
 
-        public static async Task<VirtualLayer> ParseAsyncTextAsync(string osbString)
+        public static async Task<Layer> ParseAsyncTextAsync(string osbString)
         {
             return await Task.Run(() => ParseFromText(osbString));
         }
 
-        public static async Task<VirtualLayer> ParseFromFileAsync(string filePath)
+        public static async Task<Layer> ParseFromFileAsync(string filePath)
         {
             return await Task.Run(() => ParseFromFile(filePath));
         }
 
-        public static async Task<VirtualLayer> ParseAsync(TextReader textReader)
+        public static async Task<Layer> ParseAsync(TextReader textReader)
         {
             return await Task.Run(() => Parse(textReader));
         }
 
-        public static VirtualLayer ParseFromText(string osbString)
+        public static Layer ParseFromText(string osbString)
         {
             using var sr = new StringReader(osbString);
             return Parse(sr);
         }
 
-        public static VirtualLayer ParseFromFile(string filePath)
+        public static Layer ParseFromFile(string filePath)
         {
             using var sr = new StreamReader(filePath);
             return Parse(sr);
         }
 
-        public static VirtualLayer Parse(TextReader textReader)
+        public static Layer Parse(TextReader textReader)
         {
-            VirtualLayer group = new VirtualLayer(0);
+            Layer group = new Layer(0);
             IDefinedObject? currentObj = null;
             //0 = isLooping, 1 = isTriggering, 2 = isBlank
             bool[] options = { false, false, false };
@@ -243,7 +243,7 @@ namespace Coosu.Storyboard
         private static IDefinedObject ParseObject(string line,
             int rowIndex,
             IDefinedObject? currentObj,
-            VirtualLayer layer,
+            Layer layer,
             bool[] options)
         {
             var sprite = currentObj as Sprite;

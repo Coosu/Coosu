@@ -30,7 +30,7 @@ namespace CoosuTest
 
         private static async Task OutputNewOsb(string text)
         {
-            var layer = await VirtualLayer.ParseAsyncTextAsync(text);
+            var layer = await Layer.ParseAsyncTextAsync(text);
             var g = new SpriteCompressor(layer)
             {
                 ErrorOccured = (s, e) => { Console.WriteLine(e.Message); },
