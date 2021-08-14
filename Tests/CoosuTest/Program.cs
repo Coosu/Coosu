@@ -43,7 +43,8 @@ namespace CoosuTest
         private static async Task OutputOldOsb(string text)
         {
             var ctx = new System.Runtime.Loader.AssemblyLoadContext("old", false);
-            var asm = ctx.LoadFromAssemblyPath(@"C:\Users\milkitic\Desktop\net472\netstandard2.0\Coosu.Storyboard.dll");
+            var path = Path.Combine(Environment.CurrentDirectory, @"..\..\..\V1.0.0.0\Coosu.Storyboard.dll");
+            var asm = ctx.LoadFromAssemblyPath(path);
             //ctx.Unload();
             var egT = asm.GetType("Coosu.Storyboard.Management.ElementGroup");
             var method = egT?.GetMethod("ParseFromText", BindingFlags.Static | BindingFlags.Public);

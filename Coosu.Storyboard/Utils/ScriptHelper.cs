@@ -11,7 +11,11 @@ namespace Coosu.Storyboard.Utils
         public static async Task WriteGroupedEventAsync(TextWriter writer, IEnumerable<ICommonEvent> events, int index)
         {
             var indent = new string(' ', index);
-            var groupedEvents = events.OrderBy(k => k.EventType).GroupBy(k => k.EventType);
+            var groupedEvents = events
+                .OrderBy(k => k.EventType)
+                .ThenBy(k => k.EndTime)
+                .ThenBy(k => k.EventType.Index)
+                .GroupBy(k => k.EventType);
             foreach (var grouping in groupedEvents)
                 foreach (ICommonEvent e in grouping)
                 {
@@ -24,7 +28,10 @@ namespace Coosu.Storyboard.Utils
         public static async Task WriteSequentialEventAsync(TextWriter writer, IEnumerable<ICommonEvent> events, int index)
         {
             var indent = new string(' ', index);
-            foreach (ICommonEvent e in events)
+            foreach (ICommonEvent e in events
+                .OrderBy(k => k.StartTime)
+                .ThenBy(k=>k.EndTime)
+                .ThenBy(k => k.EventType.Index))
             {
                 await writer.WriteAsync(indent);
                 await e.WriteScriptAsync(writer);
@@ -42,13 +49,14 @@ namespace Coosu.Storyboard.Utils
 
         public static async Task WriteElementEventsAsync(TextWriter writer, ISceneObject sprite, bool group)
         {
+            foreach (var loop in sprite.LoopList)
+                await WriteSubEventHostAsync(writer, loop, @group);
+         
             if (group)
                 await WriteGroupedEventAsync(writer, sprite.Events, 1);
             else
                 await WriteSequentialEventAsync(writer, sprite.Events, 1);
 
-            foreach (var loop in sprite.LoopList)
-                await WriteSubEventHostAsync(writer, loop, @group);
             foreach (var trigger in sprite.TriggerList)
                 await WriteSubEventHostAsync(writer, trigger, @group);
         }

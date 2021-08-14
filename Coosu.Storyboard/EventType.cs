@@ -34,10 +34,10 @@ namespace Coosu.Storyboard
             if (type.Size < 0) NonCommonDictionaryStore.Add(type.Flag, type);
         }
 
-        public static void SignType(string flag, int length)
+        public static void SignType(string flag, int length, int index)
         {
             if (DictionaryStore.ContainsKey(flag)) return;
-            DictionaryStore.Add(flag, new EventType(flag, length));
+            DictionaryStore.Add(flag, new EventType(flag, length, index));
         }
 
         public static EventType GetValue(string flag)
@@ -59,11 +59,13 @@ namespace Coosu.Storyboard
 
         public string Flag { get; }
         public int Size { get; }
+        public int Index { get; }
 
-        public EventType(string flag, int size)
+        public EventType(string flag, int size, int index)
         {
             Flag = flag;
             Size = size;
+            Index = index;
         }
 
         public bool Equals(EventType other)

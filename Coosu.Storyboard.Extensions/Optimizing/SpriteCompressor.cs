@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -31,12 +32,14 @@ namespace Coosu.Storyboard.Extensions.Optimizing
         private readonly object _situationChangedLock = new();
 
         private CancellationTokenSource? _cancelToken;
+        private readonly ICollection<ISceneObject> _sourceSprites;
 
         public Guid Guid { get; } = Guid.NewGuid();
 
         public SpriteCompressor(ICollection<Sprite> sprites)
         {
             _sprites = sprites;
+            _sourceSprites = (ICollection<ISceneObject>)sprites;
         }
 
         public SpriteCompressor(VirtualLayer virtualLayer)
@@ -45,9 +48,8 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                 .Where(k => k is Sprite)
                 .Cast<Sprite>()
                 .ToList();
+            _sourceSprites = virtualLayer.SceneObjects;
         }
-
-        public string? BackgroundPath { get; set; }
 
         public int ThreadCount
         {
@@ -90,7 +92,8 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             var emptyToken = new CancellationTokenSource();
             _cancelToken = new CancellationTokenSource();
             var uselessSprites = new ConcurrentBag<Sprite>();
-            Task[] tasks = RunDequeueTasks(queue, uselessSprites, emptyToken);
+            var possibleBgs = new ConcurrentBag<Sprite>();
+            Task[] tasks = RunDequeueTasks(queue, uselessSprites, possibleBgs, emptyToken);
 
             RunEnqueueTask(queue, emptyToken);
 
@@ -98,7 +101,23 @@ namespace Coosu.Storyboard.Extensions.Optimizing
 
             foreach (var uselessSprite in uselessSprites)
             {
-                _sprites.Remove(uselessSprite);
+                _sourceSprites.Remove(uselessSprite);
+            }
+
+            foreach (var grouping in possibleBgs.GroupBy(k => k.ImagePath))
+            {
+                var imgList = grouping.ToList();
+                if (imgList.Count == 1) continue;
+
+                var uselessList = imgList.Where(sprite => !GetSpriteIsValidTiming(sprite)).ToList();
+                List<Sprite> removeList = uselessList.Count == imgList.Count
+                    ? uselessList.OrderBy(k => k.ToScriptString().Length).Skip(1).ToList()
+                    : uselessList;
+
+                foreach (var sprite in removeList)
+                {
+                    _sourceSprites.Remove(sprite);
+                }
             }
 
             lock (_runLock)
@@ -159,6 +178,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
 
         private Task[] RunDequeueTasks(ConcurrentQueue<Sprite> queue,
             ConcurrentBag<Sprite> uselessSprites,
+            ConcurrentBag<Sprite> possibleBgs,
             CancellationTokenSource emptyToken)
         {
             var tasks = new Task[ThreadCount];
@@ -190,7 +210,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                             Thread.Sleep(1);
                         }
 
-                        var preserve = InnerCompress(sprite);
+                        var preserve = InnerCompress(sprite, possibleBgs);
                         if (!preserve) uselessSprites.Add(sprite);
                         lock (indexLock)
                         {
@@ -211,7 +231,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
 
         #region Compress Logic
 
-        private bool InnerCompress(Sprite sprite)
+        private bool InnerCompress(Sprite sprite, ConcurrentBag<Sprite> possibleBgs)
         {
             // 每个类型压缩从后往前
             // 1.删除没用的
@@ -250,7 +270,10 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                 }
 
                 if (!arg.Continue)
+                {
+                    if (!GetSpriteIsValidTiming(sprite)) return false;
                     return true;
+                }
             }
 
             sprite.Events = new HashSet<ICommonEvent>(sprite.Events);
@@ -259,12 +282,26 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             NormalOptimize(sprite);
             sprite.Events =
                 new SortedSet<ICommonEvent>(sprite.Events, new EventTimingComparer());
-            if (sprite.ImagePath != BackgroundPath ||
-                sprite.LayerType != LayerType.Background)
+            if (sprite.ObjectType == ObjectTypes.Sprite && 
+                Path.GetFileName(sprite.ImagePath) == sprite.ImagePath &&
+                sprite.LayerType == LayerType.Background)
             {
-                if (sprite.MaxTime.Equals(sprite.MinTime)) return false;
+                possibleBgs.Add(sprite);
+                return true;
             }
 
+            if (!GetSpriteIsValidTiming(sprite))
+                return false;
+
+            return true;
+        }
+
+        private static bool GetSpriteIsValidTiming(Sprite sprite)
+        {
+            if (sprite.MaxTime < sprite.MinTime)
+                return false;
+            if (sprite.MaxTime.Equals(sprite.MinTime))
+                return false;
             return true;
         }
 
