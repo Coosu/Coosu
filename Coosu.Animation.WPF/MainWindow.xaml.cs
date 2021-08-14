@@ -15,7 +15,6 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Coosu.Storyboard;
 using Coosu.Storyboard.Events;
-using Coosu.Storyboard.Management;
 
 namespace Coosu.Animation.WPF
 {
@@ -100,28 +99,28 @@ namespace Coosu.Animation.WPF
             var folder = System.IO.Path.GetDirectoryName(file);
             _group = _canvasHost.CreateStoryboardGroup();
             //var folder = @"D:\Games\osu!\Songs\ok";
-            var eg = ElementGroup.ParseFromFile(file);
+            var eg = Layer.ParseFromFile(file);
 
-            var min = eg.ElementList.Min(k => k.MinTime);
+            var min = eg.SceneObjects.Min(k => k.MinTime);
             if (min > 0)
             {
                 min = 0;
             }
 
             int i = int.MinValue;
-            foreach (var ec in eg.ElementList)
+            foreach (var ec in eg.SceneObjects)
             {
-                if (ec is AnimatedElement) continue;
-                if (!(ec is Element element)) continue;
-                var imagePath = System.IO.Path.Combine(folder, element.ImagePath);
-                if (!element.ImagePath.Contains("."))
+                if (ec is Storyboard.Animation) continue;
+                if (ec is not Sprite sprite) continue;
+                var imagePath = System.IO.Path.Combine(folder, sprite.ImagePath);
+                if (!sprite.ImagePath.Contains("."))
                 {
                     imagePath += ".jpg";
                 }
 
-                var origin = ParseOrigin(element.Origin);
-                var x = element.DefaultX;
-                var y = element.DefaultY;
+                var origin = ParseOrigin(sprite.OriginType);
+                var x = sprite.DefaultX;
+                var y = sprite.DefaultY;
                 if (!System.IO.File.Exists(imagePath))
                 {
                     var withoutExt = System.IO.Path.GetFileNameWithoutExtension(imagePath);
@@ -157,7 +156,7 @@ namespace Coosu.Animation.WPF
 
                 ele.ApplyAnimation(k =>
                 {
-                    foreach (var commonEvent in element.EventList)
+                    foreach (var commonEvent in sprite.Events)
                     {
                         double startT = commonEvent.StartTime - min, endT = commonEvent.EndTime - min;
 
@@ -249,9 +248,9 @@ namespace Coosu.Animation.WPF
             Console.WriteLine(sw.ElapsedMilliseconds);
         }
 
-        private Origin<double> ParseOrigin(OriginType elementOrigin)
+        private Origin<double> ParseOrigin(OriginType originType)
         {
-            switch (elementOrigin)
+            switch (originType)
             {
                 case OriginType.TopLeft:
                     return Origins.TopLeft;
@@ -272,14 +271,14 @@ namespace Coosu.Animation.WPF
                 case OriginType.BottomRight:
                     return Origins.BottomRight;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(elementOrigin), elementOrigin, null);
+                    throw new ArgumentOutOfRangeException(nameof(originType), originType, null);
             }
         }
 
-        private Random _rnd = new Random();
+        private Random _rnd = new();
         private StoryboardCanvasHost _canvasHost;
-        private List<BitmapImage> _bitmaps = new List<BitmapImage>();
-        private List<ImageObject> _list = new List<ImageObject>();
+        private readonly List<BitmapImage> _bitmaps = new();
+        private readonly List<ImageObject> _list = new();
         private StoryboardGroup _group;
 
         private void Button_Click(object sender, RoutedEventArgs e)

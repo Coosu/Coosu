@@ -8,10 +8,11 @@ namespace Coosu.Storyboard.OsbX.Actions
         {
         }
 
-        public ZoomOut(EasingType easing, float startTime, float endTime, float[] start, float[] end) : base(easing, startTime, endTime, start, end)
+        public ZoomOut(EasingType easing, double startTime, double endTime, double[] start, double[] end)
+            : base(easing, startTime, endTime, start, end)
         {
         }
 
-        public override EventType EventType => "ZO";
+        public override EventType EventType { get; } = new("ZO", 1, 12);
     }
 }

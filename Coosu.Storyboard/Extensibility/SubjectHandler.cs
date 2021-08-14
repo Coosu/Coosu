@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
+using Coosu.Storyboard.Common;
 
 namespace Coosu.Storyboard.Extensibility
 {
-    public abstract class SubjectHandler<T> : ISubjectParsingHandler<T> where T : EventContainer
+    public abstract class SubjectHandler<T> : ISubjectParsingHandler<T> where T : ISceneObject
     {
         public abstract string Flag { get; }
-        EventContainer ISubjectParsingHandler.Deserialize(string[] split)
+        ISceneObject ISubjectParsingHandler.Deserialize(string[] split)
         {
             return Deserialize(split);
         }
@@ -15,7 +16,7 @@ namespace Coosu.Storyboard.Extensibility
             return Deserialize(split);
         }
 
-        string ISubjectParsingHandler.Serialize(EventContainer raw)
+        string ISubjectParsingHandler.Serialize(ISceneObject raw)
         {
             return Serialize((T)raw);
         }
@@ -35,11 +36,11 @@ namespace Coosu.Storyboard.Extensibility
             return handler;
         }
 
-        public IActionParsingHandler GetActionHandler(string magicWord)
+        public IActionParsingHandler? GetActionHandler(string magicWord)
         {
             return _actionHandlerDic.ContainsKey(magicWord) ? _actionHandlerDic[magicWord] : null;
         }
 
-        private readonly Dictionary<string, IActionParsingHandler> _actionHandlerDic = new Dictionary<string, IActionParsingHandler>();
+        private readonly Dictionary<string, IActionParsingHandler> _actionHandlerDic = new();
     }
 }

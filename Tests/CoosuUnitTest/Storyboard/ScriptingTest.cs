@@ -1,5 +1,5 @@
+using Coosu.Storyboard;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Coosu.Storyboard.Management;
 
 namespace CoosuUnitTest.Storyboard
 {
@@ -9,15 +9,15 @@ namespace CoosuUnitTest.Storyboard
         [TestMethod]
         public void CreateElementGroup()
         {
-            var group = new ElementGroup(0);
+            var group = new Layer(0);
         }
 
         [TestMethod]
         public void CreateSpriteFromGroup()
         {
-            var group = new ElementGroup(0);
+            var group = new Layer(0);
             group.CreateSprite("");
-            Assert.AreEqual(1, group.ElementList.Count);
+            Assert.AreEqual(1, group.SceneObjects.Count);
         }
     }
 }

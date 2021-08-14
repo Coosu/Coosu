@@ -2,8 +2,8 @@
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Extensibility;
-using Coosu.Storyboard.Management;
 using Coosu.Storyboard.OsbX.SubjectHandlers;
 
 namespace Coosu.Storyboard.OsbX
@@ -12,15 +12,15 @@ namespace Coosu.Storyboard.OsbX
     {
         static OsbxConvert()
         {
-            Register.RegisterSubject(new SpriteHandler());
-            Register.RegisterSubject(new AnimationHandler());
-            Register.RegisterSubject(new Camera2Handler());
+            HandlerRegister.RegisterSubject(new SpriteHandler());
+            HandlerRegister.RegisterSubject(new AnimationHandler());
+            HandlerRegister.RegisterSubject(new Camera2Handler());
         }
 
-        public static async Task<string> SerializeObjectAsync(ElementManager manager)
+        public static async Task<string> SerializeObjectAsync(Scene manager)
         {
             var sb = new StringBuilder();
-            foreach (var @group in manager.GroupList.Values)
+            foreach (var @group in manager.Layers.Values)
             {
                 var result = await SerializeObjectAsync(group);
                 sb.AppendLine(result);
@@ -29,42 +29,42 @@ namespace Coosu.Storyboard.OsbX
             return sb.ToString().TrimEnd('\n', '\r'); ;
         }
 
-        public static async Task<string> SerializeObjectAsync(ElementGroup group)
+        public static async Task<string> SerializeObjectAsync(Layer group)
         {
             var sb = new StringBuilder();
-            foreach (var element in group.ElementList)
+            foreach (var sceneObject in group.SceneObjects)
             {
-                var result = await SerializeObjectAsync(element);
+                var result = await SerializeObjectAsync(sceneObject);
                 sb.AppendLine(result);
             }
 
             return sb.ToString().TrimEnd('\n', '\r'); ;
         }
 
-        public static async Task<string> SerializeObjectAsync(EventContainer element)
+        public static async Task<string> SerializeObjectAsync(ISceneObject sceneObject)
         {
             var sb = new StringBuilder();
-            var subjectHandler = Register.GetSubjectHandler(ElementTypeSign.GetString(element.Type));
+            var subjectHandler = HandlerRegister.GetSubjectHandler(ObjectType.GetString(sceneObject.ObjectType));
             if (subjectHandler == null)
             {
                 Console.WriteLine(
-                    $"Cannot find subject handler for `{ElementTypeSign.GetString(element.Type)}`: Skipped.");
+                    $"Cannot find subject handler for `{ObjectType.GetString(sceneObject.ObjectType)}`: Skipped.");
                 return "";
             }
 
             try
             {
-                var text = subjectHandler.Serialize(element);
+                var text = subjectHandler.Serialize(sceneObject);
                 sb.AppendLine(text);
             }
             catch (Exception ex)
             {
                 Console.WriteLine(
-                    $"Error while serializing element: `{ElementTypeSign.GetString(element.Type)}`\r\n{ex}");
+                    $"Error while serializing element: `{ObjectType.GetString(sceneObject.ObjectType)}`\r\n{ex}");
                 return "";
             }
 
-            foreach (var commonEvent in element.EventList)
+            foreach (var commonEvent in sceneObject.Events)
             {
                 var actionHandler = subjectHandler.GetActionHandler(commonEvent.EventType.Flag);
                 if (actionHandler == null)
@@ -86,21 +86,21 @@ namespace Coosu.Storyboard.OsbX
 
             //else
             //{
-            //    Console.WriteLine($"Unknown type of EventContainer: `{element.ToOsbString()}`");
+            //    Console.WriteLine($"Unknown type of EventContainer: `{sceneObject.ToOsbString()}`");
             //}
 
             return sb.ToString().TrimEnd('\n', '\r');
         }
 
-        public static async Task<ElementManager> DeserializeObjectAsync(TextReader reader)
+        public static async Task<Scene> DeserializeObjectAsync(TextReader reader)
         {
             ISubjectParsingHandler lastSubjectHandler = null;
-            EventContainer lastSubject = null;
+            IEventHost lastSubject = null;
             //int lastDeep = 0;
             var line = await reader.ReadLineAsync();
             int l = 0;
 
-            var em = new ElementManager();
+            var em = new Scene();
 
             while (line != null)
             {
@@ -115,22 +115,22 @@ namespace Coosu.Storyboard.OsbX
                     var deep = split[0].Length - mahou.Length;
                     if (deep == 0)
                     {
-                        var handler = Register.GetSubjectHandler(mahou);
+                        var handler = HandlerRegister.GetSubjectHandler(mahou);
                         if (handler == null && int.TryParse(mahou, out var flag))
                         {
-                            var magicWord = ElementTypeSign.GetString(flag);
-                            if (magicWord != null) handler = Register.GetSubjectHandler(magicWord);
+                            var magicWord = ObjectType.GetString(flag);
+                            if (magicWord != null) handler = HandlerRegister.GetSubjectHandler(magicWord);
                         }
 
                         if (handler != null)
                         {
                             try
                             {
-                                var subject = handler.Deserialize(split);
-                                var eg = em.GetOrAddGroup(subject.ZDistance);
-                                eg.AddSubject(subject);
+                                var sprite = handler.Deserialize(split);
+                                var eg = em.GetOrAddLayer(sprite.ZDistance);
+                                eg.AddSprite(sprite);
 
-                                lastSubject = subject;
+                                lastSubject = sprite;
                             }
                             catch (Exception ex)
                             {

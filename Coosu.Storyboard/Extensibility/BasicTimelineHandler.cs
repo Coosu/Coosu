@@ -12,12 +12,12 @@ namespace Coosu.Storyboard.Extensibility
             int count = raw.Start.Length;
             if (raw.End.Length != count)
             {
-                throw new Exception("wtf");
+                throw new Exception("The starting parameter's count should equal to the ending parameter's count");
             }
 
             for (int i = 0; i < count; i++)
             {
-                if (raw.Start[i] != raw.End[i])
+                if (!raw.Start[i].Equals(raw.End[i]))
                 {
                     sequenceEqual = false;
                     break;
@@ -30,36 +30,38 @@ namespace Coosu.Storyboard.Extensibility
             {
                 if (count == 1)
                     script = raw.Start[0].ToString(cultureInfo);
-                if (count == 2)
+                else if (count == 2)
                     script = raw.Start[0].ToString(cultureInfo) + "," +
                              raw.Start[1].ToString(cultureInfo);
-                if (count == 3)
+                else if (count == 3)
                     script = raw.Start[0].ToString(cultureInfo) + "," +
                              raw.Start[1].ToString(cultureInfo) + "," +
                              raw.Start[2].ToString(cultureInfo);
-                script = string.Join(",", raw.Start);
+                else
+                    script = string.Join(",", raw.Start);
             }
             else
             {
                 if (count == 1)
                     script = raw.Start[0].ToString(cultureInfo) + "," +
                              raw.End[0].ToString(cultureInfo);
-                if (count == 2)
+                else if (count == 2)
                     script = raw.Start[0].ToString(cultureInfo) + "," +
                              raw.Start[1].ToString(cultureInfo) + "," +
                              raw.End[0].ToString(cultureInfo) + "," +
                              raw.End[1].ToString(cultureInfo);
-                if (count == 3)
+                else if (count == 3)
                     script = raw.Start[0].ToString(cultureInfo) + "," +
                              raw.Start[1].ToString(cultureInfo) + "," +
                              raw.Start[2].ToString(cultureInfo) + "," +
                              raw.End[0].ToString(cultureInfo) + "," +
                              raw.End[1].ToString(cultureInfo) + "," +
                              raw.End[2].ToString(cultureInfo);
-                script = $"{string.Join(",", raw.Start)},{string.Join(",", raw.End)}";
+                else
+                    script = $"{string.Join(",", raw.Start)},{string.Join(",", raw.End)}";
             }
 
-            var e = raw.EventType.ToShortString();
+            var e = raw.EventType.Flag;
             var easing = ((int)raw.Easing).ToString();
             var startT = Math.Round(raw.StartTime).ToString(cultureInfo);
             var endT = raw.StartTime.Equals(raw.EndTime) ? "" : Math.Round(raw.EndTime).ToString(cultureInfo);
@@ -77,17 +79,17 @@ namespace Coosu.Storyboard.Extensibility
             }
 
             var easing = EasingConvert.ToEasing(split[1]);
-            var startTime = float.Parse(split[2]);
-            var endTime = string.IsNullOrWhiteSpace(split[3]) ? startTime : float.Parse(split[3]);
+            var startTime = double.Parse(split[2]);
+            var endTime = string.IsNullOrWhiteSpace(split[3]) ? startTime : double.Parse(split[3]);
 
-            var start = new float[ParameterDimension];
-            var end = new float[ParameterDimension];
+            var start = new double[ParameterDimension];
+            var end = new double[ParameterDimension];
             if (paramLength == ParameterDimension)
             {
                 int j = 4;
                 for (int i = 0; i < ParameterDimension; i++, j++)
                 {
-                    start[i] = float.Parse(split[j]);
+                    start[i] = double.Parse(split[j]);
                 }
 
                 start.CopyTo(end, 0);
@@ -97,27 +99,16 @@ namespace Coosu.Storyboard.Extensibility
                 int j = 4;
                 for (int i = 0; i < ParameterDimension; i++, j++)
                 {
-                    start[i] = float.Parse(split[j]);
+                    start[i] = double.Parse(split[j]);
                 }
 
                 for (int i = 0; i < ParameterDimension; i++, j++)
                 {
-                    end[i] = float.Parse(split[j]);
+                    end[i] = double.Parse(split[j]);
                 }
             }
 
             return new T { Easing = easing, StartTime = startTime, EndTime = endTime, Start = start, End = end };
-        }
-    }
-
-    public class EasingConvert
-    {
-        public static EasingType ToEasing(string s)
-        {
-            var easing = int.Parse(s);
-            if (easing > 34 || easing < 0)
-                throw new FormatException("Unknown easing");
-            return (EasingType)easing;
         }
     }
 }

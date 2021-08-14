@@ -1,34 +1,36 @@
-﻿namespace Coosu.Storyboard.Events
+﻿using Coosu.Storyboard.Common;
+
+namespace Coosu.Storyboard.Events
 {
-    public sealed class Move : CommonEvent, IAdjustablePositionEvent
+    public sealed class Move : CommonEvent, IPositionAdjustable
     {
         public override EventType EventType => EventTypes.Move;
 
-        public float StartX
+        public double StartX
         {
             get => Start[0];
             set => Start[0] = value;
         }
 
-        public float StartY
+        public double StartY
         {
             get => Start[1];
             set => Start[1] = value;
         }
 
-        public float EndX
+        public double EndX
         {
             get => End[0];
             set => End[0] = value;
         }
 
-        public float EndY
+        public double EndY
         {
             get => End[1];
             set => End[1] = value;
         }
 
-        public Move(EasingType easing, float startTime, float endTime, float x1, float y1, float x2, float y2) :
+        public Move(EasingType easing, double startTime, double endTime, double x1, double y1, double x2, double y2) :
             base(easing, startTime, endTime, new[] { x1, y1 }, new[] { x2, y2 })
         {
 
@@ -38,7 +40,7 @@
         {
         }
 
-        public void AdjustPosition(float x, float y)
+        public void AdjustPosition(double x, double y)
         {
             Start[0] += x;
             Start[1] += y;

@@ -2,16 +2,16 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net472;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>net5.0</TargetFrameworks>
   </PropertyGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\Coosu.Api\Coosu.Api.csproj" />
-    <ProjectReference Include="..\..\Coosu.Beatmap\Coosu.Beatmap.csproj" />
-  </ItemGroup>
 
   <ItemGroup Condition="$(TargetFramework) == net472">
     <Reference Include="System.Net.Http" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Coosu.Storyboard.Extensions\Coosu.Storyboard.Extensions.csproj" />
+    <ProjectReference Include="..\..\Coosu.Storyboard\Coosu.Storyboard.csproj" />
   </ItemGroup>
 
 </Project>

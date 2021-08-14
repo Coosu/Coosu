@@ -17,7 +17,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Coosu.Storyboard\Coosu.Storyboard.csproj" />
+    <ProjectReference Include="..\Coosu.Storyboard.Extensions\Coosu.Storyboard.Extensions.csproj" />
   </ItemGroup>
 
 </Project>

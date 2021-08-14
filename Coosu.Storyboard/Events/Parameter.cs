@@ -1,5 +1,6 @@
-﻿using System;
-using System.Globalization;
+﻿using System.IO;
+using System.Threading.Tasks;
+using Coosu.Storyboard.Utils;
 
 namespace Coosu.Storyboard.Events
 {
@@ -20,10 +21,13 @@ namespace Coosu.Storyboard.Events
             }
         }
 
-        protected override string Script => Type.ToShortString();
+        protected override async Task WriteExtraScriptAsync(TextWriter writer)
+        {
+            await writer.WriteAsync(Type.ToShortString());
+        }
 
-        public Parameter(EasingType easing, float startTime, float endTime, ParameterType type) :
-            base(easing, startTime, endTime, new float[] { (int)type }, new float[] { (int)type })
+        public Parameter(EasingType easing, double startTime, double endTime, ParameterType type) :
+            base(easing, startTime, endTime, new double[] { (int)type }, new double[] { (int)type })
         {
             Easing = EasingType.Linear;
         }

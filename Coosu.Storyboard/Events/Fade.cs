@@ -4,19 +4,19 @@
     {
         public override EventType EventType => EventTypes.Fade;
 
-        public float StartOpacity
+        public double StartOpacity
         {
             get => Start[0];
             set => Start[0] = value;
         }
 
-        public float EndOpacity
+        public double EndOpacity
         {
             get => End[0];
             set => End[0] = value;
         }
 
-        public Fade(EasingType easing, float startTime, float endTime, float f1, float f2)
+        public Fade(EasingType easing, double startTime, double endTime, double f1, double f2)
             : base(easing, startTime, endTime, new[] { f1 }, new[] { f2 })
         {
         }
