@@ -5,7 +5,7 @@ namespace Coosu.Storyboard.Utils
 {
     public static class EventHostExtensions
     {
-        public static void Adjust(this IEventHost eventHost, double offsetX, double offsetY, int offsetTiming)
+        public static void Adjust(this IEventHost eventHost, double offsetX, double offsetY, double offsetTiming)
         {
             if (eventHost is ISceneObject iso)
             {

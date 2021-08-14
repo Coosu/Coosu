@@ -9,12 +9,21 @@ using Coosu.Storyboard.Utils;
 
 namespace Coosu.Storyboard
 {
-    public class Layer : IDisposable, IScriptable
+    public class Layer : IScriptable, IAdjustable
     {
-        public void Dispose() { }
-
         public double ZDistance { get; set; }
-        public Layer(double zDistance) => ZDistance = zDistance;
+        public string Name { get; set; }
+        public Layer(string name = "Layer")
+        {
+            ZDistance = 1;
+            Name = name;
+        }
+
+        public Layer(double zDistance, string name = "Layer")
+        {
+            ZDistance = zDistance;
+            Name = name;
+        }
 
         public List<ISceneObject> SceneObjects { get; set; } = new();
 
@@ -123,19 +132,26 @@ namespace Coosu.Storyboard
             SceneObjects.AddRange(sprites);
         }
 
-        //public void ExecuteBrew(StoryboardLayer layParsed)
-        //{
-        //    throw new NotImplementedException();
-        //    foreach (var lib in ElementList)
-        //    {
-        //        lib.ExecuteBrew(layParsed);
-        //    }
-        //}
+        public void AdjustTiming(double offset)
+        {
+            foreach (var sceneObject in SceneObjects)
+            {
+                sceneObject.Adjust(0, 0, offset);
+            }
+        }
+
+        public void AdjustPosition(double x, double y)
+        {
+            foreach (var sceneObject in SceneObjects)
+            {
+                sceneObject.Adjust(x, y, 0);
+            }
+        }
 
         public async Task WriteHeaderAsync(TextWriter writer)
         {
             await writer.WriteAsync("Layer: ");
-            await writer.WriteAsync(ZDistance);
+            await writer.WriteAsync(Name);
         }
 
         public async Task WriteScriptAsync(TextWriter writer)

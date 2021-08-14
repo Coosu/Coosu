@@ -17,7 +17,7 @@ namespace Coosu.Storyboard.OsbX
             HandlerRegister.RegisterSubject(new Camera2Handler());
         }
 
-        public static async Task<string> SerializeObjectAsync(VirtualLayerManager manager)
+        public static async Task<string> SerializeObjectAsync(Scene manager)
         {
             var sb = new StringBuilder();
             foreach (var @group in manager.Layers.Values)
@@ -92,7 +92,7 @@ namespace Coosu.Storyboard.OsbX
             return sb.ToString().TrimEnd('\n', '\r');
         }
 
-        public static async Task<VirtualLayerManager> DeserializeObjectAsync(TextReader reader)
+        public static async Task<Scene> DeserializeObjectAsync(TextReader reader)
         {
             ISubjectParsingHandler lastSubjectHandler = null;
             IEventHost lastSubject = null;
@@ -100,7 +100,7 @@ namespace Coosu.Storyboard.OsbX
             var line = await reader.ReadLineAsync();
             int l = 0;
 
-            var em = new VirtualLayerManager();
+            var em = new Scene();
 
             while (line != null)
             {
