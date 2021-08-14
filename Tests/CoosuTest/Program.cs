@@ -14,7 +14,10 @@ namespace CoosuTest
         static async Task Main(string[] args)
         {
             var text = await File.ReadAllTextAsync(
-                @"D:\GitHub\ReOsuStoryboardPlayer\ReOsuStoryboardPlayer.Core.UnitTest\TestData\Denkishiki Karen Ongaku Shuudan - Gareki no Yume (Dored).osb");
+                "E:\\Games\\osu!\\Songs\\" +
+                "1037741 Denkishiki Karen Ongaku Shuudan - Gareki no Yume\\" +
+                "Denkishiki Karen Ongaku Shuudan - Gareki no Yume (Dored).osb"
+            );
             //var text = await File.ReadAllTextAsync(
             //    @"C:\Users\milkitic\Desktop\optimizer not well\huge timing.txt");
             //var text = await File.ReadAllTextAsync(
@@ -28,14 +31,10 @@ namespace CoosuTest
         private static async Task OutputNewOsb(string text)
         {
             var layer = await VirtualLayer.ParseAsyncTextAsync(text);
-            var g = new SpriteCompressor(layer);
-            g.ErrorOccured = (s, e) =>
+            var g = new SpriteCompressor(layer)
             {
-                Console.WriteLine(e.Message);
-            };
-            g.SituationFound = (s, e) =>
-            {
-                Console.WriteLine(e.Message);
+                ErrorOccured = (s, e) => { Console.WriteLine(e.Message); },
+                //SituationFound = (s, e) => { Console.WriteLine(e.Message); }
             };
             await g.CompressAsync();
             await layer.SaveScriptAsync(Path.Combine(Environment.CurrentDirectory, "output_new.osb"));
