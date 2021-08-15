@@ -59,3 +59,4 @@ jobs:
         PROJECT_FILE_PATH: ${{ env.ProjectName }}/${{ env.ProjectName }}.csproj
         VERSION_STATIC: ${{ steps.version.outputs.version }}
         NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+        TAG_COMMIT: false
