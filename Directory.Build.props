@@ -3,4 +3,10 @@
         <LangVersion>9.0</LangVersion>
         <nullable>enable</nullable>
     </PropertyGroup>
+
+  <PropertyGroup Label="MinVerSetting">
+    <MinVerTagPrefix>v</MinVerTagPrefix>
+    <MinVerMinimumMajorMinor>1.0</MinVerMinimumMajorMinor>
+  </PropertyGroup>
+  
 </Project>

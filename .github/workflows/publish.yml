@@ -1,0 +1,118 @@
+name: publish
+env:
+  7zCommand: 7z a -mx9 -mfb=273 -ms -md=31 -myx=9 -mtm=- -mmt -mmtf -md=1536m -mmf=bt3 -mmc=10000 -mpb=0 -mlc=0
+on:
+  create:
+    tags:
+      - "v*.*.*"
+  
+jobs:
+  build:
+    name: Build and Release
+    if: ${{ StartsWith(github.ref, 'refs/tags/') }}
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+        
+    - name: Restore dependencies
+      run: dotnet restore
+      
+    - name: dotnet Publish
+      run: |
+        echo ${{ github.ref }}      
+        dotnet publish Coosu.Shared --no-restore --no-self-contained --configuration Release --output ci-publish
+        dotnet publish Coosu.Storyboard --no-restore --no-self-contained --configuration Release --output ci-publish
+        dotnet publish Coosu.Storyboard.Extensions --no-restore --no-self-contained --configuration Release --output ci-publish
+        dotnet publish Coosu.Storyboard.OsbX --no-restore --no-self-contained --configuration Release --output ci-publish
+        dotnet publish Coosu.Beatmap --no-restore --no-self-contained --configuration Release --output ci-publish
+        dotnet publish Coosu.Api --no-restore --no-self-contained --configuration Release --output ci-publish
+        
+    - name: action-minver
+      uses: thefringeninja/action-minver@2.0.0-preview1
+      id: version
+      with:
+        tag-prefix: v
+        minimum-major-minor: 1.0
+        
+    - name: Pack via 7z
+      if: ${{ success() && startsWith(github.ref, 'refs/tags/') }}
+      run: |
+        mkdir -p ./ci-pack/
+        ${{ env.7zCommand }} "./ci-pack/Coosu.Shared-v${{ steps.version.outputs.version }}.7z" "./ci-publish/*" -r
+        ${{ env.7zCommand }} "./ci-pack/Coosu.Storyboard-v${{ steps.version.outputs.version }}.7z" "./ci-publish/*" -r
+        ${{ env.7zCommand }} "./ci-pack/Coosu.Storyboard.Extensions-v${{ steps.version.outputs.version }}.7z" "./ci-publish/*" -r
+        ${{ env.7zCommand }} "./ci-pack/Coosu.Storyboard.OsbX-v${{ steps.version.outputs.version }}.7z" "./ci-publish/*" -r
+        ${{ env.7zCommand }} "./ci-pack/Coosu.Beatmap-v${{ steps.version.outputs.version }}.7z" "./ci-publish/*" -r
+        ${{ env.7zCommand }} "./ci-pack/Coosu.Api-v${{ steps.version.outputs.version }}.7z" "./ci-publish/*" -r
+      
+    - name: Create a new GitHub release if a new tag is pushed
+      uses: softprops/action-gh-release@v1
+      if: ${{ success() && startsWith(github.ref, 'refs/tags/') }}
+      env:
+        GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      with:
+        name: Coosu-v${{ steps.version.outputs.version }}
+        prerelease: true
+        draft: false
+        files: |
+          ./ci-pack/Coosu.Shared-v${{ steps.version.outputs.version }}.7z
+          ./ci-pack/Coosu.Storyboard-v${{ steps.version.outputs.version }}.7z
+          ./ci-pack/Coosu.Storyboard.Extensions-v${{ steps.version.outputs.version }}.7z
+          ./ci-pack/Coosu.Storyboard.OsbX-v${{ steps.version.outputs.version }}.7z
+          ./ci-pack/Coosu.Beatmap-v${{ steps.version.outputs.version }}.7z
+          ./ci-pack/Coosu.Api-v${{ steps.version.outputs.version }}.7z
+
+    - name: Nuget Publish Coosu.Shared
+      uses: brandedoutcast/publish-nuget@v2.5.2
+      with:
+        PROJECT_FILE_PATH: Coosu.Shared/Coosu.Shared.csproj
+        VERSION_STATIC: ${{ steps.version.outputs.version }}
+        NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+        TAG_COMMIT: false
+
+    - name: Nuget Publish Coosu.Storyboard
+      uses: brandedoutcast/publish-nuget@v2.5.2
+      with:
+        PROJECT_FILE_PATH: Coosu.Storyboard/Coosu.Storyboard.csproj
+        VERSION_STATIC: ${{ steps.version.outputs.version }}
+        NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+        TAG_COMMIT: false
+
+    - name: Nuget Publish Coosu.Storyboard.Extensions
+      uses: brandedoutcast/publish-nuget@v2.5.2
+      with:
+        PROJECT_FILE_PATH: Coosu.Storyboard.Extensions/Coosu.Storyboard.Extensions.csproj
+        VERSION_STATIC: ${{ steps.version.outputs.version }}
+        NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+        TAG_COMMIT: false
+
+    - name: Nuget Publish Coosu.Storyboard.OsbX
+      uses: brandedoutcast/publish-nuget@v2.5.2
+      with:
+        PROJECT_FILE_PATH: Coosu.Storyboard.OsbX/Coosu.Storyboard.OsbX.csproj
+        VERSION_STATIC: ${{ steps.version.outputs.version }}
+        NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+        TAG_COMMIT: false
+
+    - name: Nuget Publish Coosu.Beatmap
+      uses: brandedoutcast/publish-nuget@v2.5.2
+      with:
+        PROJECT_FILE_PATH: Coosu.Beatmap/Coosu.Beatmap.csproj
+        VERSION_STATIC: ${{ steps.version.outputs.version }}
+        NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+        TAG_COMMIT: false
+
+    - name: Nuget Publish Coosu.Api
+      uses: brandedoutcast/publish-nuget@v2.5.2
+      with:
+        PROJECT_FILE_PATH: Coosu.Api/Coosu.Api.csproj
+        VERSION_STATIC: ${{ steps.version.outputs.version }}
+        NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+        TAG_COMMIT: false
