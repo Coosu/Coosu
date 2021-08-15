@@ -2,11 +2,17 @@
     <PropertyGroup>
         <LangVersion>9.0</LangVersion>
         <nullable>enable</nullable>
+        <Authors>Coosu</Authors>
+        <PackageProjectUrl>https://github.com/Coosu/Coosu</PackageProjectUrl>
+        <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <Copyright>Copyright © Coosu 2021</Copyright>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
 
   <PropertyGroup Label="MinVerSetting">
     <MinVerTagPrefix>v</MinVerTagPrefix>
     <MinVerMinimumMajorMinor>1.0</MinVerMinimumMajorMinor>
   </PropertyGroup>
-  
+
 </Project>
