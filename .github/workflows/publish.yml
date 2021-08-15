@@ -25,12 +25,12 @@ jobs:
     - name: dotnet Publish
       run: |
         echo ${{ github.ref }}      
-        dotnet publish Coosu.Shared --no-self-contained --configuration Release --output ci-publish
-        dotnet publish Coosu.Storyboard --no-self-contained --configuration Release --output ci-publish
-        dotnet publish Coosu.Storyboard.Extensions --no-self-contained --configuration Release --output ci-publish
-        dotnet publish Coosu.Storyboard.OsbX --no-self-contained --configuration Release --output ci-publish
-        dotnet publish Coosu.Beatmap --no-self-contained --configuration Release --output ci-publish
-        dotnet publish Coosu.Api --no-self-contained --configuration Release --output ci-publish
+        dotnet publish Coosu.Shared --no-self-contained --configuration Release --output ci-publish-Coosu.Shared
+        dotnet publish Coosu.Storyboard --no-self-contained --configuration Release --output ci-publish-Coosu.Storyboard
+        dotnet publish Coosu.Storyboard.Extensions --no-self-contained --configuration Release --output ci-publish-Coosu.Storyboard.Extensions
+        dotnet publish Coosu.Storyboard.OsbX --no-self-contained --configuration Release --output ci-publish-Coosu.Storyboard.OsbX
+        dotnet publish Coosu.Beatmap --no-self-contained --configuration Release --output ci-publish-Coosu.Beatmap
+        dotnet publish Coosu.Api --no-self-contained --configuration Release --output ci-publish-Coosu.Api
         
     - name: action-minver
       uses: thefringeninja/action-minver@2.0.0-preview1
@@ -43,12 +43,12 @@ jobs:
       if: ${{ success() && startsWith(github.ref, 'refs/tags/') }}
       run: |
         mkdir -p ./ci-pack/
-        7z a "./ci-pack/Coosu.Shared-v${{ steps.version.outputs.version }}.7z" "./ci-publish/*" -r
-        7z a "./ci-pack/Coosu.Storyboard-v${{ steps.version.outputs.version }}.7z" "./ci-publish/*" -r
-        7z a "./ci-pack/Coosu.Storyboard.Extensions-v${{ steps.version.outputs.version }}.7z" "./ci-publish/*" -r
-        7z a "./ci-pack/Coosu.Storyboard.OsbX-v${{ steps.version.outputs.version }}.7z" "./ci-publish/*" -r
-        7z a "./ci-pack/Coosu.Beatmap-v${{ steps.version.outputs.version }}.7z" "./ci-publish/*" -r
-        7z a "./ci-pack/Coosu.Api-v${{ steps.version.outputs.version }}.7z" "./ci-publish/*" -r
+        7z a "./ci-pack/Coosu.Shared-v${{ steps.version.outputs.version }}.7z" "./ci-publish-Coosu.Shared/*" -r
+        7z a "./ci-pack/Coosu.Storyboard-v${{ steps.version.outputs.version }}.7z" "./ci-publish-Coosu.Storyboard/*" -r
+        7z a "./ci-pack/Coosu.Storyboard.Extensions-v${{ steps.version.outputs.version }}.7z" "./ci-publish-Coosu.Storyboard.Extensions/*" -r
+        7z a "./ci-pack/Coosu.Storyboard.OsbX-v${{ steps.version.outputs.version }}.7z" "./ci-publish-Coosu.Storyboard.OsbX/*" -r
+        7z a "./ci-pack/Coosu.Beatmap-v${{ steps.version.outputs.version }}.7z" "./ci-publish-Coosu.Beatmap/*" -r
+        7z a "./ci-pack/Coosu.Api-v${{ steps.version.outputs.version }}.7z" "./ci-publish-Coosu.Api/*" -r
       
     - name: Create a new GitHub release if a new tag is pushed
       uses: softprops/action-gh-release@v1
