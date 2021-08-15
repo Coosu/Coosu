@@ -1,11 +1,11 @@
-name: Publish Coosu.Storyboard.Extensions
+name: Publish Coosu.Shared
 env:
-  ProjectName: Coosu.Storyboard.Extensions
-  TagPrefix: storyboard.extensions-v
+  ProjectName: Coosu.Shared
+  TagPrefix: shared-v
 on:
   create:
     tags:
-      - "storyboard.extensions-v*.*.*"
+      - "shared-v*.*.*"
   
 jobs:
   build:
