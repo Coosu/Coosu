@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
-using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
 using Coosu.Storyboard;
+using Coosu.Storyboard.Extensions;
 using Coosu.Storyboard.Extensions.Optimizing;
 
 namespace CoosuTest
@@ -13,19 +12,18 @@ namespace CoosuTest
     {
         static async Task Main(string[] args)
         {
-            var text = await File.ReadAllTextAsync(
-                "E:\\Games\\osu!\\Songs\\" +
-                "1037741 Denkishiki Karen Ongaku Shuudan - Gareki no Yume\\" +
-                "Denkishiki Karen Ongaku Shuudan - Gareki no Yume (Dored).osb"
-            );
+            var layer = new Layer();
+            var sprite = layer.CreateSprite("sb");
+            sprite.MoveXBy(0, 300, 100);
+            var compressor = new SpriteCompressor(layer);
+            await compressor.CompressAsync();
             //var text = await File.ReadAllTextAsync(
-            //    @"C:\Users\milkitic\Desktop\optimizer not well\huge timing.txt");
-            //var text = await File.ReadAllTextAsync(
-            //    @"C:\Users\milkitic\Desktop\optimizer not well\should not del first F.txt");
-            //var text = await File.ReadAllTextAsync(
-            //    @"C:\Users\milkitic\Desktop\optimizer not well\wtf.txt");
-            await OutputNewOsb(text);
-            await OutputOldOsb(text);
+            //    "E:\\Games\\osu!\\Songs\\" +
+            //    "1037741 Denkishiki Karen Ongaku Shuudan - Gareki no Yume\\" +
+            //    "Denkishiki Karen Ongaku Shuudan - Gareki no Yume (Dored).osb"
+            //);
+            //await OutputNewOsb(text);
+            //await OutputOldOsb(text);
         }
 
         private static async Task OutputNewOsb(string text)
