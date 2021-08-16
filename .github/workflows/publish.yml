@@ -70,8 +70,8 @@ jobs:
           ./ci-pack/Coosu.Storyboard.${{ steps.version.outputs.version }}.nupkg
           ./ci-pack/Coosu.Storyboard.Extensions.${{ steps.version.outputs.version }}.nupkg
           ./ci-pack/Coosu.Storyboard.OsbX.${{ steps.version.outputs.version }}.nupkg
-          ./ci-pack/Coosu.Beatmap.{{ steps.version.outputs.version }}.nupkg
-          ./ci-pack/Coosu.Api.{{ steps.version.outputs.version }}.nupkg
+          ./ci-pack/Coosu.Beatmap.${{ steps.version.outputs.version }}.nupkg
+          ./ci-pack/Coosu.Api.${{ steps.version.outputs.version }}.nupkg
           ./ci-7zpack/Coosu.Storyboard.Extensions-ILMerged.${{ steps.version.outputs.version }}.7z
 
     - name: Nuget Publish Coosu.Shared
