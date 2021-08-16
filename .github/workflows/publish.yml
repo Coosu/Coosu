@@ -8,7 +8,7 @@ jobs:
   build:
     name: Build and Release
     if: ${{ StartsWith(github.ref, 'refs/tags/') }}
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
     - name: Checkout code
@@ -39,12 +39,13 @@ jobs:
         dotnet pack Coosu.Api --configuration Release --output ci-pack
       
     - name: dotnet Build Coosu.Storyboard.Extensions ILMerged 
+      shell: pwsh
       run: |
-        dotnet add Coosu.Storyboard.Extensions package Costura.Fody
         dotnet build Coosu.Storyboard.Extensions --configuration Release --output ci-build-Coosu.Storyboard.Extensions
-        rm ci-build-Coosu.Storyboard.Extensions/Coosu.Shared.*
-        rm ci-build-Coosu.Storyboard.Extensions/Coosu.Storyboard.pdb
-        rm ci-build-Coosu.Storyboard.Extensions/Coosu.Storyboard.d*
+        mkdir ILMerge -Force
+        Invoke-WebRequest https://github.com/Milkitic/ILMerge/releases/download/3.0.41.49566/ILMerge-Windows.7z -OutFile "ILMerge/cli.zip"
+        7z x "ILMerge/cli.zip" -oILMerge/
+        .\ILMerge\ILMerge.exe .\ci-build-Coosu.Storyboard.Extensions\Coosu.Shared.dll .\ci-build-Coosu.Storyboard.Extensions\Coosu.Storyboard.dll .\ci-build-Coosu.Storyboard.Extensions\Coosu.Storyboard.Extensions.dll /t:library /out:Coosu.Storyboard.Extensions-ILMerged.dll
         
     - name: action-minver
       uses: thefringeninja/action-minver@2.0.0-preview1
@@ -57,7 +58,7 @@ jobs:
       if: ${{ success() && startsWith(github.ref, 'refs/tags/') }}
       run: |
         mkdir -p ./ci-7zpack/
-        7z a "./ci-7zpack/Coosu.Storyboard.Extensions-ILMerged.${{ steps.version.outputs.version }}.7z" "./ci-build-Coosu.Storyboard.Extensions/*" -r
+        7z a "./ci-7zpack/Coosu.Storyboard.Extensions-ILMerged.${{ steps.version.outputs.version }}.7z" "./Coosu.Storyboard.Extensions-ILMerged.*"
       
     - name: Create a new GitHub release if a new tag is pushed
       uses: softprops/action-gh-release@v1
