@@ -42,6 +42,9 @@ jobs:
       run: |
         dotnet add Coosu.Storyboard.Extensions package Costura.Fody
         dotnet build Coosu.Storyboard.Extensions --configuration Release --output ci-build-Coosu.Storyboard.Extensions
+        rm ci-build-Coosu.Storyboard.Extensions/Coosu.Shared.*
+        rm ci-build-Coosu.Storyboard.Extensions/Coosu.Storyboard.pdb
+        rm ci-build-Coosu.Storyboard.Extensions/Coosu.Storyboard.d*
         
     - name: action-minver
       uses: thefringeninja/action-minver@2.0.0-preview1
