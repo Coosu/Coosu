@@ -22,15 +22,20 @@ jobs:
     #- name: Restore dependencies
     #  run: dotnet restore
       
-    - name: dotnet Publish
+    - name: dotnet pack
       run: |
         echo ${{ github.ref }}      
-        dotnet publish Coosu.Shared --no-self-contained --configuration Release --output ci-publish-Coosu.Shared
-        dotnet publish Coosu.Storyboard --no-self-contained --configuration Release --output ci-publish-Coosu.Storyboard
-        dotnet publish Coosu.Storyboard.Extensions --no-self-contained --configuration Release --output ci-publish-Coosu.Storyboard.Extensions
-        dotnet publish Coosu.Storyboard.OsbX --no-self-contained --configuration Release --output ci-publish-Coosu.Storyboard.OsbX
-        dotnet publish Coosu.Beatmap --no-self-contained --configuration Release --output ci-publish-Coosu.Beatmap
-        dotnet publish Coosu.Api --no-self-contained --configuration Release --output ci-publish-Coosu.Api
+        dotnet pack Coosu.Shared --configuration Release --output ci-pack
+        dotnet pack Coosu.Storyboard --configuration Release --output ci-pack
+        dotnet pack Coosu.Storyboard.Extensions --configuration Release --output ci-pack
+        dotnet pack Coosu.Storyboard.OsbX --configuration Release --output ci-pack
+        dotnet pack Coosu.Beatmap --configuration Release --output ci-pack
+        dotnet pack Coosu.Api --configuration Release --output ci-pack
+      
+    - name: dotnet Build Coosu.Storyboard.Extensions ILMerged 
+      run: |
+        dotnet add Coosu.Storyboard.Extensions package Costura.Fody
+        dotnet build Coosu.Storyboard.Extensions --configuration Release --output ci-build-Coosu.Storyboard.Extensions
         
     - name: action-minver
       uses: thefringeninja/action-minver@2.0.0-preview1
@@ -42,13 +47,8 @@ jobs:
     - name: Pack via 7z
       if: ${{ success() && startsWith(github.ref, 'refs/tags/') }}
       run: |
-        mkdir -p ./ci-pack/
-        7z a "./ci-pack/Coosu.Shared-v${{ steps.version.outputs.version }}.7z" "./ci-publish-Coosu.Shared/*" -r
-        7z a "./ci-pack/Coosu.Storyboard-v${{ steps.version.outputs.version }}.7z" "./ci-publish-Coosu.Storyboard/*" -r
-        7z a "./ci-pack/Coosu.Storyboard.Extensions-v${{ steps.version.outputs.version }}.7z" "./ci-publish-Coosu.Storyboard.Extensions/*" -r
-        7z a "./ci-pack/Coosu.Storyboard.OsbX-v${{ steps.version.outputs.version }}.7z" "./ci-publish-Coosu.Storyboard.OsbX/*" -r
-        7z a "./ci-pack/Coosu.Beatmap-v${{ steps.version.outputs.version }}.7z" "./ci-publish-Coosu.Beatmap/*" -r
-        7z a "./ci-pack/Coosu.Api-v${{ steps.version.outputs.version }}.7z" "./ci-publish-Coosu.Api/*" -r
+        mkdir -p ./ci-7zpack/
+        7z a "./ci-7zpack/Coosu.Storyboard.Extensions-ILMerged.${{ steps.version.outputs.version }}.7z" "./ci-build-Coosu.Storyboard.Extensions/*" -r
       
     - name: Create a new GitHub release if a new tag is pushed
       uses: softprops/action-gh-release@v1
@@ -56,16 +56,17 @@ jobs:
       env:
         GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
       with:
-        name: Coosu-v${{ steps.version.outputs.version }}
+        name: v${{ steps.version.outputs.version }}
         prerelease: true
         draft: false
         files: |
-          ./ci-pack/Coosu.Shared-v${{ steps.version.outputs.version }}.7z
-          ./ci-pack/Coosu.Storyboard-v${{ steps.version.outputs.version }}.7z
-          ./ci-pack/Coosu.Storyboard.Extensions-v${{ steps.version.outputs.version }}.7z
-          ./ci-pack/Coosu.Storyboard.OsbX-v${{ steps.version.outputs.version }}.7z
-          ./ci-pack/Coosu.Beatmap-v${{ steps.version.outputs.version }}.7z
-          ./ci-pack/Coosu.Api-v${{ steps.version.outputs.version }}.7z
+          ./ci-pack/Coosu.Shared.${{ steps.version.outputs.version }}.nupkg
+          ./ci-pack/Coosu.Storyboard.${{ steps.version.outputs.version }}.nupkg
+          ./ci-pack/Coosu.Storyboard.Extensions.${{ steps.version.outputs.version }}.nupkg
+          ./ci-pack/Coosu.Storyboard.OsbX.${{ steps.version.outputs.version }}.nupkg
+          ./ci-pack/Coosu.Beatmap.{{ steps.version.outputs.version }}.nupkg
+          ./ci-pack/Coosu.Api.{{ steps.version.outputs.version }}.nupkg
+          ./ci-7zpack/Coosu.Storyboard.Extensions-ILMerged.${{ steps.version.outputs.version }}.7z
 
     - name: Nuget Publish Coosu.Shared
       uses: brandedoutcast/publish-nuget@v2.5.2

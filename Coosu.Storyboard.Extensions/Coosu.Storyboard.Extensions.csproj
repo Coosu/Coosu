@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <Description>Coosu.Storyboard is library to read and write osu!storyboard data of .osb file. This package includes useful utilities like optimizing osb scripts.</Description>
   </PropertyGroup>
 
