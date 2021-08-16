@@ -7,7 +7,6 @@
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <Copyright>Copyright © Coosu 2021</Copyright>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
 
   <PropertyGroup Label="MinVerSetting">
