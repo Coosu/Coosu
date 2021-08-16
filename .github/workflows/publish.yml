@@ -25,6 +25,12 @@ jobs:
     - name: dotnet pack
       run: |
         echo ${{ github.ref }}      
+        dotnet build Coosu.Shared --configuration Release
+        dotnet build Coosu.Storyboard --configuration Release
+        dotnet build Coosu.Storyboard.Extensions --configuration Release
+        dotnet build Coosu.Storyboard.OsbX --configuration Release
+        dotnet build Coosu.Beatmap --configuration Release
+        dotnet build Coosu.Api --configuration Release
         dotnet pack Coosu.Shared --configuration Release --output ci-pack
         dotnet pack Coosu.Storyboard --configuration Release --output ci-pack
         dotnet pack Coosu.Storyboard.Extensions --configuration Release --output ci-pack
