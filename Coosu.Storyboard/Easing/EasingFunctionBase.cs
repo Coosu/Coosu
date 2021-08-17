@@ -46,6 +46,27 @@ namespace Coosu.Storyboard.Easing
         public abstract EasingType? TryGetEasingType();
 
         protected abstract double EaseInCore(double normalizedTime);
+
+        public static implicit operator EasingFunctionBase(EasingType easing)
+        {
+            var easingFunction = easing.ToEasingFunction();
+            return easingFunction as EasingFunctionBase
+                   ?? throw new Exception("The target class " + easingFunction.GetType() +
+                                          " should be inherited by \"" + nameof(EasingFunctionBase) + "\"");
+        }
+
+        public static implicit operator EasingFunctionBase(int easingIndex)
+        {
+            if (!Enum.IsDefined(EasingTypeT, easingIndex))
+                throw new ArgumentOutOfRangeException(nameof(easingIndex), easingIndex, null);
+            var easing = (EasingType)easingIndex;
+            var easingFunction = easing.ToEasingFunction();
+            return easingFunction as EasingFunctionBase
+                   ?? throw new Exception("The target class " + easingFunction.GetType() +
+                                          " should be inherited by \"" + nameof(EasingFunctionBase) + "\"");
+        }
+
+        private static readonly Type EasingTypeT = typeof(EasingType);
     }
 
     public static class EasingFunctionExtensions

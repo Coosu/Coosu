@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Coosu.Storyboard;
@@ -16,14 +15,18 @@ namespace CoosuTest
         {
             var layer = new Layer();
             var sprite = layer.CreateSprite("sb");
+            sprite.Fade(0, 0, 300, 0, 1);
             sprite.MoveX(EasingType.BackIn, 0, 300, 320, 240);
             sprite.MoveY(new PowerEase(), 0, 300, 320, 240);
             sprite.MoveXBy(0, 300, 100);
-            sprite.VectorBy(0, 300, 1.2, 1);
-            var type = sprite.Events.First().Easing;
-            var t = type.GetEasingType();
-            var compressor = new SpriteCompressor(layer);
-            await compressor.CompressAsync();
+            sprite.VectorBy(new ElasticEase
+            {
+                EasingMode = EasingMode.EaseOut,
+                Oscillations = 5,
+                Springiness = 3d * 2
+            }, 0, 300, 1.2, 1);
+            //var compressor = new SpriteCompressor(layer);
+            //await compressor.CompressAsync();
             await layer.WriteScriptAsync(Console.Out);
             return;
             var text = await File.ReadAllTextAsync(
