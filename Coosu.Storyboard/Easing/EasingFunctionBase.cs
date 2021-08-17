@@ -1,10 +1,14 @@
 ﻿using System;
+using System.Diagnostics;
 using static Coosu.Storyboard.EasingType;
 
 namespace Coosu.Storyboard.Easing
 {
+    [DebuggerDisplay("{DebuggerDisplay}")]
     public abstract class EasingFunctionBase : IEasingFunction
     {
+        private string DebuggerDisplay => GetDescription();
+
         public EasingMode EasingMode { get; init; }
 
         public double Ease(double normalizedTime)
@@ -21,15 +25,23 @@ namespace Coosu.Storyboard.Easing
 
         public string GetDescription()
         {
-            return GetType().Name + EasingMode.ToString().Substring(4);
+            var s = TryGetEasingType()?.ToString();
+            if (s != null) return s;
+
+            var name = GetType().Name;
+            return "Variant " + name.Substring(0, name.Length - 4) + EasingMode.ToString().Substring(4);
         }
 
         public EasingType GetEasingType()
         {
             var easingType = TryGetEasingType();
             if (easingType == null)
+            {
                 Console.WriteLine("The target easing is not standard storyboard easing, use \"Linear\" instead.");
-            return Linear;
+                return Linear;
+            }
+
+            return easingType.Value;
         }
         public abstract EasingType? TryGetEasingType();
 

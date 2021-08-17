@@ -14,13 +14,8 @@ namespace Coosu.Storyboard.Extensions
     {
         private string DebuggerDisplay => this.GetHeaderString();
         public EventType EventType { get; }
-        public IEasingFunction Easing { get; set; }
 
-        IEasingFunction ICommonEvent.Easing
-        {
-            get => throw new NotImplementedException();
-            set => throw new NotImplementedException();
-        }
+        public IEasingFunction Easing { get; set; }
 
         public double StartTime { get; set; }
         public double EndTime { get; set; }
@@ -42,9 +37,11 @@ namespace Coosu.Storyboard.Extensions
 
         public async Task WriteHeaderAsync(TextWriter writer)
         {
-            await writer.WriteAsync("(Relative) " + EventType.Flag.TrimEnd('c'));
+            //await writer.WriteAsync("(Relative) " + EventType.Flag.TrimEnd('c'));
+            await writer.WriteAsync(EventType.Flag);
             await writer.WriteAsync(',');
-            await writer.WriteAsync(Easing.GetDescription());
+            var typeStr = ((int?)Easing.TryGetEasingType())?.ToString() ?? "?";
+            await writer.WriteAsync(typeStr);
             await writer.WriteAsync(" [");
             await writer.WriteAsync(Math.Round(StartTime));
             await writer.WriteAsync(",");

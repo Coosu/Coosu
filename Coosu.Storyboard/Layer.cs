@@ -369,7 +369,7 @@ namespace Coosu.Storyboard
 
                 int easing = int.MinValue, startTime = int.MinValue, endTime = int.MinValue;
 
-                if (EventType.IsCommonEvent(identifier))
+                if (EventTypes.IsCommonEvent(identifier))
                 {
                     easing = int.Parse(@params[1]);
                     if (easing is > 34 or < 0)
@@ -391,7 +391,7 @@ namespace Coosu.Storyboard
             string identifier, int easing, int startTime, int endTime)
         {
             int rawLength = rawParams.Length;
-            var eventType = EventType.GetValue(identifier);
+            var eventType = EventTypes.GetValue(identifier);
             if (eventType != default)
             {
                 var size = eventType.Size;
@@ -450,7 +450,6 @@ namespace Coosu.Storyboard
                         if (rawLength == 5)
                         {
                             currentObj.Parameter(
-                                (EasingType)easing,
                                 startTime,
                                 endTime,
                                 rawParams[4]!.ToParameterEnum());

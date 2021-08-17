@@ -48,7 +48,8 @@ namespace Coosu.Storyboard.Events
         {
             await writer.WriteAsync(EventType.Flag);
             await writer.WriteAsync(',');
-            await writer.WriteAsync((int)Easing.GetEasingType());
+            var typeStr = ((int?)Easing.TryGetEasingType())?.ToString() ?? "?";
+            await writer.WriteAsync(typeStr);
             await writer.WriteAsync(',');
             await writer.WriteAsync(Math.Round(StartTime));
             await writer.WriteAsync(',');

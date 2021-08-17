@@ -1,8 +1,10 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Coosu.Storyboard;
+using Coosu.Storyboard.Easing;
 using Coosu.Storyboard.Extensions;
 using Coosu.Storyboard.Extensions.Optimizing;
 
@@ -14,15 +16,22 @@ namespace CoosuTest
         {
             var layer = new Layer();
             var sprite = layer.CreateSprite("sb");
+            sprite.MoveX(EasingType.BackIn, 0, 300, 320, 240);
+            sprite.MoveY(new PowerEase(), 0, 300, 320, 240);
             sprite.MoveXBy(0, 300, 100);
+            sprite.VectorBy(0, 300, 1.2, 1);
+            var type = sprite.Events.First().Easing;
+            var t = type.GetEasingType();
             var compressor = new SpriteCompressor(layer);
             await compressor.CompressAsync();
-            //var text = await File.ReadAllTextAsync(
-            //    "E:\\Games\\osu!\\Songs\\" +
-            //    "1037741 Denkishiki Karen Ongaku Shuudan - Gareki no Yume\\" +
-            //    "Denkishiki Karen Ongaku Shuudan - Gareki no Yume (Dored).osb"
-            //);
-            //await OutputNewOsb(text);
+            await layer.WriteScriptAsync(Console.Out);
+            return;
+            var text = await File.ReadAllTextAsync(
+                "C:\\Users\\milkitic\\Downloads\\" +
+                "1037741 Denkishiki Karen Ongaku Shuudan - Gareki no Yume\\" +
+                "Denkishiki Karen Ongaku Shuudan - Gareki no Yume (Dored).osb"
+            );
+            await OutputNewOsb(text);
             //await OutputOldOsb(text);
         }
 
