@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Coosu.Storyboard.Extensions.Easing
+namespace Coosu.Storyboard.Easing
 {
     public class DoubleUtil
     {

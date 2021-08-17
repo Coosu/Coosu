@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Coosu.Storyboard.Common;
-using Coosu.Storyboard.Extensions.Easing;
+using Coosu.Storyboard.Easing;
 using Coosu.Storyboard.Utils;
 
 namespace Coosu.Storyboard.Extensions

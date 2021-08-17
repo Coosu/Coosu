@@ -1,4 +1,4 @@
-﻿namespace Coosu.Storyboard.Extensions.Easing
+﻿namespace Coosu.Storyboard.Easing
 {
     public class LinearEase : EasingFunctionBase
     {
@@ -6,5 +6,9 @@
         {
             return normalizedTime;
         }
+
+        public override EasingType? GetEasingType() => EasingType.Linear;
+
+        public static LinearEase Instance { get; } = new();
     }
 }

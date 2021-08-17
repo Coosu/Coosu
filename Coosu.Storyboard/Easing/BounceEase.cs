@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Coosu.Storyboard.Extensions.Easing
+namespace Coosu.Storyboard.Easing
 {
     /// <summary>
     ///     This class implements an easing function that can be used to simulate bouncing
@@ -14,13 +14,13 @@ namespace Coosu.Storyboard.Extensions.Easing
         /// <summary>
         /// Specifies the number of bounces.  This does not include the final half bounce.
         /// </summary>
-        public int Bounces { get; set; } = 3;
+        public int Bounces { get; init; } = 3;
 
         /// <summary>
         /// Specifies the amount of bounciness.  This corresponds to the scale difference between a bounce and the next bounce.  
         /// For example, Bounciness = 2.0 correspondes to the next bounce being twices as high and taking twice as long.
         /// </summary>
-        public double Bounciness { get; set; } = 2.0;
+        public double Bounciness { get; init; } = 2d;
 
         protected override double EaseInCore(double normalizedTime)
         {
@@ -74,5 +74,22 @@ namespace Coosu.Storyboard.Extensions.Easing
             // Evaluate a quadratic that hits (startTime,0), (endTime, 0), and peaks at amplitude.
             return (-amplitude / (radius * radius)) * (timeRelativeToPeak - radius) * (timeRelativeToPeak + radius);
         }
+
+        public override EasingType? GetEasingType()
+        {
+            if (Bounces != 3 || !Bounciness.Equals(2d)) return null;
+
+            return EasingMode switch
+            {
+                EasingMode.EaseIn => EasingType.BounceIn,
+                EasingMode.EaseOut => EasingType.BounceOut,
+                EasingMode.EaseInOut => EasingType.BounceInOut,
+                _ => null
+            };
+        }
+
+        public static BounceEase InstanceIn => new() { EasingMode = EasingMode.EaseIn };
+        public static BounceEase InstanceOut => new() { EasingMode = EasingMode.EaseOut };
+        public static BounceEase InstanceInOut => new() { EasingMode = EasingMode.EaseInOut };
     }
 }

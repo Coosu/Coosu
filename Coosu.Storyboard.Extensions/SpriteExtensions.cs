@@ -1,5 +1,5 @@
 ﻿using System.Numerics;
-using Coosu.Storyboard.Extensions.Easing;
+using Coosu.Storyboard.Easing;
 
 namespace Coosu.Storyboard.Extensions
 {

@@ -1,4 +1,4 @@
-﻿namespace Coosu.Storyboard.Extensions.Easing
+﻿namespace Coosu.Storyboard.Easing
 {
     public enum EasingMode
     {
