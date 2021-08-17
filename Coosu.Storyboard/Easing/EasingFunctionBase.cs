@@ -24,10 +24,21 @@ namespace Coosu.Storyboard.Easing
             return GetType().Name + EasingMode.ToString().Substring(4);
         }
 
-        protected abstract double EaseInCore(double normalizedTime);
-        public abstract EasingType? GetEasingType();
+        public EasingType GetEasingType()
+        {
+            var easingType = TryGetEasingType();
+            if (easingType == null)
+                Console.WriteLine("The target easing is not standard storyboard easing, use \"Linear\" instead.");
+            return Linear;
+        }
+        public abstract EasingType? TryGetEasingType();
 
-        public static implicit operator EasingFunctionBase(EasingType easingType)
+        protected abstract double EaseInCore(double normalizedTime);
+    }
+
+    public static class EasingFunctionExtensions
+    {
+        public static IEasingFunction ToEasingFunction(this EasingType easingType)
         {
 #pragma warning disable format
             // @formatter:off

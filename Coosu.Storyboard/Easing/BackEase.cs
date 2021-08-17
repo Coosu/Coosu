@@ -22,7 +22,7 @@ namespace Coosu.Storyboard.Easing
             return Math.Pow(normalizedTime, 3.0) - normalizedTime * amp * Math.Sin(Math.PI * normalizedTime);
         }
 
-        public override EasingType? GetEasingType()
+        public override EasingType? TryGetEasingType()
         {
             if (!Amplitude.Equals(1)) return null;
 
@@ -31,7 +31,7 @@ namespace Coosu.Storyboard.Easing
                 EasingMode.EaseIn => EasingType.BackIn,
                 EasingMode.EaseOut => EasingType.BackOut,
                 EasingMode.EaseInOut => EasingType.BackInOut,
-                _ => throw new ArgumentOutOfRangeException()
+                _ => null
             };
         }
 

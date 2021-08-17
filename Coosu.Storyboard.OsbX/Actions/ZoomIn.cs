@@ -1,4 +1,5 @@
-﻿using Coosu.Storyboard.Events;
+﻿using Coosu.Storyboard.Easing;
+using Coosu.Storyboard.Events;
 
 namespace Coosu.Storyboard.OsbX.Actions
 {
@@ -9,10 +10,15 @@ namespace Coosu.Storyboard.OsbX.Actions
         }
 
         public ZoomIn(EasingType easing, double startTime, double endTime, double[] start, double[] end)
+            : base(easing.ToEasingFunction(), startTime, endTime, start, end)
+        {
+        }
+
+        public ZoomIn(IEasingFunction easing, double startTime, double endTime, double[] start, double[] end)
             : base(easing, startTime, endTime, start, end)
         {
         }
 
-        public override EventType EventType { get; } = new("ZI", 1,11);
+        public override EventType EventType { get; } = new("ZI", 1, 11);
     }
 }

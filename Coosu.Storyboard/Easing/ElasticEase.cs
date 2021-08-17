@@ -38,7 +38,7 @@ namespace Coosu.Storyboard.Easing
             return expo * (Math.Sin((Math.PI * 2.0 * oscillations + Math.PI * 0.5) * normalizedTime));
         }
 
-        public override EasingType? GetEasingType()
+        public override EasingType? TryGetEasingType()
         {
             if (Oscillations != 3) return null;
             if (EasingMode == EasingMode.EaseOut)

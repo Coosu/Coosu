@@ -25,7 +25,7 @@ namespace Coosu.Storyboard.Easing
             return Math.Pow(normalizedTime, power);
         }
 
-        public override EasingType? GetEasingType()
+        public override EasingType? TryGetEasingType()
         {
             return null;
         }

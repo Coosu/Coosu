@@ -2,17 +2,10 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Coosu.Storyboard;
 using Coosu.Storyboard.Events;
 
@@ -162,61 +155,61 @@ namespace Coosu.Animation.WPF
 
                         if (commonEvent.EventType == EventTypes.Move)
                         {
-                            var evt = (Move) commonEvent;
-                            k.Move((Easing) evt.Easing, startT, endT,
+                            var evt = (Move)commonEvent;
+                            k.Move((Easing)evt.Easing.GetEasingType(), startT, endT,
                                 new Vector2<double>(evt.StartX, evt.StartY),
                                 new Vector2<double>(evt.EndX, evt.EndY));
                         }
                         else if (commonEvent.EventType == EventTypes.Fade)
                         {
-                            var evt = (Fade) commonEvent;
-                            k.Fade((Easing) evt.Easing, startT, endT,
+                            var evt = (Fade)commonEvent;
+                            k.Fade((Easing)evt.Easing.GetEasingType(), startT, endT,
                                 evt.StartOpacity,
                                 evt.EndOpacity);
                         }
                         else if (commonEvent.EventType == EventTypes.Scale)
                         {
-                            var evt = (Scale) commonEvent;
-                            k.ScaleVec((Easing) evt.Easing, startT, endT,
+                            var evt = (Scale)commonEvent;
+                            k.ScaleVec((Easing)evt.Easing.GetEasingType(), startT, endT,
                                 new Vector2<double>(evt.StartScale, evt.StartScale),
                                 new Vector2<double>(evt.EndScale, evt.EndScale));
                         }
                         else if (commonEvent.EventType == EventTypes.Rotate)
                         {
-                            var evt = (Rotate) commonEvent;
-                            k.Rotate((Easing) evt.Easing, startT, endT,
+                            var evt = (Rotate)commonEvent;
+                            k.Rotate((Easing)evt.Easing.GetEasingType(), startT, endT,
                                 evt.StartRotate,
                                 evt.EndRotate);
                         }
                         else if (commonEvent.EventType == EventTypes.Color)
                         {
-                            var evt = (Storyboard.Events.Color) commonEvent;
-                            k.Color((Easing) evt.Easing, startT, endT,
+                            var evt = (Storyboard.Events.Color)commonEvent;
+                            k.Color((Easing)evt.Easing.GetEasingType(), startT, endT,
                                 new Vector3<double>(evt.StartR, evt.StartG, evt.StartB),
                                 new Vector3<double>(evt.EndR, evt.EndG, evt.EndB));
                         }
                         else if (commonEvent.EventType == EventTypes.MoveX)
                         {
-                            var evt = (MoveX) commonEvent;
-                            k.MoveX((Easing) evt.Easing, startT, endT,
+                            var evt = (MoveX)commonEvent;
+                            k.MoveX((Easing)evt.Easing.GetEasingType(), startT, endT,
                                 evt.StartX, evt.EndX);
                         }
                         else if (commonEvent.EventType == EventTypes.MoveY)
                         {
-                            var evt = (MoveY) commonEvent;
-                            k.MoveY((Easing) evt.Easing, startT, endT,
+                            var evt = (MoveY)commonEvent;
+                            k.MoveY((Easing)evt.Easing.GetEasingType(), startT, endT,
                                 evt.StartY, evt.EndY);
                         }
                         else if (commonEvent.EventType == EventTypes.Vector)
                         {
-                            var evt = (Storyboard.Events.Vector) commonEvent;
-                            k.ScaleVec((Easing) evt.Easing, startT, endT,
+                            var evt = (Storyboard.Events.Vector)commonEvent;
+                            k.ScaleVec((Easing)evt.Easing.GetEasingType(), startT, endT,
                                 new Vector2<double>(evt.StartScaleX, evt.StartScaleY),
                                 new Vector2<double>(evt.EndScaleX, evt.EndScaleY));
                         }
                         else if (commonEvent.EventType == EventTypes.Parameter)
                         {
-                            var evt = (Parameter) commonEvent;
+                            var evt = (Parameter)commonEvent;
                             switch (evt.Type)
                             {
                                 case ParameterType.Horizontal:

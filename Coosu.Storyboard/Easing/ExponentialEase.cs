@@ -29,7 +29,7 @@ namespace Coosu.Storyboard.Easing
             }
         }
 
-        public override EasingType? GetEasingType()
+        public override EasingType? TryGetEasingType()
         {
             if (!Exponent.Equals(2d)) return null;
             return EasingMode switch

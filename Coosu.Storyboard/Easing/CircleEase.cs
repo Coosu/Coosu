@@ -13,7 +13,7 @@ namespace Coosu.Storyboard.Easing
             return 1.0 - Math.Sqrt(1.0 - normalizedTime * normalizedTime);
         }
 
-        public override EasingType? GetEasingType()
+        public override EasingType? TryGetEasingType()
         {
             return EasingMode switch
             {

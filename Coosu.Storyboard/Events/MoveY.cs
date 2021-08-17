@@ -1,4 +1,5 @@
 ﻿using Coosu.Storyboard.Common;
+using Coosu.Storyboard.Easing;
 
 namespace Coosu.Storyboard.Events
 {
@@ -19,6 +20,11 @@ namespace Coosu.Storyboard.Events
         }
 
         public MoveY(EasingType easing, double startTime, double endTime, double y1, double y2) :
+            base(easing.ToEasingFunction(), startTime, endTime, new[] { y1 }, new[] { y2 })
+        {
+        }
+
+        public MoveY(IEasingFunction easing, double startTime, double endTime, double y1, double y2) :
             base(easing, startTime, endTime, new[] { y1 }, new[] { y2 })
         {
         }

@@ -16,7 +16,7 @@ namespace Coosu.Storyboard.Extensions
         public EventType EventType { get; }
         public IEasingFunction Easing { get; set; }
 
-        EasingType ICommonEvent.Easing
+        IEasingFunction ICommonEvent.Easing
         {
             get => throw new NotImplementedException();
             set => throw new NotImplementedException();
@@ -33,7 +33,7 @@ namespace Coosu.Storyboard.Extensions
 
         public virtual int ParamLength => Start.Length;
         public virtual bool IsStatic => Start.SequenceEqual(End);
-        
+
         public void AdjustTiming(double offset)
         {
             StartTime += offset;

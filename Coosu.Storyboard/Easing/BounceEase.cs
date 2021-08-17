@@ -75,7 +75,7 @@ namespace Coosu.Storyboard.Easing
             return (-amplitude / (radius * radius)) * (timeRelativeToPeak - radius) * (timeRelativeToPeak + radius);
         }
 
-        public override EasingType? GetEasingType()
+        public override EasingType? TryGetEasingType()
         {
             if (Bounces != 3 || !Bounciness.Equals(2d)) return null;
 

@@ -12,7 +12,7 @@ namespace Coosu.Storyboard.Easing
             return 1.0 - Math.Sin(Math.PI * 0.5 * (1 - normalizedTime));
         }
 
-        public override EasingType? GetEasingType()
+        public override EasingType? TryGetEasingType()
         {
             return EasingMode switch
             {

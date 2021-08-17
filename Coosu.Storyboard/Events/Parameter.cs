@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
+using Coosu.Storyboard.Easing;
 using Coosu.Storyboard.Utils;
 
 namespace Coosu.Storyboard.Events
@@ -26,10 +27,11 @@ namespace Coosu.Storyboard.Events
             await writer.WriteAsync(Type.ToShortString());
         }
 
-        public Parameter(EasingType easing, double startTime, double endTime, ParameterType type) :
-            base(easing, startTime, endTime, new double[] { (int)type }, new double[] { (int)type })
+        public Parameter(double startTime, double endTime, ParameterType type) :
+            base(EasingType.Linear.ToEasingFunction(), startTime, endTime,
+                new double[] { (int)type }, new double[] { (int)type })
         {
-            Easing = EasingType.Linear;
+            Easing = EasingType.Linear.ToEasingFunction();
         }
     }
 }

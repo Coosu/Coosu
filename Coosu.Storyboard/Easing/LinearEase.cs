@@ -7,7 +7,7 @@
             return normalizedTime;
         }
 
-        public override EasingType? GetEasingType() => EasingType.Linear;
+        public override EasingType? TryGetEasingType() => EasingType.Linear;
 
         public static LinearEase Instance { get; } = new();
     }
