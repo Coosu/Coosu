@@ -7,7 +7,6 @@ namespace Coosu.Storyboard.Common
         IEasingFunction Easing { get; set; }
         double[] Start { get; set; }
         double[] End { get; set; }
-        int ParamLength { get; }
         bool IsStatic { get; }
     }
 }

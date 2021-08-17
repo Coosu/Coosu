@@ -15,7 +15,7 @@ namespace Coosu.Storyboard.Extensions
         private string DebuggerDisplay => this.GetHeaderString();
         public EventType EventType { get; }
 
-        public IEasingFunction Easing { get; set; }
+        public IEasingFunction Easing { get; set; } = LinearEase.Instance;
 
         public double StartTime { get; set; }
         public double EndTime { get; set; }

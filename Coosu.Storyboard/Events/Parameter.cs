@@ -8,8 +8,6 @@ namespace Coosu.Storyboard.Events
     public sealed class Parameter : CommonEvent
     {
         public override EventType EventType => EventTypes.Parameter;
-
-        public override int ParamLength => 1;
         public override bool IsStatic => true;
 
         public ParameterType Type

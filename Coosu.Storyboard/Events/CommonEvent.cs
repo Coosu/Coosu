@@ -16,13 +16,12 @@ namespace Coosu.Storyboard.Events
         private string DebuggerDisplay => this.GetHeaderString();
 
         public abstract EventType EventType { get; }
-        public IEasingFunction Easing { get; set; }
+        public IEasingFunction Easing { get; set; } = LinearEase.Instance;
         public double StartTime { get; set; }
         public double EndTime { get; set; }
         public double[] Start { get; set; }
         public double[] End { get; set; }
-
-        public virtual int ParamLength => Start.Length;
+        
         public virtual bool IsStatic => Start.SequenceEqual(End);
 
         //public int CompareTo(CommonEvent? other)
@@ -98,25 +97,25 @@ namespace Coosu.Storyboard.Events
 
         private async Task WriteStartAsync(TextWriter textWriter)
         {
-            for (int i = 0; i < ParamLength; i++)
+            for (int i = 0; i < EventType.Size; i++)
             {
                 await textWriter.WriteAsync(Start[i].ToIcString());
-                if (i != ParamLength - 1) await textWriter.WriteAsync(',');
+                if (i != EventType.Size - 1) await textWriter.WriteAsync(',');
             }
         }
 
         private async Task WriteFullAsync(TextWriter textWriter)
         {
-            for (int i = 0; i < ParamLength; i++)
+            for (int i = 0; i < EventType.Size; i++)
             {
                 await textWriter.WriteAsync(Start[i].ToIcString());
                 await textWriter.WriteAsync(',');
             }
 
-            for (int i = 0; i < ParamLength; i++)
+            for (int i = 0; i < EventType.Size; i++)
             {
                 await textWriter.WriteAsync(End[i].ToIcString());
-                if (i != ParamLength - 1) await textWriter.WriteAsync(',');
+                if (i != EventType.Size - 1) await textWriter.WriteAsync(',');
             }
         }
 
