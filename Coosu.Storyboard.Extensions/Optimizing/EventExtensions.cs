@@ -9,16 +9,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
 {
     public static class EventExtensions
     {
-        public static readonly ReadOnlyDictionary<EventType, double[]> DefaultDictionary = new(
-            new Dictionary<EventType, double[]>
-            {
-                [EventTypes.Fade] = new[] { 1d },
-                [EventTypes.Scale] = new[] { 1d },
-                [EventTypes.Vector] = new[] { 1d, 1d },
-                [EventTypes.Rotate] = new[] { 0d },
-                [EventTypes.Color] = new[] { 255d, 255d, 255d },
-            });
-
+      
         public static readonly ReadOnlyDictionary<EventType, double[]> UnworthyDictionary = new(
             new Dictionary<EventType, double[]>
             {
@@ -27,13 +18,6 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                 [EventTypes.Vector] = new[] { 0d, 0d },
                 [EventTypes.Color] = new[] { 0d, 0d, 0d },
             });
-
-        public static double[]? GetDefaultValue(this ICommonEvent e)
-        {
-            return DefaultDictionary.ContainsKey(e.EventType)
-                ? DefaultDictionary[e.EventType]
-                : null;
-        }
 
         public static double[] GetUnworthyValue(this ICommonEvent e)
         {

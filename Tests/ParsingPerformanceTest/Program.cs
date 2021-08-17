@@ -48,7 +48,7 @@ namespace ParsingPerformanceTest
             _text = File.ReadAllText(
                 @"D:\GitHub\ReOsuStoryboardPlayer\ReOsuStoryboardPlayer.Core.UnitTest\TestData\IOSYS feat. 3L - Miracle-Hinacle (_lolipop).osb");
             var ctx = new System.Runtime.Loader.AssemblyLoadContext("old", false);
-            var asm1 = ctx.LoadFromAssemblyPath(@"C:\Users\milkitic\Desktop\net472\netstandard2.0\Coosu.Storyboard.dll");
+            var asm1 = ctx.LoadFromAssemblyPath(@"D:\GitHub\Coosu\Tests\CoosuTest\V1.0.0.0\Coosu.Storyboard.dll");
             var ctx2 = new System.Runtime.Loader.AssemblyLoadContext("new", false);
             var asm2 = ctx2.LoadFromAssemblyPath(@"D:\GitHub\Coosu\Coosu.Storyboard\bin\Release\netstandard2.0\Coosu.Storyboard.dll");
 
@@ -103,7 +103,7 @@ namespace ParsingPerformanceTest
             var asm2 = ctx2.LoadFromAssemblyPath(@"D:\GitHub\Coosu\Coosu.Storyboard\bin\Release\netstandard2.0\Coosu.Storyboard.dll");
 
             var eg = asm1.GetType("Coosu.Storyboard.Management.ElementGroup");
-            var eg2 = asm2.GetType("Coosu.Storyboard.VirtualLayer");
+            var eg2 = asm2.GetType("Coosu.Storyboard.Layer");
             _method1 = eg?.GetMethod("ParseFromText", BindingFlags.Static | BindingFlags.Public);
             _method2 = eg2?.GetMethod("ParseFromText", BindingFlags.Static | BindingFlags.Public);
             var ret1 = _method1?.Invoke(null, new object?[] { _text });

@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Coosu.Storyboard.Common;
 
 namespace Coosu.Storyboard.Utils
@@ -56,6 +58,23 @@ namespace Coosu.Storyboard.Utils
         public static int GetMinTimeCount(this IEventHost eventHost)
         {
             return eventHost.Events.Count(k => k.StartTime.Equals(eventHost.MinTime));
+        }
+
+        public static double[] ComputeFrame(this IEventHost eventHost, EventType eventType, double time)
+        {
+            if (eventType.Size < 1) throw new ArgumentOutOfRangeException(nameof(eventType), eventType, "Only support sized event type.");
+            var commonEvents = eventHost.Events.Where(k => k.EventType == eventType).ToList();
+            if (commonEvents.Count == 0)
+                return eventType.GetDefaultValue() ?? throw new NotSupportedException(eventType.Flag + " doesn't have any default value.");
+
+            if (time < commonEvents[0].StartTime)
+                return commonEvents[0].Start.ToArray();
+
+            var e = commonEvents.FirstOrDefault(k => k.StartTime <= time && k.EndTime > time);
+            if (e != null) return e.ComputeFrame(time);
+
+            var lastE = commonEvents.Last(k => k.EndTime <= time);
+            return lastE.End.ToArray();
         }
     }
 }

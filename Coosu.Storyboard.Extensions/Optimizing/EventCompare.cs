@@ -37,12 +37,6 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                    e.IsStatic();
         }
 
-        public static bool IsDefault(this ICommonEvent e)
-        {
-            return EventExtensions.DefaultDictionary.ContainsKey(e.EventType) &&
-                   e.Start.SequenceEqual(EventExtensions.DefaultDictionary[e.EventType]);
-        }
-
         public static bool IsStatic(this ICommonEvent e)
         {
             return e.Start.SequenceEqual(e.End);

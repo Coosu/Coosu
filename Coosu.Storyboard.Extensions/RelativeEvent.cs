@@ -27,7 +27,7 @@ namespace Coosu.Storyboard.Extensions
         }
 
         public virtual int ParamLength => Start.Length;
-        public virtual bool IsStatic => Start.SequenceEqual(End);
+        public virtual bool IsStatic => Start.All(k => k == 0);
 
         public void AdjustTiming(double offset)
         {

@@ -3,7 +3,7 @@ using Coosu.Storyboard.Events;
 
 namespace Coosu.Storyboard.Utils
 {
-    public static class ParameterExtension
+    public static class ParameterExtensions
     {
         public static string ToShortString(this ParameterType pType)
         {

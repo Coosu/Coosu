@@ -17,7 +17,7 @@ namespace CoosuTest
             var sprite = layer.CreateSprite("sb");
             sprite.Fade(0, 0, 300, 0, 1);
             sprite.MoveX(EasingType.BackIn, 0, 300, 320, 240);
-            sprite.MoveY(new PowerEase(), 0, 300, 320, 240);
+            sprite.MoveY(new PowerEase() { Power = 2 }, 100, 300, 320, 240);
             sprite.MoveXBy(0, 300, 100);
             sprite.VectorBy(new ElasticEase
             {
@@ -25,8 +25,10 @@ namespace CoosuTest
                 Oscillations = 5,
                 Springiness = 3d * 2
             }, 0, 300, 1.2, 1);
-            //var compressor = new SpriteCompressor(layer);
-            //await compressor.CompressAsync();
+            await layer.WriteScriptAsync(Console.Out);
+            Console.WriteLine("==================");
+            var compressor = new SpriteCompressor(layer);
+            await compressor.CompressAsync();
             await layer.WriteScriptAsync(Console.Out);
             return;
             var text = await File.ReadAllTextAsync(

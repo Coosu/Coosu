@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Coosu.Storyboard.Common;
+using Coosu.Storyboard.Easing;
 using Coosu.Storyboard.Events;
 using Coosu.Storyboard.Utils;
 
@@ -127,6 +128,101 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             }
         }
 
+        private async Task StandardizeEventsAsync(Sprite sprite)
+        {
+            await DiscretizeEventsAsync(sprite);
+        }
+
+        private const int DiscretizingInterval = 16;
+        private async Task DiscretizeEventsAsync(Sprite sprite)
+        {
+            ExpandEasing(sprite);
+
+            var commonEvents = sprite.Events.ToList();
+            foreach (var grouping in commonEvents
+                .Where(k => k is RelativeEvent)
+                .Cast<RelativeEvent>().GroupBy(k => k.EventType))
+            {
+                var targetType = EventTypes.GetValue(grouping.Key.Index - 100);
+                var allThisTypeStandardEvents = sprite
+                    .Events
+                    .Where(k => k is CommonEvent &&
+                                k.Easing.TryGetEasingType() != null &&
+                                k.EventType == targetType)
+                    .OrderBy(k => k.StartTime)
+                    .Cast<CommonEvent>()
+                    .ToList();
+
+                foreach (var @event in grouping)
+                {
+                    var startTime = (int)@event.StartTime;
+                    var endTime = (int)@event.EndTime;
+                    var thisTime = startTime - (startTime % DiscretizingInterval);
+                    var nextTime = startTime - (startTime % DiscretizingInterval) + DiscretizingInterval;
+                    if (nextTime > endTime) nextTime = endTime;
+
+                    var targetStandardEvents = allThisTypeStandardEvents
+                        .Where(k => k.StartTime < nextTime && k.EndTime >= startTime)
+                        .ToList();
+                    if (targetStandardEvents.Count == 0)
+                    {
+                        var defaultValue = targetType.GetDefaultValue() ?? throw new NotSupportedException(
+                            targetType.Flag + " doesn't have any default value.");
+                        sprite.Events.Add(CommonEvent.Create(targetType, @event.Easing, startTime, endTime,
+                            defaultValue,
+                            @event.EventType.RelativeCompute(defaultValue, @event.End)));
+                        sprite.Events.Remove(@event);
+                    }
+                    else
+                    {
+
+                    }
+                }
+            }
+
+            ExpandEasing(sprite);
+        }
+
+        private static void ExpandEasing(IEventHost sprite)
+        {
+            var commonEvents = sprite.Events.ToList();
+            foreach (var @event in commonEvents
+                .Where(k => k is not RelativeEvent && k.Easing.TryGetEasingType() == null))
+            {
+                var eventList = new List<ICommonEvent>();
+                var targetEventType = @event.EventType;
+
+                var start = @event.Start;
+                var end = @event.End;
+                var startTime = (int)@event.StartTime;
+                var endTime = (int)@event.EndTime;
+
+                var thisTime = startTime - (startTime % DiscretizingInterval);
+                var nextTime = startTime - (startTime % DiscretizingInterval) + DiscretizingInterval;
+                if (nextTime > endTime) nextTime = endTime;
+                double[] reusableValue = @event.ComputeFrame(nextTime);
+                eventList.Add(CommonEvent.Create(targetEventType, LinearEase.Instance, startTime, nextTime, start.ToArray(),
+                    reusableValue));
+
+                while (nextTime < endTime)
+                {
+                    thisTime += DiscretizingInterval;
+                    nextTime += DiscretizingInterval;
+                    if (nextTime > endTime) nextTime = endTime;
+                    double[] newValue = @event.ComputeFrame(nextTime);
+                    eventList.Add(CommonEvent.Create(targetEventType, LinearEase.Instance, thisTime, nextTime,
+                        reusableValue.ToArray(), newValue));
+                    reusableValue = newValue;
+                }
+
+                sprite.Events.Remove(@event);
+                foreach (var commonEvent in eventList)
+                {
+                    sprite.Events.Add(commonEvent);
+                }
+            }
+        }
+
         public async Task CancelTask()
         {
             _cancelToken?.Cancel();
@@ -234,6 +330,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
         private bool InnerCompress(Sprite sprite, ConcurrentBag<Sprite> possibleBgs)
         {
             // 每个类型压缩从后往前
+            // 0.标准化
             // 1.删除没用的
             // 2.整合能整合的
             // 3.考虑单event情况
@@ -277,12 +374,13 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             }
 
             sprite.Events = new HashSet<ICommonEvent>(sprite.Events);
+            StandardizeEventsAsync(sprite).Wait();
             var (obsoleteList, controlNodes) = sprite.GetObsoleteList();
             PreOptimize(sprite, obsoleteList, controlNodes);
             NormalOptimize(sprite);
             sprite.Events =
                 new SortedSet<ICommonEvent>(sprite.Events, new EventTimingComparer());
-            if (sprite.ObjectType == ObjectTypes.Sprite && 
+            if (sprite.ObjectType == ObjectTypes.Sprite &&
                 Path.GetFileName(sprite.ImagePath) == sprite.ImagePath &&
                 sprite.LayerType == LayerType.Background)
             {
