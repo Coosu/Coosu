@@ -59,25 +59,5 @@ namespace Coosu.Storyboard.Utils
         {
             return eventHost.Events.Count(k => k.StartTime.Equals(eventHost.MinTime));
         }
-
-        public static double[] ComputeFrame(this IEventHost eventHost, EventType eventType, double time, int? accuracy)
-        {
-            if (eventType.Size < 1) throw new ArgumentOutOfRangeException(nameof(eventType), eventType, "Only support sized event type.");
-            var commonEvents = eventHost.Events
-                .OrderBy(k => k.StartTime)
-                .Where(k => k.EventType == eventType)
-                .ToList();
-            if (commonEvents.Count == 0)
-                return eventType.GetDefaultValue() ?? throw new NotSupportedException(eventType.Flag + " doesn't have any default value.");
-
-            if (time < commonEvents[0].StartTime)
-                return commonEvents[0].Start.ToArray();
-
-            var e = commonEvents.FirstOrDefault(k => k.StartTime <= time && k.EndTime > time);
-            if (e != null) return e.ComputeFrame(time, accuracy);
-
-            var lastE = commonEvents.Last(k => k.EndTime <= time);
-            return lastE.End.ToArray();
-        }
     }
 }

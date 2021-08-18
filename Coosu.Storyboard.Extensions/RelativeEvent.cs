@@ -19,15 +19,9 @@ namespace Coosu.Storyboard.Extensions
 
         public double StartTime { get; set; }
         public double EndTime { get; set; }
-        public double[] Start { get; set; }
-        public double[] End
-        {
-            get => Start;
-            set => Start = value;
-        }
-
-        public virtual int ParamLength => Start.Length;
-        public virtual bool IsStatic => Start.All(k => k == 0);
+        public double[] Start { get; set; } 
+        public double[] End { get; set; }
+        public virtual bool IsStatic => End.All(k => k == 0);
 
         public void AdjustTiming(double offset)
         {
@@ -67,7 +61,8 @@ namespace Coosu.Storyboard.Extensions
             Easing = easing;
             StartTime = startTime;
             EndTime = endTime;
-            Start = byValue;
+            End = byValue;
+            Start = new double[eventType.Size];
         }
 
         protected virtual async Task WriteExtraScriptAsync(TextWriter textWriter)
@@ -77,10 +72,16 @@ namespace Coosu.Storyboard.Extensions
 
         private async Task WriteStartAsync(TextWriter textWriter)
         {
-            for (int i = 0; i < ParamLength; i++)
+            for (int i = 0; i < EventType.Size; i++)
             {
-                await textWriter.WriteAsync(Start[i].ToIcString());
-                if (i != ParamLength - 1) await textWriter.WriteAsync(',');
+                if (Start[i] != 0)
+                {
+                    await textWriter.WriteAsync(Start[i].ToIcString());
+                    await textWriter.WriteAsync('~');
+                }
+
+                await textWriter.WriteAsync(End[i].ToIcString());
+                if (i != EventType.Size - 1) await textWriter.WriteAsync(',');
             }
         }
     }

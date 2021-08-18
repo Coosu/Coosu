@@ -46,7 +46,7 @@ namespace Coosu.Storyboard.Utils
                    e.Start.SequenceEqual(DefaultDictionary[e.EventType]);
         }
 
-        public static double[] ComputeFrame(this ICommonEvent e, double currentTime, int? accuracy)
+        public static double[] ComputeFrame(this CommonEvent e, double currentTime, int? accuracy)
         {
             var easing = e.Easing;
             var size = e.EventType.Size;
@@ -70,8 +70,7 @@ namespace Coosu.Storyboard.Utils
 
             return value;
         }
-
-        public static double[] ComputeRelative(this EventType eventType, double[] source, double[] relativeVal)
+        public static double[] ComputeRelative(this EventType eventType, double[] source, double[] relativeVal, int? accuracy = null)
         {
             if (eventType.Size < 1)
                 throw new ArgumentOutOfRangeException(nameof(eventType), eventType, "Only support sized event type.");
@@ -82,14 +81,16 @@ namespace Coosu.Storyboard.Utils
                 //{
                 //    value[i] = source[i] * relativeVal[i];
                 //}
-
-                value[i] = source[i] + relativeVal[i];
+                if (accuracy == null)
+                    value[i] = source[i] + relativeVal[i];
+                else
+                    value[i] = Math.Round(source[i] + relativeVal[i], accuracy.Value);
             }
 
             return value;
         }
 
-        public static List<ICommonEvent> ComputeDiscretizedEvents(this ICommonEvent e,
+        public static List<ICommonEvent> ComputeDiscretizedEvents(this CommonEvent e,
             int discretizingInterval = 16,
             int? discretizingAccuracy = 3)
         {

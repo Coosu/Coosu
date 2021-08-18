@@ -142,40 +142,135 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             foreach (var grouping in commonEvents
                 .Where(k => k is RelativeEvent)
                 .Cast<RelativeEvent>().GroupBy(k => k.EventType))
+            // todo: discretize and compute all at once to improve performance
             {
-                var targetType = EventTypes.GetValue(grouping.Key.Index - 100);
-                var allThisTypeStandardEvents = sprite
-                    .Events
-                    .Where(k => k is CommonEvent &&
-                                k.Easing.TryGetEasingType() != null &&
-                                k.EventType == targetType)
-                    .OrderBy(k => k.StartTime)
-                    .Cast<CommonEvent>()
-                    .ToList();
+                var targetStdType = EventTypes.GetValue(grouping.Key.Index - 100);
 
                 foreach (var @event in grouping)
                 {
+                    var allThisTypeStandardEvents = sprite
+                        .Events
+                        .Where(k => k is CommonEvent &&
+                                    k.Easing.TryGetEasingType() != null &&
+                                    k.EventType == targetStdType)
+                        .OrderBy(k => k.StartTime)
+                        .Cast<CommonEvent>()
+                        .ToList();
+
                     var startTime = (int)@event.StartTime;
                     var endTime = (int)@event.EndTime;
-                    var thisTime = startTime - (startTime % DiscretizingInterval);
-                    var nextTime = startTime - (startTime % DiscretizingInterval) + DiscretizingInterval;
-                    if (nextTime > endTime) nextTime = endTime;
 
                     var targetStandardEvents = allThisTypeStandardEvents
-                        .Where(k => k.StartTime < nextTime && k.EndTime >= startTime)
+                        .Where(k => k.StartTime < endTime && k.EndTime > startTime) // k.EndTime > startTime
                         .ToList();
-                    if (targetStandardEvents.Count == 0)
+                    if (allThisTypeStandardEvents.Count == 0)
                     {
-                        var defaultValue = targetType.GetDefaultValue() ?? throw new NotSupportedException(
-                            targetType.Flag + " doesn't have any default value.");
-                        sprite.Events.Add(CommonEvent.Create(targetType, @event.Easing, startTime, endTime,
+                        var defaultValue = targetStdType.GetDefaultValue(sprite) ?? throw new NotSupportedException(
+                            targetStdType.Flag + " doesn't have any default value.");
+                        sprite.Events.Add(CommonEvent.Create(targetStdType, @event.Easing, startTime, endTime,
                             defaultValue,
-                            @event.EventType.RelativeCompute(defaultValue, @event.End)));
+                            @event.EventType.ComputeRelative(defaultValue, @event.End)));
                         sprite.Events.Remove(@event);
+                    }
+                    else if (targetStandardEvents.Count == 0)
+                    {
+                        var lastValue = sprite.ComputeFrame(targetStdType, startTime, null);
+                        sprite.Events.Add(CommonEvent.Create(targetStdType, @event.Easing, startTime, endTime,
+                            lastValue,
+                            @event.EventType.ComputeRelative(lastValue, @event.End)));
+                        sprite.Events.Remove(@event);
+                        var nextEvents = allThisTypeStandardEvents
+                            .Where(k => k.StartTime >= endTime)
+                            .ToList();
+                        foreach (var commonEvent in nextEvents)
+                        {
+                            for (int i = 0; i < commonEvent.EventType.Size; i++)
+                            {
+                                commonEvent.Start[i] += @event.End[i]; // offset
+                                commonEvent.End[i] += @event.End[i];
+                            }
+                        }
                     }
                     else
                     {
+                        var discretizedRelative = @event.ComputeDiscretizedEvents(false)
+                            .ToDictionary(k => (k.StartTime, k.EndTime), k => k);
+                        var discretizingTargetStandardEvents = targetStandardEvents
+                            .SelectMany(k => k.ComputeDiscretizedEvents())
+                            .ToDictionary(k => (k.StartTime, k.EndTime), k => k);
+                        //var discretizingTargetStandardEventsStart = discretizingTargetStandardEvents
+                        //    .ToDictionary(k => k.Key.StartTime, k => k.Value);
+                        //var discretizingTargetStandardEventsEnd = discretizingTargetStandardEvents
+                        //    .ToDictionary(k => k.Key.EndTime, k => k.Value);
+                        var list = new List<ICommonEvent>();
+                        foreach (var kvp in discretizedRelative.ToList())
+                        {
+                            var key = kvp.Key;
+                            var relativeEvent = kvp.Value;
+                            if (discretizingTargetStandardEvents.TryGetValue(key, out var completelyCoincidentEvent))
+                            {
+                                // exact coincident
+                                var eventType = completelyCoincidentEvent.EventType;
+                                var newStart =
+                                    eventType.ComputeRelative(completelyCoincidentEvent.Start, relativeEvent.Start, 3);
+                                var newEnd =
+                                    eventType.ComputeRelative(completelyCoincidentEvent.End, relativeEvent.End, 3);
+                                completelyCoincidentEvent.Start = newStart;
+                                completelyCoincidentEvent.End = newEnd;
+                            }
+                            //else if (discretizingTargetStandardEventsEnd.TryGetValue(key.EndTime, out var differentStartEvent))
+                            //{
+                            //    // same end, but with different start
+                            //}
+                            //else if (discretizingTargetStandardEventsStart.TryGetValue(key.StartTime, out var differentEndEvent))
+                            //{ 
+                            //    //todo: will never hit
+                            //    // same start, but with different end
 
+                            //}
+                            else
+                            {
+                                // nothing
+                                var lastValue = SpriteExtensions.ComputeFrame(allThisTypeStandardEvents,
+                                    kvp.Value.EventType, kvp.Key.StartTime, 3);
+                                var commonEvent = CommonEvent.Create(targetStdType, EasingType.Linear,
+                                    kvp.Key.StartTime, kvp.Key.EndTime,
+                                    @event.EventType.ComputeRelative(lastValue, kvp.Value.Start, 3),
+                                    @event.EventType.ComputeRelative(lastValue, kvp.Value.End, 3));
+                                list.Add(commonEvent);
+                            }
+
+                            discretizedRelative.Remove(key);
+                        }
+
+                        foreach (var commonEvent in list)
+                        {
+                            sprite.Events.Add(commonEvent);
+                        }
+
+                        foreach (var value in discretizingTargetStandardEvents.Values)
+                        {
+                            sprite.Events.Add(value);
+                        }
+
+                        sprite.Events.Remove(@event);
+                        list.Clear();
+                        foreach (var targetStandardEvent in targetStandardEvents)
+                        {
+                            sprite.Events.Remove(targetStandardEvent);
+                        }
+
+                        var nextEvents = allThisTypeStandardEvents
+                            .Where(k => k.StartTime >= endTime)
+                            .ToList();
+                        foreach (var commonEvent in nextEvents)
+                        {
+                            for (int i = 0; i < commonEvent.EventType.Size; i++)
+                            {
+                                commonEvent.Start[i] += @event.End[i]; // offset
+                                commonEvent.End[i] += @event.End[i];
+                            }
+                        }
                     }
                 }
             }
@@ -189,32 +284,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             foreach (var @event in commonEvents
                 .Where(k => k is not RelativeEvent && k.Easing.TryGetEasingType() == null))
             {
-                var eventList = new List<ICommonEvent>();
-                var targetEventType = @event.EventType;
-
-                var start = @event.Start;
-                var end = @event.End;
-                var startTime = (int)@event.StartTime;
-                var endTime = (int)@event.EndTime;
-
-                var thisTime = startTime - (startTime % DiscretizingInterval);
-                var nextTime = startTime - (startTime % DiscretizingInterval) + DiscretizingInterval;
-                if (nextTime > endTime) nextTime = endTime;
-                double[] reusableValue = @event.ComputeFrame(nextTime);
-                eventList.Add(CommonEvent.Create(targetEventType, LinearEase.Instance, startTime, nextTime, start.ToArray(),
-                    reusableValue));
-
-                while (nextTime < endTime)
-                {
-                    thisTime += DiscretizingInterval;
-                    nextTime += DiscretizingInterval;
-                    if (nextTime > endTime) nextTime = endTime;
-                    double[] newValue = @event.ComputeFrame(nextTime);
-                    eventList.Add(CommonEvent.Create(targetEventType, LinearEase.Instance, thisTime, nextTime,
-                        reusableValue.ToArray(), newValue));
-                    reusableValue = newValue;
-                }
-
+                var eventList = @event.ComputeDiscretizedEvents(false);
                 sprite.Events.Remove(@event);
                 foreach (var commonEvent in eventList)
                 {
@@ -406,7 +476,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
         /// <summary>
         /// 预压缩
         /// </summary>
-        private void PreOptimize(IEventHost host, TimeRange obsoleteList, HashSet<ICommonEvent> controlNodes)
+        private void PreOptimize(IEventHost host, TimeRange obsoleteList, HashSet<CommonEvent> controlNodes)
         {
             if (host is Sprite ele)
             {
@@ -445,24 +515,24 @@ namespace Coosu.Storyboard.Extensions.Optimizing
 
             if (host.Events.Any())
             {
-                RemoveByLogic(host, host.Events.ToList());
+                RemoveByLogic(host, host.Events.Cast<CommonEvent>().ToList());
             }
         }
 
         /// <summary>
         /// 根据ObsoletedList，移除不必要的命令。
         /// </summary>
-        private void RemoveByObsoletedList(IEventHost host, TimeRange obsoleteList, HashSet<ICommonEvent> controlNodes)
+        private void RemoveByObsoletedList(IEventHost host, TimeRange obsoleteList, HashSet<CommonEvent> controlNodes)
         {
             if (obsoleteList.TimingList.Count == 0) return;
             var groups = host.Events.GroupBy(k => k.EventType);
             foreach (var group in groups)
             {
-                var list = group.ToList();
+                var list = group.Cast<CommonEvent>().ToList();
                 for (int i = 0; i < list.Count; i++)
                 {
-                    ICommonEvent nowE = list[i];
-                    ICommonEvent? nextE =
+                    CommonEvent nowE = list[i];
+                    CommonEvent? nextE =
                         i == list.Count - 1
                             ? null
                             : list[i + 1];
@@ -552,7 +622,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
         /// </summary>
         /// <param name="host"></param>
         /// <param name="eventList"></param>
-        private void RemoveByLogic(IEventHost host, List<ICommonEvent> eventList)
+        private void RemoveByLogic(IEventHost host, List<CommonEvent> eventList)
         {
             var groups = eventList.GroupBy(k => k.EventType);
             foreach (var group in groups)
@@ -563,7 +633,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                 int index = list.Count - 1;
                 while (index >= 0)
                 {
-                    ICommonEvent nowE = list[index];
+                    CommonEvent nowE = list[index];
                     if (host is Sprite ele &&
                         ele.TriggerList.Any(k => nowE.EndTime >= k.StartTime && nowE.StartTime <= k.EndTime) &&
                         ele.LoopList.Any(k => nowE.EndTime >= k.StartTime && nowE.StartTime <= k.EndTime))
@@ -667,7 +737,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                     } // 若是首个event
                     else // 若不是首个event
                     {
-                        ICommonEvent preE = list[index - 1];
+                        CommonEvent preE = list[index - 1];
                         //if (host is Element ele2 &&
                         //    ele2.TriggerList.Any(k => preE.EndTime >= k.StartTime && preE.StartTime <= k.EndTime) &&
                         //    ele2.LoopList.Any(k => preE.EndTime >= k.StartTime && preE.StartTime <= k.EndTime))
@@ -745,7 +815,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             } // group的循环
         }
 
-        private static void RemoveEvent(IEventHost sourceHost, ICollection<ICommonEvent> eventList, ICommonEvent e)
+        private static void RemoveEvent(IEventHost sourceHost, ICollection<CommonEvent> eventList, CommonEvent e)
         {
             var success = sourceHost.Events.Remove(e);
             if (!success)

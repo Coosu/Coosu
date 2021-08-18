@@ -10,6 +10,45 @@ namespace Coosu.Storyboard.Extensions.Optimizing
 {
     public static class SpriteExtensions
     {
+        public static double[] ComputeFrame(IEnumerable<CommonEvent> events, EventType eventType, double time, int? accuracy)
+        {
+            var commonEvents = events
+                .OrderBy(k => k.StartTime)
+                .ToList();
+            if (commonEvents.Count == 0)
+                return eventType.GetDefaultValue() ?? throw new NotSupportedException(eventType.Flag + " doesn't have any default value.");
+
+            if (time < commonEvents[0].StartTime)
+                return commonEvents[0].Start.ToArray();
+
+            var e = commonEvents.FirstOrDefault(k => k.StartTime <= time && k.EndTime > time);
+            if (e != null) return e.ComputeFrame(time, accuracy);
+
+            var lastE = commonEvents.Last(k => k.EndTime <= time);
+            return lastE.End.ToArray();
+        }
+
+        public static double[] ComputeFrame(this IEventHost eventHost, EventType eventType, double time, int? accuracy)
+        {
+            if (eventType.Size < 1) throw new ArgumentOutOfRangeException(nameof(eventType), eventType, "Only support sized event type.");
+            var commonEvents = eventHost.Events
+                .OrderBy(k => k.StartTime)
+                .Where(k => k.EventType == eventType)
+                .Cast<CommonEvent>()
+                .ToList();
+            if (commonEvents.Count == 0)
+                return eventType.GetDefaultValue() ?? throw new NotSupportedException(eventType.Flag + " doesn't have any default value.");
+
+            if (time < commonEvents[0].StartTime)
+                return commonEvents[0].Start.ToArray();
+
+            var e = commonEvents.FirstOrDefault(k => k.StartTime <= time && k.EndTime > time);
+            if (e != null) return e.ComputeFrame(time, accuracy);
+
+            var lastE = commonEvents.Last(k => k.EndTime <= time);
+            return lastE.End.ToArray();
+        }
+
         public static async Task ExpandAsync(this Layer eleG)
         {
             await Task.Run(() => { Expand(eleG); });
@@ -66,11 +105,13 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                 }
             }
 
-            var events = host.Events?.GroupBy(k => k.EventType);
+            var events = host.Events
+                //.Where(k => k is CommonEvent)
+                .Cast<CommonEvent>()?.GroupBy(k => k.EventType);
             if (events == null) return;
             foreach (var kv in events)
             {
-                List<ICommonEvent> list = kv.ToList();
+                List<CommonEvent> list = kv.ToList();
                 for (var i = 0; i < list.Count - 1; i++)
                 {
                     if (list[i].Start == list[i].End) // case 1
@@ -91,14 +132,15 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             }
         }
 
-        public static (TimeRange ObsoleteList, HashSet<ICommonEvent> ControlNode) GetObsoleteList(this Sprite sprite)
+        public static (TimeRange ObsoleteList, HashSet<CommonEvent> ControlNode) GetObsoleteList(this Sprite sprite)
         {
             var obsoleteList = new TimeRange();
-            var controlNode = new HashSet<ICommonEvent>();
+            var controlNode = new HashSet<CommonEvent>();
             var possibleList = sprite.Events
                 .Where(k => k.EventType == EventTypes.Fade ||
                             k.EventType == EventTypes.Scale ||
                             k.EventType == EventTypes.Vector)
+                .Cast<CommonEvent>()
                 .ToArray();
 
             if (possibleList.Length <= 0)

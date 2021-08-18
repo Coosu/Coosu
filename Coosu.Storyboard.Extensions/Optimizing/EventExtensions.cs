@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Coosu.Storyboard.Common;
+using Coosu.Storyboard.Easing;
 using Coosu.Storyboard.Events;
+using Coosu.Storyboard.Utils;
 
 namespace Coosu.Storyboard.Extensions.Optimizing
 {
     public static class EventExtensions
     {
-      
         public static readonly ReadOnlyDictionary<EventType, double[]> UnworthyDictionary = new(
             new Dictionary<EventType, double[]>
             {
@@ -44,5 +45,93 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             ec.Events.Where(k => k.EventType == EventTypes.Scale).Select(k => (Scale)k);
         public static IEnumerable<Vector> GetVectorList(this IEventHost ec) =>
             ec.Events.Where(k => k.EventType == EventTypes.Vector).Select(k => (Vector)k);
+
+        public static List<ICommonEvent> ComputeDiscretizedEvents(this ICommonEvent e,
+            bool useRelative,
+            int discretizingInterval = 16,
+            int? discretizingAccuracy = 3)
+        {
+            if (e.EventType.Index < 100)
+            {
+                return CommonEventExtensions.ComputeDiscretizedEvents((CommonEvent)e,
+                    discretizingInterval, discretizingAccuracy);
+            }
+
+            var eventList = new List<ICommonEvent>();
+            var targetEventType = e.EventType;
+
+            var startTime = (int)e.StartTime;
+            var endTime = (int)e.EndTime;
+
+            var thisTime = startTime - (startTime % discretizingInterval);
+            var nextTime = startTime - (startTime % discretizingInterval) + discretizingInterval;
+            if (nextTime > endTime) nextTime = endTime;
+            double[] reusableValue = e.ComputeFrame(nextTime, nextTime == endTime ? null : discretizingAccuracy);
+
+            eventList.Add(new RelativeEvent(targetEventType, LinearEase.Instance,
+                startTime, nextTime, reusableValue.ToArray()));
+
+            while (nextTime < endTime)
+            {
+                thisTime += discretizingInterval;
+                nextTime += discretizingInterval;
+                if (nextTime > endTime) nextTime = endTime;
+                double[] newValue = e.ComputeFrame(nextTime, nextTime == endTime ? null : discretizingAccuracy);
+                var copy = newValue.ToArray();
+                for (int i = 0; i < e.EventType.Size; i++)
+                {
+                    if (useRelative)
+                    {
+                        newValue[i] = discretizingAccuracy == null
+                            ? newValue[i] - reusableValue[i]
+                            : Math.Round(newValue[i] - reusableValue[i], discretizingAccuracy.Value);
+                        reusableValue[i] = copy[i];
+                    }
+
+                }
+
+                var relativeEvent = new RelativeEvent(targetEventType, LinearEase.Instance,
+                    thisTime, nextTime, newValue);
+                if (!useRelative)
+                {
+                    relativeEvent.Start = reusableValue;
+                    reusableValue = copy;
+                }
+
+                eventList.Add(relativeEvent);
+            }
+
+            return eventList;
+        }
+
+        public static double[] ComputeFrame(this ICommonEvent e, double currentTime, int? accuracy)
+        {
+            if (e.EventType.Index < 100)
+            {
+                return CommonEventExtensions.ComputeFrame((CommonEvent)e, currentTime, accuracy);
+            }
+
+            var easing = e.Easing;
+            var size = e.EventType.Size;
+
+            var start = new double[size];
+            var end = e.End;
+
+            var startTime = (int)e.StartTime;
+            var endTime = (int)e.EndTime;
+
+            var normalizedTime = (currentTime - startTime) / (endTime - startTime);
+            var easedTime = easing.Ease(normalizedTime);
+
+            var value = new double[size];
+            for (int i = 0; i < size; i++)
+            {
+                var val = (end[i] - start[i]) * easedTime + start[i];
+                if (accuracy == null) value[i] = val;
+                else value[i] = Math.Round(val, accuracy.Value);
+            }
+
+            return value;
+        }
     }
 }
