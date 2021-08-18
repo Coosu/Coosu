@@ -18,13 +18,13 @@ namespace CoosuTest
             //layer.Camera.MoveBy(startTime: 0, endTime: 500, x: 300, y: 30);
 
             var sprite = layer.CreateSprite("sb");
-            sprite.MoveX(new QuinticEase(), -100, 14, 600, -600);
+            sprite.MoveX(0/*new QuinticEase()*/, -100, 14, 500, -500);
             //sprite.MoveXBy(new QuadraticEase(), 0, 16 * 10, 100);
             //sprite.MoveX(new QuadraticEase(), 16 * 10.3, 16 * 20, 100, 300);
             sprite.MoveXBy(new QuinticEase
             {
                 EasingMode = EasingMode.EaseOut
-            }, 12, 16 * 20, -100);
+            }, 12, 320, -100);
             sprite.MoveX(new QuinticEase(), 320, 300, -500, -600);
             //sprite.Fade(0, 0, 300, 0, 1);
             //sprite.MoveX(EasingType.BackIn, 0, 300, 320, 240);

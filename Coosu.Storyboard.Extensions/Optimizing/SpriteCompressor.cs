@@ -6,7 +6,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Coosu.Storyboard.Common;
-using Coosu.Storyboard.Easing;
 using Coosu.Storyboard.Events;
 using Coosu.Storyboard.Utils;
 
@@ -194,14 +193,26 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                     else
                     {
                         var discretizedRelative = @event.ComputeDiscretizedEvents(false)
+                            .Where(k => !k.Start.SequenceEqual(k.End))
                             .ToDictionary(k => (k.StartTime, k.EndTime), k => k);
-                        var discretizingTargetStandardEvents = targetStandardEvents
-                            .SelectMany(k => k.ComputeDiscretizedEvents())
-                            .ToDictionary(k => (k.StartTime, k.EndTime), k => k);
-                        //var discretizingTargetStandardEventsStart = discretizingTargetStandardEvents
-                        //    .ToDictionary(k => k.Key.StartTime, k => k.Value);
-                        //var discretizingTargetStandardEventsEnd = discretizingTargetStandardEvents
-                        //    .ToDictionary(k => k.Key.EndTime, k => k.Value);
+                        var discretizingTargetStandardEvents = new Dictionary<(double StartTime, double EndTime), ICommonEvent>();
+                        var boundedDiscretizingTargetStandardEvents = new HashSet<ICommonEvent>();
+                        foreach (CommonEvent k in targetStandardEvents)
+                        {
+                            ICommonEvent? first = null;
+                            ICommonEvent? last = null;
+                            foreach (ICommonEvent discretizedEvent in k.ComputeDiscretizedEvents())
+                            {
+                                first ??= discretizedEvent;
+                                last = discretizedEvent;
+                                var valueTuple = (discretizedEvent.StartTime, discretizedEvent.EndTime);
+                                discretizingTargetStandardEvents.Add(valueTuple, discretizedEvent);
+                            }
+
+                            if (first != null) boundedDiscretizingTargetStandardEvents.Add(first);
+                            if (last != null) boundedDiscretizingTargetStandardEvents.Add(last);
+                        }
+
                         var list = new List<ICommonEvent>();
                         foreach (var kvp in discretizedRelative.ToList())
                         {
@@ -218,26 +229,65 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                                 completelyCoincidentEvent.Start = newStart;
                                 completelyCoincidentEvent.End = newEnd;
                             }
-                            //else if (discretizingTargetStandardEventsEnd.TryGetValue(key.EndTime, out var differentStartEvent))
-                            //{
-                            //    // same end, but with different start
-                            //}
-                            //else if (discretizingTargetStandardEventsStart.TryGetValue(key.StartTime, out var differentEndEvent))
-                            //{ 
-                            //    //todo: will never hit
-                            //    // same start, but with different end
-
-                            //}
                             else
                             {
-                                // nothing
-                                var lastValue = SpriteExtensions.ComputeFrame(allThisTypeStandardEvents,
-                                    kvp.Value.EventType, kvp.Key.StartTime, 3);
-                                var commonEvent = CommonEvent.Create(targetStdType, EasingType.Linear,
-                                    kvp.Key.StartTime, kvp.Key.EndTime,
-                                    @event.EventType.ComputeRelative(lastValue, kvp.Value.Start, 3),
-                                    @event.EventType.ComputeRelative(lastValue, kvp.Value.End, 3));
-                                list.Add(commonEvent);
+                                var bounded = boundedDiscretizingTargetStandardEvents.FirstOrDefault(k =>
+                                    k.StartTime <= kvp.Key.EndTime && k.EndTime >= kvp.Key.StartTime);
+                                if (bounded == null)
+                                {
+                                    // nothing
+                                    var lastValue = SpriteExtensions.ComputeFrame(allThisTypeStandardEvents,
+                                        kvp.Value.EventType, kvp.Key.StartTime, 3);
+                                    var commonEvent = CommonEvent.Create(targetStdType, EasingType.Linear,
+                                        kvp.Key.StartTime, kvp.Key.EndTime,
+                                        @event.EventType.ComputeRelative(lastValue, kvp.Value.Start, 3),
+                                        @event.EventType.ComputeRelative(lastValue, kvp.Value.End, 3));
+
+                                    if (commonEvent.End.SequenceEqual(commonEvent.Start))
+                                    {
+
+                                    }
+
+                                    list.Add(commonEvent);
+                                }
+                                else
+                                {
+                                    if (kvp.Key.StartTime < bounded.EndTime && kvp.Key.EndTime > bounded.EndTime)
+                                    {
+                                        var val = SpriteExtensions.ComputeFrame(allThisTypeStandardEvents,
+                                            kvp.Value.EventType, kvp.Key.StartTime, 3);
+
+                                        var computeRelative0 = @event.EventType.ComputeRelative(val, kvp.Value.Start, 3);
+                                        var newEvent0 = CommonEvent.Create(targetStdType, EasingType.Linear,
+                                            bounded.StartTime, kvp.Key.StartTime,
+                                            bounded.End.ToArray(), computeRelative0);
+                                        var relativeVal = @event.ComputeFrame(bounded.EndTime, 3);
+                                        var computeRelative1 = @event.EventType.ComputeRelative(val, relativeVal, 3);
+                                        var newEvent1 = CommonEvent.Create(targetStdType, EasingType.Linear,
+                                            kvp.Key.StartTime, bounded.EndTime,
+                                            computeRelative0, computeRelative1);
+                                        var computeRelative2 = @event.EventType.ComputeRelative(val, kvp.Value.End, 3);
+                                        var newEvent2 = CommonEvent.Create(targetStdType, EasingType.Linear,
+                                        bounded.EndTime, kvp.Key.EndTime,
+                                        computeRelative1, computeRelative2);
+                                        list.Add(newEvent0);
+                                        list.Add(newEvent1);
+                                        list.Add(newEvent2);
+                                    }
+                                    else if (kvp.Key.EndTime > bounded.StartTime && kvp.Key.StartTime < bounded.StartTime)
+                                    {
+                                        var val = SpriteExtensions.ComputeFrame(allThisTypeStandardEvents,
+                                            kvp.Value.EventType, kvp.Key.EndTime, 3);
+                                    }
+                                    else if (kvp.Key.EndTime.Equals(bounded.StartTime) ||
+                                             kvp.Key.StartTime.Equals(bounded.EndTime))
+                                    {
+
+                                    }
+
+                                    Console.WriteLine(bounded.StartTime + "," + bounded.EndTime + "<->" + kvp.Key);
+                                    discretizingTargetStandardEvents.Remove((bounded.StartTime, bounded.EndTime));
+                                }
                             }
 
                             discretizedRelative.Remove(key);
