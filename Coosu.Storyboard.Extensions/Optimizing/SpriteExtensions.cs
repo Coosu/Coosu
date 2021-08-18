@@ -8,7 +8,7 @@ using Coosu.Storyboard.Utils;
 
 namespace Coosu.Storyboard.Extensions.Optimizing
 {
-    public static class SpriteExtension
+    public static class SpriteExtensions
     {
         public static async Task ExpandAsync(this Layer eleG)
         {
