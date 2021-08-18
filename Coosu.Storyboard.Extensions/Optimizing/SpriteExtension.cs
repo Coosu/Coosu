@@ -200,7 +200,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
         /// </summary>
         public static void Examine(this IEventHost host, EventHandler<ProcessErrorEventArgs>? onError)
         {
-            var events = host.Events.GroupBy(k => k.EventType);
+            var events = host.Events.Where(k => k is not RelativeEvent).GroupBy(k => k.EventType);
             foreach (var kv in events)
             {
                 var list = kv.ToArray();
