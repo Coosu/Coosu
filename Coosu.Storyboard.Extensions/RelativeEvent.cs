@@ -19,7 +19,15 @@ namespace Coosu.Storyboard.Extensions
 
         public double StartTime { get; set; }
         public double EndTime { get; set; }
-        public double[] Start { get; set; } 
+
+        /// <summary>
+        /// For relative event this is a tag.
+        /// </summary>
+        public double[] Start { get; set; }
+
+        /// <summary>
+        /// This is actual relative value.
+        /// </summary>
         public double[] End { get; set; }
         public virtual bool IsStatic => End.All(k => k == 0);
 
