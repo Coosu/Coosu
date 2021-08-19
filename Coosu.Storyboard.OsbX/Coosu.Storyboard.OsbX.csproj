@@ -4,7 +4,6 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <Description>Coosu.Storyboard is library to read and write osu!storyboard data of .osb file. This library provides .osbx serializing and deserializing which is an extended format of .osb.</Description>
     <PackageTags>osu, osu!</PackageTags>
-    <PackageReleaseNotes>Better support for Camera2D.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

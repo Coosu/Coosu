@@ -2,6 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>net452</TargetFramework>
+    <Description>Coosu.Storyboard.Storybrew helps you executing Coosu in Storybrew.</Description>
+    <PackageTags>osu, osu!</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>

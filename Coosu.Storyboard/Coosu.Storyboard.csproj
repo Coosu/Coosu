@@ -4,7 +4,6 @@
 	  <TargetFrameworks>net452;netstandard2.0</TargetFrameworks>
     <Description>Coosu.Storyboard is library to read and write osu!storyboard data of .osb file.</Description>
     <PackageTags>osu, osu!</PackageTags>
-    <PackageReleaseNotes>Better support for Camera2D.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup Condition="$(TargetFramework) == 'net452'">
