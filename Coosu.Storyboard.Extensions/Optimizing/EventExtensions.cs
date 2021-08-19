@@ -24,7 +24,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
         {
             return UnworthyDictionary.ContainsKey(e.EventType)
                 ? UnworthyDictionary[e.EventType]
-                : Array.Empty<double>();
+                : EmptyArray<double>.Value;
         }
 
         public static IEnumerable<Fade> GetFadeList(this IEventHost ec) =>
@@ -46,9 +46,17 @@ namespace Coosu.Storyboard.Extensions.Optimizing
         public static IEnumerable<Vector> GetVectorList(this IEventHost ec) =>
             ec.Events.Where(k => k.EventType == EventTypes.Vector).Select(k => (Vector)k);
 
+        /// <summary>
+        /// 0ms based fixed frame determined by interval
+        /// </summary>
+        /// <param name="e"></param>
+        /// <param name="absolute"></param>
+        /// <param name="discretizingInterval"></param>
+        /// <param name="discretizingAccuracy"></param>
+        /// <returns></returns>
         public static List<ICommonEvent> ComputeDiscretizedEvents(this ICommonEvent e,
-            bool useRelative,
-            int discretizingInterval = 16,
+            bool absolute,
+            int discretizingInterval = TempGlobalConstant.DiscretizingInterval,
             int? discretizingAccuracy = 3)
         {
             if (e.EventType.Index < 100)
@@ -57,6 +65,9 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                     discretizingInterval, discretizingAccuracy);
             }
 
+            // relative events
+            // absolute: compute each frame with actual relative value
+            // !absolute: compute each frame and preserve the changed relative value compared to the first frame 
             var eventList = new List<ICommonEvent>();
             var targetEventType = e.EventType;
 
@@ -78,21 +89,21 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                 if (nextTime > endTime) nextTime = endTime;
                 double[] newValue = e.ComputeFrame(nextTime, nextTime == endTime ? null : discretizingAccuracy);
                 var copy = newValue.ToArray();
-                for (int i = 0; i < e.EventType.Size; i++)
+
+                if (absolute)
                 {
-                    if (useRelative)
+                    for (int i = 0; i < e.EventType.Size; i++)
                     {
                         newValue[i] = discretizingAccuracy == null
-                            ? newValue[i] - reusableValue[i]
-                            : Math.Round(newValue[i] - reusableValue[i], discretizingAccuracy.Value);
+                             ? newValue[i] - reusableValue[i]
+                             : Math.Round(newValue[i] - reusableValue[i], discretizingAccuracy.Value);
                         reusableValue[i] = copy[i];
                     }
-
                 }
 
                 var relativeEvent = new RelativeEvent(targetEventType, LinearEase.Instance,
                     thisTime, nextTime, newValue);
-                if (!useRelative)
+                if (!absolute)
                 {
                     relativeEvent.Start = reusableValue;
                     reusableValue = copy;

@@ -59,5 +59,14 @@ namespace Coosu.Storyboard.Utils
         {
             return eventHost.Events.Count(k => k.StartTime.Equals(eventHost.MinTime));
         }
+
+        public static bool HasEffectiveTiming(this IEventHost eventHost)
+        {
+            if (eventHost.MaxTime < eventHost.MinTime)
+                return false;
+            if (eventHost.MaxTime.Equals(eventHost.MinTime))
+                return false;
+            return true;
+        }
     }
 }

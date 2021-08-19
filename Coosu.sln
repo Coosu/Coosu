@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29006.145
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31612.314
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Coosu.Api", "Coosu.Api\Coosu.Api.csproj", "{3108AE4A-DE35-40AE-A449-1EFB9719367D}"
 EndProject
@@ -13,9 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoosuUnitTest", "Tests\Coos
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Coosu.Shared", "Coosu.Shared\Coosu.Shared.csproj", "{14A79D62-96D7-4A1C-92B1-5148558C1108}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Coosu.Animation", "Coosu.Animation\Coosu.Animation.csproj", "{8C9A6BFA-FCA2-469F-A5C9-EAC668745D92}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Coosu.Animation", "Coosu.Animation\Coosu.Animation.csproj", "{8C9A6BFA-FCA2-469F-A5C9-EAC668745D92}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Coosu.Animation.WPF", "Coosu.Animation.WPF\Coosu.Animation.WPF.csproj", "{D4FE7218-975E-40FC-BDE7-67AA16AF4840}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Coosu.Animation.WPF", "Coosu.Animation.WPF\Coosu.Animation.WPF.csproj", "{D4FE7218-975E-40FC-BDE7-67AA16AF4840}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoosuTest", "Tests\CoosuTest\CoosuTest.csproj", "{10177DA6-386D-46E9-B991-716A67773240}"
 EndProject
@@ -26,6 +26,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Coosu.Storyboard.Extensions", "Coosu.Storyboard.Extensions\Coosu.Storyboard.Extensions.csproj", "{7B7C3BF2-72E5-4D18-99B7-EE33AD516F80}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ParsingPerformanceTest", "Tests\ParsingPerformanceTest\ParsingPerformanceTest.csproj", "{EB1E4AF8-5C13-450D-9B61-64AA11021695}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Coosu.Storyboard.Storybrew", "Coosu.Storyboard.Storybrew\Coosu.Storyboard.Storybrew.csproj", "{DBE04CF2-5668-4DDB-9BEA-6BBB01147785}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -77,6 +79,10 @@ Global
 		{EB1E4AF8-5C13-450D-9B61-64AA11021695}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EB1E4AF8-5C13-450D-9B61-64AA11021695}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EB1E4AF8-5C13-450D-9B61-64AA11021695}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DBE04CF2-5668-4DDB-9BEA-6BBB01147785}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DBE04CF2-5668-4DDB-9BEA-6BBB01147785}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DBE04CF2-5668-4DDB-9BEA-6BBB01147785}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DBE04CF2-5668-4DDB-9BEA-6BBB01147785}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

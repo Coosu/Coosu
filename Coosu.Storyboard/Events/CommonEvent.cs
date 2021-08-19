@@ -63,8 +63,8 @@ namespace Coosu.Storyboard.Events
 
         protected CommonEvent()
         {
-            Start = Array.Empty<double>();
-            End = Array.Empty<double>();
+            Start = EmptyArray<double>.Value;
+            End = EmptyArray<double>.Value;
         }
 
         protected CommonEvent(IEasingFunction easing, double startTime, double endTime, double[] start, double[] end)

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Threading.Tasks;
 using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Events;
@@ -78,7 +79,7 @@ namespace Coosu.Storyboard
         /// <param name="filePath">File path of the image.</param>
         /// <param name="defaultLocation">Default location of the image.</param>
         /// <returns></returns>
-        public Sprite CreateSprite(LayerType layerType, OriginType originType, string filePath, System.Drawing.Point defaultLocation)
+        public Sprite CreateSprite(LayerType layerType, OriginType originType, string filePath, Vector2 defaultLocation)
         {
             var obj = new Sprite(layerType, originType, filePath, defaultLocation.X, defaultLocation.Y);
             AddSprite(obj);

@@ -59,8 +59,8 @@ namespace Coosu.Storyboard.Extensions
         public RelativeEvent(EventType eventType)
         {
             EventType = eventType;
-            Start = Array.Empty<double>();
-            End = Array.Empty<double>();
+            Start = EmptyArray<double>.Value;
+            End = EmptyArray<double>.Value;
         }
 
         public RelativeEvent(EventType eventType, IEasingFunction easing, double startTime, double endTime, double[] byValue)
