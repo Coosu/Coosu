@@ -194,5 +194,10 @@ namespace Coosu.Storyboard.Events
 
             return commonEvent;
         }
+
+        public object Clone()
+        {
+            return CommonEvent.Create(EventType, Easing, StartTime, EndTime, Start, End);
+        }
     }
 }

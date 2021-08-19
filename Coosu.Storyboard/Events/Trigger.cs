@@ -125,5 +125,15 @@ namespace Coosu.Storyboard.Events
             get => _baseObject;
             set => _baseObject = value;
         }
+
+        public object Clone()
+        {
+            var trigger = new Trigger(StartTime, EndTime, TriggerName)
+            {
+                Events = Events.Select(k => k.Clone()).Cast<ICommonEvent>().ToList(),
+                EnableGroupedSerialization = EnableGroupedSerialization
+            };
+            return trigger;
+        }
     }
 }

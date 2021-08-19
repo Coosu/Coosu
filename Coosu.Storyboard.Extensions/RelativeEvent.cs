@@ -92,5 +92,13 @@ namespace Coosu.Storyboard.Extensions
                 if (i != EventType.Size - 1) await textWriter.WriteAsync(',');
             }
         }
+
+        public object Clone()
+        {
+            return new RelativeEvent(EventType, Easing, StartTime, EndTime, End)
+            {
+                Start = Start
+            };
+        }
     }
 }

@@ -25,10 +25,10 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             return previous.End.SequenceEqual(next.Start);
         }
 
-        public static bool EndsWithUnworthy(this ICommonEvent e)
+        public static bool EndsWithIneffective(this ICommonEvent e)
         {
-            return EventExtensions.UnworthyDictionary.ContainsKey(e.EventType) &&
-                   EventExtensions.UnworthyDictionary[e.EventType].SequenceEqual(e.End);
+            return EventExtensions.IneffectiveDictionary.ContainsKey(e.EventType) &&
+                   EventExtensions.IneffectiveDictionary[e.EventType].SequenceEqual(e.End);
         }
 
         public static bool IsStaticAndDefault(this ICommonEvent e)

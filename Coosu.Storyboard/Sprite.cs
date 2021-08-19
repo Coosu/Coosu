@@ -68,9 +68,6 @@ namespace Coosu.Storyboard
             );
         public bool EnableGroupedSerialization { get; set; }/* = true;*/
 
-        //public bool IsWorthy => !MinTime.Equals(MaxTime) || IsBackground;
-        //public bool IsBackground { get; internal set; }
-
         // Loop control
         private bool _isTriggering;
         private bool _isLooping;
@@ -184,7 +181,6 @@ namespace Coosu.Storyboard
 
         public async Task WriteScriptAsync(TextWriter writer)
         {
-            //if (!IsWorthy) return;
             await WriteHeaderAsync(writer);
             await writer.WriteLineAsync();
             await ScriptHelper.WriteElementEventsAsync(writer, this, EnableGroupedSerialization);
@@ -200,6 +196,19 @@ namespace Coosu.Storyboard
                 Events.Add(@event);
         }
 
-        public Sprite Clone() => throw new NotImplementedException();
+        public object Clone()
+        {
+            var sprite = new Sprite(LayerType, OriginType, ImagePath, DefaultX, DefaultY)
+            {
+                ZDistance = ZDistance,
+                CameraId = CameraId,
+                EnableGroupedSerialization = EnableGroupedSerialization,
+                Events = Events.Select(k => k.Clone()).Cast<ICommonEvent>().ToList(),
+            };
+
+            sprite.LoopList.AddRange(LoopList.Select(k => k.Clone()).Cast<Loop>());
+            sprite.TriggerList.AddRange(LoopList.Select(k => k.Clone()).Cast<Trigger>());
+            return sprite;
+        }
     }
 }

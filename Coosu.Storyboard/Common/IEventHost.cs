@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Coosu.Storyboard.Common
 {
-    public interface IEventHost : IScriptable
+    public interface IEventHost : IScriptable, ICloneable
     {
         double MaxTime { get; }
         double MinTime { get; }

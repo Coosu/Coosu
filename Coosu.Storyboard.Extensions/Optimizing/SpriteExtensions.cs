@@ -164,7 +164,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                 dic[e.EventType].Count++;
                 // 最早的event晚于最小开始时间，默认加这一段
                 if (dic[e.EventType].Count == 1 &&
-                    e.Start.SequenceEqual(e.GetUnworthyValue()) &&
+                    e.Start.SequenceEqual(e.GetIneffectiveValue()) &&
                     e.StartTime > sprite.MinTime)
                 {
                     if (e.IsStatic)
@@ -175,8 +175,8 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                 }
 
                 // event.Start和End都为无用值时，开始计时
-                if (e.Start.SequenceEqual(e.GetUnworthyValue()) &&
-                    e.End.SequenceEqual(e.GetUnworthyValue()) &&
+                if (e.Start.SequenceEqual(e.GetIneffectiveValue()) &&
+                    e.End.SequenceEqual(e.GetIneffectiveValue()) &&
                     dic[e.EventType].IsFadingOut == false)
                 {
                     dic[e.EventType].StartTime = e.StartTime;
@@ -184,7 +184,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                     controlNode.Add(e);
                 }
                 // event.End为无用值时，开始计时
-                else if (e.End.SequenceEqual(e.GetUnworthyValue()) &&
+                else if (e.End.SequenceEqual(e.GetIneffectiveValue()) &&
                          dic[e.EventType].IsFadingOut == false)
                 {
                     dic[e.EventType].StartTime = e.EndTime;
@@ -193,8 +193,8 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                 }
                 else if (dic[e.EventType].IsFadingOut)
                 {
-                    if (e.Start.SequenceEqual(e.GetUnworthyValue()) &&
-                        e.End.SequenceEqual(e.GetUnworthyValue()))
+                    if (e.Start.SequenceEqual(e.GetIneffectiveValue()) &&
+                        e.End.SequenceEqual(e.GetIneffectiveValue()))
                         continue;
                     AddTimeRage(dic[e.EventType].StartTime, e.StartTime);
                     dic[e.EventType].IsFadingOut = false;
@@ -217,14 +217,14 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                 if (sprite.TriggerList
                         .Where(k =>
                             k.Events
-                                .Any(o => EventExtensions.UnworthyDictionary.ContainsKey(o.EventType))
+                                .Any(o => EventExtensions.IneffectiveDictionary.ContainsKey(o.EventType))
                         )
                         .Any(k => endTime >= k.StartTime && startTime <= k.EndTime)
                     ||
                     sprite.LoopList
                         .Where(k =>
                             k.Events
-                                .Any(o => EventExtensions.UnworthyDictionary.ContainsKey(o.EventType))
+                                .Any(o => EventExtensions.IneffectiveDictionary.ContainsKey(o.EventType))
                         )
                         .Any(k => endTime >= k.StartTime && startTime <= k.EndTime))
                 {

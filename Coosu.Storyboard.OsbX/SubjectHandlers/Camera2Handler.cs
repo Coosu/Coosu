@@ -96,5 +96,10 @@ namespace Coosu.Storyboard.OsbX.SubjectHandlers
             await writer.WriteLineAsync();
             await ScriptHelper.WriteElementEventsAsync(writer, this, EnableGroupedSerialization);
         }
+
+        public object Clone()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

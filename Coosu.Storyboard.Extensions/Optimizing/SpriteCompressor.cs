@@ -323,7 +323,6 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             }
         }
 
-
         private static void ComputeRelativeEvents(Sprite sprite)
         {
             var commonEvents = sprite.Events.ToList();
@@ -581,7 +580,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
 
                     // 判断是否此Event为控制Obsolete Range的Event。
                     if (!(nowE.OnObsoleteTimingRange(obsoleteList) &&
-                          EventExtensions.UnworthyDictionary.ContainsKey(nowE.EventType)))
+                          EventExtensions.IneffectiveDictionary.ContainsKey(nowE.EventType)))
                     {
                         bool canRemove;
 
@@ -805,7 +804,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                          * 且 此event当前动作 = 此event上个动作
                         */
                         else if (nowE.IsSmallerThenMaxTime(host) /*||
-                                 type == EventTypes.Fade && nowStartP.SequenceEqual(EventExtension.UnworthyDictionary[EventTypes.Fade]) */
+                                 type == EventTypes.Fade && nowStartP.SequenceEqual(EventExtension.IneffectiveDictionary[EventTypes.Fade]) */
                                  && nowE.IsStatic()
                                  && EventCompare.IsEventSequent(preE, nowE))
                         {
