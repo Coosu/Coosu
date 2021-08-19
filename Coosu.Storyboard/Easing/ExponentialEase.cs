@@ -14,7 +14,7 @@ namespace Coosu.Storyboard.Easing
         /// <summary>
         /// Specifies the factor which controls the shape of easing.
         /// </summary>
-        public double Exponent { get; init; } = 2;
+        public double Exponent { get; set; } = 2;
 
         protected override double EaseInCore(double normalizedTime)
         {

@@ -14,13 +14,13 @@ namespace Coosu.Storyboard.Easing
         /// <summary>
         /// Specifies the number of bounces.  This does not include the final half bounce.
         /// </summary>
-        public int Bounces { get; init; } = 3;
+        public int Bounces { get; set; } = 3;
 
         /// <summary>
         /// Specifies the amount of bounciness.  This corresponds to the scale difference between a bounce and the next bounce.  
         /// For example, Bounciness = 2.0 correspondes to the next bounce being twices as high and taking twice as long.
         /// </summary>
-        public double Bounciness { get; init; } = 2d;
+        public double Bounciness { get; set; } = 2d;
 
         protected override double EaseInCore(double normalizedTime)
         {

@@ -14,12 +14,12 @@ namespace Coosu.Storyboard.Easing
         /// <summary>
         /// Specifies the number of oscillations
         /// </summary>
-        public int Oscillations { get; init; } = 3;
+        public int Oscillations { get; set; } = 3;
 
         /// <summary>
         /// Specifies the amount of springiness
         /// </summary>
-        public double Springiness { get; init; } = 3;
+        public double Springiness { get; set; } = 3;
 
         protected override double EaseInCore(double normalizedTime)
         {

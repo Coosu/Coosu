@@ -14,7 +14,7 @@ namespace Coosu.Storyboard.Easing
         /// <summary>
         /// Specifies how much the function will pull back
         /// </summary>
-        public double Amplitude { get; init; } = 1;
+        public double Amplitude { get; set; } = 1;
 
         protected override double EaseInCore(double normalizedTime)
         {

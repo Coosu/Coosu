@@ -16,7 +16,7 @@ namespace Coosu.Storyboard.Easing
         /// <summary>
         /// Specifies the power for the polynomial equation.
         /// </summary>
-        public double Power { get; init; } = 2;
+        public double Power { get; set; } = 2;
 
 
         protected override double EaseInCore(double normalizedTime)

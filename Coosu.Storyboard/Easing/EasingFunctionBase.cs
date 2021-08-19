@@ -9,7 +9,7 @@ namespace Coosu.Storyboard.Easing
     {
         private string DebuggerDisplay => GetDescription();
 
-        public EasingMode EasingMode { get; init; }
+        public EasingMode EasingMode { get; set; }
 
         public double Ease(double normalizedTime)
         {
