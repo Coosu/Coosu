@@ -36,10 +36,13 @@ namespace Coosu.Storyboard.Extensions.Optimizing
 
         public Guid Guid { get; } = Guid.NewGuid();
 
-        public SpriteCompressor(ICollection<Sprite> sprites)
+        public SpriteCompressor(ICollection<ISceneObject> sprites)
         {
-            _sprites = sprites;
-            _sourceSprites = (ICollection<ISceneObject>)sprites;
+            _sprites = sprites
+                .Where(k => k is Sprite)
+                .Cast<Sprite>()
+                .ToList();
+            _sourceSprites = sprites;
         }
 
         public SpriteCompressor(Layer layer)
