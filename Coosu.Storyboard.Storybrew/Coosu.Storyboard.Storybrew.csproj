@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Coosu.Storyboard.Extensions\Coosu.Storyboard.Extensions.csproj" />
+    <ProjectReference Include="..\Libraries\storybrew\common\common.csproj" />
   </ItemGroup>
 
 </Project>
