@@ -1,6 +1,6 @@
 <Project>
 
-  <ItemGroup>
+  <ItemGroup Condition="$(ProjectName.StartsWith('Coosu1')) == 'true'">
     <PackageReference Include="MinVer" Version="2.5.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
