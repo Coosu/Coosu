@@ -38,14 +38,14 @@ jobs:
         dotnet pack Coosu.Beatmap --configuration Release --output ci-pack
         dotnet pack Coosu.Api --configuration Release --output ci-pack
       
-    - name: dotnet Build Coosu.Storyboard.Extensions ILMerged 
+    - name: dotnet Build Coosu.Storyboard.Storybrew ILMerged 
       shell: pwsh
       run: |
-        dotnet build Coosu.Storyboard.Extensions --configuration Release --output ci-build-Coosu.Storyboard.Extensions
+        dotnet build Coosu.Storyboard.Storybrew --configuration Release --output ci-build
         mkdir ILMerge -Force
         Invoke-WebRequest https://github.com/Milkitic/ILMerge/releases/download/3.0.41.49566/ILMerge-Windows.7z -OutFile "ILMerge/cli.zip"
         7z x "ILMerge/cli.zip" -oILMerge/
-        .\ILMerge\ILMerge.exe .\ci-build-Coosu.Storyboard.Extensions\Coosu.Shared.dll .\ci-build-Coosu.Storyboard.Extensions\Coosu.Storyboard.dll .\ci-build-Coosu.Storyboard.Extensions\Coosu.Storyboard.Extensions.dll /t:library /out:Coosu.Storyboard.Extensions-ILMerged.dll
+        .\ILMerge\ILMerge.exe .\ci-build\Coosu.Shared.dll .\ci-build\Coosu.Storyboard.dll .\ci-build\Coosu.Storyboard.Extensions.dll .\ci-build\System.Buffers.dll .\ci-build\System.Memory.dll .\ci-build\System.Numerics.Vectors.dll .\ci-build\System.Runtime.CompilerServices.Unsafe.dll .\ci-build\System.ValueTuple.dll .\ci-build\Coosu.Storyboard.Storybrew.dll /t:library /out:Coosu.Storyboard.Storybrew-ILMerged.dll
         
     - name: action-minver
       uses: thefringeninja/action-minver@2.0.0-preview1
@@ -58,7 +58,7 @@ jobs:
       if: ${{ success() && startsWith(github.ref, 'refs/tags/') }}
       run: |
         mkdir -p ./ci-7zpack/
-        7z a "./ci-7zpack/Coosu.Storyboard.Extensions-ILMerged.${{ steps.version.outputs.version }}.7z" "./Coosu.Storyboard.Extensions-ILMerged.*"
+        7z a "./ci-7zpack/Coosu.Storyboard.Storybrew-ILMerged.${{ steps.version.outputs.version }}.7z" "./Coosu.Storyboard.Storybrew-ILMerged.*"
       
     - name: Create a new GitHub release if a new tag is pushed
       uses: softprops/action-gh-release@v1
@@ -76,7 +76,7 @@ jobs:
           ./ci-pack/Coosu.Storyboard.OsbX.${{ steps.version.outputs.version }}.nupkg
           ./ci-pack/Coosu.Beatmap.${{ steps.version.outputs.version }}.nupkg
           ./ci-pack/Coosu.Api.${{ steps.version.outputs.version }}.nupkg
-          ./ci-7zpack/Coosu.Storyboard.Extensions-ILMerged.${{ steps.version.outputs.version }}.7z
+          ./ci-7zpack/Coosu.Storyboard.Storybrew-ILMerged.${{ steps.version.outputs.version }}.7z
 
     - name: Nuget Publish Coosu.Shared
       uses: brandedoutcast/publish-nuget@v2.5.2

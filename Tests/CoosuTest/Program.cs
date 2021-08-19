@@ -45,7 +45,7 @@ namespace CoosuTest
             await compressor.CompressAsync();
             await layer.WriteScriptAsync(Console.Out);
             return;
-            var text = await File.ReadAllTextAsync(
+            var text = File.ReadAllText(
                 "C:\\Users\\milkitic\\Downloads\\" +
                 "1037741 Denkishiki Karen Ongaku Shuudan - Gareki no Yume\\" +
                 "Denkishiki Karen Ongaku Shuudan - Gareki no Yume (Dored).osb"
@@ -68,6 +68,7 @@ namespace CoosuTest
 
         private static async Task OutputOldOsb(string text)
         {
+#if NET5_0_OR_GREATER
             var ctx = new System.Runtime.Loader.AssemblyLoadContext("old", false);
             var path = Path.Combine(Environment.CurrentDirectory, @"..\..\..\V1.0.0.0\Coosu.Storyboard.dll");
             var asm = ctx.LoadFromAssemblyPath(path);
@@ -84,6 +85,7 @@ namespace CoosuTest
             var task = (Task)methodSave.Invoke(eg,
                 new object?[] { Path.Combine(Environment.CurrentDirectory, "output_old.osb") });
             await task;
+#endif
         }
     }
 }

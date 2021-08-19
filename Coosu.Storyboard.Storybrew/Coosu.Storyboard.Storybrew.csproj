@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net452</TargetFramework>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <Description>Coosu.Storyboard.Storybrew helps you executing Coosu in Storybrew.</Description>
     <PackageTags>osu, osu!</PackageTags>
   </PropertyGroup>
