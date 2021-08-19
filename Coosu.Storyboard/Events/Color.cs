@@ -1,4 +1,6 @@
-﻿namespace Coosu.Storyboard.Events
+﻿using Coosu.Storyboard.Easing;
+
+namespace Coosu.Storyboard.Events
 {
     public sealed class Color : CommonEvent
     {
@@ -40,8 +42,15 @@
             set => End[2] = value;
         }
 
-        public Color(EasingType easing, double startTime, double endTime, double r1, double g1, double b1, double r2,
-            double g2, double b2) : base(easing, startTime, endTime, new[] { r1, g1, b1 }, new[] { r2, g2, b2 })
+        public Color(EasingType easing, double startTime, double endTime,
+            double r1, double g1, double b1, double r2, double g2, double b2)
+            : base(easing.ToEasingFunction(), startTime, endTime, new[] { r1, g1, b1 }, new[] { r2, g2, b2 })
+        {
+        }
+
+        public Color(IEasingFunction easing, double startTime, double endTime,
+            double r1, double g1, double b1, double r2, double g2, double b2)
+            : base(easing, startTime, endTime, new[] { r1, g1, b1 }, new[] { r2, g2, b2 })
         {
         }
     }

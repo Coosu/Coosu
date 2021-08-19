@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Coosu.Storyboard.Common;
+using Coosu.Storyboard.Easing;
 using Coosu.Storyboard.Extensibility;
 using Coosu.Storyboard.Utils;
 
@@ -15,13 +16,12 @@ namespace Coosu.Storyboard.Events
         private string DebuggerDisplay => this.GetHeaderString();
 
         public abstract EventType EventType { get; }
-        public EasingType Easing { get; set; }
+        public IEasingFunction Easing { get; set; } = LinearEase.Instance;
         public double StartTime { get; set; }
         public double EndTime { get; set; }
         public double[] Start { get; set; }
         public double[] End { get; set; }
-
-        public virtual int ParamLength => Start.Length;
+        
         public virtual bool IsStatic => Start.SequenceEqual(End);
 
         //public int CompareTo(CommonEvent? other)
@@ -47,7 +47,8 @@ namespace Coosu.Storyboard.Events
         {
             await writer.WriteAsync(EventType.Flag);
             await writer.WriteAsync(',');
-            await writer.WriteAsync((int)Easing);
+            var typeStr = ((int?)Easing.TryGetEasingType())?.ToString() ?? "?";
+            await writer.WriteAsync(typeStr);
             await writer.WriteAsync(',');
             await writer.WriteAsync(Math.Round(StartTime));
             await writer.WriteAsync(',');
@@ -62,11 +63,11 @@ namespace Coosu.Storyboard.Events
 
         protected CommonEvent()
         {
-            Start = Array.Empty<double>();
-            End = Array.Empty<double>();
+            Start = EmptyArray<double>.Value;
+            End = EmptyArray<double>.Value;
         }
 
-        protected CommonEvent(EasingType easing, double startTime, double endTime, double[] start, double[] end)
+        protected CommonEvent(IEasingFunction easing, double startTime, double endTime, double[] start, double[] end)
         {
             Easing = easing;
             StartTime = startTime;
@@ -74,6 +75,15 @@ namespace Coosu.Storyboard.Events
             Start = start;
             End = end;
         }
+
+        //protected CommonEvent(EasingType easing, double startTime, double endTime, double[] start, double[] end)
+        //{
+        //    Easing = easing.ToEasingFunction();
+        //    StartTime = startTime;
+        //    EndTime = endTime;
+        //    Start = start;
+        //    End = end;
+        //}
 
         protected virtual async Task WriteExtraScriptAsync(TextWriter textWriter)
         {
@@ -87,30 +97,36 @@ namespace Coosu.Storyboard.Events
 
         private async Task WriteStartAsync(TextWriter textWriter)
         {
-            for (int i = 0; i < ParamLength; i++)
+            for (int i = 0; i < EventType.Size; i++)
             {
                 await textWriter.WriteAsync(Start[i].ToIcString());
-                if (i != ParamLength - 1) await textWriter.WriteAsync(',');
+                if (i != EventType.Size - 1) await textWriter.WriteAsync(',');
             }
         }
 
         private async Task WriteFullAsync(TextWriter textWriter)
         {
-            for (int i = 0; i < ParamLength; i++)
+            for (int i = 0; i < EventType.Size; i++)
             {
                 await textWriter.WriteAsync(Start[i].ToIcString());
                 await textWriter.WriteAsync(',');
             }
 
-            for (int i = 0; i < ParamLength; i++)
+            for (int i = 0; i < EventType.Size; i++)
             {
                 await textWriter.WriteAsync(End[i].ToIcString());
-                if (i != ParamLength - 1) await textWriter.WriteAsync(',');
+                if (i != EventType.Size - 1) await textWriter.WriteAsync(',');
             }
         }
 
-        //todo: use Span<T>
         public static ICommonEvent Create(EventType e, EasingType easing, double startTime, double endTime,
+            params double[] parameters)
+        {
+            return Create(e, easing.ToEasingFunction(), startTime, endTime, parameters);
+        }
+
+        //todo: use Span<T>
+        public static ICommonEvent Create(EventType e, IEasingFunction easing, double startTime, double endTime,
             params double[] parameters)
         {
             var size = e.Size;
@@ -121,6 +137,12 @@ namespace Coosu.Storyboard.Events
         }
 
         public static ICommonEvent Create(EventType e, EasingType easing,
+            double startTime, double endTime, double[] start, double[]? end)
+        {
+            return Create(e, easing.ToEasingFunction(), startTime, endTime, start, end);
+        }
+
+        public static ICommonEvent Create(EventType e, IEasingFunction easing,
             double startTime, double endTime, double[] start, double[]? end)
         {
             ICommonEvent commonEvent;
@@ -162,7 +184,7 @@ namespace Coosu.Storyboard.Events
             }
             else if (e == EventTypes.Parameter)
             {
-                commonEvent = new Parameter(easing, startTime, endTime, (ParameterType)(int)start[0]);
+                commonEvent = new Parameter(startTime, endTime, (ParameterType)(int)start[0]);
             }
             else
             {

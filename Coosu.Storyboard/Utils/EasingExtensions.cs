@@ -50,9 +50,9 @@ namespace Coosu.Storyboard.Utils
         public static readonly Func<double, double> ElasticInOut = x => ToInOut(ElasticIn, x);
 
         public static double Ease(this EasingType easing, double value)
-            => easing.ToEasingFunction().Invoke(value);
+            => easing.ToEasingFunc().Invoke(value);
 
-        public static Func<double, double> ToEasingFunction(this EasingType easing)
+        public static Func<double, double> ToEasingFunc(this EasingType easing)
         {
             switch (easing)
             {

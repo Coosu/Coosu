@@ -1,7 +1,69 @@
-﻿namespace Coosu.Storyboard
+﻿using System;
+using System.Collections.Generic;
+
+namespace Coosu.Storyboard
 {
     public static class EventTypes
     {
+        #region static members
+
+        private static readonly Dictionary<string, EventType> DictionaryStore = new(StringComparer.OrdinalIgnoreCase);
+        private static readonly Dictionary<int, EventType> DictionaryStoreIndex = new();
+        private static readonly Dictionary<string, EventType> NonCommonDictionaryStore = new(StringComparer.OrdinalIgnoreCase);
+
+        static EventTypes()
+        {
+            SignType(EventTypes.Fade);
+            SignType(EventTypes.Move);
+            SignType(EventTypes.MoveX);
+            SignType(EventTypes.MoveY);
+            SignType(EventTypes.Scale);
+            SignType(EventTypes.Vector);
+            SignType(EventTypes.Rotate);
+            SignType(EventTypes.Color);
+            SignType(EventTypes.Parameter);
+            SignType(EventTypes.Loop);
+            SignType(EventTypes.Trigger);
+        }
+
+        public static void SignType(EventType type)
+        {
+            if (DictionaryStore.ContainsKey(type.Flag)) return;
+            DictionaryStore.Add(type.Flag, type);
+            DictionaryStoreIndex.Add(type.Index, type);
+            if (type.Size < 0) NonCommonDictionaryStore.Add(type.Flag, type);
+        }
+
+        public static void SignType(string flag, int length, int index)
+        {
+            if (DictionaryStore.ContainsKey(flag)) return;
+            var type = new EventType(flag, length, index);
+            DictionaryStoreIndex.Add(index, type);
+            DictionaryStore.Add(flag, type);
+        }
+
+        public static EventType GetValue(string flag)
+        {
+            return DictionaryStore.TryGetValue(flag, out var val) ? val : default;
+        }
+
+        public static EventType GetValue(int index)
+        {
+            return DictionaryStoreIndex.TryGetValue(index, out var val) ? val : default;
+        }
+
+        public static bool Contains(string flag)
+        {
+            return DictionaryStore.ContainsKey(flag);
+        }
+
+        public static bool IsCommonEvent(string flag)
+        {
+            return !NonCommonDictionaryStore.ContainsKey(flag);
+        }
+
+        #endregion
+
         public static EventType Loop { get; } = new("L", -1, 0);
         public static EventType Move { get; } = new("M", 2, 1);
         public static EventType Fade { get; } = new("F", 1, 2);

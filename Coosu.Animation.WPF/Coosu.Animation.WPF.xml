@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Coosu.Animation.WPF</name>
+    </assembly>
+    <members>
+        <member name="P:Coosu.Animation.WPF.BlendEffect.Base">
+            <summary>
+            Brush that acts as the input for the background layer
+            </summary>
+        </member>
+        <member name="P:Coosu.Animation.WPF.BlendEffect.Blend">
+            <summary>
+            Brush that acts as the input for the foreground layer
+            </summary>
+        </member>
+        <member name="P:Coosu.Animation.WPF.BlendEffect.Amount">
+            <summary>
+            Intensity of the color blending between 0 and 1.0
+            </summary>
+        </member>
+        <member name="P:Coosu.Animation.WPF.BlendEffect.Mode">
+            <summary>
+            Blend mode for calculating the result layer
+            </summary>
+        </member>
+        <member name="T:Coosu.Animation.WPF.App">
+            <summary>
+            App.xaml 的交互逻辑
+            </summary>
+        </member>
+        <member name="T:Coosu.Animation.WPF.MainWindow">
+            <summary>
+            MainWindow.xaml 的交互逻辑
+            </summary>
+            <summary>
+            MainWindow
+            </summary>
+        </member>
+        <member name="M:Coosu.Animation.WPF.MainWindow.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="T:XamlGeneratedNamespace.GeneratedApplication">
+            <summary>
+            GeneratedApplication
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedApplication.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedApplication.Main">
+            <summary>
+            Application Entry Point.
+            </summary>
+        </member>
+    </members>
+</doc>

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Threading.Tasks;
 using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Events;
@@ -78,7 +79,7 @@ namespace Coosu.Storyboard
         /// <param name="filePath">File path of the image.</param>
         /// <param name="defaultLocation">Default location of the image.</param>
         /// <returns></returns>
-        public Sprite CreateSprite(LayerType layerType, OriginType originType, string filePath, System.Drawing.Point defaultLocation)
+        public Sprite CreateSprite(LayerType layerType, OriginType originType, string filePath, Vector2 defaultLocation)
         {
             var obj = new Sprite(layerType, originType, filePath, defaultLocation.X, defaultLocation.Y);
             AddSprite(obj);
@@ -369,7 +370,7 @@ namespace Coosu.Storyboard
 
                 int easing = int.MinValue, startTime = int.MinValue, endTime = int.MinValue;
 
-                if (EventType.IsCommonEvent(identifier))
+                if (EventTypes.IsCommonEvent(identifier))
                 {
                     easing = int.Parse(@params[1]);
                     if (easing is > 34 or < 0)
@@ -391,7 +392,7 @@ namespace Coosu.Storyboard
             string identifier, int easing, int startTime, int endTime)
         {
             int rawLength = rawParams.Length;
-            var eventType = EventType.GetValue(identifier);
+            var eventType = EventTypes.GetValue(identifier);
             if (eventType != default)
             {
                 var size = eventType.Size;
@@ -450,7 +451,6 @@ namespace Coosu.Storyboard
                         if (rawLength == 5)
                         {
                             currentObj.Parameter(
-                                (EasingType)easing,
                                 startTime,
                                 endTime,
                                 rawParams[4]!.ToParameterEnum());

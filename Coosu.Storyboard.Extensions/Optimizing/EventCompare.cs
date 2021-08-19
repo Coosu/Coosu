@@ -20,7 +20,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                    obsoleteList.OnTimingRange(out _, e.EndTime);
         }
 
-        public static bool IsEventSequent(ICommonEvent previous, ICommonEvent next)
+        public static bool IsEventSequent(CommonEvent previous, CommonEvent next)
         {
             return previous.End.SequenceEqual(next.Start);
         }
@@ -35,12 +35,6 @@ namespace Coosu.Storyboard.Extensions.Optimizing
         {
             return e.IsDefault() &&
                    e.IsStatic();
-        }
-
-        public static bool IsDefault(this ICommonEvent e)
-        {
-            return EventExtensions.DefaultDictionary.ContainsKey(e.EventType) &&
-                   e.Start.SequenceEqual(EventExtensions.DefaultDictionary[e.EventType]);
         }
 
         public static bool IsStatic(this ICommonEvent e)

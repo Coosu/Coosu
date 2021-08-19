@@ -1,15 +1,16 @@
 <Project>
-    <PropertyGroup>
-        <LangVersion>9.0</LangVersion>
-        <nullable>enable</nullable>
-        <Authors>Coosu</Authors>
-        <PackageProjectUrl>https://github.com/Coosu/Coosu</PackageProjectUrl>
-        <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-        <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <Copyright>Copyright © Coosu 2021</Copyright>
-    </PropertyGroup>
 
-  <PropertyGroup Label="MinVerSetting">
+  <PropertyGroup Label="GeneralProps" Condition="$(MSBuildProjectName.StartsWith('Coosu')) == 'true'">
+    <LangVersion>9.0</LangVersion>
+    <nullable>enable</nullable>
+    <Authors>Coosu</Authors>
+    <PackageProjectUrl>https://github.com/Coosu/Coosu</PackageProjectUrl>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Copyright>Copyright © Coosu 2021</Copyright>
+  </PropertyGroup>
+  
+  <PropertyGroup Label="MinVerSetting" Condition="$(MSBuildProjectName.StartsWith('Coosu')) == 'true'">
     <MinVerTagPrefix>v</MinVerTagPrefix>
     <MinVerMinimumMajorMinor>1.0</MinVerMinimumMajorMinor>
   </PropertyGroup>

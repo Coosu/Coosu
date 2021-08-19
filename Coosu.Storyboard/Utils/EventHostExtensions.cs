@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Coosu.Storyboard.Common;
 
 namespace Coosu.Storyboard.Utils
@@ -56,6 +58,15 @@ namespace Coosu.Storyboard.Utils
         public static int GetMinTimeCount(this IEventHost eventHost)
         {
             return eventHost.Events.Count(k => k.StartTime.Equals(eventHost.MinTime));
+        }
+
+        public static bool HasEffectiveTiming(this IEventHost eventHost)
+        {
+            if (eventHost.MaxTime < eventHost.MinTime)
+                return false;
+            if (eventHost.MaxTime.Equals(eventHost.MinTime))
+                return false;
+            return true;
         }
     }
 }

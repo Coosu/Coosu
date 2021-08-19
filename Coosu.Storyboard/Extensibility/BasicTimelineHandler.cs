@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using Coosu.Storyboard.Easing;
 using Coosu.Storyboard.Events;
 
 namespace Coosu.Storyboard.Extensibility
@@ -62,7 +63,7 @@ namespace Coosu.Storyboard.Extensibility
             }
 
             var e = raw.EventType.Flag;
-            var easing = ((int)raw.Easing).ToString();
+            var easing = ((int)raw.Easing.GetEasingType()).ToString();
             var startT = Math.Round(raw.StartTime).ToString(cultureInfo);
             var endT = raw.StartTime.Equals(raw.EndTime) ? "" : Math.Round(raw.EndTime).ToString(cultureInfo);
 
@@ -108,7 +109,10 @@ namespace Coosu.Storyboard.Extensibility
                 }
             }
 
-            return new T { Easing = easing, StartTime = startTime, EndTime = endTime, Start = start, End = end };
+            return new T
+            {
+                Easing = easing.ToEasingFunction(), StartTime = startTime, EndTime = endTime, Start = start, End = end
+            };
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace Coosu.Storyboard.Events
+﻿using Coosu.Storyboard.Easing;
+
+namespace Coosu.Storyboard.Events
 {
     public class Rotate : CommonEvent
     {
@@ -17,6 +19,11 @@
         }
 
         public Rotate(EasingType easing, double startTime, double endTime, double r1, double r2) :
+            base(easing.ToEasingFunction(), startTime, endTime, new[] { r1 }, new[] { r2 })
+        {
+        }
+
+        public Rotate(IEasingFunction easing, double startTime, double endTime, double r1, double r2) :
             base(easing, startTime, endTime, new[] { r1 }, new[] { r2 })
         {
         }

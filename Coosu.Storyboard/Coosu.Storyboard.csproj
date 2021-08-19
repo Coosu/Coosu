@@ -1,11 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	  <TargetFramework>netstandard2.0</TargetFramework>
+	  <TargetFrameworks>net452;netstandard2.0</TargetFrameworks>
     <Description>Coosu.Storyboard is library to read and write osu!storyboard data of .osb file.</Description>
     <PackageTags>osu, osu!</PackageTags>
     <PackageReleaseNotes>Better support for Camera2D.</PackageReleaseNotes>
   </PropertyGroup>
+
+  <ItemGroup Condition="$(TargetFramework) == 'net452'">
+    <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="System.Memory" Version="4.5.4" />

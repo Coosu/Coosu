@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net452</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Coosu.Storyboard.Extensions\Coosu.Storyboard.Extensions.csproj" />
+    <ProjectReference Include="..\Libraries\storybrew\common\common.csproj" />
+  </ItemGroup>
+
+</Project>
