@@ -47,10 +47,10 @@ namespace Coosu.Storyboard
         /// <summary>
         /// Create a storyboard sprite by a static image.
         /// </summary>
-        /// <param name="originType">Origin of the image.</param>
         /// <param name="filePath">File path of the image.</param>
+        /// <param name="originType">Origin of the image.</param>
         /// <returns></returns>
-        public Sprite CreateSprite(OriginType originType, string filePath)
+        public Sprite CreateSprite(string filePath, OriginType originType)
         {
             var obj = new Sprite(LayerType.Foreground, originType, filePath, 320, 240);
             AddSprite(obj);
@@ -60,11 +60,24 @@ namespace Coosu.Storyboard
         /// <summary>
         /// Create a storyboard sprite by a static image.
         /// </summary>
+        /// <param name="filePath">File path of the image.</param>
+        /// <param name="layerType">Origin of the image.</param>
+        /// <returns></returns>
+        public Sprite CreateSprite(string filePath, LayerType layerType)
+        {
+            var obj = new Sprite(layerType, OriginType.Centre, filePath, 320, 240);
+            AddSprite(obj);
+            return obj;
+        }
+
+        /// <summary>
+        /// Create a storyboard sprite by a static image.
+        /// </summary>
+        /// <param name="filePath">File path of the image.</param>
         /// <param name="layerType">Layer of the image.</param>
         /// <param name="originType">Origin of the image.</param>
-        /// <param name="filePath">File path of the image.</param>
         /// <returns></returns>
-        public Sprite CreateSprite(LayerType layerType, OriginType originType, string filePath)
+        public Sprite CreateSprite(string filePath, LayerType layerType, OriginType originType)
         {
             var obj = new Sprite(layerType, originType, filePath, 320, 240);
             AddSprite(obj);
@@ -74,12 +87,12 @@ namespace Coosu.Storyboard
         /// <summary>
         /// Create a storyboard sprite by a static image.
         /// </summary>
+        /// <param name="filePath">File path of the image.</param>
         /// <param name="layerType">Layer of the image.</param>
         /// <param name="originType">Origin of the image.</param>
-        /// <param name="filePath">File path of the image.</param>
         /// <param name="defaultLocation">Default location of the image.</param>
         /// <returns></returns>
-        public Sprite CreateSprite(LayerType layerType, OriginType originType, string filePath, Vector2 defaultLocation)
+        public Sprite CreateSprite(string filePath, LayerType layerType, OriginType originType, Vector2 defaultLocation)
         {
             var obj = new Sprite(layerType, originType, filePath, defaultLocation.X, defaultLocation.Y);
             AddSprite(obj);
@@ -89,13 +102,13 @@ namespace Coosu.Storyboard
         /// <summary>
         /// Create a storyboard sprite by a static image.
         /// </summary>
+        /// <param name="filePath">File path of the image.</param>
         /// <param name="layerType">Layer of the image.</param>
         /// <param name="originType">Origin of the image.</param>
-        /// <param name="filePath">File path of the image.</param>
         /// <param name="defaultX">Default x-coordinate of the image.</param>
         /// <param name="defaultY">Default y-coordinate of the image.</param>
         /// <returns></returns>
-        public Sprite CreateSprite(LayerType layerType, OriginType originType, string filePath, double defaultX, double defaultY)
+        public Sprite CreateSprite(string filePath, LayerType layerType, OriginType originType,  double defaultX, double defaultY)
         {
             var obj = new Sprite(layerType, originType, filePath, defaultX, defaultY);
             AddSprite(obj);
@@ -103,9 +116,9 @@ namespace Coosu.Storyboard
         }
 
         public Animation CreateAnimation(
+            string filePath,
             LayerType layerType,
             OriginType originType,
-            string filePath,
             int defaultX, int defaultY,
             int frameCount, double frameDelay, LoopType loopType)
         {

@@ -31,17 +31,16 @@ namespace CoosuTest
                 }, 12, 320, -100);
                 sprite.MoveX(new QuinticEase(), 320, 300, -500, -600);
             }
-            //sprite.Fade(0, 0, 300, 0, 1);
-            //sprite.MoveX(EasingType.BackIn, 0, 300, 320, 240);
-            //sprite.MoveY(new PowerEase() { Power = 2 }, 100, 300, 320, 240);
-            //sprite.MoveXBy(0, 300, 100);
-            //sprite.VectorBy(new ElasticEase
-            //{
-            //    EasingMode = EasingMode.EaseOut,
-            //    Oscillations = 5,
-            //    Springiness = 3d * 2
-            //}, 0, 300, 1.2, 1);
-            //await layer.WriteScriptAsync(Console.Out);
+            
+            for (int i = 0; i < 1; i++)
+            {
+                var sprite = layer.CreateSprite(@"sb\cg\waifu.png");
+                sprite.MoveXBy(30, 270, 100);
+                sprite.MoveX(-100, 70, 0, 400);
+                sprite.MoveX(230, 400, 400, 800);
+            }
+
+            await layer.WriteScriptAsync(Console.Out);
             Console.WriteLine("==================");
             string? preP = null;
             var compressor = new SpriteCompressor(layer)

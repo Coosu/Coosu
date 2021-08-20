@@ -316,9 +316,22 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                     else if (targetStandardEvents.Count == 0)
                     {
                         var lastValue = sprite.ComputeFrame(targetStdType, startTime, null);
-                        sprite.Events.Add(CommonEvent.Create(targetStdType, @event.Easing, startTime, endTime,
+                        var newEvent = CommonEvent.Create(targetStdType, @event.Easing, startTime, endTime,
                             lastValue,
-                            @event.EventType.ComputeRelative(lastValue, @event.End)));
+                            @event.EventType.ComputeRelative(lastValue, @event.End));
+                        if (newEvent.Easing.TryGetEasingType() == null)
+                        {
+                            var de = newEvent.ComputeDiscretizedEvents(false);
+                            foreach (var commonEvent in de)
+                            {
+                                sprite.Events.Add(commonEvent);
+                            }
+                        }
+                        else
+                        {
+                            sprite.Events.Add(newEvent);
+                        }
+
                         sprite.Events.Remove(@event);
                         var nextEvents = allThisTypeStandardEvents
                             .Where(k => k.StartTime >= endTime)
@@ -415,6 +428,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                                     {
                                         var val = SpriteExtensions.ComputeFrame(allThisTypeStandardEvents,
                                             kvp.Value.EventType, kvp.Key.EndTime, 3);
+                                        var computeRelative0 = @event.EventType.ComputeRelative(val, kvp.Value.Start, 3);
                                     }
                                     else if (kvp.Key.EndTime.Equals(bounded.StartTime) ||
                                              kvp.Key.StartTime.Equals(bounded.EndTime))
