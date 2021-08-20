@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Extensions.Optimizing;
@@ -12,6 +13,7 @@ namespace Coosu.Storyboard.Storybrew
         public static void ExecuteBrew(this Layer layer, StoryboardLayer brewLayer)
         {
             var compressor = new SpriteCompressor(layer);
+            compressor.ErrorOccured = (_, e) => throw new Exception(e.Message);
             compressor.CompressAsync().Wait();
             if (layer.SceneObjects.Count == 0) return;
 
@@ -32,6 +34,7 @@ namespace Coosu.Storyboard.Storybrew
             {
                 var sceneObjects = new List<ISceneObject> { sprite };
                 var compressor = new SpriteCompressor(sceneObjects);
+                compressor.ErrorOccured = (_, e) => throw new Exception(e.Message);
                 compressor.CompressAsync().Wait();
                 if (sceneObjects.Count == 0) return;
             }

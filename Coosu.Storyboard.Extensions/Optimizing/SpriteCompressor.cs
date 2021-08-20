@@ -22,7 +22,6 @@ namespace Coosu.Storyboard.Extensions.Optimizing
         public EventHandler<ProgressEventArgs>? ProgressChanged;
 
         private int _threadCount = 1;
-        private int _pauseThreadCount = 0;
 
         private readonly ICollection<Sprite> _sprites;
 
@@ -59,25 +58,14 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             get => _threadCount;
             set
             {
-                lock (_runLock)
-                {
-                    if (IsRunning)
-                        throw new Exception();
-                }
-
-                _threadCount =
-                    (value < 1
-                        ? 1
-                        : (value > 4
-                            ? 4
-                            : value)
-                    );
+                lock (_runLock) if (IsRunning) throw new Exception();
+                _threadCount = value < 1 ? 1 : value;
             }
         }
 
         public bool IsRunning { get; private set; }
 
-        public async Task CompressAsync()
+        public async Task<bool> CompressAsync()
         {
             lock (_runLock)
             {
@@ -90,18 +78,13 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                 OperationStart?.Invoke(this, new CompressorEventArgs(Guid));
             }
 
-            var queue = new ConcurrentQueue<Sprite>();
-
-            var emptyToken = new CancellationTokenSource();
             _cancelToken = new CancellationTokenSource();
             var uselessSprites = new ConcurrentBag<Sprite>();
             var possibleBgs = new ConcurrentBag<Sprite>();
-            Task[] tasks = RunDequeueTasks(queue, uselessSprites, possibleBgs, emptyToken);
 
-            RunEnqueueTask(queue, emptyToken);
+            var isCancel = await RunPTask(uselessSprites, possibleBgs);
 
-            await Task.WhenAll(tasks);
-
+            if (isCancel) return false;
             foreach (var uselessSprite in uselessSprites)
             {
                 _sourceSprites.Remove(uselessSprite);
@@ -128,6 +111,51 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                 IsRunning = false;
                 OperationEnd?.Invoke(this, new CompressorEventArgs(Guid));
             }
+
+            return true;
+        }
+
+        private Task<bool> RunPTask(ConcurrentBag<Sprite> uselessSprites, ConcurrentBag<Sprite> possibleBgs)
+        {
+            return Task.Factory.StartNew(() =>
+            {
+                object indexLock = new();
+                int index = 0;
+                int total = _sprites.Count;
+                var mrs = new ManualResetEventSlim(true);
+                try
+                {
+                    _sprites
+                        .AsParallel()
+                        .WithCancellation(_cancelToken?.Token ?? CancellationToken.None)
+                        .WithDegreeOfParallelism(_threadCount)
+                        .ForAll(sprite =>
+                        {
+                            mrs.Wait();
+
+                            var preserve = InnerCompress(mrs, sprite, possibleBgs);
+                            if (!preserve) uselessSprites.Add(sprite);
+                            lock (indexLock)
+                            {
+                                index++;
+                                ProgressChanged?.Invoke(this, new ProgressEventArgs(Guid)
+                                {
+                                    Progress = index,
+                                    TotalCount = total
+                                });
+                            }
+                        });
+                    return false;
+                }
+                catch (OperationCanceledException)
+                {
+                    return true;
+                }
+                finally
+                {
+                    mrs.Dispose();
+                }
+            }, TaskCreationOptions.LongRunning);
         }
 
         public async Task CancelTask()
@@ -154,87 +182,17 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             _sprites?.Clear();
         }
 
-        private void RunEnqueueTask(ConcurrentQueue<Sprite> queue, CancellationTokenSource emptyToken)
-        {
-            var enqueueTask = new Task(() =>
-            {
-                foreach (var sprite in _sprites)
-                {
-                    if (_cancelToken?.IsCancellationRequested != false)
-                    {
-                        break;
-                    }
-
-                    queue.Enqueue(sprite);
-                }
-
-                while (!queue.IsEmpty && _cancelToken?.IsCancellationRequested != true)
-                {
-                    Thread.Sleep(1);
-                }
-
-                emptyToken.Cancel();
-            }, emptyToken.Token);
-
-            enqueueTask.Start();
-        }
-
-        private Task[] RunDequeueTasks(ConcurrentQueue<Sprite> queue,
-            ConcurrentBag<Sprite> uselessSprites,
-            ConcurrentBag<Sprite> possibleBgs,
-            CancellationTokenSource emptyToken)
-        {
-            var tasks = new Task[ThreadCount];
-            object indexLock = new object();
-            int index = 0; //
-            int total = _sprites.Count();
-            for (var i = 0; i < tasks.Length; i++)
-            {
-                tasks[i] = Task.Run(() =>
-                {
-                    while (!emptyToken.IsCancellationRequested && _cancelToken?.IsCancellationRequested != true)
-                    {
-                        Sprite sprite;
-
-                        if (!queue.IsEmpty)
-                        {
-                            if (!queue.TryDequeue(out sprite))
-                            {
-                                continue;
-                            }
-                        }
-                        else
-                        {
-                            continue;
-                        }
-
-                        while (_pauseThreadCount != 0)
-                        {
-                            Thread.Sleep(1);
-                        }
-
-                        var preserve = InnerCompress(sprite, possibleBgs);
-                        if (!preserve) uselessSprites.Add(sprite);
-                        lock (indexLock)
-                        {
-                            index++;
-                        }
-
-                        ProgressChanged?.Invoke(this, new ProgressEventArgs(Guid)
-                        {
-                            Progress = index,
-                            TotalCount = total
-                        });
-                    }
-                }, emptyToken.Token);
-            }
-
-            return tasks;
-        }
 
         #region Compress Logic
 
-        private bool InnerCompress(Sprite sprite, ConcurrentBag<Sprite> possibleBgs)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="mrs"></param>
+        /// <param name="sprite"></param>
+        /// <param name="possibleBgs"></param>
+        /// <returns>determine if preserve the object.</returns>
+        private bool InnerCompress(ManualResetEventSlim mrs, Sprite sprite, ConcurrentBag<Sprite> possibleBgs)
         {
             // 每个类型压缩从后往前
             // 0.标准化
@@ -268,9 +226,9 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                         return true;
                     }
 
-                    _pauseThreadCount++;
+                    mrs.Set();
                     ErrorOccured?.Invoke(sprite, arg);
-                    _pauseThreadCount--;
+                    mrs.Reset();
                 }
 
                 if (!arg.Continue)
@@ -467,7 +425,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                                     {
                                     }
 
-                                    Console.WriteLine(bounded.StartTime + "," + bounded.EndTime + "<->" + kvp.Key);
+                                    //Console.WriteLine(bounded.StartTime + "," + bounded.EndTime + "<->" + kvp.Key);
                                     discretizingTargetStandardEvents.Remove((bounded.StartTime, bounded.EndTime));
                                 }
                             }
