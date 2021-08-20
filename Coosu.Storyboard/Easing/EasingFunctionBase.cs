@@ -10,7 +10,7 @@ namespace Coosu.Storyboard.Easing
         private string DebuggerDisplay => GetDescription();
 
         public EasingMode EasingMode { get; set; }
-
+        internal bool ThrowIfChangeProperty { get; set; } = false;
         public double Ease(double normalizedTime)
         {
             return EasingMode switch

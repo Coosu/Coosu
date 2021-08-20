@@ -7,6 +7,9 @@ namespace Coosu.Storyboard.Easing
     /// </summary>
     public class ElasticEase : EasingFunctionBase
     {
+        private int _oscillations = 3;
+        private double _springiness = 3;
+
         public ElasticEase()
         {
         }
@@ -14,12 +17,30 @@ namespace Coosu.Storyboard.Easing
         /// <summary>
         /// Specifies the number of oscillations
         /// </summary>
-        public int Oscillations { get; set; } = 3;
+        public int Oscillations
+        {
+            get => _oscillations;
+            set
+            {
+                if (ThrowIfChangeProperty)
+                    throw new NotSupportedException("The preset easing property could not be changed.");
+                _oscillations = value;
+            }
+        }
 
         /// <summary>
         /// Specifies the amount of springiness
         /// </summary>
-        public double Springiness { get; set; } = 3;
+        public double Springiness
+        {
+            get => _springiness;
+            set
+            {
+                if (ThrowIfChangeProperty)
+                    throw new NotSupportedException("The preset easing property could not be changed.");
+                _springiness = value;
+            }
+        }
 
         protected override double EaseInCore(double normalizedTime)
         {
@@ -61,10 +82,10 @@ namespace Coosu.Storyboard.Easing
             };
         }
 
-        public static ElasticEase InstanceIn => new() { EasingMode = EasingMode.EaseIn };
-        public static ElasticEase InstanceQuarterOut => new() { EasingMode = EasingMode.EaseOut, Springiness = 3d / 4 };
-        public static ElasticEase InstanceHalfOut => new() { EasingMode = EasingMode.EaseOut, Springiness = 3d / 2 };
-        public static ElasticEase InstanceOut => new() { EasingMode = EasingMode.EaseOut };
-        public static ElasticEase InstanceInOut => new() { EasingMode = EasingMode.EaseInOut };
+        public static ElasticEase InstanceIn => new() { EasingMode = EasingMode.EaseIn, ThrowIfChangeProperty = true };
+        public static ElasticEase InstanceQuarterOut => new() { EasingMode = EasingMode.EaseOut, Springiness = 3d / 4, ThrowIfChangeProperty = true };
+        public static ElasticEase InstanceHalfOut => new() { EasingMode = EasingMode.EaseOut, Springiness = 3d / 2, ThrowIfChangeProperty = true };
+        public static ElasticEase InstanceOut => new() { EasingMode = EasingMode.EaseOut, ThrowIfChangeProperty = true };
+        public static ElasticEase InstanceInOut => new() { EasingMode = EasingMode.EaseInOut, ThrowIfChangeProperty = true };
     }
 }

@@ -7,6 +7,8 @@ namespace Coosu.Storyboard.Easing
     /// </summary>
     public class ExponentialEase : EasingFunctionBase
     {
+        private double _exponent = 2;
+
         public ExponentialEase()
         {
         }
@@ -14,7 +16,16 @@ namespace Coosu.Storyboard.Easing
         /// <summary>
         /// Specifies the factor which controls the shape of easing.
         /// </summary>
-        public double Exponent { get; set; } = 2;
+        public double Exponent
+        {
+            get => _exponent;
+            set
+            {
+                if (ThrowIfChangeProperty)
+                    throw new NotSupportedException("The preset easing property could not be changed.");
+                _exponent = value;
+            }
+        }
 
         protected override double EaseInCore(double normalizedTime)
         {
@@ -41,8 +52,8 @@ namespace Coosu.Storyboard.Easing
             };
         }
 
-        public static ExponentialEase InstanceIn => new() { EasingMode = EasingMode.EaseIn };
-        public static ExponentialEase InstanceOut => new() { EasingMode = EasingMode.EaseOut };
-        public static ExponentialEase InstanceInOut => new() { EasingMode = EasingMode.EaseInOut };
+        public static ExponentialEase InstanceIn => new() { EasingMode = EasingMode.EaseIn, ThrowIfChangeProperty = true };
+        public static ExponentialEase InstanceOut => new() { EasingMode = EasingMode.EaseOut, ThrowIfChangeProperty = true };
+        public static ExponentialEase InstanceInOut => new() { EasingMode = EasingMode.EaseInOut, ThrowIfChangeProperty = true };
     }
 }

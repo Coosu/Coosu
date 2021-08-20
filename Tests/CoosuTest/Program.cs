@@ -17,15 +17,20 @@ namespace CoosuTest
             //layer.Camera.RotateBy(startTime: 0, endTime: 500, degree: 90);
             //layer.Camera.MoveBy(startTime: 0, endTime: 500, x: 300, y: 30);
 
-            var sprite = layer.CreateSprite("sb");
-            sprite.MoveX(0/*new QuinticEase()*/, -100, 14, 500, -500);
-            //sprite.MoveXBy(new QuadraticEase(), 0, 16 * 10, 100);
-            //sprite.MoveX(new QuadraticEase(), 16 * 10.3, 16 * 20, 100, 300);
-            sprite.MoveXBy(new QuinticEase
+            ExponentialEase.InstanceIn.Exponent = 1;
+
+            for (int i = 0; i < 50000; i++)
             {
-                EasingMode = EasingMode.EaseOut
-            }, 12, 320, -100);
-            sprite.MoveX(new QuinticEase(), 320, 300, -500, -600);
+                var sprite = layer.CreateSprite("sb");
+                sprite.MoveX(0/*new QuinticEase()*/, -100, 14, 500, -500);
+                //sprite.MoveXBy(new QuadraticEase(), 0, 16 * 10, 100);
+                //sprite.MoveX(new QuadraticEase(), 16 * 10.3, 16 * 20, 100, 300);
+                sprite.MoveXBy(new QuinticEase
+                {
+                    EasingMode = EasingMode.EaseOut
+                }, 12, 320, -100);
+                sprite.MoveX(new QuinticEase(), 320, 300, -500, -600);
+            }
             //sprite.Fade(0, 0, 300, 0, 1);
             //sprite.MoveX(EasingType.BackIn, 0, 300, 320, 240);
             //sprite.MoveY(new PowerEase() { Power = 2 }, 100, 300, 320, 240);
@@ -36,10 +41,11 @@ namespace CoosuTest
             //    Oscillations = 5,
             //    Springiness = 3d * 2
             //}, 0, 300, 1.2, 1);
-            await layer.WriteScriptAsync(Console.Out);
+            //await layer.WriteScriptAsync(Console.Out);
             Console.WriteLine("==================");
             var compressor = new SpriteCompressor(layer)
             {
+                ThreadCount = Environment.ProcessorCount + 1,
                 ErrorOccured = (s, e) => Console.WriteLine(e.Message)
             };
             await compressor.CompressAsync();

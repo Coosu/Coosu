@@ -7,6 +7,8 @@ namespace Coosu.Storyboard.Easing
     /// </summary>
     public class BackEase : EasingFunctionBase
     {
+        private double _amplitude = 1;
+
         public BackEase()
         {
         }
@@ -14,7 +16,16 @@ namespace Coosu.Storyboard.Easing
         /// <summary>
         /// Specifies how much the function will pull back
         /// </summary>
-        public double Amplitude { get; set; } = 1;
+        public double Amplitude
+        {
+            get => _amplitude;
+            set
+            {
+                if (ThrowIfChangeProperty)
+                    throw new NotSupportedException("The preset easing property could not be changed.");
+                _amplitude = value;
+            }
+        }
 
         protected override double EaseInCore(double normalizedTime)
         {
@@ -35,8 +46,8 @@ namespace Coosu.Storyboard.Easing
             };
         }
 
-        public static BackEase InstanceIn => new() { EasingMode = EasingMode.EaseIn };
-        public static BackEase InstanceOut => new() { EasingMode = EasingMode.EaseOut };
-        public static BackEase InstanceInOut => new() { EasingMode = EasingMode.EaseInOut };
+        public static BackEase InstanceIn => new() { EasingMode = EasingMode.EaseIn, ThrowIfChangeProperty = true };
+        public static BackEase InstanceOut => new() { EasingMode = EasingMode.EaseOut, ThrowIfChangeProperty = true };
+        public static BackEase InstanceInOut => new() { EasingMode = EasingMode.EaseInOut, ThrowIfChangeProperty = true };
     }
 }

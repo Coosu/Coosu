@@ -7,6 +7,9 @@ namespace Coosu.Storyboard.Easing
     /// </summary>
     public class BounceEase : EasingFunctionBase
     {
+        private int _bounces = 3;
+        private double _bounciness = 2d;
+
         public BounceEase()
         {
         }
@@ -14,13 +17,31 @@ namespace Coosu.Storyboard.Easing
         /// <summary>
         /// Specifies the number of bounces.  This does not include the final half bounce.
         /// </summary>
-        public int Bounces { get; set; } = 3;
+        public int Bounces
+        {
+            get => _bounces;
+            set
+            {
+                if (ThrowIfChangeProperty)
+                    throw new NotSupportedException("The preset easing property could not be changed.");
+                _bounces = value;
+            }
+        }
 
         /// <summary>
         /// Specifies the amount of bounciness.  This corresponds to the scale difference between a bounce and the next bounce.  
         /// For example, Bounciness = 2.0 correspondes to the next bounce being twices as high and taking twice as long.
         /// </summary>
-        public double Bounciness { get; set; } = 2d;
+        public double Bounciness
+        {
+            get => _bounciness;
+            set
+            {
+                if (ThrowIfChangeProperty)
+                    throw new NotSupportedException("The preset easing property could not be changed.");
+                _bounciness = value;
+            }
+        }
 
         protected override double EaseInCore(double normalizedTime)
         {
@@ -88,8 +109,8 @@ namespace Coosu.Storyboard.Easing
             };
         }
 
-        public static BounceEase InstanceIn => new() { EasingMode = EasingMode.EaseIn };
-        public static BounceEase InstanceOut => new() { EasingMode = EasingMode.EaseOut };
-        public static BounceEase InstanceInOut => new() { EasingMode = EasingMode.EaseInOut };
+        public static BounceEase InstanceIn => new() { EasingMode = EasingMode.EaseIn, ThrowIfChangeProperty = true };
+        public static BounceEase InstanceOut => new() { EasingMode = EasingMode.EaseOut, ThrowIfChangeProperty = true };
+        public static BounceEase InstanceInOut => new() { EasingMode = EasingMode.EaseInOut, ThrowIfChangeProperty = true };
     }
 }

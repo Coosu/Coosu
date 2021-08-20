@@ -9,6 +9,8 @@ namespace Coosu.Storyboard.Easing
     /// </summary>
     public class PowerEase : EasingFunctionBase
     {
+        private double _power = 2;
+
         public PowerEase()
         {
         }
@@ -16,7 +18,16 @@ namespace Coosu.Storyboard.Easing
         /// <summary>
         /// Specifies the power for the polynomial equation.
         /// </summary>
-        public double Power { get; set; } = 2;
+        public double Power
+        {
+            get => _power;
+            set
+            {
+                if (ThrowIfChangeProperty)
+                    throw new NotSupportedException("The preset easing property could not be changed.");
+                _power = value;
+            }
+        }
 
 
         protected override double EaseInCore(double normalizedTime)
@@ -30,8 +41,8 @@ namespace Coosu.Storyboard.Easing
             return null;
         }
 
-        public static PowerEase InstanceIn => new() { EasingMode = EasingMode.EaseIn };
-        public static PowerEase InstanceOut => new() { EasingMode = EasingMode.EaseOut };
-        public static PowerEase InstanceInOut => new() { EasingMode = EasingMode.EaseInOut };
+        public static PowerEase InstanceIn => new() { EasingMode = EasingMode.EaseIn, ThrowIfChangeProperty = true };
+        public static PowerEase InstanceOut => new() { EasingMode = EasingMode.EaseOut, ThrowIfChangeProperty = true };
+        public static PowerEase InstanceInOut => new() { EasingMode = EasingMode.EaseInOut, ThrowIfChangeProperty = true };
     }
 }
