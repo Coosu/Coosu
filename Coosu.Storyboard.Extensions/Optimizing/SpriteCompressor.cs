@@ -222,9 +222,9 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                         return true;
                     }
 
-                    mrs.Set();
-                    ErrorOccured?.Invoke(sprite, arg);
                     mrs.Reset();
+                    ErrorOccured?.Invoke(sprite, arg);
+                    mrs.Set();
                 }
 
                 if (!arg.Continue)
