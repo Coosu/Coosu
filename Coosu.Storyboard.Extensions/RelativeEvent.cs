@@ -95,9 +95,9 @@ namespace Coosu.Storyboard.Extensions
 
         public object Clone()
         {
-            return new RelativeEvent(EventType, Easing, StartTime, EndTime, End)
+            return new RelativeEvent(EventType, Easing, StartTime, EndTime, End.ToArray())
             {
-                Start = Start
+                Start = Start.ToArray()
             };
         }
     }

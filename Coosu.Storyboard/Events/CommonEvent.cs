@@ -197,7 +197,7 @@ namespace Coosu.Storyboard.Events
 
         public object Clone()
         {
-            return CommonEvent.Create(EventType, Easing, StartTime, EndTime, Start, End);
+            return CommonEvent.Create(EventType, Easing, StartTime, EndTime, Start.ToArray(), End.ToArray());
         }
     }
 }
