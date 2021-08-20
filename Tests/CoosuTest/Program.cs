@@ -6,6 +6,7 @@ using Coosu.Storyboard;
 using Coosu.Storyboard.Easing;
 using Coosu.Storyboard.Extensions;
 using Coosu.Storyboard.Extensions.Optimizing;
+using Coosu.Storyboard.Utils;
 
 namespace CoosuTest
 {
@@ -46,7 +47,11 @@ namespace CoosuTest
             var compressor = new SpriteCompressor(layer)
             {
                 ThreadCount = Environment.ProcessorCount + 1,
-                ErrorOccured = (s, e) => Console.WriteLine(e.Message),
+                ErrorOccured = (s, e) =>
+                {
+                    Console.WriteLine(e.SourceSprite.GetHeaderString() + ": " + e.Message);
+                    //Console.ReadLine();
+                },
                 ProgressChanged = (s, e) =>
                 {
                     var p = (e.Progress / (double)e.TotalCount).ToString("P0");

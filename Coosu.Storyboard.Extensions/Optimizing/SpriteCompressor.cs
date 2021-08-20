@@ -202,14 +202,10 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             // 4.排除第一行误加的情况 (defaultParams)
             var errorList = new List<string?>();
 
-            void OnErrorOccured(object sender, ProcessErrorEventArgs args)
+            sprite.Examine((o, e) =>
             {
-                errorList.Add(args.Message);
-            }
-
-            ErrorOccured += OnErrorOccured;
-            sprite.Examine(ErrorOccured);
-            ErrorOccured -= OnErrorOccured;
+                errorList.Add(e.Message);
+            });
 
             if (errorList.Count > 0)
             {
