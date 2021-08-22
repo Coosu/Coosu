@@ -20,10 +20,16 @@ namespace CoosuTest
 
             for (int i = 0; i < 1; i++)
             {
-                var sprite = layer.CreateSprite("sb");
+                var sprite = layer.CreateSprite(@"sb\cg\waifu.png");
+                //sprite.MoveX(0, 60, 64, 100, 100);
+                //sprite.MoveX(0, 64, 96, 100, 100);
+                //sprite.MoveXBy(0, 60, 80, 100);
+
+
                 sprite.MoveXBy(0, 30, 60, 100);
-                sprite.MoveXBy(0, 60, 100, 100);
+                sprite.MoveXBy(0, 60, 80, 100);
                 sprite.MoveX(0, 0, 100, 0, 0);
+                sprite.MoveXBy(0, -200, 200, 100);
 
                 //sprite.MoveXBy(0, 0, 60, 100);
                 //sprite.MoveX(0, 40, 100, 0, 100);

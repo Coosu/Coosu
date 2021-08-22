@@ -2,6 +2,6 @@
 {
     public static class TempGlobalConstant
     {
-        public const int DiscretizingInterval = 100;
+        public const int DiscretizingInterval = 32;
     }
 }
