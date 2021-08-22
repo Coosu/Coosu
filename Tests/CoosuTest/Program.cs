@@ -18,27 +18,35 @@ namespace CoosuTest
             //layer.Camera.RotateBy(startTime: 0, endTime: 500, degree: 90);
             //layer.Camera.MoveBy(startTime: 0, endTime: 500, x: 300, y: 30);
 
-            for (int i = 0; i < 50000; i++)
-            {
-                var sprite = layer.CreateSprite("sb");
-                sprite.MoveX(0/*new QuinticEase()*/, -100, 14, 500, -500);
-                sprite.MoveX(0/*new QuinticEase()*/, -10, 24, 500, -500);
-                //sprite.MoveXBy(new QuadraticEase(), 0, 16 * 10, 100);
-                //sprite.MoveX(new QuadraticEase(), 16 * 10.3, 16 * 20, 100, 300);
-                sprite.MoveXBy(new QuinticEase
-                {
-                    EasingMode = EasingMode.EaseOut
-                }, 12, 320, -100);
-                sprite.MoveX(new QuinticEase(), 320, 300, -500, -600);
-            }
-            
             for (int i = 0; i < 1; i++)
             {
-                var sprite = layer.CreateSprite(@"sb\cg\waifu.png");
-                sprite.MoveXBy(30, 270, 100);
-                sprite.MoveX(-100, 70, 0, 400);
-                sprite.MoveX(230, 400, 400, 800);
+                var sprite = layer.CreateSprite("sb");
+                sprite.MoveXBy(0, 30, 60, 100);
+                sprite.MoveXBy(0, 60, 100, 100);
+                sprite.MoveX(0, 0, 100, 0, 0);
+
+                //sprite.MoveXBy(0, 0, 60, 100);
+                //sprite.MoveX(0, 40, 100, 0, 100);
+
+                //sprite.MoveXBy(0, 40, 100, 100);
+                //sprite.MoveX(0, 0, 60, 0, 100);
+
+                //sprite.MoveXBy(new QuadraticEase(), 0, 16 * 10, 100);
+                //sprite.MoveX(new QuadraticEase(), 16 * 10.3, 16 * 20, 100, 300);
+                //sprite.MoveXBy(new QuinticEase
+                //{
+                //    EasingMode = EasingMode.EaseOut
+                //}, 12, 320, -100);
+                //sprite.MoveX(new QuinticEase(), 320, 300, -500, -600);
             }
+
+            //for (int i = 0; i < 1; i++)
+            //{
+            //    var sprite = layer.CreateSprite(@"sb\cg\waifu.png");
+            //    sprite.MoveXBy(30, 270, 100);
+            //    sprite.MoveX(-100, 70, 0, 400);
+            //    sprite.MoveX(230, 400, 400, 800);
+            //}
 
             await layer.WriteScriptAsync(Console.Out);
             Console.WriteLine("==================");
