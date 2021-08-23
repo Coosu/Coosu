@@ -420,32 +420,35 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                                             var absoluteFrame1 = SpriteExtensions.ComputeFrame(allThisTypeStandardEvents,
                                                 targetStdType, relative.Key.StartTime, 3);
                                             var computedFrame1 = @event.EventType.ComputeRelative(absoluteFrame1, relative.Value.Start, 3);
-                                            var newEvent0_1 = CommonEvent.Create(targetStdType, EasingType.Linear,
-                                                bounded.StartTime, relative.Key.StartTime,
-                                                bounded.Start.ToArray(), computedFrame1);
-                                            AddMiniUnitEvent(newEvent0_1, list);
+                                            if (!relative.Key.StartTime.Equals(bounded.StartTime))
+                                            {
+                                                var newEvent0_1 = CommonEvent.Create(targetStdType, EasingType.Linear,
+                                                    bounded.StartTime, relative.Key.StartTime,
+                                                    bounded.Start.ToArray(), computedFrame1);
+                                                AddMiniUnitEvent(newEvent0_1, list);
+                                            }
+
                                             double[] computedFrame2;
+                                            var relativeFrame2 = @event.ComputeFrame(bounded.EndTime, 3); //get
+                                            computedFrame2 = @event.EventType.ComputeRelative(bounded.End, relativeFrame2, 3);
                                             if (!relative.Key.StartTime.Equals(bounded.EndTime))
                                             {
-                                                var relativeFrame2 = @event.ComputeFrame(bounded.EndTime, 3); //get
-                                                computedFrame2 = @event.EventType.ComputeRelative(bounded.End, relativeFrame2, 3);
                                                 var newEvent1_2 = CommonEvent.Create(targetStdType, EasingType.Linear,
                                                     relative.Key.StartTime, bounded.EndTime,
                                                     computedFrame1, computedFrame2);
                                                 AddMiniUnitEvent(newEvent1_2, list);
                                             }
-                                            else
-                                            {
-                                                computedFrame2 = computedFrame1;
-                                            }
 
                                             var absoluteFrame3 = SpriteExtensions.ComputeFrame(allThisTypeStandardEvents,
                                                 targetStdType, relative.Key.EndTime, 3);
                                             var computedFrame3 = @event.EventType.ComputeRelative(absoluteFrame3, relative.Value.End, 3);
-                                            var newEvent2_3 = CommonEvent.Create(targetStdType, EasingType.Linear,
-                                                bounded.EndTime, relative.Key.EndTime,
-                                                computedFrame2, computedFrame3);
-                                            AddMiniUnitEvent(newEvent2_3, list);
+                                            if (!relative.Key.StartTime.Equals(bounded.EndTime))
+                                            {
+                                                var newEvent2_3 = CommonEvent.Create(targetStdType, EasingType.Linear,
+                                                    bounded.EndTime, relative.Key.StartTime,
+                                                    computedFrame2, computedFrame3);
+                                                AddMiniUnitEvent(newEvent2_3, list);
+                                            }
                                         }
                                         else if (relative.Key.EndTime >= bounded.StartTime && relative.Key.StartTime < bounded.StartTime)
                                         {
@@ -458,30 +461,39 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                                             var computedFrame0 = @event.EventType.ComputeRelative(absoluteFrame0, relative.Value.Start, 3);
                                             var relativeFrame1 = @event.ComputeFrame(bounded.StartTime, 3);
                                             var computedFrame1 = @event.EventType.ComputeRelative(bounded.Start, relativeFrame1, 3);
-                                            var newEvent0_1 = CommonEvent.Create(targetStdType, EasingType.Linear,
-                                                relative.Key.StartTime, bounded.StartTime,
-                                                computedFrame0, computedFrame1);
-                                            AddMiniUnitEvent(newEvent0_1, list);
+
+                                            if (!relative.Key.StartTime.Equals(bounded.StartTime))
+                                            {
+                                                var newEvent0_1 = CommonEvent.Create(targetStdType, EasingType.Linear,
+                                                    relative.Key.StartTime, bounded.StartTime,
+                                                    computedFrame0, computedFrame1);
+                                                AddMiniUnitEvent(newEvent0_1, list);
+                                            }
 
                                             double[] computedFrame2;
+                                            var absoluteFrame2 = SpriteExtensions.ComputeFrame(allThisTypeStandardEvents,
+                                                targetStdType, relative.Key.EndTime, 3);
+                                            computedFrame2 = @event.EventType.ComputeRelative(absoluteFrame2, relative.Value.End, 3);
                                             if (!relative.Key.EndTime.Equals(bounded.StartTime))
                                             {
-                                                var absoluteFrame2 = SpriteExtensions.ComputeFrame(allThisTypeStandardEvents,
-                                                    targetStdType, relative.Key.EndTime, 3);
-                                                computedFrame2 = @event.EventType.ComputeRelative(absoluteFrame2, relative.Value.End, 3);
                                                 var newEvent1_2 = CommonEvent.Create(targetStdType, EasingType.Linear,
-                                                    bounded.StartTime, relative.Key.EndTime,
-                                                    computedFrame1, computedFrame2);
+                                                 bounded.StartTime, relative.Key.EndTime,
+                                                 computedFrame1, computedFrame2);
                                                 AddMiniUnitEvent(newEvent1_2, list);
-                                            }
-                                            else
-                                            {
-                                                computedFrame2 = computedFrame1;
                                             }
 
                                             //if (!grouping
                                             //    .Where(k => k != @event)
                                             //    .Any(k => k.StartTime <= bounded.EndTime && k.EndTime >= bounded.StartTime))
+                                            if (!relative.Key.EndTime.Equals(bounded.EndTime) &&
+                                                !grouping
+                                                    .Where(k => k != @event)
+                                                    .Any(k => k.StartTime <= bounded.EndTime &&
+                                                              k.EndTime >= bounded.StartTime) && 
+                                                !discretizedRelative
+                                                    .Where(k => k.Value != relative.Value)
+                                                    .Any(k => k.Key.StartTime <= bounded.EndTime &&
+                                                              k.Key.EndTime >= bounded.StartTime))
                                             {
                                                 var computedFrame3 =
                                                     @event.EventType.ComputeRelative(bounded.End, relative.Value.End, 3);
@@ -503,31 +515,40 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                                                 targetStdType, relative.Key.StartTime, 3);
                                             var computedFrame1 = @event.EventType.ComputeRelative(absoluteFrame1, relative.Value.Start, 3);
 
-                                            var newEvent0_1 = CommonEvent.Create(targetStdType, EasingType.Linear,
-                                                bounded.StartTime, relative.Key.StartTime,
-                                                computedFrame0, computedFrame1);
-                                            AddMiniUnitEvent(newEvent0_1, list);
+                                            if (!relative.Key.StartTime.Equals(bounded.StartTime))
+                                            {
+                                                var newEvent0_1 = CommonEvent.Create(targetStdType, EasingType.Linear,
+                                                    bounded.StartTime, relative.Key.StartTime,
+                                                    computedFrame0, computedFrame1);
+                                                AddMiniUnitEvent(newEvent0_1, list);
+                                            }
+
                                             var absoluteFrame2 = SpriteExtensions.ComputeFrame(allThisTypeStandardEvents,
                                                 targetStdType, relative.Key.EndTime, 3);
                                             var computedFrame2 = @event.EventType.ComputeRelative(absoluteFrame2, relative.Value.End, 3);
+
                                             var newEvent1_2 = CommonEvent.Create(targetStdType, EasingType.Linear,
                                                 relative.Key.StartTime, relative.Key.EndTime,
                                                 computedFrame1, computedFrame2);
                                             AddMiniUnitEvent(newEvent1_2, list);
 
-                                            //if (!grouping
-                                            //    .Where(k => k != @event)
-                                            //    .Any(k => k.StartTime <= bounded.EndTime && k.EndTime >= relative.Key.EndTime))
+                                            if (!relative.Key.EndTime.Equals(bounded.EndTime) &&
+                                                !grouping
+                                                    .Where(k => k != @event)
+                                                    .Any(k => k.StartTime <= bounded.EndTime &&
+                                                              k.EndTime >= bounded.StartTime) &&
+                                                !discretizedRelative
+                                                    .Where(k => k.Value != relative.Value)
+                                                    .Any(k => k.Key.StartTime <= bounded.EndTime &&
+                                                              k.Key.EndTime >= bounded.StartTime))
                                             {
-                                                if (!relative.Key.EndTime.Equals(bounded.EndTime))
-                                                {
-                                                    var computedFrame3 =
-                                                        @event.EventType.ComputeRelative(bounded.End, relative.Value.End, 3);
-                                                    var newEvent2_3 = CommonEvent.Create(targetStdType, EasingType.Linear,
-                                                        relative.Key.EndTime, bounded.EndTime,
-                                                        computedFrame2, computedFrame3);
-                                                    AddMiniUnitEvent(newEvent2_3, list);
-                                                }
+                                                var computedFrame3 =
+                                                    @event.EventType.ComputeRelative(bounded.End, relative.Value.End,
+                                                        3);
+                                                var newEvent2_3 = CommonEvent.Create(targetStdType, EasingType.Linear,
+                                                    relative.Key.EndTime, bounded.EndTime,
+                                                    computedFrame2, computedFrame3);
+                                                AddMiniUnitEvent(newEvent2_3, list);
                                             }
 
                                         }
@@ -560,7 +581,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                                         value.End[i] += @event.End[i];
                                     }
                                 }
-                                
+
                                 sprite.Events.Add(value);
                             }
 
