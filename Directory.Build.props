@@ -4,6 +4,8 @@
     <LangVersion>9.0</LangVersion>
     <nullable>enable</nullable>
     <Authors>Coosu</Authors>
+    <RepositoryUrl>https://github.com/Coosu/Coosu.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType> 
     <PackageProjectUrl>https://github.com/Coosu/Coosu</PackageProjectUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
