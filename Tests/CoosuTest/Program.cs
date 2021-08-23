@@ -18,9 +18,21 @@ namespace CoosuTest
             //layer.Camera.RotateBy(startTime: 0, endTime: 500, degree: 90);
             //layer.Camera.MoveBy(startTime: 0, endTime: 500, x: 300, y: 30);
 
+//            var layer = Layer.ParseFromText(@"
+//Sprite,Foreground,Centre,""sb\cg\waifu.png"",320,240
+// MX,0,-100,-64,0,18
+// MX,0,-64,-32,18,34
+// MX,0,-32,0,34,50
+// MX,0,0,32,50,66
+// MX,0,32,64,66,82
+// MX,0,64,96,82,98
+// MX,0,96,100,98,100
+//");
             for (int i = 0; i < 1; i++)
             {
+                //var sprite = (Sprite)layer.SceneObjects[0];
                 var sprite = layer.CreateSprite(@"sb\cg\waifu.png");
+
                 //sprite.MoveX(0, 60, 64, 100, 100);
                 //sprite.MoveX(0, 64, 96, 100, 100);
                 //sprite.MoveXBy(0, 60, 80, 100);
@@ -30,6 +42,7 @@ namespace CoosuTest
                 sprite.MoveXBy(0, 60, 80, 100);
                 sprite.MoveX(0, 0, 100, 0, 0);
                 sprite.MoveXBy(0, -100, 100, 100);
+                sprite.MoveXBy(0, -200, 200, 100);
 
                 //sprite.MoveXBy(0, 0, 60, 100);
                 //sprite.MoveX(0, 40, 100, 0, 100);

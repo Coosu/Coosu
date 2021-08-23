@@ -486,10 +486,10 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                                             //    .Where(k => k != @event)
                                             //    .Any(k => k.StartTime <= bounded.EndTime && k.EndTime >= bounded.StartTime))
                                             if (!relative.Key.EndTime.Equals(bounded.EndTime) &&
-                                                !grouping
-                                                    .Where(k => k != @event)
-                                                    .Any(k => k.StartTime <= bounded.EndTime &&
-                                                              k.EndTime >= bounded.StartTime) && 
+                                                //!grouping
+                                                //    .Where(k => k != @event)
+                                                //    .Any(k => k.StartTime <= bounded.EndTime &&
+                                                //              k.EndTime >= bounded.StartTime) && 
                                                 !discretizedRelative
                                                     .Where(k => k.Value != relative.Value)
                                                     .Any(k => k.Key.StartTime <= bounded.EndTime &&
@@ -533,10 +533,10 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                                             AddMiniUnitEvent(newEvent1_2, list);
 
                                             if (!relative.Key.EndTime.Equals(bounded.EndTime) &&
-                                                !grouping
-                                                    .Where(k => k != @event)
-                                                    .Any(k => k.StartTime <= bounded.EndTime &&
-                                                              k.EndTime >= bounded.StartTime) &&
+                                                //!grouping
+                                                //    .Where(k => k != @event)
+                                                //    .Any(k => k.StartTime <= bounded.EndTime &&
+                                                //              k.EndTime >= bounded.StartTime) &&
                                                 !discretizedRelative
                                                     .Where(k => k.Value != relative.Value)
                                                     .Any(k => k.Key.StartTime <= bounded.EndTime &&
