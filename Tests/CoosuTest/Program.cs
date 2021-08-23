@@ -6,6 +6,7 @@ using Coosu.Storyboard;
 using Coosu.Storyboard.Easing;
 using Coosu.Storyboard.Extensions;
 using Coosu.Storyboard.Extensions.Optimizing;
+using Coosu.Storyboard.Utils;
 
 namespace CoosuTest
 {
@@ -17,36 +18,53 @@ namespace CoosuTest
             //layer.Camera.RotateBy(startTime: 0, endTime: 500, degree: 90);
             //layer.Camera.MoveBy(startTime: 0, endTime: 500, x: 300, y: 30);
 
-            for (int i = 0; i < 50000; i++)
+            for (int i = 0; i < 1; i++)
             {
-                var sprite = layer.CreateSprite("sb");
-                sprite.MoveX(0/*new QuinticEase()*/, -100, 14, 500, -500);
-                sprite.MoveX(0/*new QuinticEase()*/, -10, 24, 500, -500);
+                var sprite = layer.CreateSprite(@"sb\cg\waifu.png");
+                //sprite.MoveX(0, 60, 64, 100, 100);
+                //sprite.MoveX(0, 64, 96, 100, 100);
+                //sprite.MoveXBy(0, 60, 80, 100);
+
+
+                sprite.MoveXBy(0, 30, 60, 100);
+                sprite.MoveXBy(0, 60, 80, 100);
+                sprite.MoveX(0, 0, 100, 0, 0);
+                sprite.MoveXBy(0, -200, 200, 100);
+
+                //sprite.MoveXBy(0, 0, 60, 100);
+                //sprite.MoveX(0, 40, 100, 0, 100);
+
+                //sprite.MoveXBy(0, 40, 100, 100);
+                //sprite.MoveX(0, 0, 60, 0, 100);
+
                 //sprite.MoveXBy(new QuadraticEase(), 0, 16 * 10, 100);
                 //sprite.MoveX(new QuadraticEase(), 16 * 10.3, 16 * 20, 100, 300);
-                sprite.MoveXBy(new QuinticEase
-                {
-                    EasingMode = EasingMode.EaseOut
-                }, 12, 320, -100);
-                sprite.MoveX(new QuinticEase(), 320, 300, -500, -600);
+                //sprite.MoveXBy(new QuinticEase
+                //{
+                //    EasingMode = EasingMode.EaseOut
+                //}, 12, 320, -100);
+                //sprite.MoveX(new QuinticEase(), 320, 300, -500, -600);
             }
-            //sprite.Fade(0, 0, 300, 0, 1);
-            //sprite.MoveX(EasingType.BackIn, 0, 300, 320, 240);
-            //sprite.MoveY(new PowerEase() { Power = 2 }, 100, 300, 320, 240);
-            //sprite.MoveXBy(0, 300, 100);
-            //sprite.VectorBy(new ElasticEase
+
+            //for (int i = 0; i < 1; i++)
             //{
-            //    EasingMode = EasingMode.EaseOut,
-            //    Oscillations = 5,
-            //    Springiness = 3d * 2
-            //}, 0, 300, 1.2, 1);
-            //await layer.WriteScriptAsync(Console.Out);
+            //    var sprite = layer.CreateSprite(@"sb\cg\waifu.png");
+            //    sprite.MoveXBy(30, 270, 100);
+            //    sprite.MoveX(-100, 70, 0, 400);
+            //    sprite.MoveX(230, 400, 400, 800);
+            //}
+
+            await layer.WriteScriptAsync(Console.Out);
             Console.WriteLine("==================");
             string? preP = null;
             var compressor = new SpriteCompressor(layer)
             {
                 ThreadCount = Environment.ProcessorCount + 1,
-                ErrorOccured = (s, e) => Console.WriteLine(e.Message),
+                ErrorOccured = (s, e) =>
+                {
+                    Console.WriteLine(e.SourceSprite.GetHeaderString() + ": " + e.Message);
+                    //Console.ReadLine();
+                },
                 ProgressChanged = (s, e) =>
                 {
                     var p = (e.Progress / (double)e.TotalCount).ToString("P0");
