@@ -9,10 +9,6 @@ namespace Coosu.Storyboard.Easing
     {
         private double _exponent = 2;
 
-        public ExponentialEase()
-        {
-        }
-
         /// <summary>
         /// Specifies the factor which controls the shape of easing.
         /// </summary>

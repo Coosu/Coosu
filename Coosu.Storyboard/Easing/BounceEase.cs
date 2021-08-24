@@ -10,10 +10,6 @@ namespace Coosu.Storyboard.Easing
         private int _bounces = 3;
         private double _bounciness = 2d;
 
-        public BounceEase()
-        {
-        }
-
         /// <summary>
         /// Specifies the number of bounces.  This does not include the final half bounce.
         /// </summary>

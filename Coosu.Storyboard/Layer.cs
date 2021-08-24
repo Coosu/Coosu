@@ -10,111 +10,150 @@ using Coosu.Storyboard.Utils;
 
 namespace Coosu.Storyboard
 {
+    /// <summary>
+    /// Coosu layer.
+    /// <para>This is more of a group for controlling a set of sprites instead of osu!storyboard layer.</para>
+    /// </summary>
     public class Layer : IScriptable, IAdjustable
     {
+        /// <summary>
+        /// Layer Z-distance.
+        /// The default value is 1.
+        /// The range of the value is from 0 to <see cref="double.MaxValue"/>
+        /// </summary>
         public double ZDistance { get; set; }
+
+        /// <summary>
+        /// Layer name.
+        /// </summary>
         public string Name { get; set; }
+
+        /// <summary>
+        /// Create a new layer.
+        /// </summary>
+        /// <param name="name"></param>
         public Layer(string name = "CoosuDefaultLayer")
         {
             ZDistance = 1;
             Name = name;
         }
 
+        /// <summary>
+        /// Create a new layer.
+        /// </summary>
+        /// <param name="zDistance">Layer Z-distance.</param>
+        /// <param name="name">Layer name.</param>
         public Layer(double zDistance, string name = "CoosuDefaultLayer")
         {
             ZDistance = zDistance;
             Name = name;
         }
 
+        /// <summary>
+        /// Sprite list in this layer.
+        /// </summary>
         public List<ISceneObject> SceneObjects { get; set; } = new();
 
-        public ISceneObject this[int index] => SceneObjects[index];
-
-        public IEnumerable<ISceneObject> this[Func<ISceneObject, bool> predicate] => SceneObjects.Where(predicate);
+        #region Create Sprite
 
         /// <summary>
-        /// Create a storyboard sprite by a static image.
+        /// Create a storyboard sprite.
         /// </summary>
-        /// <param name="filePath">File path of the image.</param>
-        /// <returns></returns>
+        /// <param name="filePath">Image file path.</param>
+        /// <returns>Created sprite.</returns>
         public Sprite CreateSprite(string filePath)
         {
             var obj = new Sprite(LayerType.Foreground, OriginType.Centre, filePath, 320, 240);
-            AddSprite(obj);
+            AddObject(obj);
             return obj;
         }
 
         /// <summary>
-        /// Create a storyboard sprite by a static image.
+        /// Create a storyboard sprite.
         /// </summary>
-        /// <param name="filePath">File path of the image.</param>
-        /// <param name="originType">Origin of the image.</param>
-        /// <returns></returns>
+        /// <param name="filePath">Image file path.</param>
+        /// <param name="originType">The sprite's origin.</param>
+        /// <returns>Created sprite.</returns>
         public Sprite CreateSprite(string filePath, OriginType originType)
         {
             var obj = new Sprite(LayerType.Foreground, originType, filePath, 320, 240);
-            AddSprite(obj);
+            AddObject(obj);
             return obj;
         }
 
         /// <summary>
-        /// Create a storyboard sprite by a static image.
+        /// Create a storyboard sprite.
         /// </summary>
-        /// <param name="filePath">File path of the image.</param>
-        /// <param name="layerType">Origin of the image.</param>
-        /// <returns></returns>
+        /// <param name="filePath">Image file path.</param>
+        /// <param name="layerType">The sprite's layer.</param>
+        /// <returns>Created sprite.</returns>
         public Sprite CreateSprite(string filePath, LayerType layerType)
         {
             var obj = new Sprite(layerType, OriginType.Centre, filePath, 320, 240);
-            AddSprite(obj);
+            AddObject(obj);
             return obj;
         }
 
         /// <summary>
-        /// Create a storyboard sprite by a static image.
+        /// Create a storyboard sprite.
         /// </summary>
-        /// <param name="filePath">File path of the image.</param>
-        /// <param name="layerType">Layer of the image.</param>
-        /// <param name="originType">Origin of the image.</param>
-        /// <returns></returns>
+        /// <param name="filePath">Image file path.</param>
+        /// <param name="layerType">The sprite's layer.</param>
+        /// <param name="originType">The sprite's origin.</param>
+        /// <returns>Created sprite.</returns>
         public Sprite CreateSprite(string filePath, LayerType layerType, OriginType originType)
         {
             var obj = new Sprite(layerType, originType, filePath, 320, 240);
-            AddSprite(obj);
+            AddObject(obj);
             return obj;
         }
 
         /// <summary>
-        /// Create a storyboard sprite by a static image.
+        /// Create a storyboard sprite.
         /// </summary>
-        /// <param name="filePath">File path of the image.</param>
-        /// <param name="layerType">Layer of the image.</param>
-        /// <param name="originType">Origin of the image.</param>
-        /// <param name="defaultLocation">Default location of the image.</param>
-        /// <returns></returns>
+        /// <param name="filePath">Image file path.</param>
+        /// <param name="layerType">The sprite's layer.</param>
+        /// <param name="originType">The sprite's origin.</param>
+        /// <param name="defaultLocation">The sprite's default location.</param>
+        /// <returns>Created sprite.</returns>
         public Sprite CreateSprite(string filePath, LayerType layerType, OriginType originType, Vector2 defaultLocation)
         {
             var obj = new Sprite(layerType, originType, filePath, defaultLocation.X, defaultLocation.Y);
-            AddSprite(obj);
+            AddObject(obj);
             return obj;
         }
 
         /// <summary>
-        /// Create a storyboard sprite by a static image.
+        /// Create a storyboard sprite.
         /// </summary>
-        /// <param name="filePath">File path of the image.</param>
-        /// <param name="layerType">Layer of the image.</param>
-        /// <param name="originType">Origin of the image.</param>
-        /// <param name="defaultX">Default x-coordinate of the image.</param>
-        /// <param name="defaultY">Default y-coordinate of the image.</param>
-        /// <returns></returns>
-        public Sprite CreateSprite(string filePath, LayerType layerType, OriginType originType,  double defaultX, double defaultY)
+        /// <param name="filePath">Image file path.</param>
+        /// <param name="layerType">The sprite's layer.</param>
+        /// <param name="originType">The sprite's origin.</param>
+        /// <param name="defaultX">The sprite's default x.</param>
+        /// <param name="defaultY">The sprite's default y.</param>
+        /// <returns>Created sprite.</returns>
+        public Sprite CreateSprite(string filePath, LayerType layerType, OriginType originType, double defaultX,
+            double defaultY)
         {
             var obj = new Sprite(layerType, originType, filePath, defaultX, defaultY);
-            AddSprite(obj);
+            AddObject(obj);
             return obj;
         }
 
+        #endregion
+
+        /// <summary>
+        /// Create a storyboard animation.
+        /// </summary>
+        /// <param name="filePath">Image file path.</param>
+        /// <param name="layerType">The animation's layer.</param>
+        /// <param name="originType">The animation's origin.</param>
+        /// <param name="defaultX">The animation's default x.</param>
+        /// <param name="defaultY">The animation's default y.</param>
+        /// <param name="frameCount">The animation's total frame count.</param>
+        /// <param name="frameDelay">The animation's frame delay between each frames.</param>
+        /// <param name="loopType">The animation's loop type.</param>
+        /// <returns>Created animation.</returns>
         public Animation CreateAnimation(
             string filePath,
             LayerType layerType,
@@ -132,18 +171,18 @@ namespace Coosu.Storyboard
                 frameDelay,
                 loopType
             );
-            AddSprite(obj);
+            AddObject(obj);
             return obj;
         }
 
-        public void AddSprite(ISceneObject sprite)
+        public void AddObject(ISceneObject @object)
         {
-            SceneObjects.Add(sprite);
+            SceneObjects.Add(@object);
         }
 
-        public void AddSprite(params ISceneObject[] sprites)
+        public void AddObjects(params ISceneObject[] objects)
         {
-            SceneObjects.AddRange(sprites);
+            SceneObjects.AddRange(objects);
         }
 
         public void AdjustTiming(double offset)
@@ -258,10 +297,13 @@ namespace Coosu.Storyboard
         }
 
         private const char SplitChar = ',';
+
         private const char QuoteChar = '\"';
+
         //private static readonly string[] SpriteDefinitions = { "Sprite", "Animation", "4", "6" };
         private static readonly char[] PrefixChars = { ' ', '_' };
         private static readonly string[] Prefixes = { " ", "_" };
+
         private static readonly string[] DoublePrefixes = { "  ", "__" };
         //private const string
         //    F = "F", S = "S", R = "R", Mx = "MX", My = "MY",
@@ -510,7 +552,8 @@ namespace Coosu.Storyboard
 
             void InjectEvent(Span<double> array)
             {
-                var commonEvent = CommonEvent.Create(eventType, (EasingType)easing, startTime, endTime, array.ToArray());
+                var commonEvent =
+                    CommonEvent.Create(eventType, (EasingType)easing, startTime, endTime, array.ToArray());
                 currentObj.AddEvent(commonEvent);
             }
         }
@@ -518,7 +561,7 @@ namespace Coosu.Storyboard
         private Sprite CreateSprite(string layer, string origin, string imagePath, double defaultX, double defaultY)
         {
             var obj = new Sprite(layer, origin, imagePath, defaultX, defaultY);
-            AddSprite(obj);
+            AddObject(obj);
             return obj;
         }
 
@@ -526,7 +569,7 @@ namespace Coosu.Storyboard
             double defaultY, int frameCount, double frameDelay, string loopType)
         {
             var obj = new Animation(layer, origin, imagePath, defaultX, defaultY, frameCount, frameDelay, loopType);
-            AddSprite(obj);
+            AddObject(obj);
             return obj;
         }
     }

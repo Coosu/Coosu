@@ -11,10 +11,6 @@ namespace Coosu.Storyboard.Easing
     {
         private double _power = 2;
 
-        public PowerEase()
-        {
-        }
-
         /// <summary>
         /// Specifies the power for the polynomial equation.
         /// </summary>
