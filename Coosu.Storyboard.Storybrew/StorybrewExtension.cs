@@ -3,16 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Extensions.Optimizing;
+using Coosu.Storyboard.Storybrew;
 using OpenTK;
 using StorybrewCommon.Storyboarding;
 
-namespace Coosu.Storyboard.Storybrew
+// ReSharper disable once CheckNamespace
+namespace Coosu.Storyboard
 {
     public static class StorybrewExtension
     {
         public static void ExecuteBrew(this Layer layer, StoryboardLayer brewLayer)
         {
-            var compressor = new SpriteCompressor(layer);
+            var compressor = new SpriteCompressor(layer)
+            {
+                ThreadCount = Environment.ProcessorCount - 1,
+            };
             compressor.ErrorOccured = (_, e) => throw new Exception(e.Message);
             compressor.CompressAsync().Wait();
             if (layer.SceneObjects.Count == 0) return;
@@ -33,7 +38,10 @@ namespace Coosu.Storyboard.Storybrew
             if (optimize)
             {
                 var sceneObjects = new List<ISceneObject> { sprite };
-                var compressor = new SpriteCompressor(sceneObjects);
+                var compressor = new SpriteCompressor(sceneObjects)
+                {
+                    ThreadCount = Environment.ProcessorCount - 1,
+                };
                 compressor.ErrorOccured = (_, e) => throw new Exception(e.Message);
                 compressor.CompressAsync().Wait();
                 if (sceneObjects.Count == 0) return;
@@ -44,13 +52,13 @@ namespace Coosu.Storyboard.Storybrew
                 brewObj = brewLayer.CreateAnimation(animation.ImagePath,
                     (int)animation.FrameCount,
                     (int)animation.FrameDelay,
-                    ConvertHelper.ConvertLoopType(animation.LoopType),
-                    ConvertHelper.ConvertOrigin(animation.OriginType),
+                    StorybrewInteropHelper.ConvertLoopType(animation.LoopType),
+                    StorybrewInteropHelper.ConvertOrigin(animation.OriginType),
                     new Vector2((float)animation.DefaultX,
                         (float)animation.DefaultY));
             else
                 brewObj = brewLayer.CreateSprite(sprite.ImagePath,
-                    ConvertHelper.ConvertOrigin(sprite.OriginType),
+                    StorybrewInteropHelper.ConvertOrigin(sprite.OriginType),
                     new Vector2((float)sprite.DefaultX, (float)sprite.DefaultY)
                 );
 
@@ -73,7 +81,7 @@ namespace Coosu.Storyboard.Storybrew
         private static void InnerExecuteBrew(IEventHost eventHost, OsbSprite brewObj)
         {
             foreach (var commonEvent in eventHost.Events)
-                ConvertHelper.ExecuteEvent(commonEvent, brewObj);
+                StorybrewInteropHelper.ExecuteEvent(commonEvent, brewObj);
         }
     }
 }
