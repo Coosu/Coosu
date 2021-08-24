@@ -167,7 +167,6 @@ namespace Coosu.Storyboard
             double rotate) =>
             sprite.AddEventRelative(MoreEventTypes.RotateBy, easing, startTime, endTime, rotate);
 
-
         #endregion
 
         #region MoveX
@@ -248,6 +247,7 @@ namespace Coosu.Storyboard
             Vector3 color) =>
             sprite.AddEventRelative(MoreEventTypes.ColorBy, LinearEase.Instance, startTime, endTime, color.X, color.Y,
                 color.Z);
+
         /// <summary>
         /// Color by relative rgb values.
         /// </summary>
@@ -297,6 +297,8 @@ namespace Coosu.Storyboard
             sprite.AddEventRelative(MoreEventTypes.VectorBy, easing, startTime, endTime, r, g, b);
 
         #endregion
+
+        #region Vector
 
         /// <summary>
         /// Vector by relative size.
@@ -356,6 +358,8 @@ namespace Coosu.Storyboard
             double startTime, double endTime,
             double x, double y) =>
             sprite.AddEventRelative(MoreEventTypes.VectorBy, easing, startTime, endTime, x, y);
+
+        #endregion
 
         private static void AddEventRelative(this Sprite sprite, EventType e, EasingFunctionBase easing,
             double startTime, double endTime,
