@@ -5,6 +5,7 @@ using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Extensions.Optimizing;
 using Coosu.Storyboard.Storybrew;
 using OpenTK;
+using StorybrewCommon.Scripting;
 using StorybrewCommon.Storyboarding;
 
 // ReSharper disable once CheckNamespace
@@ -12,7 +13,14 @@ namespace Coosu.Storyboard
 {
     public static class StorybrewExtension
     {
-        public static void ExecuteBrew(this Layer layer, StoryboardLayer brewLayer, Action<CompressSettings>? configureSettings)
+        public static void ExecuteBrew(this Layer layer, StoryboardObjectGenerator sog,
+            Action<CompressSettings>? configureSettings = null)
+        {
+            ExecuteBrew(layer, sog.GetLayer(layer.Name), configureSettings);
+        }
+
+        public static void ExecuteBrew(this Layer layer, StoryboardLayer brewLayer,
+            Action<CompressSettings>? configureSettings = null)
         {
             void EventHandler(object _, ProcessErrorEventArgs e) => throw new Exception(e.Message);
 
@@ -30,7 +38,8 @@ namespace Coosu.Storyboard
             }
         }
 
-        public static void ExecuteBrew(this Sprite sprite, StoryboardLayer brewLayer, Action<CompressSettings>? configureSettings)
+        public static void ExecuteBrew(this Sprite sprite, StoryboardLayer brewLayer, 
+            Action<CompressSettings>? configureSettings = null)
         {
             InnerExecuteBrew(sprite, brewLayer, true, configureSettings);
         }

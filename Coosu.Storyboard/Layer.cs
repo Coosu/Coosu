@@ -14,13 +14,13 @@ namespace Coosu.Storyboard
     {
         public double ZDistance { get; set; }
         public string Name { get; set; }
-        public Layer(string name = "Layer")
+        public Layer(string name = "CoosuDefaultLayer")
         {
             ZDistance = 1;
             Name = name;
         }
 
-        public Layer(double zDistance, string name = "Layer")
+        public Layer(double zDistance, string name = "CoosuDefaultLayer")
         {
             ZDistance = zDistance;
             Name = name;
