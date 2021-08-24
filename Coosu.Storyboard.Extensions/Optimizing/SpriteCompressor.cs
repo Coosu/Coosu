@@ -1,14 +1,13 @@
-﻿using Coosu.Storyboard.Common;
-using Coosu.Storyboard.Events;
-using Coosu.Storyboard.Utils;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Coosu.Shared.Mathematics;
+using Coosu.Storyboard.Common;
+using Coosu.Storyboard.Events;
+using Coosu.Storyboard.Utils;
 
 namespace Coosu.Storyboard.Extensions.Optimizing
 {
@@ -357,12 +356,12 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                         }
                         else
                         {
-                            var discretizedRelative = @event.ComputeDiscretizedEvents(false,
+                            var discretizedRelatives = @event.ComputeDiscretizedEvents(false,
                                     TempGlobalConstant.DiscretizingInterval,
-                                    TempGlobalConstant.DiscretizingAccuracy)
+                                    null)
                                 .Where(k => !k.Start.SequenceEqual(k.End))
                                 .ToDictionary(k => (k.StartTime, k.EndTime), k => k);
-                            endTime = (int)discretizedRelative.Last().Key.EndTime;
+                            endTime = (int)discretizedRelatives.Last().Key.EndTime;
                             var discretizingTargetStandardEvents =
                                 new Dictionary<(double StartTime, double EndTime), ICommonEvent>();
                             //var boundedDiscretizingTargetStandardEvents = new HashSet<ICommonEvent>(); //todo: 算上因特殊情况被再度切割的？
@@ -386,7 +385,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                             }
 
                             var list = new List<ICommonEvent>();
-                            foreach (var relative in discretizedRelative.ToList())
+                            foreach (var relative in discretizedRelatives.ToList())
                             {
                                 var key = relative.Key;
                                 var relativeEvent = relative.Value;
@@ -505,7 +504,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                                                 //    .Where(k => k != @event)
                                                 //    .Any(k => k.StartTime <= bounded.EndTime &&
                                                 //              k.EndTime >= bounded.StartTime) && 
-                                                !discretizedRelative
+                                                !discretizedRelatives
                                                     .Where(k => k.Value != relative.Value)
                                                     .Any(k => k.Key.StartTime <= bounded.EndTime &&
                                                               k.Key.EndTime >= bounded.StartTime))
@@ -555,7 +554,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                                                 //    .Where(k => k != @event)
                                                 //    .Any(k => k.StartTime <= bounded.EndTime &&
                                                 //              k.EndTime >= bounded.StartTime) &&
-                                                !discretizedRelative
+                                                !discretizedRelatives
                                                     .Where(k => k.Value != relative.Value)
                                                     .Any(k => k.Key.StartTime <= bounded.EndTime &&
                                                               k.Key.EndTime >= bounded.StartTime))
@@ -582,7 +581,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                                     }
                                 }
 
-                                discretizedRelative.Remove(key);
+                                discretizedRelatives.Remove(key);
                             }
 
                             foreach (var commonEvent in list)
