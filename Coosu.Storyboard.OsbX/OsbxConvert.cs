@@ -128,7 +128,7 @@ namespace Coosu.Storyboard.OsbX
                             {
                                 var sprite = handler.Deserialize(split);
                                 var eg = em.GetOrAddLayer(sprite.ZDistance);
-                                eg.AddSprite(sprite);
+                                eg.AddObject(sprite);
 
                                 lastSubject = sprite;
                             }

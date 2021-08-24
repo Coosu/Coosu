@@ -10,10 +10,6 @@ namespace Coosu.Storyboard.Easing
         private int _oscillations = 3;
         private double _springiness = 3;
 
-        public ElasticEase()
-        {
-        }
-
         /// <summary>
         /// Specifies the number of oscillations
         /// </summary>

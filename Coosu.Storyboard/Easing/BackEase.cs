@@ -9,10 +9,6 @@ namespace Coosu.Storyboard.Easing
     {
         private double _amplitude = 1;
 
-        public BackEase()
-        {
-        }
-
         /// <summary>
         /// Specifies how much the function will pull back
         /// </summary>
