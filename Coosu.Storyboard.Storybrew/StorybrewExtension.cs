@@ -12,38 +12,43 @@ namespace Coosu.Storyboard
 {
     public static class StorybrewExtension
     {
-        public static void ExecuteBrew(this Layer layer, StoryboardLayer brewLayer)
+        public static void ExecuteBrew(this Layer layer, StoryboardLayer brewLayer, Action<CompressSettings>? configureSettings)
         {
-            var compressor = new SpriteCompressor(layer)
-            {
-                ThreadCount = Environment.ProcessorCount - 1,
-            };
-            compressor.ErrorOccured = (_, e) => throw new Exception(e.Message);
+            void EventHandler(object _, ProcessErrorEventArgs e) => throw new Exception(e.Message);
+
+            var compressor = new SpriteCompressor(layer);
+            configureSettings?.Invoke(compressor.Settings);
+
+            compressor.ErrorOccured += EventHandler;
             compressor.CompressAsync().Wait();
+            compressor.ErrorOccured -= EventHandler;
             if (layer.SceneObjects.Count == 0) return;
 
             foreach (var sprite in layer.SceneObjects.Where(k => k is Sprite).Cast<Sprite>())
             {
-                InnerExecuteBrew(sprite, brewLayer, false);
+                InnerExecuteBrew(sprite, brewLayer, false, configureSettings);
             }
         }
 
-        public static void ExecuteBrew(this Sprite sprite, StoryboardLayer brewLayer)
+        public static void ExecuteBrew(this Sprite sprite, StoryboardLayer brewLayer, Action<CompressSettings>? configureSettings)
         {
-            InnerExecuteBrew(sprite, brewLayer, true);
+            InnerExecuteBrew(sprite, brewLayer, true, configureSettings);
         }
 
-        private static void InnerExecuteBrew(Sprite sprite, StoryboardLayer brewLayer, bool optimize)
+        private static void InnerExecuteBrew(Sprite sprite, StoryboardLayer brewLayer,
+            bool optimize, Action<CompressSettings>? configureSettings)
         {
             if (optimize)
             {
+                void EventHandler(object _, ProcessErrorEventArgs e) => throw new Exception(e.Message);
+
                 var sceneObjects = new List<ISceneObject> { sprite };
-                var compressor = new SpriteCompressor(sceneObjects)
-                {
-                    ThreadCount = Environment.ProcessorCount - 1,
-                };
-                compressor.ErrorOccured = (_, e) => throw new Exception(e.Message);
+                var compressor = new SpriteCompressor(sceneObjects);
+                configureSettings?.Invoke(compressor.Settings);
+
+                compressor.ErrorOccured += EventHandler;
                 compressor.CompressAsync().Wait();
+                compressor.ErrorOccured -= EventHandler;
                 if (sceneObjects.Count == 0) return;
             }
 

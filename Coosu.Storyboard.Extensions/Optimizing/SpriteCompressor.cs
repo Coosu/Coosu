@@ -13,15 +13,16 @@ namespace Coosu.Storyboard.Extensions.Optimizing
 {
     public class SpriteCompressor : IDisposable
     {
-        public EventHandler<CompressorEventArgs>? OperationStart;
-        public EventHandler<CompressorEventArgs>? OperationEnd;
-        public EventHandler<ProcessErrorEventArgs>? ErrorOccured; //lock
+        public CompressSettings Settings { get; }
+        public event EventHandler<CompressorEventArgs>? OperationStart;
+        public event EventHandler<CompressorEventArgs>? OperationEnd;
+        public event EventHandler<ProcessErrorEventArgs>? ErrorOccured; //lock
         //public EventHandler<SituationEventArgs> ElementFound; //lock
-        public EventHandler<SituationEventArgs>? SituationFound; //lock
-        public EventHandler<SituationEventArgs>? SituationChanged; //lock
-        public EventHandler<ProgressEventArgs>? ProgressChanged;
+        public event EventHandler<SituationEventArgs>? SituationFound; //lock
+        public event EventHandler<SituationEventArgs>? SituationChanged; //lock
+        public event EventHandler<ProgressEventArgs>? ProgressChanged;
 
-        private int _threadCount = 1;
+        //private int _threadCount = 1;
 
         private readonly ICollection<Sprite> _sprites;
 
@@ -35,33 +36,35 @@ namespace Coosu.Storyboard.Extensions.Optimizing
 
         public Guid Guid { get; } = Guid.NewGuid();
 
-        public SpriteCompressor(ICollection<ISceneObject> sprites)
+        public SpriteCompressor(ICollection<ISceneObject> sprites, CompressSettings? compressSettings = null)
         {
             _sprites = sprites
                 .Where(k => k is Sprite)
                 .Cast<Sprite>()
                 .ToList();
             _sourceSprites = sprites;
+            Settings = compressSettings ?? new CompressSettings();
         }
 
-        public SpriteCompressor(Layer layer)
+        public SpriteCompressor(Layer layer, CompressSettings? compressSettings = null)
         {
             _sprites = layer.SceneObjects
                 .Where(k => k is Sprite)
                 .Cast<Sprite>()
                 .ToList();
             _sourceSprites = layer.SceneObjects;
+            Settings = compressSettings ?? new CompressSettings();
         }
 
-        public int ThreadCount
-        {
-            get => _threadCount;
-            set
-            {
-                lock (_runLock) if (IsRunning) throw new Exception();
-                _threadCount = value < 1 ? 1 : value;
-            }
-        }
+        //public int ThreadCount
+        //{
+        //    get => _threadCount;
+        //    set
+        //    {
+        //        lock (_runLock) if (IsRunning) throw new Exception();
+        //        _threadCount = value < 1 ? 1 : value;
+        //    }
+        //}
 
         public bool IsRunning { get; private set; }
 
@@ -128,7 +131,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                     _sprites
                         .AsParallel()
                         .WithCancellation(_cancelToken?.Token ?? CancellationToken.None)
-                        .WithDegreeOfParallelism(_threadCount)
+                        .WithDegreeOfParallelism(Settings.ThreadCount)
                         .ForAll(sprite =>
                         {
                             mrs.Wait();
@@ -252,7 +255,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             return sprite.HasEffectiveTiming();
         }
 
-        private static void StandardizeEvents(Sprite sprite)
+        private void StandardizeEvents(Sprite sprite)
         {
             DiscretizeNonStandardEasing(sprite);
             ComputeRelativeEvents(sprite);
@@ -262,15 +265,15 @@ namespace Coosu.Storyboard.Extensions.Optimizing
         /// Make non-standard easing discretized.
         /// </summary>
         /// <param name="sprite"></param>
-        private static void DiscretizeNonStandardEasing(IEventHost sprite)
+        private void DiscretizeNonStandardEasing(IEventHost sprite)
         {
             var commonEvents = sprite.Events.ToList();
             foreach (var @event in commonEvents
                 .Where(k => k is not RelativeEvent && k.Easing.TryGetEasingType() == null))
             {
                 var eventList = @event.ComputeDiscretizedEvents(false,
-                    TempGlobalConstant.DiscretizingInterval,
-                    TempGlobalConstant.DiscretizingAccuracy);
+                    Settings.DiscretizingInterval,
+                    Settings.DiscretizingAccuracy);
                 sprite.Events.Remove(@event);
                 foreach (var commonEvent in eventList)
                 {
@@ -279,7 +282,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             }
         }
 
-        private static void ComputeRelativeEvents(Sprite sprite)
+        private void ComputeRelativeEvents(Sprite sprite)
         {
             var commonEvents = sprite.Events.ToList();
             foreach (var grouping in commonEvents
@@ -329,8 +332,8 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                             if (newEvent.Easing.TryGetEasingType() == null)
                             {
                                 var de = newEvent.ComputeDiscretizedEvents(false,
-                                    TempGlobalConstant.DiscretizingInterval,
-                                    TempGlobalConstant.DiscretizingAccuracy);
+                                    Settings.DiscretizingInterval,
+                                    Settings.DiscretizingAccuracy);
                                 foreach (var commonEvent in de)
                                 {
                                     sprite.Events.Add(commonEvent);
@@ -357,7 +360,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                         else
                         {
                             var discretizedRelatives = @event.ComputeDiscretizedEvents(false,
-                                    TempGlobalConstant.DiscretizingInterval,
+                                    Settings.DiscretizingInterval,
                                     null)
                                 .Where(k => !k.Start.SequenceEqual(k.End))
                                 .ToDictionary(k => (k.StartTime, k.EndTime), k => k);
@@ -370,8 +373,8 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                                 ICommonEvent? first = null;
                                 ICommonEvent? last = null;
                                 var computeDiscretizedEvents = k.ComputeDiscretizedEvents(
-                                    TempGlobalConstant.DiscretizingInterval,
-                                    TempGlobalConstant.DiscretizingAccuracy);
+                                    Settings.DiscretizingInterval,
+                                    Settings.DiscretizingAccuracy);
                                 foreach (ICommonEvent discretizedEvent in computeDiscretizedEvents)
                                 {
                                     first ??= discretizedEvent;
@@ -394,9 +397,9 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                                     // exact coincident
                                     var eventType = completelyCoincidentEvent.EventType;
                                     var newStart =
-                                        eventType.ComputeRelative(completelyCoincidentEvent.Start, relativeEvent.Start, TempGlobalConstant.DiscretizingAccuracy);
+                                        eventType.ComputeRelative(completelyCoincidentEvent.Start, relativeEvent.Start, Settings.DiscretizingAccuracy);
                                     var newEnd =
-                                        eventType.ComputeRelative(completelyCoincidentEvent.End, relativeEvent.End, TempGlobalConstant.DiscretizingAccuracy);
+                                        eventType.ComputeRelative(completelyCoincidentEvent.End, relativeEvent.End, Settings.DiscretizingAccuracy);
                                     completelyCoincidentEvent.Start = newStart;
                                     completelyCoincidentEvent.End = newEnd;
                                     discretizingTargetStandardEvents.Remove(key);
@@ -410,11 +413,11 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                                     {
                                         // nothing
                                         var lastValue = SpriteExtensions.ComputeFrame(allThisTypeStandardEvents,
-                                            relative.Value.EventType, relative.Key.StartTime, TempGlobalConstant.DiscretizingAccuracy);
+                                            relative.Value.EventType, relative.Key.StartTime, Settings.DiscretizingAccuracy);
                                         var commonEvent = CommonEvent.Create(targetStdType, EasingType.Linear,
                                             relative.Key.StartTime, relative.Key.EndTime,
-                                            @event.EventType.ComputeRelative(lastValue, relative.Value.Start, TempGlobalConstant.DiscretizingAccuracy),
-                                            @event.EventType.ComputeRelative(lastValue, relative.Value.End, TempGlobalConstant.DiscretizingAccuracy));
+                                            @event.EventType.ComputeRelative(lastValue, relative.Value.Start, Settings.DiscretizingAccuracy),
+                                            @event.EventType.ComputeRelative(lastValue, relative.Value.End, Settings.DiscretizingAccuracy));
                                         list.Add(commonEvent);
                                     }
                                     else
@@ -426,8 +429,8 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                                             // relative:    |___!  (kvp) (0~?~100)
                                             //           0  1 2 3
                                             var absoluteFrame1 = SpriteExtensions.ComputeFrame(allThisTypeStandardEvents,
-                                                targetStdType, relative.Key.StartTime, TempGlobalConstant.DiscretizingAccuracy);
-                                            var computedFrame1 = @event.EventType.ComputeRelative(absoluteFrame1, relative.Value.Start, TempGlobalConstant.DiscretizingAccuracy);
+                                                targetStdType, relative.Key.StartTime, Settings.DiscretizingAccuracy);
+                                            var computedFrame1 = @event.EventType.ComputeRelative(absoluteFrame1, relative.Value.Start, Settings.DiscretizingAccuracy);
                                             if (!relative.Key.StartTime.Equals(bounded.StartTime))
                                             {
                                                 var newEvent0_1 = CommonEvent.Create(targetStdType, EasingType.Linear,
@@ -438,8 +441,8 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                                             }
 
                                             double[] computedFrame2;
-                                            var relativeFrame2 = @event.ComputeFrame(bounded.EndTime, TempGlobalConstant.DiscretizingAccuracy); //get
-                                            computedFrame2 = @event.EventType.ComputeRelative(bounded.End, relativeFrame2, TempGlobalConstant.DiscretizingAccuracy);
+                                            var relativeFrame2 = @event.ComputeFrame(bounded.EndTime, Settings.DiscretizingAccuracy); //get
+                                            computedFrame2 = @event.EventType.ComputeRelative(bounded.End, relativeFrame2, Settings.DiscretizingAccuracy);
                                             if (!relative.Key.StartTime.Equals(bounded.EndTime))
                                             {
                                                 var newEvent1_2 = CommonEvent.Create(targetStdType, EasingType.Linear,
@@ -450,8 +453,8 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                                             }
 
                                             var absoluteFrame3 = SpriteExtensions.ComputeFrame(allThisTypeStandardEvents,
-                                                targetStdType, relative.Key.EndTime, TempGlobalConstant.DiscretizingAccuracy);
-                                            var computedFrame3 = @event.EventType.ComputeRelative(absoluteFrame3, relative.Value.End, TempGlobalConstant.DiscretizingAccuracy);
+                                                targetStdType, relative.Key.EndTime, Settings.DiscretizingAccuracy);
+                                            var computedFrame3 = @event.EventType.ComputeRelative(absoluteFrame3, relative.Value.End, Settings.DiscretizingAccuracy);
                                             if (!relative.Key.EndTime.Equals(bounded.EndTime))
                                             {
                                                 var newEvent2_3 = CommonEvent.Create(targetStdType, EasingType.Linear,
@@ -469,10 +472,10 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                                             // relative: !___|    (kvp) (0~?~100)
                                             //           0 1 2  3
                                             var absoluteFrame0 = SpriteExtensions.ComputeFrame(allThisTypeStandardEvents,
-                                                targetStdType, relative.Key.StartTime, TempGlobalConstant.DiscretizingAccuracy);
-                                            var computedFrame0 = @event.EventType.ComputeRelative(absoluteFrame0, relative.Value.Start, TempGlobalConstant.DiscretizingAccuracy);
-                                            var relativeFrame1 = @event.ComputeFrame(bounded.StartTime, TempGlobalConstant.DiscretizingAccuracy);
-                                            var computedFrame1 = @event.EventType.ComputeRelative(bounded.Start, relativeFrame1, TempGlobalConstant.DiscretizingAccuracy);
+                                                targetStdType, relative.Key.StartTime, Settings.DiscretizingAccuracy);
+                                            var computedFrame0 = @event.EventType.ComputeRelative(absoluteFrame0, relative.Value.Start, Settings.DiscretizingAccuracy);
+                                            var relativeFrame1 = @event.ComputeFrame(bounded.StartTime, Settings.DiscretizingAccuracy);
+                                            var computedFrame1 = @event.EventType.ComputeRelative(bounded.Start, relativeFrame1, Settings.DiscretizingAccuracy);
 
                                             if (!relative.Key.StartTime.Equals(bounded.StartTime))
                                             {
@@ -485,8 +488,8 @@ namespace Coosu.Storyboard.Extensions.Optimizing
 
                                             double[] computedFrame2;
                                             var absoluteFrame2 = SpriteExtensions.ComputeFrame(allThisTypeStandardEvents,
-                                                targetStdType, relative.Key.EndTime, TempGlobalConstant.DiscretizingAccuracy);
-                                            computedFrame2 = @event.EventType.ComputeRelative(absoluteFrame2, relative.Value.End, TempGlobalConstant.DiscretizingAccuracy);
+                                                targetStdType, relative.Key.EndTime, Settings.DiscretizingAccuracy);
+                                            computedFrame2 = @event.EventType.ComputeRelative(absoluteFrame2, relative.Value.End, Settings.DiscretizingAccuracy);
                                             if (!relative.Key.EndTime.Equals(bounded.StartTime))
                                             {
                                                 var newEvent1_2 = CommonEvent.Create(targetStdType, EasingType.Linear,
@@ -510,7 +513,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                                                               k.Key.EndTime >= bounded.StartTime))
                                             {
                                                 var computedFrame3 =
-                                                    @event.EventType.ComputeRelative(bounded.End, relative.Value.End, TempGlobalConstant.DiscretizingAccuracy);
+                                                    @event.EventType.ComputeRelative(bounded.End, relative.Value.End, Settings.DiscretizingAccuracy);
                                                 var newEvent2_3 = CommonEvent.Create(targetStdType, EasingType.Linear,
                                                     relative.Key.EndTime, bounded.EndTime,
                                                     computedFrame2, computedFrame3);
@@ -524,11 +527,11 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                                             // absolute: !______!  (bounded)
                                             // relative: |_|__|_|  (kvp) (0~?~100)
                                             //           0 1  2 3
-                                            var computedFrame0 = @event.EventType.ComputeRelative(bounded.Start, relative.Value.Start, TempGlobalConstant.DiscretizingAccuracy);
+                                            var computedFrame0 = @event.EventType.ComputeRelative(bounded.Start, relative.Value.Start, Settings.DiscretizingAccuracy);
 
                                             var absoluteFrame1 = SpriteExtensions.ComputeFrame(allThisTypeStandardEvents,
-                                                targetStdType, relative.Key.StartTime, TempGlobalConstant.DiscretizingAccuracy);
-                                            var computedFrame1 = @event.EventType.ComputeRelative(absoluteFrame1, relative.Value.Start, TempGlobalConstant.DiscretizingAccuracy);
+                                                targetStdType, relative.Key.StartTime, Settings.DiscretizingAccuracy);
+                                            var computedFrame1 = @event.EventType.ComputeRelative(absoluteFrame1, relative.Value.Start, Settings.DiscretizingAccuracy);
 
                                             if (!relative.Key.StartTime.Equals(bounded.StartTime))
                                             {
@@ -540,8 +543,8 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                                             }
 
                                             var absoluteFrame2 = SpriteExtensions.ComputeFrame(allThisTypeStandardEvents,
-                                                targetStdType, relative.Key.EndTime, TempGlobalConstant.DiscretizingAccuracy);
-                                            var computedFrame2 = @event.EventType.ComputeRelative(absoluteFrame2, relative.Value.End, TempGlobalConstant.DiscretizingAccuracy);
+                                                targetStdType, relative.Key.EndTime, Settings.DiscretizingAccuracy);
+                                            var computedFrame2 = @event.EventType.ComputeRelative(absoluteFrame2, relative.Value.End, Settings.DiscretizingAccuracy);
 
                                             var newEvent1_2 = CommonEvent.Create(targetStdType, EasingType.Linear,
                                                 relative.Key.StartTime, relative.Key.EndTime,

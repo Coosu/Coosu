@@ -11,7 +11,11 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Copyright>Copyright © Coosu 2021</Copyright>
   </PropertyGroup>
-  
+
+  <PropertyGroup Condition="$(MSBuildProjectName.StartsWith('Coosu')) == 'true' And $(Configuration) != 'Debug' ">
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+  </PropertyGroup>
+
   <PropertyGroup Label="MinVerSetting" Condition="$(MSBuildProjectName.StartsWith('Coosu')) == 'true'">
     <MinVerTagPrefix>v</MinVerTagPrefix>
     <MinVerMinimumMajorMinor>1.0</MinVerMinimumMajorMinor>

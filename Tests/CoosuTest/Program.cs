@@ -44,25 +44,26 @@ namespace CoosuTest
                 }, 0, 3000 + Random(-1000, 1000), 400 + Random(-50, 50), 150 + Random(-50, 50));
                 sprite.MoveBy(0, 4000, -100, -100);
             }
-            
+
             //await layer.WriteScriptAsync(Console.Out);
             //Console.WriteLine("==================");
             string? preP = null;
-            var compressor = new SpriteCompressor(layer)
+            var compressor = new SpriteCompressor(layer, new CompressSettings
             {
-                ThreadCount = Environment.ProcessorCount + 1,
-                ErrorOccured = (s, e) =>
-                {
-                    //Console.WriteLine(e.SourceSprite.GetHeaderString() + ": " + e.Message);
-                    //Console.ReadLine();
-                },
-                ProgressChanged = (s, e) =>
-                {
-                    //var p = (e.Progress / (double)e.TotalCount).ToString("P0");
-                    //if (preP == p) return;
-                    //Console.WriteLine(p);
-                    //preP = p;
-                }
+                ThreadCount = Environment.ProcessorCount + 1
+            });
+
+            compressor.ErrorOccured += (s, e) =>
+            {
+                //Console.WriteLine(e.SourceSprite.GetHeaderString() + ": " + e.Message);
+                //Console.ReadLine();
+            };
+            compressor.ProgressChanged += (s, e) =>
+            {
+                //var p = (e.Progress / (double)e.TotalCount).ToString("P0");
+                //if (preP == p) return;
+                //Console.WriteLine(p);
+                //preP = p;
             };
             var canceled = await compressor.CompressAsync();
             await layer.WriteScriptAsync(Console.Out);
@@ -79,11 +80,9 @@ namespace CoosuTest
         private static async Task OutputNewOsb(string text)
         {
             var layer = await Layer.ParseAsyncTextAsync(text);
-            var g = new SpriteCompressor(layer)
-            {
-                ErrorOccured = (s, e) => { Console.WriteLine(e.Message); },
-                //SituationFound = (s, e) => { Console.WriteLine(e.Message); }
-            };
+            var g = new SpriteCompressor(layer);
+            //g.SituationFound += (s, e) => { Console.WriteLine(e.Message); };
+            g.ErrorOccured += (s, e) => { Console.WriteLine(e.Message); };
             await g.CompressAsync();
             await layer.SaveScriptAsync(Path.Combine(Environment.CurrentDirectory, "output_new.osb"));
         }
