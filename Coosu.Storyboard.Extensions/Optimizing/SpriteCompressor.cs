@@ -362,6 +362,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                                     TempGlobalConstant.DiscretizingAccuracy)
                                 .Where(k => !k.Start.SequenceEqual(k.End))
                                 .ToDictionary(k => (k.StartTime, k.EndTime), k => k);
+                            endTime = (int)discretizedRelative.Last().Key.EndTime;
                             var discretizingTargetStandardEvents =
                                 new Dictionary<(double StartTime, double EndTime), ICommonEvent>();
                             //var boundedDiscretizingTargetStandardEvents = new HashSet<ICommonEvent>(); //todo: 算上因特殊情况被再度切割的？

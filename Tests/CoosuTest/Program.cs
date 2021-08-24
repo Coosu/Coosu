@@ -34,18 +34,18 @@ namespace CoosuTest
                 //sprite.MoveX(0, 60, 64, 100, 100);
                 //sprite.MoveX(0, 64, 96, 100, 100);
                 //sprite.MoveXBy(0, 60, 80, 100);
-                sprite.MoveX(0, 300, -50, 0);
+                sprite.MoveX(0, 500, -50, 0);
                 sprite.MoveXBy(new PowerEase()
                 {
-                    Power = 1,
+                    Power = 10,
                     EasingMode = EasingMode.EaseOut
-                }, 0, 100, 200);
+                }, 0, 300, 200);
 
                 sprite.MoveXBy(new PowerEase()
                 {
-                    Power = 1,
+                    Power = 10,
                     EasingMode = EasingMode.EaseInOut
-                }, 0 + 50, 100 + 200, 200);
+                }, 0 + 100, 300 + 200, 200);
 
                 //sprite.MoveXBy(0, 30, 60, 100);
                 //sprite.MoveXBy(0, 60, 80, 100);
