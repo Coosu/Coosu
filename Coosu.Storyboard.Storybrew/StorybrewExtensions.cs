@@ -11,14 +11,29 @@ using StorybrewCommon.Storyboarding;
 // ReSharper disable once CheckNamespace
 namespace Coosu.Storyboard
 {
-    public static class StorybrewExtension
+    /// <summary>
+    /// Storybrew extension methods for Coosu.
+    /// </summary>
+    public static class StorybrewExtensions
     {
-        public static void ExecuteBrew(this Layer layer, StoryboardObjectGenerator sog,
+        /// <summary>
+        /// Executing Coosu commands and optimizing automatically in storybrew.
+        /// </summary>
+        /// <param name="layer">Specific Coosu <see cref="Layer"/>.</param>
+        /// <param name="brewObjectGenerator">Specific storybrew <see cref="StoryboardObjectGenerator"/>.</param>
+        /// <param name="configureSettings">Configure compressing options.</param>
+        public static void ExecuteBrew(this Layer layer, StoryboardObjectGenerator brewObjectGenerator,
             Action<CompressSettings>? configureSettings = null)
         {
-            ExecuteBrew(layer, sog.GetLayer(layer.Name), configureSettings);
+            ExecuteBrew(layer, brewObjectGenerator.GetLayer(layer.Name), configureSettings);
         }
 
+        /// <summary>
+        /// Executing Coosu commands and optimizing automatically in storybrew.
+        /// </summary>
+        /// <param name="layer">Specific Coosu <see cref="Layer"/>.</param>
+        /// <param name="brewLayer">Specific storybrew <see cref="StoryboardLayer"/>.</param>
+        /// <param name="configureSettings">Configure compressing options.</param>
         public static void ExecuteBrew(this Layer layer, StoryboardLayer brewLayer,
             Action<CompressSettings>? configureSettings = null)
         {
@@ -38,7 +53,13 @@ namespace Coosu.Storyboard
             }
         }
 
-        public static void ExecuteBrew(this Sprite sprite, StoryboardLayer brewLayer, 
+        /// <summary>
+        /// Executing Coosu commands and optimizing automatically in storybrew.
+        /// </summary>
+        /// <param name="sprite">Specific Coosu <see cref="Sprite"/>.</param>
+        /// <param name="brewLayer">Specific storybrew <see cref="StoryboardLayer"/>.</param>
+        /// <param name="configureSettings">Configure compressing options.</param>
+        public static void ExecuteBrew(this Sprite sprite, StoryboardLayer brewLayer,
             Action<CompressSettings>? configureSettings = null)
         {
             InnerExecuteBrew(sprite, brewLayer, true, configureSettings);

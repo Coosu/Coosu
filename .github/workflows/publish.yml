@@ -49,6 +49,7 @@ jobs:
         Invoke-WebRequest https://github.com/Milkitic/ILMerge/releases/download/3.0.41.49566/ILMerge-Windows.7z -OutFile "ILMerge/cli.zip"
         7z x "ILMerge/cli.zip" -oILMerge/
         .\ILMerge\ILMerge.exe .\ci-build\Coosu.Storyboard.Storybrew.dll .\ci-build\Coosu.Shared.dll .\ci-build\Coosu.Storyboard.dll .\ci-build\Coosu.Storyboard.Extensions.dll .\ci-build\System.Buffers.dll .\ci-build\System.Memory.dll .\ci-build\System.Numerics.Vectors.dll .\ci-build\System.Runtime.CompilerServices.Unsafe.dll .\ci-build\System.ValueTuple.dll /t:library /out:Coosu.Storyboard.Storybrew-ILMerged.dll
+        .\ci-build\CombineXml.ps1 "" ".\ci-build\"
         
     - name: action-minver
       uses: thefringeninja/action-minver@2.0.0-preview1
