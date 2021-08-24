@@ -12,4 +12,8 @@
     <ProjectReference Include="..\Libraries\storybrew\common\common.csproj" />
   </ItemGroup>
 
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="D:\PortablePrograms\ILMerge\ILMerge.exe $(OutputPath)Coosu.Shared.dll $(OutputPath)Coosu.Storyboard.dll $(OutputPath)Coosu.Storyboard.Extensions.dll $(OutputPath)System.Buffers.dll $(OutputPath)System.Memory.dll $(OutputPath)System.Numerics.Vectors.dll $(OutputPath)System.Runtime.CompilerServices.Unsafe.dll $(OutputPath)System.ValueTuple.dll $(OutputPath)Coosu.Storyboard.Storybrew.dll /t:library /out:$(OutputPath)Coosu.Storyboard.Storybrew-ILMerged-v$(MinverVersion).dll" />
+  </Target>
+
 </Project>

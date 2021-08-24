@@ -2,6 +2,7 @@
 {
     public static class TempGlobalConstant
     {
-        public const int DiscretizingInterval = 32;
+        public static int DiscretizingInterval = 32;
+        public static int DiscretizingAccuracy = 0;
     }
 }

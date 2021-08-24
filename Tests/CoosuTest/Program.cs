@@ -18,31 +18,40 @@ namespace CoosuTest
             //layer.Camera.RotateBy(startTime: 0, endTime: 500, degree: 90);
             //layer.Camera.MoveBy(startTime: 0, endTime: 500, x: 300, y: 30);
 
-//            var layer = Layer.ParseFromText(@"
+//            layer = Layer.ParseFromText(@"
 //Sprite,Foreground,Centre,""sb\cg\waifu.png"",320,240
-// MX,0,-100,-64,0,18
-// MX,0,-64,-32,18,34
-// MX,0,-32,0,34,50
-// MX,0,0,32,50,66
-// MX,0,32,64,66,82
-// MX,0,64,96,82,98
-// MX,0,96,100,98,100
+// MX,0,4960,4992,342.24,344.448
+// MX,0,4992,5000,344.448,345
+// MX,0,5000,5024,345,345.12
+// MX,0,5024,5056,345.12,345.28
+// MX,0,5056,5088,345.28,345.44
 //");
             for (int i = 0; i < 1; i++)
             {
-                //var sprite = (Sprite)layer.SceneObjects[0];
                 var sprite = layer.CreateSprite(@"sb\cg\waifu.png");
+                sprite = (Sprite)layer.SceneObjects[0];
 
                 //sprite.MoveX(0, 60, 64, 100, 100);
                 //sprite.MoveX(0, 64, 96, 100, 100);
                 //sprite.MoveXBy(0, 60, 80, 100);
+                sprite.MoveX(0, 300, -50, 0);
+                sprite.MoveXBy(new PowerEase()
+                {
+                    Power = 1,
+                    EasingMode = EasingMode.EaseOut
+                }, 0, 100, 200);
 
+                sprite.MoveXBy(new PowerEase()
+                {
+                    Power = 1,
+                    EasingMode = EasingMode.EaseInOut
+                }, 0 + 50, 100 + 200, 200);
 
-                sprite.MoveXBy(0, 30, 60, 100);
-                sprite.MoveXBy(0, 60, 80, 100);
-                sprite.MoveX(0, 0, 100, 0, 0);
-                sprite.MoveXBy(0, -100, 100, 100);
-                sprite.MoveXBy(0, -200, 200, 100);
+                //sprite.MoveXBy(0, 30, 60, 100);
+                //sprite.MoveXBy(0, 60, 80, 100);
+                //sprite.MoveX(0, 0, 100, 0, 0);
+                //sprite.MoveXBy(0, -100, 100, 100);
+                //sprite.MoveXBy(0, -200, 200, 100);
 
                 //sprite.MoveXBy(0, 0, 60, 100);
                 //sprite.MoveX(0, 40, 100, 0, 100);
@@ -87,7 +96,7 @@ namespace CoosuTest
                 }
             };
             var canceled = await compressor.CompressAsync();
-            await layer.WriteScriptAsync(Console.Out);
+            //await layer.WriteScriptAsync(Console.Out);
             return;
             var text = File.ReadAllText(
                 "C:\\Users\\milkitic\\Downloads\\" +

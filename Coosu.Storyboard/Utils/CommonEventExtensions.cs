@@ -91,8 +91,8 @@ namespace Coosu.Storyboard.Utils
         }
 
         public static List<ICommonEvent> ComputeDiscretizedEvents(this CommonEvent e,
-            int discretizingInterval = TempGlobalConstant.DiscretizingInterval,
-            int? discretizingAccuracy = 3)
+            int discretizingInterval,
+            int? discretizingAccuracy)
         {
             var eventList = new List<ICommonEvent>();
             var targetEventType = e.EventType;

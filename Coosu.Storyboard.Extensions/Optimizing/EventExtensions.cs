@@ -56,8 +56,8 @@ namespace Coosu.Storyboard.Extensions.Optimizing
         /// <returns></returns>
         public static List<ICommonEvent> ComputeDiscretizedEvents(this ICommonEvent e,
             bool absolute,
-            int discretizingInterval = TempGlobalConstant.DiscretizingInterval,
-            int? discretizingAccuracy = 3)
+            int discretizingInterval,
+            int? discretizingAccuracy)
         {
             if (e.EventType.Index < 100)
             {
