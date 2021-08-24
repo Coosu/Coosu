@@ -294,8 +294,8 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                     j++;
                     try
                     {
-                        Console.WriteLine();
-                        Console.WriteLine("Step " + j + ": " + @event.GetHeaderString());
+                        //Console.WriteLine();
+                        //Console.WriteLine("Step " + j + ": " + @event.GetHeaderString());
                         var allThisTypeStandardEvents = sprite
                             .Events
                             .Where(k => k is CommonEvent &&
@@ -625,7 +625,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                     }
                     finally
                     {
-                        sprite.WriteScriptAsync(Console.Out).Wait();
+                        //sprite.WriteScriptAsync(Console.Out).Wait();
                     }
                 }
             }

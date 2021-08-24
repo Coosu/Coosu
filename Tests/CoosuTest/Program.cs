@@ -26,72 +26,42 @@ namespace CoosuTest
             // MX,0,5024,5056,345.12,345.28
             // MX,0,5056,5088,345.28,345.44
             //");
-            for (int i = 0; i < 1; i++)
+            var r = new Random();
+            Func<double, double, double> Random = (x, y) => { return r.NextDouble() * (y - x) + x; };
+            for (int i = 0; i < 10000; i++)
             {
-                var sprite = layer.CreateSprite(@"sb\cg\waifu.png");
-                sprite = (Sprite)layer.SceneObjects[0];
-
-                //sprite.MoveX(0, 60, 64, 100, 100);
-                //sprite.MoveX(0, 64, 96, 100, 100);
-                //sprite.MoveXBy(0, 60, 80, 100);
-                sprite.MoveX(new PowerEase()
+                var sprite = layer.CreateSprite("one_plane.jpg");
+                sprite.Move(new PowerEase()
                 {
                     Power = 10,
                     EasingMode = EasingMode.EaseOut
-                }, 0, 3000, -50, 400);
+                }, 0, 3000, -50 + Random(-50, 50), 50 + Random(-50, 50), 400 + Random(-50, 50), 250 + Random(-50, 50));
 
-                sprite.MoveXBy(new PowerEase()
+                sprite.MoveBy(new PowerEase()
                 {
                     Power = 10,
                     EasingMode = EasingMode.EaseInOut
-                }, 0, 3000, 400);
-
-                //sprite.MoveXBy(0, 30, 60, 100);
-                //sprite.MoveXBy(0, 60, 80, 100);
-                //sprite.MoveX(0, 0, 100, 0, 0);
-                //sprite.MoveXBy(0, -100, 100, 100);
-                //sprite.MoveXBy(0, -200, 200, 100);
-
-                //sprite.MoveXBy(0, 0, 60, 100);
-                //sprite.MoveX(0, 40, 100, 0, 100);
-
-                //sprite.MoveXBy(0, 40, 100, 100);
-                //sprite.MoveX(0, 0, 60, 0, 100);
-
-                //sprite.MoveXBy(new QuadraticEase(), 0, 16 * 10, 100);
-                //sprite.MoveX(new QuadraticEase(), 16 * 10.3, 16 * 20, 100, 300);
-                //sprite.MoveXBy(new QuinticEase
-                //{
-                //    EasingMode = EasingMode.EaseOut
-                //}, 12, 320, -100);
-                //sprite.MoveX(new QuinticEase(), 320, 300, -500, -600);
+                }, 0, 3000 + Random(-1000, 1000), 400 + Random(-50, 50), 150 + Random(-50, 50));
+                sprite.MoveBy(0, 4000, -100, -100);
             }
-
-            //for (int i = 0; i < 1; i++)
-            //{
-            //    var sprite = layer.CreateSprite(@"sb\cg\waifu.png");
-            //    sprite.MoveXBy(30, 270, 100);
-            //    sprite.MoveX(-100, 70, 0, 400);
-            //    sprite.MoveX(230, 400, 400, 800);
-            //}
-
-            await layer.WriteScriptAsync(Console.Out);
-            Console.WriteLine("==================");
+            
+            //await layer.WriteScriptAsync(Console.Out);
+            //Console.WriteLine("==================");
             string? preP = null;
             var compressor = new SpriteCompressor(layer)
             {
                 ThreadCount = Environment.ProcessorCount + 1,
                 ErrorOccured = (s, e) =>
                 {
-                    Console.WriteLine(e.SourceSprite.GetHeaderString() + ": " + e.Message);
+                    //Console.WriteLine(e.SourceSprite.GetHeaderString() + ": " + e.Message);
                     //Console.ReadLine();
                 },
                 ProgressChanged = (s, e) =>
                 {
-                    var p = (e.Progress / (double)e.TotalCount).ToString("P0");
-                    if (preP == p) return;
-                    Console.WriteLine(p);
-                    preP = p;
+                    //var p = (e.Progress / (double)e.TotalCount).ToString("P0");
+                    //if (preP == p) return;
+                    //Console.WriteLine(p);
+                    //preP = p;
                 }
             };
             var canceled = await compressor.CompressAsync();
