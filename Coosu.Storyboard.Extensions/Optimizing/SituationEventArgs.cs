@@ -8,7 +8,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
     {
         public SituationType SituationType { get; }
         public Sprite? Sprite { get; set; }
-        public IEventHost Host { get; set; }
+        public IDetailedEventHost Host { get; set; }
         public ICommonEvent[] Events { get; set; }
         public override bool Continue { get; set; } = true;
 

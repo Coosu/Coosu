@@ -48,39 +48,39 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                    move.StartY.Equals(sprite.DefaultY);
         }
 
-        public static bool IsTimeInRange(this ICommonEvent e, IEventHost host)
+        public static bool IsTimeInRange(this ICommonEvent e, IDetailedEventHost host)
         {
             return e.IsSmallerThenMaxTime(host) && e.IsLargerThanMinTime(host);
         }
 
-        public static bool IsSmallerThenMaxTime(this ICommonEvent e, IEventHost host)
+        public static bool IsSmallerThenMaxTime(this ICommonEvent e, IDetailedEventHost host)
         {
             return e.EndTime < host.MaxTime ||
                    e.EqualsMultiMaxTime(host);
         }
 
-        public static bool IsLargerThanMinTime(this ICommonEvent e, IEventHost host)
+        public static bool IsLargerThanMinTime(this ICommonEvent e, IDetailedEventHost host)
         {
             return e.StartTime > host.MinTime ||
                    e.EqualsMultiMinTime(host);
         }
 
-        public static bool EqualsMultiMaxTime(this ICommonEvent e, IEventHost host)
+        public static bool EqualsMultiMaxTime(this ICommonEvent e, IDetailedEventHost host)
         {
             return e.EqualsMaxTime(host) && host.GetMaxTimeCount() > 1;
         }
 
-        public static bool EqualsMultiMinTime(this ICommonEvent e, IEventHost host)
+        public static bool EqualsMultiMinTime(this ICommonEvent e, IDetailedEventHost host)
         {
             return e.EqualsMinTime(host) && host.GetMinTimeCount() > 1;
         }
 
-        public static bool EqualsMaxTime(this ICommonEvent e, IEventHost host)
+        public static bool EqualsMaxTime(this ICommonEvent e, IDetailedEventHost host)
         {
             return e.EndTime == host.MaxTime;
         }
 
-        public static bool EqualsMinTime(this ICommonEvent e, IEventHost host)
+        public static bool EqualsMinTime(this ICommonEvent e, IDetailedEventHost host)
         {
             return e.StartTime == host.MinTime;
         }

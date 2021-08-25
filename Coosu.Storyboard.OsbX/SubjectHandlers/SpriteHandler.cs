@@ -23,7 +23,7 @@ namespace Coosu.Storyboard.OsbX.SubjectHandlers
         //Sprite,0,Centre,"",320,240
         public override string Serialize(Sprite raw)
         {
-            return $"{Flag},{raw.LayerType},{raw.OriginType},\"{raw.ImagePath}\",{raw.DefaultX},{raw.DefaultY},{raw.CameraId},{raw.ZDistance},0";
+            return $"{Flag},{raw.LayerType},{raw.OriginType},\"{raw.ImagePath}\",{raw.DefaultX},{raw.DefaultY},{raw.CameraIdentifier},{raw.ZDistance},0";
         }
 
         public override Sprite Deserialize(string[] split)
@@ -38,10 +38,10 @@ namespace Coosu.Storyboard.OsbX.SubjectHandlers
             var defY = double.Parse(split[5]);
 
             double zDistance = 1;
-            int cameraId = 0;
+            string cameraIdentifier = Guid.Empty.ToString();
             if (split.Length == 9)
             {
-                cameraId = int.Parse(split[6]);
+                cameraIdentifier = split[6];
                 zDistance = double.TryParse(split[7], out var result) ? result : 1f;
                 var absolute = int.Parse(split[8]) != 0;
                 if (absolute)
@@ -53,7 +53,7 @@ namespace Coosu.Storyboard.OsbX.SubjectHandlers
             return new Sprite(layerType, origin, path, defX, defY)
             {
                 ZDistance = zDistance,
-                CameraId = cameraId
+                CameraIdentifier = cameraIdentifier
             };
 
         }

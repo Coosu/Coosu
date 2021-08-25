@@ -28,7 +28,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             return lastE.End.ToArray();
         }
 
-        public static double[] ComputeFrame(this IEventHost eventHost, EventType eventType, double time, int? accuracy)
+        public static double[] ComputeFrame(this IDetailedEventHost eventHost, EventType eventType, double time, int? accuracy)
         {
             if (eventType.Size < 1) throw new ArgumentOutOfRangeException(nameof(eventType), eventType, "Only support sized event type.");
             var commonEvents = eventHost.Events
@@ -69,7 +69,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             eleG.InnerFix(false, true);
         }
 
-        public static void Expand(this IEventHost host)
+        public static void Expand(this IDetailedEventHost host)
         {
             if (host is Sprite sprite)
             {
@@ -240,7 +240,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
         /// <summary>
         /// 检查timing是否合法.
         /// </summary>
-        public static void Examine(this IEventHost host, EventHandler<ProcessErrorEventArgs>? onError)
+        public static void Examine(this IDetailedEventHost host, EventHandler<ProcessErrorEventArgs>? onError)
         {
             var events = host.Events.Where(k => k is not RelativeEvent).GroupBy(k => k.EventType);
             foreach (var kv in events)

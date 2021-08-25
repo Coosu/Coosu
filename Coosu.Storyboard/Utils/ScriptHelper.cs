@@ -30,7 +30,7 @@ namespace Coosu.Storyboard.Utils
             var indent = new string(' ', index);
             foreach (ICommonEvent e in events
                 .OrderBy(k => k.StartTime)
-                .ThenBy(k=>k.EndTime)
+                .ThenBy(k => k.EndTime)
                 .ThenBy(k => k.EventType.Index))
             {
                 await writer.WriteAsync(indent);
@@ -39,7 +39,7 @@ namespace Coosu.Storyboard.Utils
             }
         }
 
-        public static async Task WriteHostEventsAsync(TextWriter writer, IEventHost host, bool group)
+        public static async Task WriteHostEventsAsync(TextWriter writer, IDetailedEventHost host, bool group)
         {
             if (group)
                 await WriteGroupedEventAsync(writer, host.Events, 1);
@@ -47,18 +47,21 @@ namespace Coosu.Storyboard.Utils
                 await WriteSequentialEventAsync(writer, host.Events, 1);
         }
 
-        public static async Task WriteElementEventsAsync(TextWriter writer, ISceneObject sprite, bool group)
+        public static async Task WriteElementEventsAsync(TextWriter writer, ISceneObject sceneObject, bool group)
         {
-            foreach (var loop in sprite.LoopList)
-                await WriteSubEventHostAsync(writer, loop, @group);
-         
-            if (group)
-                await WriteGroupedEventAsync(writer, sprite.Events, 1);
-            else
-                await WriteSequentialEventAsync(writer, sprite.Events, 1);
+            var sprite = sceneObject as Sprite;
+            if (sprite != null)
+                foreach (var loop in sprite.LoopList)
+                    await WriteSubEventHostAsync(writer, loop, @group);
 
-            foreach (var trigger in sprite.TriggerList)
-                await WriteSubEventHostAsync(writer, trigger, @group);
+            if (group)
+                await WriteGroupedEventAsync(writer, sceneObject.Events, 1);
+            else
+                await WriteSequentialEventAsync(writer, sceneObject.Events, 1);
+
+            if (sprite != null)
+                foreach (var trigger in sprite.TriggerList)
+                    await WriteSubEventHostAsync(writer, trigger, @group);
         }
 
         public static async Task WriteSubEventHostAsync(TextWriter writer, ISubEventHost subEventHost, bool group)

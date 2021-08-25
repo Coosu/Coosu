@@ -113,7 +113,7 @@ namespace Coosu.Storyboard
             }
         }
 
-        private static void InnerExecuteBrew(IEventHost eventHost, OsbSprite brewObj)
+        private static void InnerExecuteBrew(IDetailedEventHost eventHost, OsbSprite brewObj)
         {
             foreach (var commonEvent in eventHost.Events)
                 StorybrewInteropHelper.ExecuteEvent(commonEvent, brewObj);

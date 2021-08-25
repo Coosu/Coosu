@@ -15,22 +15,23 @@ namespace CoosuTest
     {
         static async Task Main(string[] args)
         {
-            var text1 = File.ReadAllText(
-                "D:\\GitHub\\ReOsuStoryboardPlayer\\ReOsuStoryboardPlayer.Core.UnitTest\\TestData\\" +
-                "test.osb");
-            var sw = Stopwatch.StartNew();
-            var layer1 = await Layer.ParseAsyncTextAsync(text1);
-            Console.WriteLine("parse: " + sw.Elapsed);
-            var s1 = await layer1.ToScriptStringAsync();
-            var c = new SpriteCompressor(layer1);
-            sw.Restart();
-            await c.CompressAsync();
-            Console.WriteLine("compress: " + sw.Elapsed);
-            var s2 = await layer1.ToScriptStringAsync();
-            var len1 = s1.Length;
-            var len2 = s2.Length;
-            var percent = (len2 / (double)len1).ToString("P2");
-            Console.WriteLine(percent);
+            //var text1 = File.ReadAllText(
+            //    "D:\\GitHub\\ReOsuStoryboardPlayer\\ReOsuStoryboardPlayer.Core.UnitTest\\TestData\\" +
+            //    "test.osb");
+            //var sw = Stopwatch.StartNew();
+            //var layer1 = await Layer.ParseAsyncTextAsync(text1);
+            //Console.WriteLine("parse: " + sw.Elapsed);
+            //var s1 = await layer1.ToScriptStringAsync();
+            //var c = new SpriteCompressor(layer1);
+            //sw.Restart();
+            //await c.CompressAsync();
+            //Console.WriteLine("compress: " + sw.Elapsed);
+            //var s2 = await layer1.ToScriptStringAsync();
+            //var len1 = s1.Length;
+            //var len2 = s2.Length;
+            //var percent = (len2 / (double)len1).ToString("P2");
+            //Console.WriteLine(percent);
+
             var layer = new Layer();
             //layer.Camera.RotateBy(startTime: 0, endTime: 500, degree: 90);
             //layer.Camera.MoveBy(startTime: 0, endTime: 500, x: 300, y: 30);
@@ -45,28 +46,39 @@ namespace CoosuTest
             //");
             var r = new Random();
             Func<double, double, double> Random = (x, y) => { return r.NextDouble() * (y - x) + x; };
-            for (int i = 0; i < 10000; i++)
+            for (int i = 0; i < 1; i++)
             {
                 var sprite = layer.CreateSprite("one_plane.jpg");
-                sprite.Move(new PowerEase()
+                sprite.MoveXBy(new PowerEase()
                 {
-                    Power = 10,
+                    Power = 30,
                     EasingMode = EasingMode.EaseOut
-                }, 0, 3000, -50 + Random(-50, 50), 50 + Random(-50, 50), 400 + Random(-50, 50), 250 + Random(-50, 50));
+                }, 0, 300, 300);
 
-                sprite.MoveBy(new PowerEase()
+                sprite.MoveXBy(new PowerEase()
                 {
-                    Power = 10,
+                    Power = 30,
                     EasingMode = EasingMode.EaseInOut
-                }, 0, 3000 + Random(-1000, 1000), 400 + Random(-50, 50), 150 + Random(-50, 50));
-                sprite.MoveBy(0, 4000, -100, -100);
+                }, 100, 400, 300);
+                //sprite.MoveBy(new PowerEase()
+                //{
+                //    Power = 10,
+                //    EasingMode = EasingMode.EaseInOut
+                //}, 0, 3000 + Random(-1000, 1000), 400 + Random(-50, 50), 150 + Random(-50, 50));
+                sprite.MoveXBy(0, 400, 100);
             }
 
-            //await layer.WriteScriptAsync(Console.Out);
-            //Console.WriteLine("==================");
+            foreach (var sprite in layer)
+            {
+             
+            }
+
+            await layer.WriteScriptAsync(Console.Out);
+            Console.WriteLine("==================");
             string? preP = null;
             var compressor = new SpriteCompressor(layer, new CompressSettings
             {
+                DiscretizingAccuracy = 0,
                 ThreadCount = Environment.ProcessorCount + 1
             });
 

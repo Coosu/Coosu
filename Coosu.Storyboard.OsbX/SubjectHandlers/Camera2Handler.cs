@@ -36,7 +36,7 @@ namespace Coosu.Storyboard.OsbX.SubjectHandlers
         // Camera
         public override string Serialize(Camera2Object raw)
         {
-            return $"{Flag},{raw.CameraId}";
+            return $"{Flag},{raw.CameraIdentifier}";
         }
 
         public override Camera2Object Deserialize(string[] split)
@@ -44,13 +44,13 @@ namespace Coosu.Storyboard.OsbX.SubjectHandlers
             if (split.Length < 1) throw new ArgumentOutOfRangeException();
 
             //var type = ObjectTypeManager.Parse(split[0]);
-            int cameraId = 0;
+            string cameraIdentifier = Guid.Empty.ToString();
             if (split.Length >= 2)
             {
-                cameraId = int.Parse(split[1]);
+                cameraIdentifier = (split[1]);
             }
 
-            return new Camera2Object { CameraId = cameraId };
+            return new Camera2Object { CameraIdentifier = cameraIdentifier };
 
         }
     }
@@ -62,7 +62,7 @@ namespace Coosu.Storyboard.OsbX.SubjectHandlers
         public double DefaultY { get; set; }
         public double DefaultX { get; set; }
         public double ZDistance { get; set; }
-        public int CameraId { get; set; }
+        public string CameraIdentifier { get; set; }
         public List<Loop> LoopList { get; } = new();
         public List<Trigger> TriggerList { get; } = new();
         public double MaxTime => Events.Count > 0 ? Events.Max(k => k.EndTime) : 0;
@@ -87,7 +87,7 @@ namespace Coosu.Storyboard.OsbX.SubjectHandlers
 
         public async Task WriteHeaderAsync(TextWriter writer)
         {
-            await writer.WriteAsync($"{ObjectType.GetString(ObjectType)},{CameraId}");
+            await writer.WriteAsync($"{ObjectType.GetString(ObjectType)},{CameraIdentifier}");
         }
 
         public async Task WriteScriptAsync(TextWriter writer)

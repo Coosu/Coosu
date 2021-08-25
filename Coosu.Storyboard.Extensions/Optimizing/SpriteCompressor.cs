@@ -265,7 +265,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
         /// Make non-standard easing discretized.
         /// </summary>
         /// <param name="sprite"></param>
-        private void DiscretizeNonStandardEasing(IEventHost sprite)
+        private void DiscretizeNonStandardEasing(IDetailedEventHost sprite)
         {
             var commonEvents = sprite.Events.ToList();
             foreach (var @event in commonEvents
@@ -297,8 +297,8 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                     j++;
                     try
                     {
-                        //Console.WriteLine();
-                        //Console.WriteLine("Step " + j + ": " + @event.GetHeaderString());
+                        Console.WriteLine();
+                        Console.WriteLine("Step " + j + ": " + @event.GetHeaderString());
                         var allThisTypeStandardEvents = sprite
                             .Events
                             .Where(k => k is CommonEvent &&
@@ -616,7 +616,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                     }
                     finally
                     {
-                        //sprite.WriteScriptAsync(Console.Out).Wait();
+                        sprite.WriteScriptAsync(Console.Out).Wait();
                     }
                 }
             }
@@ -668,7 +668,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
         /// <summary>
         /// 预压缩
         /// </summary>
-        private void PreOptimize(IEventHost host, TimeRange obsoleteList, HashSet<CommonEvent> controlNodes)
+        private void PreOptimize(IDetailedEventHost host, TimeRange obsoleteList, HashSet<CommonEvent> controlNodes)
         {
             if (host is Sprite ele)
             {
@@ -690,7 +690,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
         /// <summary>
         /// 正常压缩
         /// </summary>
-        private void NormalOptimize(IEventHost host)
+        private void NormalOptimize(IDetailedEventHost host)
         {
             if (host is Sprite ele)
             {
@@ -714,7 +714,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
         /// <summary>
         /// 根据ObsoletedList，移除不必要的命令。
         /// </summary>
-        private void RemoveByObsoletedList(IEventHost host, TimeRange obsoleteList, HashSet<CommonEvent> controlNodes)
+        private void RemoveByObsoletedList(IDetailedEventHost host, TimeRange obsoleteList, HashSet<CommonEvent> controlNodes)
         {
             if (obsoleteList.TimingList.Count == 0) return;
             var groups = host.Events.GroupBy(k => k.EventType);
@@ -814,7 +814,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
         /// </summary>
         /// <param name="host"></param>
         /// <param name="eventList"></param>
-        private void RemoveByLogic(IEventHost host, List<CommonEvent> eventList)
+        private void RemoveByLogic(IDetailedEventHost host, List<CommonEvent> eventList)
         {
             var groups = eventList.GroupBy(k => k.EventType);
             foreach (var group in groups)
@@ -1007,7 +1007,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             } // group的循环
         }
 
-        private static void RemoveEvent(IEventHost sourceHost, ICollection<CommonEvent> eventList, CommonEvent e)
+        private static void RemoveEvent(IDetailedEventHost sourceHost, ICollection<CommonEvent> eventList, CommonEvent e)
         {
             var success = sourceHost.Events.Remove(e);
             if (!success)
@@ -1025,12 +1025,12 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             eventList.Remove(e);
         }
 
-        private void RaiseSituationEvent(IEventHost host, SituationType situationType, Action continueAction, params ICommonEvent[] events)
+        private void RaiseSituationEvent(IDetailedEventHost host, SituationType situationType, Action continueAction, params ICommonEvent[] events)
         {
             RaiseSituationEvent(host, situationType, continueAction, null, events);
         }
 
-        private void RaiseSituationEvent(IEventHost host, SituationType situationType, Action continueAction,
+        private void RaiseSituationEvent(IDetailedEventHost host, SituationType situationType, Action continueAction,
             Action? breakAction, params ICommonEvent[] events)
         {
             var sprite = host is ISubEventHost e ? e.BaseObject as Sprite : host as Sprite;

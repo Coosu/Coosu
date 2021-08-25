@@ -95,7 +95,7 @@ namespace Coosu.Storyboard.OsbX
         public static async Task<Scene> DeserializeObjectAsync(TextReader reader)
         {
             ISubjectParsingHandler lastSubjectHandler = null;
-            IEventHost lastSubject = null;
+            IDetailedEventHost lastSubject = null;
             //int lastDeep = 0;
             var line = await reader.ReadLineAsync();
             int l = 0;

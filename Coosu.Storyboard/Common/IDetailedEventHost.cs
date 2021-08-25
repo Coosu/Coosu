@@ -3,7 +3,13 @@ using System.Collections.Generic;
 
 namespace Coosu.Storyboard.Common
 {
-    public interface IEventHost : IScriptable, ICloneable
+    public interface IEventHost
+    {
+        ICollection<ICommonEvent> Events { get; set; }
+        void AddEvent(ICommonEvent @event);
+    }
+
+    public interface IDetailedEventHost : IScriptable, ICloneable, IEventHost
     {
         double MaxTime { get; }
         double MinTime { get; }
@@ -11,7 +17,5 @@ namespace Coosu.Storyboard.Common
         double MinEndTime { get; }
 
         bool EnableGroupedSerialization { get; set; }
-        ICollection<ICommonEvent> Events { get; set; }
-        void AddEvent(ICommonEvent @event);
     }
 }

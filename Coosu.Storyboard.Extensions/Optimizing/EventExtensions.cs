@@ -27,23 +27,23 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                 : EmptyArray<double>.Value;
         }
 
-        public static IEnumerable<Fade> EnumerateFadeEvents(this IEventHost ec) =>
+        public static IEnumerable<Fade> EnumerateFadeEvents(this IDetailedEventHost ec) =>
             ec.Events.Where(k => k.EventType == EventTypes.Fade).Select(k => (Fade)k);
-        public static IEnumerable<Color> EnumerateColorEvents(this IEventHost ec) =>
+        public static IEnumerable<Color> EnumerateColorEvents(this IDetailedEventHost ec) =>
             ec.Events.Where(k => k.EventType == EventTypes.Color).Select(k => (Color)k);
-        public static IEnumerable<Move> EnumerateMoveEvents(this IEventHost ec) =>
+        public static IEnumerable<Move> EnumerateMoveEvents(this IDetailedEventHost ec) =>
             ec.Events.Where(k => k.EventType == EventTypes.Move).Select(k => (Move)k);
-        public static IEnumerable<MoveX> EnumerateMoveXEvents(this IEventHost ec) =>
+        public static IEnumerable<MoveX> EnumerateMoveXEvents(this IDetailedEventHost ec) =>
             ec.Events.Where(k => k.EventType == EventTypes.MoveX).Select(k => (MoveX)k);
-        public static IEnumerable<MoveY> EnumerateMoveYEvents(this IEventHost ec) =>
+        public static IEnumerable<MoveY> EnumerateMoveYEvents(this IDetailedEventHost ec) =>
             ec.Events.Where(k => k.EventType == EventTypes.MoveY).Select(k => (MoveY)k);
-        public static IEnumerable<Parameter> EnumerateParameterEvents(this IEventHost ec) =>
+        public static IEnumerable<Parameter> EnumerateParameterEvents(this IDetailedEventHost ec) =>
             ec.Events.Where(k => k.EventType == EventTypes.Parameter).Select(k => (Parameter)k);
-        public static IEnumerable<Rotate> EnumerateRotateEvents(this IEventHost ec) =>
+        public static IEnumerable<Rotate> EnumerateRotateEvents(this IDetailedEventHost ec) =>
             ec.Events.Where(k => k.EventType == EventTypes.Rotate).Select(k => (Rotate)k);
-        public static IEnumerable<Scale> EnumerateScaleEvents(this IEventHost ec) =>
+        public static IEnumerable<Scale> EnumerateScaleEvents(this IDetailedEventHost ec) =>
             ec.Events.Where(k => k.EventType == EventTypes.Scale).Select(k => (Scale)k);
-        public static IEnumerable<Vector> EnumerateVectorEvents(this IEventHost ec) =>
+        public static IEnumerable<Vector> EnumerateVectorEvents(this IDetailedEventHost ec) =>
             ec.Events.Where(k => k.EventType == EventTypes.Vector).Select(k => (Vector)k);
 
         /// <summary>

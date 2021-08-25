@@ -7,18 +7,21 @@ namespace Coosu.Storyboard.Utils
 {
     public static class EventHostExtensions
     {
-        public static void Adjust(this IEventHost eventHost, double offsetX, double offsetY, double offsetTiming)
+        public static void Adjust(this IDetailedEventHost eventHost, double offsetX, double offsetY, double offsetTiming)
         {
             if (eventHost is ISceneObject iso)
             {
                 iso.DefaultX += offsetX;
                 iso.DefaultY += offsetY;
 
-                foreach (var loop in iso.LoopList)
-                    loop.Adjust(offsetX, offsetY, offsetTiming);
+                if (iso is Sprite sprite)
+                {
+                    foreach (var loop in sprite.LoopList)
+                        loop.Adjust(offsetX, offsetY, offsetTiming);
 
-                foreach (var trigger in iso.TriggerList)
-                    trigger.Adjust(offsetX, offsetY, offsetTiming);
+                    foreach (var trigger in sprite.TriggerList)
+                        trigger.Adjust(offsetX, offsetY, offsetTiming);
+                }
             }
 
             var events = eventHost.Events.GroupBy(k => k.EventType);
@@ -37,30 +40,40 @@ namespace Coosu.Storyboard.Utils
         public static int GetMaxTimeCount(this ISceneObject eventHost)
         {
             var maxTime = eventHost.MaxTime;
-            return eventHost.Events.Count(k => k.EndTime.Equals(maxTime)) +
-                   eventHost.LoopList.Count(k => k.OuterMaxTime.Equals(maxTime)) +
-                   eventHost.TriggerList.Count(k => k.MaxTime.Equals(maxTime));
+            if (eventHost is Sprite sprite)
+            {
+                return sprite.Events.Count(k => k.EndTime.Equals(maxTime)) +
+                       sprite.LoopList.Count(k => k.OuterMaxTime.Equals(maxTime)) +
+                       sprite.TriggerList.Count(k => k.MaxTime.Equals(maxTime));
+            }
+
+            return eventHost.Events.Count(k => k.EndTime.Equals(maxTime));
         }
 
         public static int GetMinTimeCount(this ISceneObject eventHost)
         {
             var minTime = eventHost.MinTime;
-            return eventHost.Events.Count(k => k.StartTime.Equals(minTime)) +
-                   eventHost.LoopList.Count(k => k.OuterMinTime.Equals(minTime)) +
-                   eventHost.TriggerList.Count(k => k.MinTime.Equals(minTime));
+            if (eventHost is Sprite sprite)
+            {
+                return sprite.Events.Count(k => k.StartTime.Equals(minTime)) +
+                       sprite.LoopList.Count(k => k.OuterMinTime.Equals(minTime)) +
+                       sprite.TriggerList.Count(k => k.MinTime.Equals(minTime));
+            }
+
+            return eventHost.Events.Count(k => k.StartTime.Equals(minTime));
         }
 
-        public static int GetMaxTimeCount(this IEventHost eventHost)
+        public static int GetMaxTimeCount(this IDetailedEventHost eventHost)
         {
             return eventHost.Events.Count(k => k.EndTime.Equals(eventHost.MaxTime));
         }
 
-        public static int GetMinTimeCount(this IEventHost eventHost)
+        public static int GetMinTimeCount(this IDetailedEventHost eventHost)
         {
             return eventHost.Events.Count(k => k.StartTime.Equals(eventHost.MinTime));
         }
 
-        public static bool HasEffectiveTiming(this IEventHost eventHost)
+        public static bool HasEffectiveTiming(this IDetailedEventHost eventHost)
         {
             if (eventHost.MaxTime < eventHost.MinTime)
                 return false;

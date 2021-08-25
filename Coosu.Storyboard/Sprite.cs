@@ -29,7 +29,7 @@ namespace Coosu.Storyboard
         public double DefaultX { get; set; }
 
         public double ZDistance { get; set; }
-        public int CameraId { get; set; }
+        public string CameraIdentifier { get; set; }
 
         // EventHosts
         public ICollection<ICommonEvent> Events { get; set; } =
@@ -201,7 +201,7 @@ namespace Coosu.Storyboard
             var sprite = new Sprite(LayerType, OriginType, ImagePath, DefaultX, DefaultY)
             {
                 ZDistance = ZDistance,
-                CameraId = CameraId,
+                CameraIdentifier = CameraIdentifier,
                 EnableGroupedSerialization = EnableGroupedSerialization,
                 Events = Events.Select(k => k.Clone()).Cast<ICommonEvent>().ToList(),
             };
