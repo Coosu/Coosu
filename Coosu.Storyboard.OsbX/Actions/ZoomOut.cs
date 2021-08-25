@@ -9,12 +9,7 @@ namespace Coosu.Storyboard.OsbX.Actions
         {
         }
 
-        public ZoomOut(EasingType easing, double startTime, double endTime, double[] start, double[] end)
-            : base(easing.ToEasingFunction(), startTime, endTime, start, end)
-        {
-        }
-
-        public ZoomOut(IEasingFunction easing, double startTime, double endTime, double[] start, double[] end)
+        public ZoomOut(EasingFunctionBase easing, double startTime, double endTime, double[] start, double[] end)
             : base(easing, startTime, endTime, start, end)
         {
         }

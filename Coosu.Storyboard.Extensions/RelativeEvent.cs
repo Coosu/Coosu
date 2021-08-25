@@ -15,7 +15,7 @@ namespace Coosu.Storyboard.Extensions
         private string DebuggerDisplay => this.GetHeaderString();
         public EventType EventType { get; }
 
-        public IEasingFunction Easing { get; set; } = LinearEase.Instance;
+        public EasingFunctionBase Easing { get; set; } = LinearEase.Instance;
 
         public double StartTime { get; set; }
         public double EndTime { get; set; }
@@ -63,7 +63,7 @@ namespace Coosu.Storyboard.Extensions
             End = EmptyArray<double>.Value;
         }
 
-        public RelativeEvent(EventType eventType, IEasingFunction easing, double startTime, double endTime, double[] byValue)
+        public RelativeEvent(EventType eventType, EasingFunctionBase easing, double startTime, double endTime, double[] byValue)
         {
             EventType = eventType;
             Easing = easing;

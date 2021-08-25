@@ -11,31 +11,28 @@ using Coosu.Storyboard.Utils;
 namespace Coosu.Storyboard.Events
 {
     [DebuggerDisplay("Expression = {DebuggerDisplay}")]
-    public abstract class CommonEvent : ICommonEvent //,IComparable<CommonEvent>
+    public abstract class CommonEvent : ICommonEvent
     {
+        private double[]? _end;
         private string DebuggerDisplay => this.GetHeaderString();
 
         public abstract EventType EventType { get; }
-        public IEasingFunction Easing { get; set; } = LinearEase.Instance;
+        public EasingFunctionBase Easing { get; set; } = LinearEase.Instance;
         public double StartTime { get; set; }
         public double EndTime { get; set; }
         public double[] Start { get; set; }
-        public double[] End { get; set; }
-        
-        public virtual bool IsStatic => Start.SequenceEqual(End);
 
-        //public int CompareTo(CommonEvent? other)
-        //{
-        //    if (other == null)
-        //        return 1;
-        //    if (StartTime > other.StartTime)
-        //        return 1;
-        //    if (StartTime.Equals(other.StartTime))
-        //        return 0;
-        //    if (StartTime < other.StartTime)
-        //        return -1;
-        //    throw new ArgumentOutOfRangeException(nameof(other));
-        //}
+        public double[] End
+        {
+            get => EventType.Size == 0 ? Start : _end!;
+            set
+            {
+                if (EventType.Size == 0) Start = value;
+                else _end = value;
+            }
+        }
+
+        public virtual bool IsStatic => Start.SequenceEqual(End);
 
         public void AdjustTiming(double offset)
         {
@@ -67,23 +64,14 @@ namespace Coosu.Storyboard.Events
             End = EmptyArray<double>.Value;
         }
 
-        protected CommonEvent(IEasingFunction easing, double startTime, double endTime, double[] start, double[] end)
+        protected CommonEvent(EasingFunctionBase easing, double startTime, double endTime, Span<double> start, Span<double> end)
         {
             Easing = easing;
             StartTime = startTime;
             EndTime = endTime;
-            Start = start;
-            End = end;
+            Start = start.ToArray();
+            End = end == default ? Start : end.ToArray();
         }
-
-        //protected CommonEvent(EasingType easing, double startTime, double endTime, double[] start, double[] end)
-        //{
-        //    Easing = easing.ToEasingFunction();
-        //    StartTime = startTime;
-        //    EndTime = endTime;
-        //    Start = start;
-        //    End = end;
-        //}
 
         protected virtual async Task WriteExtraScriptAsync(TextWriter textWriter)
         {
@@ -119,73 +107,45 @@ namespace Coosu.Storyboard.Events
             }
         }
 
-        public static ICommonEvent Create(EventType e, EasingType easing, double startTime, double endTime,
-            params double[] parameters)
-        {
-            return Create(e, easing.ToEasingFunction(), startTime, endTime, parameters);
-        }
-
-        //todo: use Span<T>
-        public static ICommonEvent Create(EventType e, IEasingFunction easing, double startTime, double endTime,
-            params double[] parameters)
+        public static ICommonEvent Create(EventType e, EasingFunctionBase easing,
+            double startTime, double endTime,
+            Span<double> value)
         {
             var size = e.Size;
-            if (parameters.Length != size * 2) throw new ArgumentException();
+            if (size != 0 && value.Length != size && value.Length != size * 2) throw new ArgumentException();
+            if (size == 0) return Create(e, easing, startTime, endTime, value.Slice(0, 1), default);
             return Create(e, easing, startTime, endTime,
-                parameters.Take(size).ToArray(),
-                parameters.Skip(size).ToArray());
+                value.Slice(0, size),
+                value.Length == size ? default : value.Slice(size, size));
         }
 
-        public static ICommonEvent Create(EventType e, EasingType easing,
-            double startTime, double endTime, double[] start, double[]? end)
-        {
-            return Create(e, easing.ToEasingFunction(), startTime, endTime, start, end);
-        }
-
-        public static ICommonEvent Create(EventType e, IEasingFunction easing,
-            double startTime, double endTime, double[] start, double[]? end)
+        public static ICommonEvent Create(EventType e, EasingFunctionBase easing,
+            double startTime, double endTime, Span<double> start, Span<double> end)
         {
             ICommonEvent commonEvent;
-            if (end == null || end.Length == 0)
-                end = start;
+            if (e.Size != 0 && end.Length == 0)
+                end = start.ToArray();
+
+            if (e.Size != 0 && start.Length != e.Size) throw new ArgumentException();
 
             if (e == EventTypes.Fade)
-            {
-                commonEvent = new Fade(easing, startTime, endTime, start[0], end[0]);
-            }
+                commonEvent = new Fade(easing, startTime, endTime, start, end);
             else if (e == EventTypes.Move)
-            {
-                commonEvent = new Move(easing, startTime, endTime, start[0], start[1], end[0], end[1]);
-            }
+                commonEvent = new Move(easing, startTime, endTime, start, end);
             else if (e == EventTypes.MoveX)
-            {
-                commonEvent = new MoveX(easing, startTime, endTime, start[0], end[0]);
-            }
+                commonEvent = new MoveX(easing, startTime, endTime, start, end);
             else if (e == EventTypes.MoveY)
-            {
-                commonEvent = new MoveY(easing, startTime, endTime, start[0], end[0]);
-            }
+                commonEvent = new MoveY(easing, startTime, endTime, start, end);
             else if (e == EventTypes.Scale)
-            {
-                commonEvent = new Scale(easing, startTime, endTime, start[0], end[0]);
-            }
+                commonEvent = new Scale(easing, startTime, endTime, start, end);
             else if (e == EventTypes.Vector)
-            {
-                commonEvent = new Vector(easing, startTime, endTime, start[0], start[1], end[0], end[1]);
-            }
+                commonEvent = new Vector(easing, startTime, endTime, start, end);
             else if (e == EventTypes.Rotate)
-            {
-                commonEvent = new Rotate(easing, startTime, endTime, start[0], end[0]);
-            }
+                commonEvent = new Rotate(easing, startTime, endTime, start, end);
             else if (e == EventTypes.Color)
-            {
-                commonEvent = new Color(easing, startTime, endTime, start[0], start[1], start[2], end[0], end[1],
-                    end[2]);
-            }
+                commonEvent = new Color(easing, startTime, endTime, start, end);
             else if (e == EventTypes.Parameter)
-            {
-                commonEvent = new Parameter(startTime, endTime, (ParameterType)(int)start[0]);
-            }
+                commonEvent = new Parameter(startTime, endTime, start.Slice(0, 1));
             else
             {
                 var result = HandlerRegister.GetEventTransformation(e)?.Invoke(e, easing, startTime, endTime, start, end);

@@ -1,4 +1,5 @@
-﻿using Coosu.Storyboard.Common;
+﻿using System;
+using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Easing;
 
 namespace Coosu.Storyboard.Events
@@ -19,13 +20,13 @@ namespace Coosu.Storyboard.Events
             set => End[0] = value;
         }
 
-        public MoveX(EasingType easing, double startTime, double endTime, double x1, double x2) :
-            base(easing.ToEasingFunction(), startTime, endTime, new[] { x1 }, new[] { x2 })
+        public MoveX(EasingFunctionBase easing, double startTime, double endTime, double x1, double x2) :
+            base(easing, startTime, endTime, new[] { x1 }, new[] { x2 })
         {
         }
 
-        public MoveX(IEasingFunction easing, double startTime, double endTime, double x1, double x2) :
-            base(easing, startTime, endTime, new[] { x1 }, new[] { x2 })
+        public MoveX(EasingFunctionBase easing, double startTime, double endTime, Span<double> start, Span<double> end)
+            : base(easing, startTime, endTime, start, end)
         {
         }
 

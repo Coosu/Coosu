@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -14,6 +15,22 @@ namespace CoosuTest
     {
         static async Task Main(string[] args)
         {
+            var text1 = File.ReadAllText(
+                "D:\\GitHub\\ReOsuStoryboardPlayer\\ReOsuStoryboardPlayer.Core.UnitTest\\TestData\\" +
+                "test.osb");
+            var sw = Stopwatch.StartNew();
+            var layer1 = await Layer.ParseAsyncTextAsync(text1);
+            Console.WriteLine("parse: " + sw.Elapsed);
+            var s1 = await layer1.ToScriptStringAsync();
+            var c = new SpriteCompressor(layer1);
+            sw.Restart();
+            await c.CompressAsync();
+            Console.WriteLine("compress: " + sw.Elapsed);
+            var s2 = await layer1.ToScriptStringAsync();
+            var len1 = s1.Length;
+            var len2 = s2.Length;
+            var percent = (len2 / (double)len1).ToString("P2");
+            Console.WriteLine(percent);
             var layer = new Layer();
             //layer.Camera.RotateBy(startTime: 0, endTime: 500, degree: 90);
             //layer.Camera.MoveBy(startTime: 0, endTime: 500, x: 300, y: 30);
