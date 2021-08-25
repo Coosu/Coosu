@@ -11,7 +11,16 @@ namespace Coosu.Storyboard.Extensions
 {
     public static class SpriteEventExtensions
     {
-        public static async Task StandardizeEventsAsync(this IEventHost host,
+        /// <summary>
+        /// Standardize an <see cref="IEventHost"/>'s events to osu!storyboard standard events.
+        /// </summary>
+        /// <param name="host"></param>
+        /// <param name="discretizingInterval">Discretizing interval in milliseconds.
+        /// The value should be larger than 16 as recommended in osu!wiki.</param>
+        /// <param name="discretizingAccuracy">Discretizing accuracy that how many numbers will be preserved after decimal point.
+        /// If the value is null the numbers will not be rounded.</param>
+        /// <returns></returns>
+        public static void StandardizeEvents(this IEventHost host,
             int discretizingInterval,
             int? discretizingAccuracy)
         {
@@ -22,7 +31,6 @@ namespace Coosu.Storyboard.Extensions
         /// <summary>
         /// Make non-standard easing discretized.
         /// </summary>
-        /// <param name="sprite"></param>
         private static void DiscretizeNonStandardEasing(IEventHost sprite,
             int discretizingInterval,
             int? discretizingAccuracy)
@@ -384,7 +392,7 @@ namespace Coosu.Storyboard.Extensions
             }
         }
 
-        private static void AddEventDirectly(IEventHost sprite, ICommonEvent newEvent, 
+        private static void AddEventDirectly(IEventHost sprite, ICommonEvent newEvent,
             int discretizingInterval,
             int? discretizingAccuracy)
         {
@@ -404,12 +412,13 @@ namespace Coosu.Storyboard.Extensions
             }
         }
 
-        private static void AddMiniUnitEvent(ICommonEvent e, List<ICommonEvent> list)
+        private static void AddMiniUnitEvent(ICommonEvent e, ICollection<ICommonEvent> list)
         {
             if (e.IsStatic && e.StartTime.Equals(e.EndTime))
             {
 
             }
+
             else if (e.IsStatic && e.StartTime.Equals(e.EndTime) &&
                  (list.Any(k => k.StartTime.Equals(e.StartTime)
                                 && e.Start.SequenceEqual(k.Start)) ||
