@@ -30,14 +30,12 @@ namespace Coosu.Storyboard
 
         public ObjectType ObjectType { get; } = 10;
         public int? RowInSource { get; set; }
-        public Task WriteHeaderAsync(TextWriter writer)
+        public async Task WriteHeaderAsync(TextWriter writer)
         {
-            throw new System.NotImplementedException();
         }
 
-        public Task WriteScriptAsync(TextWriter writer)
+        public async Task WriteScriptAsync(TextWriter writer)
         {
-            throw new System.NotImplementedException();
         }
 
         public object Clone()
