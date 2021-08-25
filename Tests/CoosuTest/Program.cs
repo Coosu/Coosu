@@ -33,6 +33,7 @@ namespace CoosuTest
             //Console.WriteLine(percent);
 
             var layer = new Layer();
+            //layer.Camera2
             //layer.Camera.RotateBy(startTime: 0, endTime: 500, degree: 90);
             //layer.Camera.MoveBy(startTime: 0, endTime: 500, x: 300, y: 30);
 

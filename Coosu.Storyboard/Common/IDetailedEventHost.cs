@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Coosu.Storyboard.Common
 {
-    public interface IEventHost
+    public interface IEventHost : IScriptable
     {
         ICollection<ICommonEvent> Events { get; set; }
         void AddEvent(ICommonEvent @event);

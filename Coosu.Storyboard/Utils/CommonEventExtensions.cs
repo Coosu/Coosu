@@ -20,7 +20,7 @@ namespace Coosu.Storyboard.Utils
                 [EventTypes.Color] = new[] { 255d, 255d, 255d },
             });
 
-        public static double[]? GetDefaultValue(this EventType eventType, Sprite sprite)
+        public static double[]? GetDefaultValue(this EventType eventType, ICameraUsable sprite)
         {
             if (eventType == EventTypes.Move) return new[] { sprite.DefaultX, sprite.DefaultY };
             if (eventType == EventTypes.MoveX) return new[] { sprite.DefaultX };

@@ -2,9 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Coosu.Storyboard.Common;
-using Coosu.Storyboard.Events;
+using Coosu.Storyboard.Utils;
 
 namespace Coosu.Storyboard
 {
@@ -19,6 +20,7 @@ namespace Coosu.Storyboard
         {
             Camera2.DefaultX = defaultX;
             Camera2.DefaultY = defaultY;
+            Camera2.OriginType = origin;
         }
 
         public ObjectType ObjectType { get; } = 10;
@@ -38,10 +40,23 @@ namespace Coosu.Storyboard
             throw new System.NotImplementedException();
         }
 
-        public double MaxTime { get; }
-        public double MinTime { get; }
-        public double MaxStartTime { get; }
-        public double MinEndTime { get; }
+        public double MaxTime =>
+            NumericHelper.GetMaxValue(
+                Events.Select(k => k.EndTime)
+            );
+        public double MinTime =>
+            NumericHelper.GetMinValue(
+                Events.Select(k => k.StartTime)
+            );
+        public double MaxStartTime =>
+            NumericHelper.GetMaxValue(
+                Events.Select(k => k.StartTime)
+            );
+        public double MinEndTime =>
+            NumericHelper.GetMinValue(
+                Events.Select(k => k.EndTime)
+            );
+
         public bool EnableGroupedSerialization { get; set; }
 
         public ICollection<ICommonEvent> Events
@@ -67,9 +82,17 @@ namespace Coosu.Storyboard
             set => Camera2.DefaultY = value;
         }
 
-        public double ZDistance => Camera2.ZDistance;
+        public double ZDistance
+        {
+            get => Camera2.ZDistance;
+            set => Camera2.ZDistance = value;
+        }
 
-        public string CameraIdentifier => Camera2.Id;
+        public string CameraIdentifier
+        {
+            get => Camera2.CameraIdentifier;
+            set => Camera2.CameraIdentifier = value;
+        }
 
         #region ISpriteHost
 

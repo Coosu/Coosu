@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
+using Coosu.Storyboard.Common;
 
-namespace Coosu.Storyboard.Common
+namespace Coosu.Storyboard
 {
-    public class Camera2 : IEventHost
+    public class Camera2 : IEventHost, ICameraUsable
     {
-        public string Id { get; set; } = Guid.NewGuid().ToString();
+        public string CameraIdentifier { get; set; } = Guid.NewGuid().ToString();
         public double ZDistance { get; set; } = 1;
         public double DefaultX { get; set; } = 320;
         public double DefaultY { get; set; } = 240;
@@ -25,6 +28,16 @@ namespace Coosu.Storyboard.Common
         public State GetObjectState(double time, State oldState)
         {
             return oldState;
+        }
+
+        public Task WriteHeaderAsync(TextWriter writer)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task WriteScriptAsync(TextWriter writer)
+        {
+            throw new NotImplementedException();
         }
     }
 }

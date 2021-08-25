@@ -28,7 +28,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             return lastE.End.ToArray();
         }
 
-        public static double[] ComputeFrame(this IDetailedEventHost eventHost, EventType eventType, double time, int? accuracy)
+        public static double[] ComputeFrame(this IEventHost eventHost, EventType eventType, double time, int? accuracy)
         {
             if (eventType.Size < 1) throw new ArgumentOutOfRangeException(nameof(eventType), eventType, "Only support sized event type.");
             var commonEvents = eventHost.Events
