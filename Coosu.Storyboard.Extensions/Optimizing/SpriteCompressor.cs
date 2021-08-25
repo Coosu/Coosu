@@ -318,33 +318,21 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                         {
                             var defaultValue = targetStdType.GetDefaultValue(sprite) ?? throw new NotSupportedException(
                                 targetStdType.Flag + " doesn't have any default value.");
-                            sprite.Events.Add(CommonEvent.Create(targetStdType, @event.Easing, startTime, endTime,
+                            var newEvent = CommonEvent.Create(targetStdType, @event.Easing, startTime, endTime,
                                 defaultValue,
-                                @event.EventType.ComputeRelative(defaultValue, @event.End)));
+                                @event.EventType.ComputeRelative(defaultValue, @event.End));
+                            AddEventDirectly(sprite, newEvent);
                             sprite.Events.Remove(@event);
                         }
                         else if (targetStandardEvents.Count == 0)
                         {
-                            var lastValue = sprite.ComputeFrame(targetStdType, startTime, null);
+                            var lastValue = sprite.ComputeFrame(targetStdType, startTime, 0);
                             var newEvent = CommonEvent.Create(targetStdType, @event.Easing, startTime, endTime,
                                 lastValue,
                                 @event.EventType.ComputeRelative(lastValue, @event.End));
-                            if (newEvent.Easing.TryGetEasingType() == null)
-                            {
-                                var de = newEvent.ComputeDiscretizedEvents(false,
-                                    Settings.DiscretizingInterval,
-                                    Settings.DiscretizingAccuracy);
-                                foreach (var commonEvent in de)
-                                {
-                                    sprite.Events.Add(commonEvent);
-                                }
-                            }
-                            else
-                            {
-                                sprite.Events.Add(newEvent);
-                            }
-
+                            AddEventDirectly(sprite, newEvent);
                             sprite.Events.Remove(@event);
+
                             var nextEvents = allThisTypeStandardEvents
                                 .Where(k => k.StartTime >= endTime)
                                 .ToList();
@@ -631,6 +619,24 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                         //sprite.WriteScriptAsync(Console.Out).Wait();
                     }
                 }
+            }
+        }
+
+        private void AddEventDirectly(Sprite sprite, ICommonEvent newEvent)
+        {
+            if (newEvent.Easing.TryGetEasingType() == null)
+            {
+                var de = newEvent.ComputeDiscretizedEvents(false,
+                    Settings.DiscretizingInterval,
+                    Settings.DiscretizingAccuracy);
+                foreach (var commonEvent in de)
+                {
+                    sprite.Events.Add(commonEvent);
+                }
+            }
+            else
+            {
+                sprite.Events.Add(newEvent);
             }
         }
 
