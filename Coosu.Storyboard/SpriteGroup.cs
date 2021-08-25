@@ -16,10 +16,15 @@ namespace Coosu.Storyboard
             ObjectType.SignType(10, "SpriteGroup");
         }
 
-        public SpriteGroup(double defaultX, double defaultY, OriginType origin)
+        public SpriteGroup()
+        {
+        }
+
+        public SpriteGroup(double defaultX, double defaultY, double defaultZ, OriginType origin)
         {
             Camera2.DefaultX = defaultX;
             Camera2.DefaultY = defaultY;
+            Camera2.DefaultZ = defaultZ;
             Camera2.OriginType = origin;
         }
 
@@ -37,7 +42,14 @@ namespace Coosu.Storyboard
 
         public object Clone()
         {
-            throw new System.NotImplementedException();
+            return new SpriteGroup
+            {
+                EnableGroupedSerialization = EnableGroupedSerialization,
+                Camera2 = (Camera2)Camera2.Clone(),
+                RowInSource = RowInSource,
+                Sprites = Sprites.Select(k => k.Clone()).Cast<Sprite>().ToList()
+            };
+
         }
 
         public double MaxTime =>
@@ -82,10 +94,10 @@ namespace Coosu.Storyboard
             set => Camera2.DefaultY = value;
         }
 
-        public double ZDistance
+        public double DefaultZ
         {
-            get => Camera2.ZDistance;
-            set => Camera2.ZDistance = value;
+            get => Camera2.DefaultZ;
+            set => Camera2.DefaultZ = value;
         }
 
         public string CameraIdentifier
@@ -96,9 +108,9 @@ namespace Coosu.Storyboard
 
         #region ISpriteHost
 
-        public Camera2 Camera2 { get; } = new();
+        public Camera2 Camera2 { get; private set; } = new();
 
-        public ICollection<Sprite> Sprites { get; } = new List<Sprite>();
+        public ICollection<Sprite> Sprites { get; private set; } = new List<Sprite>();
 
         public IEnumerator<Sprite> GetEnumerator()
         {

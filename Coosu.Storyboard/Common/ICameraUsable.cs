@@ -2,9 +2,9 @@
 {
     public interface ICameraUsable
     {
-        public double DefaultY { get; set; }
         public double DefaultX { get; set; }
-        public double ZDistance { get; set; }
+        public double DefaultY { get; set; }
+        public double DefaultZ { get; set; }
         public string CameraIdentifier { get; set; }
     }
 }

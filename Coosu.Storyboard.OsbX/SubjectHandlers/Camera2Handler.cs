@@ -61,7 +61,7 @@ namespace Coosu.Storyboard.OsbX.SubjectHandlers
         public int? RowInSource { get; set; }
         public double DefaultY { get; set; }
         public double DefaultX { get; set; }
-        public double ZDistance { get; set; }
+        public double DefaultZ { get; set; }
         public string CameraIdentifier { get; set; }
         public List<Loop> LoopList { get; } = new();
         public List<Trigger> TriggerList { get; } = new();

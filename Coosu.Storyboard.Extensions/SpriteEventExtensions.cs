@@ -21,8 +21,8 @@ namespace Coosu.Storyboard.Extensions
         /// If the value is null the numbers will not be rounded.</param>
         /// <returns></returns>
         public static void StandardizeEvents(this IEventHost host,
-            int discretizingInterval,
-            int? discretizingAccuracy)
+            int discretizingInterval = 48,
+            int? discretizingAccuracy = 3)
         {
             DiscretizeNonStandardEasing(host, discretizingInterval, discretizingAccuracy);
             ComputeRelativeEvents(host, discretizingInterval, discretizingAccuracy);

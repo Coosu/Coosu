@@ -33,10 +33,9 @@ namespace CoosuTest
             //Console.WriteLine(percent);
 
             var layer = new Layer();
-            //layer.Camera2
-            //layer.Camera.RotateBy(startTime: 0, endTime: 500, degree: 90);
-            //layer.Camera.MoveBy(startTime: 0, endTime: 500, x: 300, y: 30);
-
+            layer.Camera2.RotateBy(new BackEase() { Amplitude = 2 }, startTime: 0, endTime: 500, Math.PI / 2);
+            layer.Camera2.MoveBy(startTime: 0, endTime: 500, x: 300, y: 30);
+            layer.Camera2.StandardizeEvents();
             //            layer = Layer.ParseFromText(@"
             //Sprite,Foreground,Centre,""sb\cg\waifu.png"",320,240
             // MX,0,4960,4992,342.24,344.448
@@ -71,7 +70,7 @@ namespace CoosuTest
 
             foreach (var sprite in layer)
             {
-             
+
             }
 
             await layer.WriteScriptAsync(Console.Out);

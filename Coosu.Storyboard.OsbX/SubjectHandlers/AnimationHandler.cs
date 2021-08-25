@@ -22,7 +22,7 @@ namespace Coosu.Storyboard.OsbX.SubjectHandlers
         public override string Serialize(Animation raw)
         {
             return string.Format("{0},{1},{2},\"{3}\",{4},{5},{6},{7},{8},{9},{10},{11}", Flag, raw.LayerType, raw.OriginType, raw.ImagePath,
-                    raw.DefaultX, raw.DefaultY, raw.FrameCount, raw.FrameDelay, raw.LoopType, raw.CameraIdentifier, raw.ZDistance, 0);
+                    raw.DefaultX, raw.DefaultY, raw.FrameCount, raw.FrameDelay, raw.LoopType, raw.CameraIdentifier, raw.DefaultZ, 0);
         }
 
         public override Animation Deserialize(string[] split)
@@ -41,12 +41,12 @@ namespace Coosu.Storyboard.OsbX.SubjectHandlers
                 ? (LoopType)Enum.Parse(typeof(LoopType), split[8])
                 : LoopType.LoopForever;
 
-            double zDistance = 1;
+            double defaultZ = 1;
             string cameraIdentifier = Guid.Empty.ToString();
             if (split.Length == 11)
             {
                 cameraIdentifier = split[9];
-                zDistance = int.TryParse(split[10], out var result) ? result : 1;
+                defaultZ = int.TryParse(split[10], out var result) ? result : 1;
                 var absolute = int.Parse(split[11]) != 0;
                 if (absolute)
                 {
@@ -56,7 +56,7 @@ namespace Coosu.Storyboard.OsbX.SubjectHandlers
 
             return new Animation(layerType, origin, path, defX, defY, frameCount, frameDelay, loopType)
             {
-                ZDistance = zDistance,
+                DefaultZ = defaultZ,
                 CameraIdentifier = cameraIdentifier
             };
 

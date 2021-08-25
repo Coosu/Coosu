@@ -37,7 +37,8 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                 .Cast<CommonEvent>()
                 .ToList();
             if (commonEvents.Count == 0)
-                return eventType.GetDefaultValue() ?? throw new NotSupportedException(eventType.Flag + " doesn't have any default value.");
+                return eventType.GetDefaultValue(eventHost as ICameraUsable) ??
+                       throw new NotSupportedException(eventType.Flag + " doesn't have any default value.");
 
             if (time < commonEvents[0].StartTime)
                 return commonEvents[0].Start.ToArray();

@@ -28,7 +28,7 @@ namespace Coosu.Storyboard
         public double DefaultY { get; set; }
         public double DefaultX { get; set; }
 
-        public double ZDistance { get; set; }
+        public double DefaultZ { get; set; }
         public string CameraIdentifier { get; set; }
 
         // EventHosts
@@ -200,7 +200,7 @@ namespace Coosu.Storyboard
         {
             var sprite = new Sprite(LayerType, OriginType, ImagePath, DefaultX, DefaultY)
             {
-                ZDistance = ZDistance,
+                DefaultZ = DefaultZ,
                 CameraIdentifier = CameraIdentifier,
                 EnableGroupedSerialization = EnableGroupedSerialization,
                 Events = Events.Select(k => k.Clone()).Cast<ICommonEvent>().ToList(),
