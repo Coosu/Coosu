@@ -1,4 +1,5 @@
-﻿using Coosu.Storyboard.Easing;
+﻿using System;
+using Coosu.Storyboard.Easing;
 
 namespace Coosu.Storyboard.Events
 {
@@ -18,13 +19,13 @@ namespace Coosu.Storyboard.Events
             set => End[0] = value;
         }
 
-        public Fade(EasingType easing, double startTime, double endTime, double f1, double f2)
-            : base(easing.ToEasingFunction(), startTime, endTime, new[] { f1 }, new[] { f2 })
+        public Fade(EasingFunctionBase easing, double startTime, double endTime, double f1, double f2)
+            : base(easing, startTime, endTime, new[] { f1 }, new[] { f2 })
         {
         }
 
-        public Fade(IEasingFunction easing, double startTime, double endTime, double f1, double f2)
-            : base(easing, startTime, endTime, new[] { f1 }, new[] { f2 })
+        public Fade(EasingFunctionBase easing, double startTime, double endTime, Span<double> start, Span<double> end)
+            : base(easing, startTime, endTime, start, end)
         {
         }
 

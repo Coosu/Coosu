@@ -71,7 +71,7 @@ namespace Coosu.Storyboard.Easing
 
     public static class EasingFunctionExtensions
     {
-        public static IEasingFunction ToEasingFunction(this EasingType easingType)
+        public static EasingFunctionBase ToEasingFunction(this EasingType easingType)
         {
 #pragma warning disable format
             // @formatter:off

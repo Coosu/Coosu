@@ -1,4 +1,5 @@
-﻿using Coosu.Storyboard.Easing;
+﻿using System;
+using Coosu.Storyboard.Easing;
 
 namespace Coosu.Storyboard.Events
 {
@@ -30,13 +31,13 @@ namespace Coosu.Storyboard.Events
             set => End[1] = value;
         }
 
-        public Vector(EasingType easing, double startTime, double endTime, double vx1, double vy1, double vx2, double vy2) :
-            base(easing.ToEasingFunction(), startTime, endTime, new[] { vx1, vy1 }, new[] { vx2, vy2 })
+        public Vector(EasingFunctionBase easing, double startTime, double endTime, double vx1, double vy1, double vx2, double vy2) :
+            base(easing, startTime, endTime, new[] { vx1, vy1 }, new[] { vx2, vy2 })
         {
         }
 
-        public Vector(IEasingFunction easing, double startTime, double endTime, double vx1, double vy1, double vx2, double vy2) :
-            base(easing, startTime, endTime, new[] { vx1, vy1 }, new[] { vx2, vy2 })
+        public Vector(EasingFunctionBase easing, double startTime, double endTime, Span<double> start, Span<double> end)
+            : base(easing, startTime, endTime, start, end)
         {
         }
 

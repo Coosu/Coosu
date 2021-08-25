@@ -96,7 +96,7 @@ namespace ParsingPerformanceTest
         public ParsingTask()
         {
             _text = File.ReadAllText(
-                @"D:\GitHub\ReOsuStoryboardPlayer\ReOsuStoryboardPlayer.Core.UnitTest\TestData\IOSYS feat. 3L - Miracle-Hinacle (_lolipop).osb");
+                @"D:\GitHub\ReOsuStoryboardPlayer\ReOsuStoryboardPlayer.Core.UnitTest\TestData\Denkishiki Karen Ongaku Shuudan - Gareki no Yume (Dored).osb");
             var ctx = new System.Runtime.Loader.AssemblyLoadContext("old", false);
             var asm1 = ctx.LoadFromAssemblyPath(@"C:\Users\milkitic\Desktop\net472\netstandard2.0\Coosu.Storyboard.dll");
             var ctx2 = new System.Runtime.Loader.AssemblyLoadContext("new", false);

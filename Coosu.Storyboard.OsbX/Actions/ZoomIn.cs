@@ -8,13 +8,8 @@ namespace Coosu.Storyboard.OsbX.Actions
         public ZoomIn()
         {
         }
-
-        public ZoomIn(EasingType easing, double startTime, double endTime, double[] start, double[] end)
-            : base(easing.ToEasingFunction(), startTime, endTime, start, end)
-        {
-        }
-
-        public ZoomIn(IEasingFunction easing, double startTime, double endTime, double[] start, double[] end)
+        
+        public ZoomIn(EasingFunctionBase easing, double startTime, double endTime, double[] start, double[] end)
             : base(easing, startTime, endTime, start, end)
         {
         }
