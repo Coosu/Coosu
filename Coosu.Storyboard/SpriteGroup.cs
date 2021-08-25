@@ -114,7 +114,7 @@ namespace Coosu.Storyboard
 
         public IEnumerator<Sprite> GetEnumerator()
         {
-            throw new NotImplementedException();
+            return Sprites.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
