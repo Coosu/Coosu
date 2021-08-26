@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Extensions.Optimizing;
@@ -54,7 +53,7 @@ namespace Coosu.Storyboard
                 InnerExecuteBrew(sprite, brewLayer, false, configureSettings);
             }
         }
-        
+
         private static void InnerExecuteBrew(Sprite sprite, StoryboardLayer brewLayer,
             bool optimize, Action<CompressOptions>? configureSettings)
         {
