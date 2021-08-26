@@ -4,13 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Events;
+using Coosu.Storyboard.Extensions.Computing;
 using Coosu.Storyboard.Utils;
 
 namespace Coosu.Storyboard.Extensions.Optimizing
 {
     public static class SpriteExtensions
     {
-        public static double[] ComputeFrame(IEnumerable<CommonEvent> events, EventType eventType, double time, int? accuracy)
+        public static double[] ComputeFrame(IEnumerable<BasicEvent> events, EventType eventType, double time, int? accuracy)
         {
             var commonEvents = events
                 .OrderBy(k => k.StartTime)
@@ -22,29 +23,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                 return commonEvents[0].Start.ToArray();
 
             var e = commonEvents.FirstOrDefault(k => k.StartTime <= time && k.EndTime > time);
-            if (e != null) return e.ComputeFrame(time, accuracy);
-
-            var lastE = commonEvents.Last(k => k.EndTime <= time);
-            return lastE.End.ToArray();
-        }
-
-        public static double[] ComputeFrame(this IEventHost eventHost, EventType eventType, double time, int? accuracy)
-        {
-            if (eventType.Size < 1) throw new ArgumentOutOfRangeException(nameof(eventType), eventType, "Only support sized event type.");
-            var commonEvents = eventHost.Events
-                .OrderBy(k => k.StartTime)
-                .Where(k => k.EventType == eventType)
-                .Cast<CommonEvent>()
-                .ToList();
-            if (commonEvents.Count == 0)
-                return eventType.GetDefaultValue(eventHost as ICameraUsable) ??
-                       throw new NotSupportedException(eventType.Flag + " doesn't have any default value.");
-
-            if (time < commonEvents[0].StartTime)
-                return commonEvents[0].Start.ToArray();
-
-            var e = commonEvents.FirstOrDefault(k => k.StartTime <= time && k.EndTime > time);
-            if (e != null) return e.ComputeFrame(time, accuracy);
+            if (e != null) return KeyEventExtensions.ComputeFrame(e, time, accuracy);
 
             var lastE = commonEvents.Last(k => k.EndTime <= time);
             return lastE.End.ToArray();
@@ -93,7 +72,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                             foreach (var e in loop.Events)
                             {
                                 sprite.AddEvent(
-                                    CommonEvent.Create(e.EventType,
+                                    BasicEvent.Create(e.EventType,
                                         e.Easing,
                                         fixedStartTime + e.StartTime, fixedStartTime + e.EndTime,
                                         e.Start, e.End)
@@ -108,11 +87,11 @@ namespace Coosu.Storyboard.Extensions.Optimizing
 
             var events = host.Events
                 //.Where(k => k is CommonEvent)
-                .Cast<CommonEvent>()?.GroupBy(k => k.EventType);
+                .Cast<BasicEvent>()?.GroupBy(k => k.EventType);
             if (events == null) return;
             foreach (var kv in events)
             {
-                List<CommonEvent> list = kv.ToList();
+                List<BasicEvent> list = kv.ToList();
                 for (var i = 0; i < list.Count - 1; i++)
                 {
                     if (list[i].Start == list[i].End) // case 1
@@ -123,7 +102,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                     if (!list[i].EndTime.Equals(list[i + 1].StartTime)) // case 2
                     {
                         host.AddEvent(
-                            CommonEvent.Create(list[i].EventType,
+                            BasicEvent.Create(list[i].EventType,
                                 EasingType.Linear,
                                 list[i].EndTime, list[i + 1].StartTime,
                                 list[i].End, list[i].End)
@@ -133,19 +112,21 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             }
         }
 
-        public static (TimeRange ObsoleteList, HashSet<CommonEvent> ControlNode) GetObsoleteList(this Sprite sprite)
+        public static TimeRange ComputeInvisibleRange(this Sprite sprite, out HashSet<BasicEvent> keyEvents)
         {
             var obsoleteList = new TimeRange();
-            var controlNode = new HashSet<CommonEvent>();
+            keyEvents = new HashSet<BasicEvent>();
             var possibleList = sprite.Events
                 .Where(k => k.EventType == EventTypes.Fade ||
                             k.EventType == EventTypes.Scale ||
                             k.EventType == EventTypes.Vector)
-                .Cast<CommonEvent>()
+                .Cast<BasicEvent>()
                 .ToArray();
 
             if (possibleList.Length <= 0)
-                return (obsoleteList, controlNode);
+            {
+                return (obsoleteList);
+            }
 
             var dic = new Dictionary<EventType, EventContext>
             {
@@ -172,7 +153,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                         e.AdjustTiming(sprite.MinTime - e.StartTime); // todo: stop changing here
                     dic[e.EventType].StartTime = sprite.MinTime;
                     dic[e.EventType].IsFadingOut = true;
-                    controlNode.Add(e);
+                    keyEvents.Add(e);
                 }
 
                 // event.Start和End都为无用值时，开始计时
@@ -182,7 +163,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                 {
                     dic[e.EventType].StartTime = e.StartTime;
                     dic[e.EventType].IsFadingOut = true;
-                    controlNode.Add(e);
+                    keyEvents.Add(e);
                 }
                 // event.End为无用值时，开始计时
                 else if (e.End.SequenceEqual(e.GetIneffectiveValue()) &&
@@ -190,7 +171,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                 {
                     dic[e.EventType].StartTime = e.EndTime;
                     dic[e.EventType].IsFadingOut = true;
-                    controlNode.Add(e);
+                    keyEvents.Add(e);
                 }
                 else if (dic[e.EventType].IsFadingOut)
                 {
@@ -200,7 +181,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                     AddTimeRage(dic[e.EventType].StartTime, e.StartTime);
                     dic[e.EventType].IsFadingOut = false;
                     dic[e.EventType].StartTime = double.MinValue;
-                    controlNode.Add(e);
+                    keyEvents.Add(e);
                 }
             }
 
@@ -235,7 +216,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                 obsoleteList.Add(startTime, endTime);
             }
 
-            return (obsoleteList, controlNode);
+            return obsoleteList;
         }
 
         /// <summary>
@@ -249,8 +230,8 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                 var list = kv.ToArray();
                 for (var i = 0; i < list.Length - 1; i++)
                 {
-                    ICommonEvent objNext = list[i + 1];
-                    ICommonEvent objNow = list[i];
+                    IKeyEvent objNext = list[i + 1];
+                    IKeyEvent objNow = list[i];
                     if (objNow.StartTime > objNow.EndTime)
                     {
                         var info = $"{{{objNow.GetHeaderString()}}}:\r\n" +
@@ -299,6 +280,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
 
         private static void InnerFix(this Layer eleG, bool expand, bool fillFadeout)
         {
+            throw new NotImplementedException();
             if (!expand && !fillFadeout)
                 return;
             foreach (var ec in eleG.SceneObjects)
@@ -306,11 +288,11 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                 if (ec is not Sprite ele) continue;
 
                 if (expand) ele.Expand();
-                if (fillFadeout) ele.GetObsoleteList();
+                if (fillFadeout) ele.ComputeInvisibleRange(out _);
             }
         }
 
-        public class EventContext
+        private class EventContext
         {
             public int Count { get; set; } = 0;
             public bool IsFadingOut { get; set; } = false;

@@ -553,7 +553,7 @@ namespace Coosu.Storyboard
 
             void InjectEvent(Span<double> span)
             {
-                var commonEvent = CommonEvent.Create(eventType, (EasingType)easing, startTime, endTime, span);
+                var commonEvent = BasicEvent.Create(eventType, (EasingType)easing, startTime, endTime, span);
                 currentObj.AddEvent(commonEvent);
             }
         }

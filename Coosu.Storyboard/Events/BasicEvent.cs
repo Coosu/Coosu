@@ -11,7 +11,7 @@ using Coosu.Storyboard.Utils;
 namespace Coosu.Storyboard.Events
 {
     [DebuggerDisplay("Expression = {DebuggerDisplay}")]
-    public abstract class CommonEvent : ICommonEvent
+    public abstract class BasicEvent : IKeyEvent
     {
         private double[]? _end;
         private string DebuggerDisplay => this.GetHeaderString();
@@ -58,13 +58,13 @@ namespace Coosu.Storyboard.Events
         public virtual async Task WriteScriptAsync(TextWriter writer) =>
             await WriteHeaderAsync(writer);
 
-        protected CommonEvent()
+        protected BasicEvent()
         {
             Start = EmptyArray<double>.Value;
             End = EmptyArray<double>.Value;
         }
 
-        protected CommonEvent(EasingFunctionBase easing, double startTime, double endTime, Span<double> start, Span<double> end)
+        protected BasicEvent(EasingFunctionBase easing, double startTime, double endTime, Span<double> start, Span<double> end)
         {
             Easing = easing;
             StartTime = startTime;
@@ -107,7 +107,7 @@ namespace Coosu.Storyboard.Events
             }
         }
 
-        public static ICommonEvent Create(EventType e, EasingFunctionBase easing,
+        public static IKeyEvent Create(EventType e, EasingFunctionBase easing,
             double startTime, double endTime,
             Span<double> value)
         {
@@ -119,45 +119,45 @@ namespace Coosu.Storyboard.Events
                 value.Length == size ? default : value.Slice(size, size));
         }
 
-        public static ICommonEvent Create(EventType e, EasingFunctionBase easing,
+        public static IKeyEvent Create(EventType e, EasingFunctionBase easing,
             double startTime, double endTime, Span<double> start, Span<double> end)
         {
-            ICommonEvent commonEvent;
+            IKeyEvent keyEvent;
             if (e.Size != 0 && end.Length == 0)
                 end = start.ToArray();
 
             if (e.Size != 0 && start.Length != e.Size) throw new ArgumentException();
 
             if (e == EventTypes.Fade)
-                commonEvent = new Fade(easing, startTime, endTime, start, end);
+                keyEvent = new Fade(easing, startTime, endTime, start, end);
             else if (e == EventTypes.Move)
-                commonEvent = new Move(easing, startTime, endTime, start, end);
+                keyEvent = new Move(easing, startTime, endTime, start, end);
             else if (e == EventTypes.MoveX)
-                commonEvent = new MoveX(easing, startTime, endTime, start, end);
+                keyEvent = new MoveX(easing, startTime, endTime, start, end);
             else if (e == EventTypes.MoveY)
-                commonEvent = new MoveY(easing, startTime, endTime, start, end);
+                keyEvent = new MoveY(easing, startTime, endTime, start, end);
             else if (e == EventTypes.Scale)
-                commonEvent = new Scale(easing, startTime, endTime, start, end);
+                keyEvent = new Scale(easing, startTime, endTime, start, end);
             else if (e == EventTypes.Vector)
-                commonEvent = new Vector(easing, startTime, endTime, start, end);
+                keyEvent = new Vector(easing, startTime, endTime, start, end);
             else if (e == EventTypes.Rotate)
-                commonEvent = new Rotate(easing, startTime, endTime, start, end);
+                keyEvent = new Rotate(easing, startTime, endTime, start, end);
             else if (e == EventTypes.Color)
-                commonEvent = new Color(easing, startTime, endTime, start, end);
+                keyEvent = new Color(easing, startTime, endTime, start, end);
             else if (e == EventTypes.Parameter)
-                commonEvent = new Parameter(startTime, endTime, start.Slice(0, 1));
+                keyEvent = new Parameter(startTime, endTime, start.Slice(0, 1));
             else
             {
                 var result = HandlerRegister.GetEventTransformation(e)?.Invoke(e, easing, startTime, endTime, start, end);
-                commonEvent = result ?? throw new ArgumentOutOfRangeException(nameof(e), e, null);
+                keyEvent = result ?? throw new ArgumentOutOfRangeException(nameof(e), e, null);
             }
 
-            return commonEvent;
+            return keyEvent;
         }
 
         public object Clone()
         {
-            return CommonEvent.Create(EventType, Easing, StartTime, EndTime, Start.ToArray(), End.ToArray());
+            return BasicEvent.Create(EventType, Easing, StartTime, EndTime, Start.ToArray(), End.ToArray());
         }
     }
 }

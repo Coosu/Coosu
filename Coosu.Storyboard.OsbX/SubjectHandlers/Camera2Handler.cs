@@ -72,10 +72,10 @@ namespace Coosu.Storyboard.OsbX.SubjectHandlers
         public bool EnableGroupedSerialization { get; set; }
 
         // EventHosts
-        public ICollection<ICommonEvent> Events { get; set; } =
-            new SortedSet<ICommonEvent>(new EventTimingComparer());
+        public ICollection<IKeyEvent> Events { get; set; } =
+            new SortedSet<IKeyEvent>(new EventTimingComparer());
 
-        public void AddEvent(ICommonEvent @event)
+        public void AddEvent(IKeyEvent @event)
         {
             Events.Add(@event);
         }

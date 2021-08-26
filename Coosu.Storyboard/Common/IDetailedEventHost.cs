@@ -5,8 +5,8 @@ namespace Coosu.Storyboard.Common
 {
     public interface IEventHost : IScriptable
     {
-        ICollection<ICommonEvent> Events { get; set; }
-        void AddEvent(ICommonEvent @event);
+        ICollection<IKeyEvent> Events { get; set; }
+        void AddEvent(IKeyEvent @event);
     }
 
     public interface IDetailedEventHost : IScriptable, ICloneable, IEventHost

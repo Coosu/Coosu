@@ -1,16 +1,72 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Events;
 using Coosu.Storyboard.Extensions.Optimizing;
 using Coosu.Storyboard.Utils;
 
-namespace Coosu.Storyboard.Extensions
+namespace Coosu.Storyboard.Extensions.Computing
 {
-    public static class SpriteEventExtensions
+    public static class EventHostExtensions
     {
+        public static int GetMaxTimeCount(this IDetailedEventHost eventHost)
+        {
+            var maxTime = eventHost.MaxTime;
+            if (eventHost is Sprite sprite)
+            {
+                return sprite.Events.Count(k => k.EndTime.Equals(maxTime)) +
+                       sprite.LoopList.Count(k => k.OuterMaxTime.Equals(maxTime)) +
+                       sprite.TriggerList.Count(k => k.MaxTime.Equals(maxTime));
+            }
+
+            return eventHost.Events.Count(k => k.EndTime.Equals(maxTime));
+        }
+
+        public static int GetMinTimeCount(this IDetailedEventHost eventHost)
+        {
+            var minTime = eventHost.MinTime;
+            if (eventHost is Sprite sprite)
+            {
+                return sprite.Events.Count(k => k.StartTime.Equals(minTime)) +
+                       sprite.LoopList.Count(k => k.OuterMinTime.Equals(minTime)) +
+                       sprite.TriggerList.Count(k => k.MinTime.Equals(minTime));
+            }
+
+            return eventHost.Events.Count(k => k.StartTime.Equals(minTime));
+        }
+
+        public static bool HasEffectiveTiming(this IDetailedEventHost eventHost)
+        {
+            if (eventHost.MaxTime < eventHost.MinTime)
+                return false;
+            if (eventHost.MaxTime.Equals(eventHost.MinTime))
+                return false;
+            return true;
+        }
+
+        public static double[] ComputeFrame(this IEventHost eventHost, EventType eventType, double time, int? accuracy)
+        {
+            if (eventType.Size < 1) throw new ArgumentOutOfRangeException(nameof(eventType), eventType, "Only support sized event type.");
+            var commonEvents = eventHost.Events
+                .OrderBy(k => k.StartTime)
+                .Where(k => k.EventType == eventType)
+                .Cast<BasicEvent>()
+                .ToList();
+            if (commonEvents.Count == 0)
+                return eventType.GetDefaultValue(eventHost as ICameraUsable) ??
+                       throw new NotSupportedException(eventType.Flag + " doesn't have any default value.");
+
+            if (time < commonEvents[0].StartTime)
+                return commonEvents[0].Start.ToArray();
+
+            var e = commonEvents.FirstOrDefault(k => k.StartTime <= time && k.EndTime > time);
+            if (e != null) return BasicEventExtensions.ComputeFrame(e, time, accuracy);
+
+            var lastE = commonEvents.Last(k => k.EndTime <= time);
+            return lastE.End.ToArray();
+        }
+
         /// <summary>
         /// Standardize an <see cref="IEventHost"/>'s events to osu!storyboard standard events.
         /// </summary>
@@ -71,11 +127,11 @@ namespace Coosu.Storyboard.Extensions
                         Console.WriteLine("Step " + j + ": " + @event.GetHeaderString());
                         var allThisTypeStandardEvents = sprite
                             .Events
-                            .Where(k => k is CommonEvent &&
+                            .Where(k => k is BasicEvent &&
                                         k.Easing.TryGetEasingType() != null &&
                                         k.EventType == targetStdType)
                             .OrderBy(k => k.StartTime)
-                            .Cast<CommonEvent>()
+                            .Cast<BasicEvent>()
                             .ToList();
 
                         var startTime = (int)@event.StartTime;
@@ -88,7 +144,7 @@ namespace Coosu.Storyboard.Extensions
                         {
                             var defaultValue = targetStdType.GetDefaultValue(camerable) ?? throw new NotSupportedException(
                                 targetStdType.Flag + " doesn't have any default value.");
-                            var newEvent = CommonEvent.Create(targetStdType, @event.Easing, startTime, endTime,
+                            var newEvent = BasicEvent.Create(targetStdType, @event.Easing, startTime, endTime,
                                 defaultValue,
                                 @event.EventType.ComputeRelative(defaultValue, @event.End));
                             AddEventDirectly(sprite, newEvent, discretizingInterval, discretizingAccuracy);
@@ -97,7 +153,7 @@ namespace Coosu.Storyboard.Extensions
                         else if (targetStandardEvents.Count == 0)
                         {
                             var lastValue = sprite.ComputeFrame(targetStdType, startTime, 0);
-                            var newEvent = CommonEvent.Create(targetStdType, @event.Easing, startTime, endTime,
+                            var newEvent = BasicEvent.Create(targetStdType, @event.Easing, startTime, endTime,
                                 lastValue,
                                 @event.EventType.ComputeRelative(lastValue, @event.End));
                             AddEventDirectly(sprite, newEvent, discretizingInterval, discretizingAccuracy);
@@ -124,16 +180,16 @@ namespace Coosu.Storyboard.Extensions
                                 .ToDictionary(k => (k.StartTime, k.EndTime), k => k);
                             endTime = (int)discretizedRelatives.Last().Key.EndTime;
                             var discretizingTargetStandardEvents =
-                                new Dictionary<(double StartTime, double EndTime), ICommonEvent>();
+                                new Dictionary<(double StartTime, double EndTime), IKeyEvent>();
                             //var boundedDiscretizingTargetStandardEvents = new HashSet<ICommonEvent>(); //todo: 算上因特殊情况被再度切割的？
-                            foreach (CommonEvent k in targetStandardEvents)
+                            foreach (BasicEvent k in targetStandardEvents)
                             {
-                                ICommonEvent? first = null;
-                                ICommonEvent? last = null;
+                                IKeyEvent? first = null;
+                                IKeyEvent? last = null;
                                 var computeDiscretizedEvents = k.ComputeDiscretizedEvents(
                                     discretizingInterval,
                                     discretizingAccuracy);
-                                foreach (ICommonEvent discretizedEvent in computeDiscretizedEvents)
+                                foreach (IKeyEvent discretizedEvent in computeDiscretizedEvents)
                                 {
                                     first ??= discretizedEvent;
                                     last = discretizedEvent;
@@ -145,7 +201,7 @@ namespace Coosu.Storyboard.Extensions
                                 //if (last != null) boundedDiscretizingTargetStandardEvents.Add(last);
                             }
 
-                            var list = new List<ICommonEvent>();
+                            var list = new List<IKeyEvent>();
                             foreach (var relative in discretizedRelatives.ToList())
                             {
                                 var key = relative.Key;
@@ -172,7 +228,7 @@ namespace Coosu.Storyboard.Extensions
                                         // nothing
                                         var lastValue = SpriteExtensions.ComputeFrame(allThisTypeStandardEvents,
                                             relative.Value.EventType, relative.Key.StartTime, discretizingAccuracy);
-                                        var commonEvent = CommonEvent.Create(targetStdType, EasingType.Linear,
+                                        var commonEvent = BasicEvent.Create(targetStdType, EasingType.Linear,
                                             relative.Key.StartTime, relative.Key.EndTime,
                                             @event.EventType.ComputeRelative(lastValue, relative.Value.Start, discretizingAccuracy),
                                             @event.EventType.ComputeRelative(lastValue, relative.Value.End, discretizingAccuracy));
@@ -191,7 +247,7 @@ namespace Coosu.Storyboard.Extensions
                                             var computedFrame1 = @event.EventType.ComputeRelative(absoluteFrame1, relative.Value.Start, discretizingAccuracy);
                                             if (!relative.Key.StartTime.Equals(bounded.StartTime))
                                             {
-                                                var newEvent0_1 = CommonEvent.Create(targetStdType, EasingType.Linear,
+                                                var newEvent0_1 = BasicEvent.Create(targetStdType, EasingType.Linear,
                                                     bounded.StartTime, relative.Key.StartTime,
                                                     bounded.Start.ToArray(), computedFrame1);
                                                 AddMiniUnitEvent(newEvent0_1, list);
@@ -203,7 +259,7 @@ namespace Coosu.Storyboard.Extensions
                                             computedFrame2 = @event.EventType.ComputeRelative(bounded.End, relativeFrame2, discretizingAccuracy);
                                             if (!relative.Key.StartTime.Equals(bounded.EndTime))
                                             {
-                                                var newEvent1_2 = CommonEvent.Create(targetStdType, EasingType.Linear,
+                                                var newEvent1_2 = BasicEvent.Create(targetStdType, EasingType.Linear,
                                                     relative.Key.StartTime, bounded.EndTime,
                                                     computedFrame1, computedFrame2);
                                                 AddMiniUnitEvent(newEvent1_2, list);
@@ -215,7 +271,7 @@ namespace Coosu.Storyboard.Extensions
                                             var computedFrame3 = @event.EventType.ComputeRelative(absoluteFrame3, relative.Value.End, discretizingAccuracy);
                                             if (!relative.Key.EndTime.Equals(bounded.EndTime))
                                             {
-                                                var newEvent2_3 = CommonEvent.Create(targetStdType, EasingType.Linear,
+                                                var newEvent2_3 = BasicEvent.Create(targetStdType, EasingType.Linear,
                                                     bounded.EndTime, relative.Key.EndTime,
                                                     computedFrame2, computedFrame3);
                                                 AddMiniUnitEvent(newEvent2_3, list);
@@ -237,7 +293,7 @@ namespace Coosu.Storyboard.Extensions
 
                                             if (!relative.Key.StartTime.Equals(bounded.StartTime))
                                             {
-                                                var newEvent0_1 = CommonEvent.Create(targetStdType, EasingType.Linear,
+                                                var newEvent0_1 = BasicEvent.Create(targetStdType, EasingType.Linear,
                                                     relative.Key.StartTime, bounded.StartTime,
                                                     computedFrame0, computedFrame1);
                                                 AddMiniUnitEvent(newEvent0_1, list);
@@ -250,7 +306,7 @@ namespace Coosu.Storyboard.Extensions
                                             computedFrame2 = @event.EventType.ComputeRelative(absoluteFrame2, relative.Value.End, discretizingAccuracy);
                                             if (!relative.Key.EndTime.Equals(bounded.StartTime))
                                             {
-                                                var newEvent1_2 = CommonEvent.Create(targetStdType, EasingType.Linear,
+                                                var newEvent1_2 = BasicEvent.Create(targetStdType, EasingType.Linear,
                                                  bounded.StartTime, relative.Key.EndTime,
                                                  computedFrame1, computedFrame2);
                                                 AddMiniUnitEvent(newEvent1_2, list);
@@ -272,7 +328,7 @@ namespace Coosu.Storyboard.Extensions
                                             {
                                                 var computedFrame3 =
                                                     @event.EventType.ComputeRelative(bounded.End, relative.Value.End, discretizingAccuracy);
-                                                var newEvent2_3 = CommonEvent.Create(targetStdType, EasingType.Linear,
+                                                var newEvent2_3 = BasicEvent.Create(targetStdType, EasingType.Linear,
                                                     relative.Key.EndTime, bounded.EndTime,
                                                     computedFrame2, computedFrame3);
                                                 AddMiniUnitEvent(newEvent2_3, list);
@@ -293,7 +349,7 @@ namespace Coosu.Storyboard.Extensions
 
                                             if (!relative.Key.StartTime.Equals(bounded.StartTime))
                                             {
-                                                var newEvent0_1 = CommonEvent.Create(targetStdType, EasingType.Linear,
+                                                var newEvent0_1 = BasicEvent.Create(targetStdType, EasingType.Linear,
                                                     bounded.StartTime, relative.Key.StartTime,
                                                     computedFrame0, computedFrame1);
                                                 AddMiniUnitEvent(newEvent0_1, list);
@@ -304,7 +360,7 @@ namespace Coosu.Storyboard.Extensions
                                                 targetStdType, relative.Key.EndTime, discretizingAccuracy);
                                             var computedFrame2 = @event.EventType.ComputeRelative(absoluteFrame2, relative.Value.End, discretizingAccuracy);
 
-                                            var newEvent1_2 = CommonEvent.Create(targetStdType, EasingType.Linear,
+                                            var newEvent1_2 = BasicEvent.Create(targetStdType, EasingType.Linear,
                                                 relative.Key.StartTime, relative.Key.EndTime,
                                                 computedFrame1, computedFrame2);
                                             AddMiniUnitEvent(newEvent1_2, list);
@@ -323,7 +379,7 @@ namespace Coosu.Storyboard.Extensions
                                                 var computedFrame3 =
                                                     @event.EventType.ComputeRelative(bounded.End, relative.Value.End,
                                                         3);
-                                                var newEvent2_3 = CommonEvent.Create(targetStdType, EasingType.Linear,
+                                                var newEvent2_3 = BasicEvent.Create(targetStdType, EasingType.Linear,
                                                     relative.Key.EndTime, bounded.EndTime,
                                                     computedFrame2, computedFrame3);
                                                 AddMiniUnitEvent(newEvent2_3, list);
@@ -392,7 +448,7 @@ namespace Coosu.Storyboard.Extensions
             }
         }
 
-        private static void AddEventDirectly(IEventHost sprite, ICommonEvent newEvent,
+        private static void AddEventDirectly(IEventHost sprite, IKeyEvent newEvent,
             int discretizingInterval,
             int? discretizingAccuracy)
         {
@@ -412,7 +468,7 @@ namespace Coosu.Storyboard.Extensions
             }
         }
 
-        private static void AddMiniUnitEvent(ICommonEvent e, ICollection<ICommonEvent> list)
+        private static void AddMiniUnitEvent(IKeyEvent e, ICollection<IKeyEvent> list)
         {
             if (e.IsStatic && e.StartTime.Equals(e.EndTime))
             {

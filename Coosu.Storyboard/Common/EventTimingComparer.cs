@@ -3,9 +3,9 @@ using System.Linq;
 
 namespace Coosu.Storyboard.Common
 {
-    public class EventTimingComparer : IComparer<ICommonEvent>
+    public class EventTimingComparer : IComparer<IKeyEvent>
     {
-        public int Compare(ICommonEvent? x, ICommonEvent? y)
+        public int Compare(IKeyEvent? x, IKeyEvent? y)
         {
             if (y == null && x == null)
                 return 0;

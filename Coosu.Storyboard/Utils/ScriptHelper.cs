@@ -8,7 +8,7 @@ namespace Coosu.Storyboard.Utils
 {
     public static class ScriptHelper
     {
-        public static async Task WriteGroupedEventAsync(TextWriter writer, IEnumerable<ICommonEvent> events, int index)
+        public static async Task WriteGroupedEventAsync(TextWriter writer, IEnumerable<IKeyEvent> events, int index)
         {
             var indent = new string(' ', index);
             var groupedEvents = events
@@ -17,7 +17,7 @@ namespace Coosu.Storyboard.Utils
                 .ThenBy(k => k.EventType.Index)
                 .GroupBy(k => k.EventType);
             foreach (var grouping in groupedEvents)
-                foreach (ICommonEvent e in grouping)
+                foreach (IKeyEvent e in grouping)
                 {
                     await writer.WriteAsync(indent);
                     await e.WriteScriptAsync(writer);
@@ -25,10 +25,10 @@ namespace Coosu.Storyboard.Utils
                 }
         }
 
-        public static async Task WriteSequentialEventAsync(TextWriter writer, IEnumerable<ICommonEvent> events, int index)
+        public static async Task WriteSequentialEventAsync(TextWriter writer, IEnumerable<IKeyEvent> events, int index)
         {
             var indent = new string(' ', index);
-            foreach (ICommonEvent e in events
+            foreach (IKeyEvent e in events
                 .OrderBy(k => k.StartTime)
                 .ThenBy(k => k.EndTime)
                 .ThenBy(k => k.EventType.Index))

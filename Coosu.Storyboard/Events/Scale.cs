@@ -3,7 +3,7 @@ using Coosu.Storyboard.Easing;
 
 namespace Coosu.Storyboard.Events
 {
-    public sealed class Scale : CommonEvent
+    public sealed class Scale : BasicEvent
     {
         public override EventType EventType => EventTypes.Scale;
 

@@ -16,8 +16,8 @@ namespace Coosu.Storyboard.Easing
         {
             return EasingMode switch
             {
-                EasingMode.EaseIn => EasingType.QuadIn,
-                EasingMode.EaseOut => EasingType.QuadOut,
+                EasingMode.EaseIn => EasingType.EasingIn,
+                EasingMode.EaseOut => EasingType.EasingOut,
                 EasingMode.EaseInOut => EasingType.QuadInOut,
                 _ => null
             };

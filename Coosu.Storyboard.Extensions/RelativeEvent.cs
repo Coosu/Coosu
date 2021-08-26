@@ -10,7 +10,7 @@ using Coosu.Storyboard.Utils;
 namespace Coosu.Storyboard.Extensions
 {
     [DebuggerDisplay("Expression = {DebuggerDisplay}")]
-    public class RelativeEvent : ICommonEvent
+    public class RelativeEvent : IKeyEvent
     {
         private string DebuggerDisplay => this.GetHeaderString();
         public EventType EventType { get; }

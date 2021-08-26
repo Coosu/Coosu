@@ -306,26 +306,26 @@ namespace Coosu.Storyboard
 
         private static void AddEvent(this IEventHost host, double startTime, double endTime, ParameterType p)
         {
-            host.AddEvent(CommonEvent.Create(EventTypes.Parameter, EasingType.Linear, startTime, endTime,
+            host.AddEvent(BasicEvent.Create(EventTypes.Parameter, EasingType.Linear, startTime, endTime,
                 new[] { (double)(int)p }, new[] { (double)(int)p }));
         }
 
         private static void AddEvent(this IEventHost host, EventType e, EasingFunctionBase easing, double startTime, double endTime,
             double x1, double x2)
         {
-            host.AddEvent(CommonEvent.Create(e, easing, startTime, endTime, new[] { x1 }, new[] { x2 }));
+            host.AddEvent(BasicEvent.Create(e, easing, startTime, endTime, new[] { x1 }, new[] { x2 }));
         }
 
         private static void AddEvent(this IEventHost host, EventType e, EasingFunctionBase easing, double startTime, double endTime,
             double x1, double y1, double x2, double y2)
         {
-            host.AddEvent(CommonEvent.Create(e, easing, startTime, endTime, new[] { x1, y1 }, new[] { x2, y2 }));
+            host.AddEvent(BasicEvent.Create(e, easing, startTime, endTime, new[] { x1, y1 }, new[] { x2, y2 }));
         }
 
         private static void AddEvent(this IEventHost host, EventType e, EasingFunctionBase easing, double startTime, double endTime,
             double x1, double y1, double z1, double x2, double y2, double z2)
         {
-            host.AddEvent(CommonEvent.Create(e, easing, startTime, endTime, new[] { x1, y1, z1 }, new[] { x2, y2, z2 }));
+            host.AddEvent(BasicEvent.Create(e, easing, startTime, endTime, new[] { x1, y1, z1 }, new[] { x2, y2, z2 }));
         }
     }
 }

@@ -3,7 +3,7 @@ using Coosu.Storyboard.Events;
 
 namespace Coosu.Storyboard.OsbX.Actions
 {
-    public class ZoomOut : CommonEvent
+    public class ZoomOut : BasicEvent
     {
         public ZoomOut()
         {

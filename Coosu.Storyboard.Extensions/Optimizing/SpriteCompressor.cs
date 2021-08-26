@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Events;
+using Coosu.Storyboard.Extensions.Computing;
 using Coosu.Storyboard.Utils;
 
 namespace Coosu.Storyboard.Extensions.Optimizing
@@ -237,13 +238,13 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                 }
             }
 
-            sprite.Events = new HashSet<ICommonEvent>(sprite.Events);
+            sprite.Events = new HashSet<IKeyEvent>(sprite.Events);
             sprite.StandardizeEvents(Settings.DiscretizingInterval, Settings.DiscretizingAccuracy);
-            var (obsoleteList, controlNodes) = sprite.GetObsoleteList();
-            PreOptimize(sprite, obsoleteList, controlNodes);
+            var obsoleteList = sprite.ComputeInvisibleRange(out var keyEvents);
+            PreOptimize(sprite, obsoleteList, keyEvents);
             NormalOptimize(sprite);
             sprite.Events =
-                new SortedSet<ICommonEvent>(sprite.Events, new EventTimingComparer());
+                new SortedSet<IKeyEvent>(sprite.Events, new EventTimingComparer());
             if (sprite.ObjectType == ObjectTypes.Sprite &&
                 Path.GetFileName(sprite.ImagePath) == sprite.ImagePath &&
                 sprite.LayerType == LayerType.Background)
@@ -258,23 +259,23 @@ namespace Coosu.Storyboard.Extensions.Optimizing
         /// <summary>
         /// 预压缩
         /// </summary>
-        private void PreOptimize(IDetailedEventHost host, TimeRange obsoleteList, HashSet<CommonEvent> controlNodes)
+        private void PreOptimize(IDetailedEventHost host, TimeRange obsoleteList, HashSet<BasicEvent> keyEvents)
         {
             if (host is Sprite ele)
             {
                 foreach (var item in ele.LoopList)
                 {
-                    PreOptimize(item, obsoleteList, controlNodes);
+                    PreOptimize(item, obsoleteList, keyEvents);
                 }
 
                 foreach (var item in ele.TriggerList)
                 {
-                    PreOptimize(item, obsoleteList, controlNodes);
+                    PreOptimize(item, obsoleteList, keyEvents);
                 }
             }
 
             if (host.Events.Any())
-                RemoveByObsoletedList(host, obsoleteList, controlNodes);
+                RemoveByObsoletedList(host, obsoleteList, keyEvents);
         }
 
         /// <summary>
@@ -297,24 +298,24 @@ namespace Coosu.Storyboard.Extensions.Optimizing
 
             if (host.Events.Any())
             {
-                RemoveByLogic(host, host.Events.Cast<CommonEvent>().ToList());
+                RemoveByLogic(host, host.Events.Cast<BasicEvent>().ToList());
             }
         }
 
         /// <summary>
         /// 根据ObsoletedList，移除不必要的命令。
         /// </summary>
-        private void RemoveByObsoletedList(IDetailedEventHost host, TimeRange obsoleteList, HashSet<CommonEvent> controlNodes)
+        private void RemoveByObsoletedList(IDetailedEventHost host, TimeRange obsoleteList, HashSet<BasicEvent> keyEvents)
         {
             if (obsoleteList.TimingList.Count == 0) return;
             var groups = host.Events.GroupBy(k => k.EventType);
             foreach (var group in groups)
             {
-                var list = group.Cast<CommonEvent>().ToList();
+                var list = group.Cast<BasicEvent>().ToList();
                 for (int i = 0; i < list.Count; i++)
                 {
-                    CommonEvent nowE = list[i];
-                    CommonEvent? nextE =
+                    BasicEvent nowE = list[i];
+                    BasicEvent? nextE =
                         i == list.Count - 1
                             ? null
                             : list[i + 1];
@@ -326,7 +327,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                     */
 
                     // 判断是否此Event为控制Obsolete Range的Event。
-                    if (!(nowE.OnObsoleteTimingRange(obsoleteList) &&
+                    if (!(nowE.OnInvisibleTimingRangeBound(obsoleteList) &&
                           EventExtensions.IneffectiveDictionary.ContainsKey(nowE.EventType)))
                     {
                         bool canRemove;
@@ -335,7 +336,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                         if (nextE == null)
                         {
                             // 判断是否此Event在某Obsolete Range内，且此Obsolete Range持续到EventHost结束。
-                            canRemove = nowE.InObsoleteTimingRange(obsoleteList, out var range) &&
+                            canRemove = nowE.InInvisibleTimingRange(obsoleteList, out var range) &&
                                         range.EndTime.Equals(host.MaxTime);
                             if (!canRemove) continue;
 
@@ -381,7 +382,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                         {
                             // 判断是否此Event在某Obsolete Range内，且下一Event的StartTime也在此Obsolete Range内。
                             canRemove = obsoleteList.ContainsTimingPoint(out _,
-                                nowE.StartTime, nowE.EndTime, nextE.StartTime) /*&& !controlNodes.Contains(nowE)*/;
+                                nowE.StartTime, nowE.EndTime, nextE.StartTime) /*&& !keyEvents.Contains(nowE)*/;
                             //目前限制：多个fadoutlist的控制节点不能删的只剩一个
                             if (canRemove)
                             {
@@ -404,7 +405,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
         /// </summary>
         /// <param name="host"></param>
         /// <param name="eventList"></param>
-        private void RemoveByLogic(IDetailedEventHost host, List<CommonEvent> eventList)
+        private void RemoveByLogic(IDetailedEventHost host, List<BasicEvent> eventList)
         {
             var groups = eventList.GroupBy(k => k.EventType);
             foreach (var group in groups)
@@ -415,7 +416,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                 int index = list.Count - 1;
                 while (index >= 0)
                 {
-                    CommonEvent nowE = list[index];
+                    BasicEvent nowE = list[index];
                     if (host is Sprite ele &&
                         ele.TriggerList.Any(k => nowE.EndTime >= k.StartTime && nowE.StartTime <= k.EndTime) &&
                         ele.LoopList.Any(k => nowE.EndTime >= k.StartTime && nowE.StartTime <= k.EndTime))
@@ -451,7 +452,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                             list.Count > 1)
                         {
                             var nextE = list[1];
-                            if (EventCompare.IsEventSequent(nowE, nextE))
+                            if (nowE.SuccessiveTo(nextE))
                             {
                                 RaiseSituationEvent(host, SituationType.ThisFirstIsStaticAndSequentWithNextHeadToRemove,
                                     () => { RemoveEvent(host, list, nowE); },
@@ -519,7 +520,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                     } // 若是首个event
                     else // 若不是首个event
                     {
-                        CommonEvent preE = list[index - 1];
+                        BasicEvent preE = list[index - 1];
                         //if (host is Element ele2 &&
                         //    ele2.TriggerList.Any(k => preE.EndTime >= k.StartTime && preE.StartTime <= k.EndTime) &&
                         //    ele2.LoopList.Any(k => preE.EndTime >= k.StartTime && preE.StartTime <= k.EndTime))
@@ -533,7 +534,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                         */
                         if (nowE.IsStatic()
                             && preE.IsStatic()
-                            && EventCompare.IsEventSequent(preE, nowE))
+                            && preE.SuccessiveTo(nowE))
                         {
                             RaiseSituationEvent(host, SituationType.ThisPrevIsStaticAndSequentToCombine,
                                 () =>
@@ -553,7 +554,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                         else if (nowE.IsSmallerThenMaxTime(host) /*||
                                  type == EventTypes.Fade && nowStartP.SequenceEqual(EventExtension.IneffectiveDictionary[EventTypes.Fade]) */
                                  && nowE.IsStatic()
-                                 && EventCompare.IsEventSequent(preE, nowE))
+                                 && preE.SuccessiveTo(nowE))
                         {
                             RaiseSituationEvent(host, SituationType.ThisIsStaticAndSequentWithPrevToCombine,
                                 () =>
@@ -578,7 +579,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                         {
                             if (index > 1 ||
                                 preE.EqualsMultiMinTime(host) ||
-                                preE.IsStatic() && EventCompare.IsEventSequent(preE, nowE))
+                                preE.IsStatic() && preE.SuccessiveTo(nowE))
                             {
                                 RaiseSituationEvent(host, SituationType.PrevIsStaticAndTimeOverlapWithThisStartTimeToRemove,
                                     () =>
@@ -597,7 +598,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             } // group的循环
         }
 
-        private static void RemoveEvent(IDetailedEventHost sourceHost, ICollection<CommonEvent> eventList, CommonEvent e)
+        private static void RemoveEvent(IDetailedEventHost sourceHost, ICollection<BasicEvent> eventList, BasicEvent e)
         {
             var success = sourceHost.Events.Remove(e);
             if (!success)
@@ -615,13 +616,13 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             eventList.Remove(e);
         }
 
-        private void RaiseSituationEvent(IDetailedEventHost host, SituationType situationType, Action continueAction, params ICommonEvent[] events)
+        private void RaiseSituationEvent(IDetailedEventHost host, SituationType situationType, Action continueAction, params IKeyEvent[] events)
         {
             RaiseSituationEvent(host, situationType, continueAction, null, events);
         }
 
         private void RaiseSituationEvent(IDetailedEventHost host, SituationType situationType, Action continueAction,
-            Action? breakAction, params ICommonEvent[] events)
+            Action? breakAction, params IKeyEvent[] events)
         {
             var sprite = host is ISubEventHost e ? e.BaseObject as Sprite : host as Sprite;
             var args = new SituationEventArgs(Guid, situationType)

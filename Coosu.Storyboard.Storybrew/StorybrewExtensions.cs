@@ -4,7 +4,6 @@ using System.Linq;
 using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Extensions.Optimizing;
 using Coosu.Storyboard.Storybrew;
-using OpenTK;
 using StorybrewCommon.Scripting;
 using StorybrewCommon.Storyboarding;
 
@@ -89,12 +88,12 @@ namespace Coosu.Storyboard
                     (int)animation.FrameDelay,
                     StorybrewInteropHelper.ConvertLoopType(animation.LoopType),
                     StorybrewInteropHelper.ConvertOrigin(animation.OriginType),
-                    new Vector2((float)animation.DefaultX,
+                    new OpenTK.Vector2((float)animation.DefaultX,
                         (float)animation.DefaultY));
             else
                 brewObj = brewLayer.CreateSprite(sprite.ImagePath,
                     StorybrewInteropHelper.ConvertOrigin(sprite.OriginType),
-                    new Vector2((float)sprite.DefaultX, (float)sprite.DefaultY)
+                    new OpenTK.Vector2((float)sprite.DefaultX, (float)sprite.DefaultY)
                 );
 
             InnerExecuteBrew(sprite, brewObj);
@@ -113,7 +112,7 @@ namespace Coosu.Storyboard
             }
         }
 
-        private static void InnerExecuteBrew(IDetailedEventHost eventHost, OsbSprite brewObj)
+        private static void InnerExecuteBrew(IEventHost eventHost, OsbSprite brewObj)
         {
             foreach (var commonEvent in eventHost.Events)
                 StorybrewInteropHelper.ExecuteEvent(commonEvent, brewObj);

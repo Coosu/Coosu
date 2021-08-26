@@ -14,9 +14,9 @@ namespace Coosu.Storyboard
         public double DefaultY { get; set; } = 240;
         public double DefaultZ { get; set; } = 1;
         public OriginType OriginType { get; set; } = OriginType.Centre;
-        public ICollection<ICommonEvent> Events { get; set; } = new List<ICommonEvent>();
+        public ICollection<IKeyEvent> Events { get; set; } = new List<IKeyEvent>();
 
-        public void AddEvent(ICommonEvent @event)
+        public void AddEvent(IKeyEvent @event)
         {
             Events.Add(@event);
         }
@@ -48,7 +48,7 @@ namespace Coosu.Storyboard
                 DefaultY = DefaultY,
                 DefaultZ = DefaultZ,
                 OriginType = OriginType,
-                Events = Events.Select(k=>k.Clone()).Cast<ICommonEvent>().ToList()
+                Events = Events.Select(k=>k.Clone()).Cast<IKeyEvent>().ToList()
             };
         }
     }

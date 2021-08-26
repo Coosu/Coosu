@@ -2,7 +2,7 @@
 
 namespace Coosu.Storyboard.OsbX.Actions
 {
-    public class Origin : CommonEvent
+    public class Origin : BasicEvent
     {
         public override EventType EventType => EventTypes.Scale;
 

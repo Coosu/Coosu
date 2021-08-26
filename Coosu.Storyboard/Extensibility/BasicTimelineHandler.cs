@@ -5,7 +5,7 @@ using Coosu.Storyboard.Events;
 
 namespace Coosu.Storyboard.Extensibility
 {
-    public abstract class BasicTimelineHandler<T> : ActionHandler<T> where T : CommonEvent, new()
+    public abstract class BasicTimelineHandler<T> : ActionHandler<T> where T : BasicEvent, new()
     {
         public override string Serialize(T raw)
         {

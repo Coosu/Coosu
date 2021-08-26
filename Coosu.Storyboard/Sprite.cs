@@ -32,8 +32,8 @@ namespace Coosu.Storyboard
         public string CameraIdentifier { get; set; }
 
         // EventHosts
-        public ICollection<ICommonEvent> Events { get; set; } =
-            new SortedSet<ICommonEvent>(new EventTimingComparer());
+        public ICollection<IKeyEvent> Events { get; set; } =
+            new SortedSet<IKeyEvent>(new EventTimingComparer());
 
         // ISceneObject
         public List<Loop> LoopList { get; } = new();
@@ -186,7 +186,7 @@ namespace Coosu.Storyboard
             await ScriptHelper.WriteElementEventsAsync(writer, this, EnableGroupedSerialization);
         }
 
-        public void AddEvent(ICommonEvent @event)
+        public void AddEvent(IKeyEvent @event)
         {
             if (_isLooping)
                 LoopList[LoopList.Count - 1].AddEvent(@event);
@@ -203,7 +203,7 @@ namespace Coosu.Storyboard
                 DefaultZ = DefaultZ,
                 CameraIdentifier = CameraIdentifier,
                 EnableGroupedSerialization = EnableGroupedSerialization,
-                Events = Events.Select(k => k.Clone()).Cast<ICommonEvent>().ToList(),
+                Events = Events.Select(k => k.Clone()).Cast<IKeyEvent>().ToList(),
             };
 
             sprite.LoopList.AddRange(LoopList.Select(k => k.Clone()).Cast<Loop>());

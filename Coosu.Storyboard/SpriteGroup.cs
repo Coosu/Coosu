@@ -69,13 +69,13 @@ namespace Coosu.Storyboard
 
         public bool EnableGroupedSerialization { get; set; }
 
-        public ICollection<ICommonEvent> Events
+        public ICollection<IKeyEvent> Events
         {
             get => Camera2.Events;
             set => Camera2.Events = value;
         }
 
-        public void AddEvent(ICommonEvent @event)
+        public void AddEvent(IKeyEvent @event)
         {
             Camera2.AddEvent(@event);
         }
