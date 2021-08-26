@@ -3,13 +3,34 @@
   <PropertyGroup>
     <TargetFrameworks>net452;net472;netcoreapp3.1;net5.0-windows</TargetFrameworks>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-    <UseWPF>true</UseWPF>
     <Description>Coosu.Storyboard.Advanced helps you to make some effects easily.</Description>
     <PackageTags>osu, osu!</PackageTags>
   </PropertyGroup>
 
+  <PropertyGroup Condition="$(TargetFramework) != 'net452'">
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup Condition="$(TargetFramework) == 'net452'">
+    <Reference Include="PresentationCore">
+      <HintPath>PresentationCore.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationFramework">
+      <HintPath>PresentationFramework.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\Coosu.Storyboard.Extensions\Coosu.Storyboard.Extensions.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="$(TargetFramework) == 'net452'">
+    <None Update="PresentationCore.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="PresentationFramework.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
