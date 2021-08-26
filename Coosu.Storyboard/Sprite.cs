@@ -30,7 +30,7 @@ namespace Coosu.Storyboard
         public double DefaultX { get; set; }
 
         public double DefaultZ { get; set; }
-        public string CameraIdentifier { get; set; }
+        public string CameraIdentifier { get; set; } = "00000000-0000-0000-0000-000000000000";
 
         // EventHosts
         public ICollection<IKeyEvent> Events { get; set; } =
