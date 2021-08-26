@@ -9,7 +9,7 @@ namespace Coosu.Storyboard
 
         private static readonly Dictionary<string, EventType> DictionaryStore = new(StringComparer.OrdinalIgnoreCase);
         private static readonly Dictionary<int, EventType> DictionaryStoreIndex = new();
-        private static readonly Dictionary<string, EventType> NonCommonDictionaryStore = new(StringComparer.OrdinalIgnoreCase);
+        private static readonly Dictionary<string, EventType> NonBasicDictionaryStore = new(StringComparer.OrdinalIgnoreCase);
 
         static EventTypes()
         {
@@ -31,7 +31,7 @@ namespace Coosu.Storyboard
             if (DictionaryStore.ContainsKey(type.Flag)) return;
             DictionaryStore.Add(type.Flag, type);
             DictionaryStoreIndex.Add(type.Index, type);
-            if (type.Size < 0) NonCommonDictionaryStore.Add(type.Flag, type);
+            if (type.Size < 0) NonBasicDictionaryStore.Add(type.Flag, type);
         }
 
         public static void SignType(string flag, int size, int index)
@@ -57,9 +57,9 @@ namespace Coosu.Storyboard
             return DictionaryStore.ContainsKey(flag);
         }
 
-        public static bool IsCommonEvent(string flag)
+        public static bool IsBasicEvent(string flag)
         {
-            return !NonCommonDictionaryStore.ContainsKey(flag);
+            return !NonBasicDictionaryStore.ContainsKey(flag);
         }
 
         #endregion

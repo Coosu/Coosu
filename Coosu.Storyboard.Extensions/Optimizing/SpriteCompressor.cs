@@ -14,7 +14,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
 {
     public class SpriteCompressor : IDisposable
     {
-        public CompressSettings Settings { get; }
+        public CompressOptions Options { get; }
         public event EventHandler<CompressorEventArgs>? OperationStart;
         public event EventHandler<CompressorEventArgs>? OperationEnd;
         public event EventHandler<ProcessErrorEventArgs>? ErrorOccured; //lock
@@ -37,24 +37,24 @@ namespace Coosu.Storyboard.Extensions.Optimizing
 
         public Guid Guid { get; } = Guid.NewGuid();
 
-        public SpriteCompressor(ICollection<ISceneObject> sprites, CompressSettings? compressSettings = null)
+        public SpriteCompressor(ICollection<ISceneObject> sprites, CompressOptions? compressSettings = null)
         {
             _sprites = sprites
                 .Where(k => k is Sprite)
                 .Cast<Sprite>()
                 .ToList();
             _sourceSprites = sprites;
-            Settings = compressSettings ?? new CompressSettings();
+            Options = compressSettings ?? new CompressOptions();
         }
 
-        public SpriteCompressor(Layer layer, CompressSettings? compressSettings = null)
+        public SpriteCompressor(Layer layer, CompressOptions? compressSettings = null)
         {
             _sprites = layer.SceneObjects
                 .Where(k => k is Sprite)
                 .Cast<Sprite>()
                 .ToList();
             _sourceSprites = layer.SceneObjects;
-            Settings = compressSettings ?? new CompressSettings();
+            Options = compressSettings ?? new CompressOptions();
         }
 
         //public int ThreadCount
@@ -132,7 +132,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                     _sprites
                         .AsParallel()
                         .WithCancellation(_cancelToken?.Token ?? CancellationToken.None)
-                        .WithDegreeOfParallelism(Settings.ThreadCount)
+                        .WithDegreeOfParallelism(Options.ThreadCount)
                         .ForAll(sprite =>
                         {
                             mrs.Wait();
@@ -239,7 +239,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             }
 
             sprite.Events = new HashSet<IKeyEvent>(sprite.Events);
-            sprite.StandardizeEvents(Settings.DiscretizingInterval, Settings.DiscretizingAccuracy);
+            sprite.StandardizeEvents(Options.DiscretizingInterval, Options.DiscretizingAccuracy);
             var obsoleteList = sprite.ComputeInvisibleRange(out var keyEvents);
             PreOptimize(sprite, obsoleteList, keyEvents);
             NormalOptimize(sprite);

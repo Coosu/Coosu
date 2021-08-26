@@ -10,9 +10,9 @@ namespace Coosu.Storyboard.OsbX
             host.Events.Add(basicEvent);
         }
 
-        public static void ApplyAction<T>(this IDetailedEventHost host, T commonEvent) where T : BasicEvent
+        public static void ApplyAction<T>(this IDetailedEventHost host, T basicEvent) where T : BasicEvent
         {
-            host.Events.Add(commonEvent);
+            host.Events.Add(basicEvent);
         }
     }
 }

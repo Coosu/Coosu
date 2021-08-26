@@ -83,7 +83,7 @@ namespace CoosuTest
             await layer.WriteScriptAsync(Console.Out);
             Console.WriteLine("==================");
             string? preP = null;
-            var compressor = new SpriteCompressor(layer, new CompressSettings
+            var compressor = new SpriteCompressor(layer, new CompressOptions
             {
                 DiscretizingAccuracy = 0,
                 ThreadCount = Environment.ProcessorCount + 1

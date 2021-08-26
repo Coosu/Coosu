@@ -426,7 +426,7 @@ namespace Coosu.Storyboard
 
                 int easing = int.MinValue, startTime = int.MinValue, endTime = int.MinValue;
 
-                if (EventTypes.IsCommonEvent(identifier))
+                if (EventTypes.IsBasicEvent(identifier))
                 {
                     easing = int.Parse(@params[1]);
                     if (easing is > 34 or < 0)
@@ -553,8 +553,8 @@ namespace Coosu.Storyboard
 
             void InjectEvent(Span<double> span)
             {
-                var commonEvent = BasicEvent.Create(eventType, (EasingType)easing, startTime, endTime, span);
-                currentObj.AddEvent(commonEvent);
+                var basicEvent = BasicEvent.Create(eventType, (EasingType)easing, startTime, endTime, span);
+                currentObj.AddEvent(basicEvent);
             }
         }
 

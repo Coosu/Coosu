@@ -5,7 +5,7 @@ using Coosu.Storyboard.Events;
 
 namespace Coosu.Storyboard
 {
-    public static class SpriteCommonEventExtensions
+    public static class SpriteBasicEventExtensions
     {
         // Move
         public static void Move(this IEventHost host, double startTime, Vector2 point) =>

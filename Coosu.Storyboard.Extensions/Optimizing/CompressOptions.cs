@@ -2,7 +2,7 @@
 
 namespace Coosu.Storyboard.Extensions.Optimizing
 {
-    public class CompressSettings
+    public class CompressOptions
     {
         /// <summary>
         /// Specific value that how many threads can be used when compressing.

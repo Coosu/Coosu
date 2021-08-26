@@ -40,6 +40,24 @@ namespace Coosu.Storyboard.Extensions.Computing
             return value;
         }
 
+        public static double[] ComputeFrame(IEnumerable<BasicEvent> events, EventType eventType, double time, int? accuracy)
+        {
+            var basicEvents = events
+                .OrderBy(k => k.StartTime)
+                .ToList();
+            if (basicEvents.Count == 0)
+                return eventType.GetDefaultValue() ?? throw new NotSupportedException(eventType.Flag + " doesn't have any default value.");
+
+            if (time < basicEvents[0].StartTime)
+                return basicEvents[0].Start.ToArray();
+
+            var e = basicEvents.FirstOrDefault(k => k.StartTime <= time && k.EndTime > time);
+            if (e != null) return KeyEventExtensions.ComputeFrame(e, time, accuracy);
+
+            var lastE = basicEvents.Last(k => k.EndTime <= time);
+            return lastE.End.ToArray();
+        }
+
         public static List<IKeyEvent> ComputeDiscretizedEvents(this BasicEvent e,
             int discretizingInterval,
             int? discretizingAccuracy)
