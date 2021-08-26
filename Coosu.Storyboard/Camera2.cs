@@ -9,10 +9,18 @@ namespace Coosu.Storyboard
 {
     public class Camera2 : IEventHost, ICameraUsable, ICloneable
     {
+        /// <inheritdoc />
         public string CameraIdentifier { get; set; } = Guid.NewGuid().ToString();
+
+        /// <inheritdoc />
         public double DefaultX { get; set; } = 320;
+
+        /// <inheritdoc />
         public double DefaultY { get; set; } = 240;
+
+        /// <inheritdoc />
         public double DefaultZ { get; set; } = 1;
+
         public OriginType OriginType { get; set; } = OriginType.Centre;
         public ICollection<IKeyEvent> Events { get; set; } = new List<IKeyEvent>();
 

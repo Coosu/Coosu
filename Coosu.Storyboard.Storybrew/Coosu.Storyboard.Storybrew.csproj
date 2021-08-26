@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Coosu.Storyboard.Extensions\Coosu.Storyboard.Extensions.csproj" />
+    <ProjectReference Include="..\Coosu.Storyboard.Advanced\Coosu.Storyboard.Advanced.csproj" />
     <ProjectReference Include="..\Libraries\storybrew\common\common.csproj" />
   </ItemGroup>
 

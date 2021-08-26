@@ -5,7 +5,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
     public class CompressOptions
     {
         /// <summary>
-        /// Specific value that how many threads can be used when compressing.
+        /// Specific value that how many threads can be used while compressing.
         /// <para>The default value is <see cref="Environment.ProcessorCount"/> - 1.</para>
         /// </summary>
         public int ThreadCount { get; set; } = Environment.ProcessorCount == 1 ? 1 : Environment.ProcessorCount - 1;

@@ -18,13 +18,6 @@ namespace Coosu.Storyboard
     public class Layer : ISpriteHost, IAdjustable
     {
         /// <summary>
-        /// Layer Z-distance.
-        /// The default value is 1.
-        /// The range of the value is from 0 to <see cref="double.MaxValue"/>
-        /// </summary>
-        public double ZDistance { get; set; }
-
-        /// <summary>
         /// Layer name.
         /// </summary>
         public string Name { get; set; }
@@ -35,18 +28,18 @@ namespace Coosu.Storyboard
         /// <param name="name"></param>
         public Layer(string name = "CoosuDefaultLayer")
         {
-            ZDistance = 1;
+            Camera2.DefaultZ = 1;
             Name = name;
         }
 
         /// <summary>
         /// Create a new layer.
         /// </summary>
-        /// <param name="zDistance">Layer Z-distance.</param>
+        /// <param name="defaultZ">Layer Z-distance.</param>
         /// <param name="name">Layer name.</param>
-        public Layer(double zDistance, string name = "CoosuDefaultLayer")
+        public Layer(double defaultZ, string name = "CoosuDefaultLayer")
         {
-            ZDistance = zDistance;
+            Camera2.DefaultZ = defaultZ;
             Name = name;
         }
 
@@ -577,7 +570,7 @@ namespace Coosu.Storyboard
 
         public object Clone()
         {
-            return new Layer(ZDistance, Name)
+            return new Layer(Camera2.DefaultZ, Name)
             {
                 SceneObjects = SceneObjects.Select(k => k.Clone()).Cast<ISceneObject>().ToList()
             };
@@ -598,12 +591,16 @@ namespace Coosu.Storyboard
         public double MaxStartTime => SceneObjects.Count == 0 ? 0 : SceneObjects.Max(k => k.MaxStartTime);
         public double MinEndTime => SceneObjects.Count == 0 ? 0 : SceneObjects.Min(k => k.MinEndTime);
 
-        public ICollection<Sprite> Sprites => SceneObjects
+        public IList<Sprite> Sprites => SceneObjects
             .Where(k => k is Sprite)
             .Cast<Sprite>()
             .ToList();
 
         public Camera2 Camera2 { get; } = new();
+        public void AddSprite(Sprite sprite)
+        {
+            AddObject(sprite);
+        }
 
         #endregion
     }

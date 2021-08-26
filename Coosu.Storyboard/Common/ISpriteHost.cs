@@ -9,15 +9,8 @@ namespace Coosu.Storyboard.Common
         double MinTime { get; }
         double MaxStartTime { get; }
         double MinEndTime { get; }
-        ICollection<Sprite> Sprites { get; }
+        IList<Sprite> Sprites { get; }
         Camera2 Camera2 { get; }
-    }
-
-    public struct State
-    {
-        public double X { get; set; }
-        public double Y { get; set; }
-        public double Scale { get; set; }
-        public double Rotation { get; set; }
+        void AddSprite(Sprite sprite);
     }
 }

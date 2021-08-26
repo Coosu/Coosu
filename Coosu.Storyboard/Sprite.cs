@@ -26,10 +26,14 @@ namespace Coosu.Storyboard
         public LayerType LayerType { get; }
         public OriginType OriginType { get; }
         public string ImagePath { get; }
-        public double DefaultY { get; set; }
+        /// <inheritdoc />
         public double DefaultX { get; set; }
+        /// <inheritdoc />
+        public double DefaultY { get; set; }
 
+        /// <inheritdoc />
         public double DefaultZ { get; set; }
+        /// <inheritdoc />
         public string CameraIdentifier { get; set; } = "00000000-0000-0000-0000-000000000000";
 
         // EventHosts

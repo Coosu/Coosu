@@ -127,7 +127,7 @@ namespace Coosu.Storyboard.OsbX
                             try
                             {
                                 var sprite = handler.Deserialize(split);
-                                var eg = em.GetOrAddLayer(sprite.DefaultZ);
+                                var eg = em.GetOrAddLayer(sprite.CameraIdentifier);
                                 eg.AddObject(sprite);
 
                                 lastSubject = sprite;

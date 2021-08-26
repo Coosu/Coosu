@@ -79,24 +79,28 @@ namespace Coosu.Storyboard
             Camera2.AddEvent(@event);
         }
 
+        /// <inheritdoc />
         public double DefaultX
         {
             get => Camera2.DefaultX;
             set => Camera2.DefaultX = value;
         }
 
+        /// <inheritdoc />
         public double DefaultY
         {
             get => Camera2.DefaultY;
             set => Camera2.DefaultY = value;
         }
 
+        /// <inheritdoc />
         public double DefaultZ
         {
             get => Camera2.DefaultZ;
             set => Camera2.DefaultZ = value;
         }
 
+        /// <inheritdoc />
         public string CameraIdentifier
         {
             get => Camera2.CameraIdentifier;
@@ -106,8 +110,12 @@ namespace Coosu.Storyboard
         #region ISpriteHost
 
         public Camera2 Camera2 { get; private set; } = new();
+        public void AddSprite(Sprite sprite)
+        {
+            Sprites.Add(sprite);
+        }
 
-        public ICollection<Sprite> Sprites { get; private set; } = new List<Sprite>();
+        public IList<Sprite> Sprites { get; private set; } = new List<Sprite>();
 
         public IEnumerator<Sprite> GetEnumerator()
         {

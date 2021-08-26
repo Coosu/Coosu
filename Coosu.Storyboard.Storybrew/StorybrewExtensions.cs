@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Extensions.Optimizing;
@@ -18,24 +19,26 @@ namespace Coosu.Storyboard
         /// <summary>
         /// Executing Coosu commands and optimizing automatically in storybrew.
         /// </summary>
-        /// <param name="layer">Specific Coosu <see cref="Layer"/>.</param>
+        /// <param name="sprite">Specific Coosu <see cref="Sprite"/>.</param>
+        /// <param name="layerName">Layer name.</param>
         /// <param name="brewObjectGenerator">Specific storybrew <see cref="StoryboardObjectGenerator"/>.</param>
         /// <param name="configureSettings">Configure compressing options.</param>
-        public static void ExecuteBrew(this Layer layer, StoryboardObjectGenerator brewObjectGenerator,
+        public static void ExecuteBrew(this Sprite sprite, string layerName, StoryboardObjectGenerator brewObjectGenerator,
             Action<CompressOptions>? configureSettings = null)
         {
-            ExecuteBrew(layer, brewObjectGenerator.GetLayer(layer.Name), configureSettings);
+            ExecuteBrew(new Layer(layerName) { SceneObjects = new List<ISceneObject> { sprite } }, brewObjectGenerator, configureSettings);
         }
 
         /// <summary>
         /// Executing Coosu commands and optimizing automatically in storybrew.
         /// </summary>
         /// <param name="layer">Specific Coosu <see cref="Layer"/>.</param>
-        /// <param name="brewLayer">Specific storybrew <see cref="StoryboardLayer"/>.</param>
+        /// <param name="brewObjectGenerator">Specific storybrew <see cref="StoryboardObjectGenerator"/>.</param>
         /// <param name="configureSettings">Configure compressing options.</param>
-        public static void ExecuteBrew(this Layer layer, StoryboardLayer brewLayer,
+        public static void ExecuteBrew(this Layer layer, StoryboardObjectGenerator brewObjectGenerator,
             Action<CompressOptions>? configureSettings = null)
         {
+            var brewLayer = brewObjectGenerator.GetLayer(layer.Name);
             void EventHandler(object _, ProcessErrorEventArgs e) => throw new Exception(e.Message);
 
             var compressor = new SpriteCompressor(layer);
@@ -51,19 +54,7 @@ namespace Coosu.Storyboard
                 InnerExecuteBrew(sprite, brewLayer, false, configureSettings);
             }
         }
-
-        /// <summary>
-        /// Executing Coosu commands and optimizing automatically in storybrew.
-        /// </summary>
-        /// <param name="sprite">Specific Coosu <see cref="Sprite"/>.</param>
-        /// <param name="brewLayer">Specific storybrew <see cref="StoryboardLayer"/>.</param>
-        /// <param name="configureSettings">Configure compressing options.</param>
-        public static void ExecuteBrew(this Sprite sprite, StoryboardLayer brewLayer,
-            Action<CompressOptions>? configureSettings = null)
-        {
-            InnerExecuteBrew(sprite, brewLayer, true, configureSettings);
-        }
-
+        
         private static void InnerExecuteBrew(Sprite sprite, StoryboardLayer brewLayer,
             bool optimize, Action<CompressOptions>? configureSettings)
         {

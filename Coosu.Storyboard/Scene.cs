@@ -9,45 +9,45 @@ namespace Coosu.Storyboard
     public class Scene : IScriptable, IAdjustable
     {
         public string Name { get; set; }
-        public Dictionary<double, Layer> Layers { get; } = new();
+        public Dictionary<string, Layer> Layers { get; } = new();
 
         public Scene(string name = "Scene")
         {
             Name = name;
         }
 
-        public bool ContainsLayer(double z)
+        public bool ContainsLayer(string cameraId)
         {
-            return Layers.ContainsKey(z);
+            return Layers.ContainsKey(cameraId);
         }
 
-        public Layer GetOrAddLayer(double z)
+        public Layer GetOrAddLayer(string cameraId)
         {
-            if (ContainsLayer(z))
-                return Layers[z];
-            return CreateLayer(z);
+            if (ContainsLayer(cameraId))
+                return Layers[cameraId];
+            return CreateLayer(cameraId);
         }
 
-        public Layer CreateLayer(double z)
+        public Layer CreateLayer(string cameraId)
         {
-            var elementGroup = new Layer(z);
-            Layers.Add(z, elementGroup);
+            var elementGroup = new Layer(cameraId);
+            Layers.Add(cameraId, elementGroup);
             return elementGroup;
         }
 
         public void AddLayer(Layer layer)
         {
-            Layers.Add(layer.ZDistance, layer);
+            Layers.Add(layer.Camera2.CameraIdentifier, layer);
         }
 
         public void DeleteLayer(Layer layer)
         {
-            Layers.Remove(layer.ZDistance);
+            Layers.Remove(layer.Camera2.CameraIdentifier);
         }
 
-        public void DeleteLayer(double z)
+        public void DeleteLayer(string cameraId)
         {
-            Layers.Remove(z);
+            Layers.Remove(cameraId);
         }
 
         public async Task WriteHeaderAsync(TextWriter writer)

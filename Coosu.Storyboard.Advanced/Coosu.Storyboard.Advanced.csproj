@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <TargetFrameworks>net452;net472;netcoreapp3.1;net5.0-windows</TargetFrameworks>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <UseWPF>true</UseWPF>
+    <Description>Coosu.Storyboard.Advanced helps you to make some effects easily.</Description>
+    <PackageTags>osu, osu!</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Coosu.Storyboard.Extensions\Coosu.Storyboard.Extensions.csproj" />
+  </ItemGroup>
+
+</Project>
