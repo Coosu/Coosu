@@ -2,7 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Coosu.Storyboard.Utils
+namespace Coosu.Shared
 {
     public static class TextWriterExtensions
     {

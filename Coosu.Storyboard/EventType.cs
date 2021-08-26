@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace Coosu.Storyboard
@@ -17,7 +16,7 @@ namespace Coosu.Storyboard
             Size = size;
             Index = index;
         }
-        
+
         public bool Equals(EventType other)
         {
             return Flag == other.Flag;

@@ -3,6 +3,8 @@
 namespace Coosu.Storyboard.Events
 {
     [Flags]
+#pragma warning disable format
+// @formatter:off
     public enum TriggerType
     {
         HitSound         = 0b0000,
@@ -15,4 +17,6 @@ namespace Coosu.Storyboard.Events
         HitSoundAddition = HitSoundWhistle | HitSoundClap | HitSoundFinish,
         HitSoundSample   = HitSoundSoft | HitSoundNormal | HitSoundDrum
     }
+// @formatter:on
+#pragma warning restore format
 }

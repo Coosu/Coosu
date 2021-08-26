@@ -149,67 +149,67 @@ namespace Coosu.Animation.WPF
 
                 ele.ApplyAnimation(k =>
                 {
-                    foreach (var commonEvent in sprite.Events)
+                    foreach (var keyEvent in sprite.Events)
                     {
-                        double startT = commonEvent.StartTime - min, endT = commonEvent.EndTime - min;
+                        double startT = keyEvent.StartTime - min, endT = keyEvent.EndTime - min;
 
-                        if (commonEvent.EventType == EventTypes.Move)
+                        if (keyEvent.EventType == EventTypes.Move)
                         {
-                            var evt = (Move)commonEvent;
+                            var evt = (Move)keyEvent;
                             k.Move((Easing)evt.Easing.GetEasingType(), startT, endT,
                                 new Vector2<double>(evt.StartX, evt.StartY),
                                 new Vector2<double>(evt.EndX, evt.EndY));
                         }
-                        else if (commonEvent.EventType == EventTypes.Fade)
+                        else if (keyEvent.EventType == EventTypes.Fade)
                         {
-                            var evt = (Fade)commonEvent;
+                            var evt = (Fade)keyEvent;
                             k.Fade((Easing)evt.Easing.GetEasingType(), startT, endT,
                                 evt.StartOpacity,
                                 evt.EndOpacity);
                         }
-                        else if (commonEvent.EventType == EventTypes.Scale)
+                        else if (keyEvent.EventType == EventTypes.Scale)
                         {
-                            var evt = (Scale)commonEvent;
+                            var evt = (Scale)keyEvent;
                             k.ScaleVec((Easing)evt.Easing.GetEasingType(), startT, endT,
                                 new Vector2<double>(evt.StartScale, evt.StartScale),
                                 new Vector2<double>(evt.EndScale, evt.EndScale));
                         }
-                        else if (commonEvent.EventType == EventTypes.Rotate)
+                        else if (keyEvent.EventType == EventTypes.Rotate)
                         {
-                            var evt = (Rotate)commonEvent;
+                            var evt = (Rotate)keyEvent;
                             k.Rotate((Easing)evt.Easing.GetEasingType(), startT, endT,
                                 evt.StartRotate,
                                 evt.EndRotate);
                         }
-                        else if (commonEvent.EventType == EventTypes.Color)
+                        else if (keyEvent.EventType == EventTypes.Color)
                         {
-                            var evt = (Storyboard.Events.Color)commonEvent;
+                            var evt = (Storyboard.Events.Color)keyEvent;
                             k.Color((Easing)evt.Easing.GetEasingType(), startT, endT,
                                 new Vector3<double>(evt.StartR, evt.StartG, evt.StartB),
                                 new Vector3<double>(evt.EndR, evt.EndG, evt.EndB));
                         }
-                        else if (commonEvent.EventType == EventTypes.MoveX)
+                        else if (keyEvent.EventType == EventTypes.MoveX)
                         {
-                            var evt = (MoveX)commonEvent;
+                            var evt = (MoveX)keyEvent;
                             k.MoveX((Easing)evt.Easing.GetEasingType(), startT, endT,
                                 evt.StartX, evt.EndX);
                         }
-                        else if (commonEvent.EventType == EventTypes.MoveY)
+                        else if (keyEvent.EventType == EventTypes.MoveY)
                         {
-                            var evt = (MoveY)commonEvent;
+                            var evt = (MoveY)keyEvent;
                             k.MoveY((Easing)evt.Easing.GetEasingType(), startT, endT,
                                 evt.StartY, evt.EndY);
                         }
-                        else if (commonEvent.EventType == EventTypes.Vector)
+                        else if (keyEvent.EventType == EventTypes.Vector)
                         {
-                            var evt = (Storyboard.Events.Vector)commonEvent;
+                            var evt = (Storyboard.Events.Vector)keyEvent;
                             k.ScaleVec((Easing)evt.Easing.GetEasingType(), startT, endT,
                                 new Vector2<double>(evt.StartScaleX, evt.StartScaleY),
                                 new Vector2<double>(evt.EndScaleX, evt.EndScaleY));
                         }
-                        else if (commonEvent.EventType == EventTypes.Parameter)
+                        else if (keyEvent.EventType == EventTypes.Parameter)
                         {
-                            var evt = (Parameter)commonEvent;
+                            var evt = (Parameter)keyEvent;
                             switch (evt.Type)
                             {
                                 case ParameterType.Horizontal:
@@ -225,10 +225,10 @@ namespace Coosu.Animation.WPF
                                     throw new ArgumentOutOfRangeException();
                             }
                         }
-                        else if (commonEvent.EventType == EventTypes.Loop)
+                        else if (keyEvent.EventType == EventTypes.Loop)
                         {
                         }
-                        else if (commonEvent.EventType == EventTypes.Trigger)
+                        else if (keyEvent.EventType == EventTypes.Trigger)
                         {
                         }
                     }

@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Easing;
 using Coosu.Storyboard.Extensions;
 
@@ -6,58 +7,58 @@ using Coosu.Storyboard.Extensions;
 namespace Coosu.Storyboard
 {
     /// <summary>
-    /// Extension methods for <see cref="Sprite"/>.
+    /// Extension methods for <see cref="host"/>.
     /// This includes relative events.
     /// </summary>
-    public static class SpriteEventExtensions
+    public static class SpriteRelativeEventExtensions
     {
         #region Move
 
         /// <summary>
         /// Move by relative displacement.
         /// </summary>
-        /// <param name="sprite">Specific sprite.</param>
+        /// <param name="host">Specific host.</param>
         /// <param name="startTime">Event start time.</param>
         /// <param name="endTime">Event end time.</param>
         /// <param name="point">Relative displacement.</param>
-        public static void MoveBy(this Sprite sprite,
+        public static void MoveBy(this IEventHost host,
             double startTime, double endTime,
             Vector2 point) =>
-            sprite.AddEventRelative(MoreEventTypes.MoveBy, LinearEase.Instance, startTime, endTime, point.X, point.Y);
+            host.AddEventRelative(MoreEventTypes.MoveBy, LinearEase.Instance, startTime, endTime, point.X, point.Y);
 
         /// <summary>
         /// Move by relative displacement.
         /// </summary>
-        /// <param name="sprite">Specific sprite.</param>
+        /// <param name="host">Specific host.</param>
         /// <param name="startTime">Event start time.</param>
         /// <param name="endTime">Event end time.</param>
         /// <param name="x">Relative x.</param>
         /// <param name="y">Relative y.</param>
-        public static void MoveBy(this Sprite sprite,
+        public static void MoveBy(this IEventHost host,
             double startTime, double endTime,
             double x, double y) =>
-            sprite.AddEventRelative(MoreEventTypes.MoveBy, LinearEase.Instance, startTime, endTime, x, y);
+            host.AddEventRelative(MoreEventTypes.MoveBy, LinearEase.Instance, startTime, endTime, x, y);
 
         /// <summary>
         /// Move by relative displacement.
         /// </summary>
-        /// <param name="sprite">Specific sprite.</param>
+        /// <param name="host">Specific host.</param>
         /// <param name="easing">Easing. This parameter can be <see cref="EasingFunctionBase"/>,
         ///     <see cref="EasingType"/> or
         ///     index integer of <see cref="EasingType"/>.</param>
         /// <param name="startTime">Event start time.</param>
         /// <param name="endTime">Event end time.</param>
         /// <param name="point">Relative displacement.</param>
-        public static void MoveBy(this Sprite sprite,
+        public static void MoveBy(this IEventHost host,
             EasingFunctionBase easing,
             double startTime, double endTime,
             Vector2 point) =>
-            sprite.AddEventRelative(MoreEventTypes.MoveBy, easing, startTime, endTime, point.X, point.Y);
+            host.AddEventRelative(MoreEventTypes.MoveBy, easing, startTime, endTime, point.X, point.Y);
 
         /// <summary>
         /// Move by relative displacement.
         /// </summary>
-        /// <param name="sprite">Specific sprite.</param>
+        /// <param name="host">Specific host.</param>
         /// <param name="easing">Easing. This parameter can be <see cref="EasingFunctionBase"/>,
         ///     <see cref="EasingType"/> or
         ///     index integer of <see cref="EasingType"/>.</param>
@@ -65,11 +66,11 @@ namespace Coosu.Storyboard
         /// <param name="endTime">Event end time.</param>
         /// <param name="x">Relative x.</param>
         /// <param name="y">Relative y.</param>
-        public static void MoveBy(this Sprite sprite,
+        public static void MoveBy(this IEventHost host,
             EasingFunctionBase easing,
             double startTime, double endTime,
             double x, double y) =>
-            sprite.AddEventRelative(MoreEventTypes.MoveBy, easing, startTime, endTime, x, y);
+            host.AddEventRelative(MoreEventTypes.MoveBy, easing, startTime, endTime, x, y);
 
         #endregion
 
@@ -78,30 +79,30 @@ namespace Coosu.Storyboard
         /// <summary>
         /// Fade by relative opacity.
         /// </summary>
-        /// <param name="sprite">Specific sprite.</param>
+        /// <param name="host">Specific host.</param>
         /// <param name="startTime">Event start time.</param>
         /// <param name="endTime">Event end time.</param>
         /// <param name="opacity">Relative opacity.</param>
-        public static void FadeBy(this Sprite sprite,
+        public static void FadeBy(this IEventHost host,
             double startTime, double endTime,
             double opacity) =>
-            sprite.AddEventRelative(MoreEventTypes.FadeBy, LinearEase.Instance, startTime, endTime, opacity);
+            host.AddEventRelative(MoreEventTypes.FadeBy, LinearEase.Instance, startTime, endTime, opacity);
 
         /// <summary>
         /// Fade by relative opacity.
         /// </summary>
-        /// <param name="sprite">Specific sprite.</param>
+        /// <param name="host">Specific host.</param>
         /// <param name="easing">Easing. This parameter can be <see cref="EasingFunctionBase"/>,
         ///     <see cref="EasingType"/> or
         ///     index integer of <see cref="EasingType"/>.</param>
         /// <param name="startTime">Event start time.</param>
         /// <param name="endTime">Event end time.</param>
         /// <param name="opacity">Relative opacity.</param>
-        public static void FadeBy(this Sprite sprite
+        public static void FadeBy(this IEventHost host
             , EasingFunctionBase easing,
             double startTime, double endTime,
             double opacity) =>
-            sprite.AddEventRelative(MoreEventTypes.FadeBy, easing, startTime, endTime, opacity);
+            host.AddEventRelative(MoreEventTypes.FadeBy, easing, startTime, endTime, opacity);
 
         #endregion
 
@@ -110,30 +111,30 @@ namespace Coosu.Storyboard
         /// <summary>
         /// Scale by relative size.
         /// </summary>
-        /// <param name="sprite">Specific sprite.</param>
+        /// <param name="host">Specific host.</param>
         /// <param name="startTime">Event start time.</param>
         /// <param name="endTime">Event end time.</param>
         /// <param name="scale">Relative size.</param>
-        public static void ScaleBy(this Sprite sprite,
+        public static void ScaleBy(this IEventHost host,
             double startTime, double endTime,
             double scale) =>
-            sprite.AddEventRelative(MoreEventTypes.ScaleBy, LinearEase.Instance, startTime, endTime, scale);
+            host.AddEventRelative(MoreEventTypes.ScaleBy, LinearEase.Instance, startTime, endTime, scale);
 
         /// <summary>
         /// Scale by relative size.
         /// </summary>
-        /// <param name="sprite">Specific sprite.</param>
+        /// <param name="host">Specific host.</param>
         /// <param name="easing">Easing. This parameter can be <see cref="EasingFunctionBase"/>,
         ///     <see cref="EasingType"/> or
         ///     index integer of <see cref="EasingType"/>.</param>
         /// <param name="startTime">Event start time.</param>
         /// <param name="endTime">Event end time.</param>
         /// <param name="scale">Relative size.</param>
-        public static void ScaleBy(this Sprite sprite,
+        public static void ScaleBy(this IEventHost host,
             EasingFunctionBase easing,
             double startTime, double endTime,
             double scale) =>
-            sprite.AddEventRelative(MoreEventTypes.ScaleBy, easing, startTime, endTime, scale);
+            host.AddEventRelative(MoreEventTypes.ScaleBy, easing, startTime, endTime, scale);
 
         #endregion
 
@@ -142,30 +143,30 @@ namespace Coosu.Storyboard
         /// <summary>
         /// Rotate by relative rotation.
         /// </summary>
-        /// <param name="sprite">Specific sprite.</param>
+        /// <param name="host">Specific host.</param>
         /// <param name="startTime">Event start time.</param>
         /// <param name="endTime">Event end time.</param>
         /// <param name="rotate">Relative rotation.</param>
-        public static void RotateBy(this Sprite sprite,
+        public static void RotateBy(this IEventHost host,
             double startTime, double endTime,
             double rotate) =>
-            sprite.AddEventRelative(MoreEventTypes.RotateBy, LinearEase.Instance, startTime, endTime, rotate);
+            host.AddEventRelative(MoreEventTypes.RotateBy, LinearEase.Instance, startTime, endTime, rotate);
 
         /// <summary>
         /// Rotate by relative rotation.
         /// </summary>
-        /// <param name="sprite">Specific sprite.</param>
+        /// <param name="host">Specific host.</param>
         /// <param name="easing">Easing. This parameter can be <see cref="EasingFunctionBase"/>,
         ///     <see cref="EasingType"/> or
         ///     index integer of <see cref="EasingType"/>.</param>
         /// <param name="startTime">Event start time.</param>
         /// <param name="endTime">Event end time.</param>
         /// <param name="rotate">Relative rotation.</param>
-        public static void RotateBy(this Sprite sprite,
+        public static void RotateBy(this IEventHost host,
             EasingFunctionBase easing,
             double startTime, double endTime,
             double rotate) =>
-            sprite.AddEventRelative(MoreEventTypes.RotateBy, easing, startTime, endTime, rotate);
+            host.AddEventRelative(MoreEventTypes.RotateBy, easing, startTime, endTime, rotate);
 
         #endregion
 
@@ -174,30 +175,30 @@ namespace Coosu.Storyboard
         /// <summary>
         /// Move by relative x.
         /// </summary>
-        /// <param name="sprite">Specific sprite.</param>
+        /// <param name="host">Specific host.</param>
         /// <param name="startTime">Event start time.</param>
         /// <param name="endTime">Event end time.</param>
         /// <param name="x">Relative x.</param>
-        public static void MoveXBy(this Sprite sprite,
+        public static void MoveXBy(this IEventHost host,
             double startTime, double endTime,
             double x) =>
-            sprite.AddEventRelative(MoreEventTypes.MoveXBy, LinearEase.Instance, startTime, endTime, x);
+            host.AddEventRelative(MoreEventTypes.MoveXBy, LinearEase.Instance, startTime, endTime, x);
 
         /// <summary>
         /// Move by relative x.
         /// </summary>
-        /// <param name="sprite">Specific sprite.</param>
+        /// <param name="host">Specific host.</param>
         /// <param name="easing">Easing. This parameter can be <see cref="EasingFunctionBase"/>,
         ///     <see cref="EasingType"/> or
         ///     index integer of <see cref="EasingType"/>.</param>
         /// <param name="startTime">Event start time.</param>
         /// <param name="endTime">Event end time.</param>
         /// <param name="x">Relative x.</param>
-        public static void MoveXBy(this Sprite sprite,
+        public static void MoveXBy(this IEventHost host,
             EasingFunctionBase easing,
             double startTime, double endTime,
             double x) =>
-            sprite.AddEventRelative(MoreEventTypes.MoveXBy, easing, startTime, endTime, x);
+            host.AddEventRelative(MoreEventTypes.MoveXBy, easing, startTime, endTime, x);
 
         #endregion
 
@@ -206,30 +207,30 @@ namespace Coosu.Storyboard
         /// <summary>
         /// Move by relative y.
         /// </summary>
-        /// <param name="sprite">Specific sprite.</param>
+        /// <param name="host">Specific host.</param>
         /// <param name="startTime">Event start time.</param>
         /// <param name="endTime">Event end time.</param>
         /// <param name="y">Relative y.</param>
-        public static void MoveYBy(this Sprite sprite,
+        public static void MoveYBy(this IEventHost host,
             double startTime, double endTime,
             double y) =>
-            sprite.AddEventRelative(MoreEventTypes.MoveYBy, LinearEase.Instance, startTime, endTime, y);
+            host.AddEventRelative(MoreEventTypes.MoveYBy, LinearEase.Instance, startTime, endTime, y);
 
         /// <summary>
         /// Move by relative y.
         /// </summary>
-        /// <param name="sprite">Specific sprite.</param>
+        /// <param name="host">Specific host.</param>
         /// <param name="easing">Easing. This parameter can be <see cref="EasingFunctionBase"/>,
         ///     <see cref="EasingType"/> or
         ///     index integer of <see cref="EasingType"/>.</param>
         /// <param name="startTime">Event start time.</param>
         /// <param name="endTime">Event end time.</param>
         /// <param name="y">Relative y.</param>
-        public static void MoveYBy(this Sprite sprite,
+        public static void MoveYBy(this IEventHost host,
             EasingFunctionBase easing,
             double startTime, double endTime,
             double y) =>
-            sprite.AddEventRelative(MoreEventTypes.MoveYBy, easing, startTime, endTime, y);
+            host.AddEventRelative(MoreEventTypes.MoveYBy, easing, startTime, endTime, y);
 
         #endregion
 
@@ -238,50 +239,50 @@ namespace Coosu.Storyboard
         /// <summary>
         /// Color by relative rgb values.
         /// </summary>
-        /// <param name="sprite">Specific sprite.</param>
+        /// <param name="host">Specific host.</param>
         /// <param name="startTime">Event start time.</param>
         /// <param name="endTime">Event end time.</param>
         /// <param name="color">Relative color. The range of each value is 0-255.</param>
-        public static void ColorBy(this Sprite sprite,
+        public static void ColorBy(this IEventHost host,
             double startTime, double endTime,
             Vector3 color) =>
-            sprite.AddEventRelative(MoreEventTypes.ColorBy, LinearEase.Instance, startTime, endTime, color.X, color.Y,
+            host.AddEventRelative(MoreEventTypes.ColorBy, LinearEase.Instance, startTime, endTime, color.X, color.Y,
                 color.Z);
 
         /// <summary>
         /// Color by relative rgb values.
         /// </summary>
-        /// <param name="sprite">Specific sprite.</param>
+        /// <param name="host">Specific host.</param>
         /// <param name="startTime">Event start time.</param>
         /// <param name="endTime">Event end time.</param>
         /// <param name="r">Relative R. The range of the value is 0-255.</param>
         /// <param name="g">Relative G. The range of the value is 0-255.</param>
         /// <param name="b">Relative B. The range of the value is 0-255.</param>
-        public static void ColorBy(this Sprite sprite,
+        public static void ColorBy(this IEventHost host,
             double startTime, double endTime,
             byte r, byte g, byte b) =>
-            sprite.AddEventRelative(MoreEventTypes.VectorBy, LinearEase.Instance, startTime, endTime, r, g, b);
+            host.AddEventRelative(MoreEventTypes.VectorBy, LinearEase.Instance, startTime, endTime, r, g, b);
 
         /// <summary>
         /// Color by relative rgb values.
         /// </summary>
-        /// <param name="sprite">Specific sprite.</param>
+        /// <param name="host">Specific host.</param>
         /// <param name="easing">Easing. This parameter can be <see cref="EasingFunctionBase"/>,
         ///     <see cref="EasingType"/> or
         ///     index integer of <see cref="EasingType"/>.</param>
         /// <param name="startTime">Event start time.</param>
         /// <param name="endTime">Event end time.</param>
         /// <param name="color">Relative color. The range of each value is 0-255.</param>
-        public static void ColorBy(this Sprite sprite,
+        public static void ColorBy(this IEventHost host,
             EasingFunctionBase easing,
             double startTime, double endTime,
             Vector3 color) =>
-            sprite.AddEventRelative(MoreEventTypes.ColorBy, easing, startTime, endTime, color.X, color.Y, color.Z);
+            host.AddEventRelative(MoreEventTypes.ColorBy, easing, startTime, endTime, color.X, color.Y, color.Z);
 
         /// <summary>
         /// Color by relative rgb values.
         /// </summary>
-        /// <param name="sprite">Specific sprite.</param>
+        /// <param name="host">Specific host.</param>
         /// <param name="easing">Easing. This parameter can be <see cref="EasingFunctionBase"/>,
         ///     <see cref="EasingType"/> or
         ///     index integer of <see cref="EasingType"/>.</param>
@@ -290,11 +291,11 @@ namespace Coosu.Storyboard
         /// <param name="r">Relative R. The range of the value is 0-255.</param>
         /// <param name="g">Relative G. The range of the value is 0-255.</param>
         /// <param name="b">Relative B. The range of the value is 0-255.</param>
-        public static void ColorBy(this Sprite sprite,
+        public static void ColorBy(this IEventHost host,
             EasingFunctionBase easing,
             double startTime, double endTime,
             byte r, byte g, byte b) =>
-            sprite.AddEventRelative(MoreEventTypes.VectorBy, easing, startTime, endTime, r, g, b);
+            host.AddEventRelative(MoreEventTypes.VectorBy, easing, startTime, endTime, r, g, b);
 
         #endregion
 
@@ -303,49 +304,49 @@ namespace Coosu.Storyboard
         /// <summary>
         /// Vector by relative size.
         /// </summary>
-        /// <param name="sprite">Specific sprite.</param>
+        /// <param name="host">Specific host.</param>
         /// <param name="startTime">Event start time.</param>
         /// <param name="endTime">Event end time.</param>
         /// <param name="vector">Relative vector.</param>
-        public static void VectorBy(this Sprite sprite,
+        public static void VectorBy(this IEventHost host,
             double startTime, double endTime,
             Vector2 vector) =>
-            sprite.AddEventRelative(MoreEventTypes.VectorBy, LinearEase.Instance, startTime, endTime, vector.X,
+            host.AddEventRelative(MoreEventTypes.VectorBy, LinearEase.Instance, startTime, endTime, vector.X,
                 vector.Y);
 
         /// <summary>
         /// Vector by relative size.
         /// </summary>
-        /// <param name="sprite">Specific sprite.</param>
+        /// <param name="host">Specific host.</param>
         /// <param name="startTime">Event start time.</param>
         /// <param name="endTime">Event end time.</param>
         /// <param name="x">Relative x.</param>
         /// <param name="y">Relative y.</param>
-        public static void VectorBy(this Sprite sprite,
+        public static void VectorBy(this IEventHost host,
             double startTime, double endTime,
             double x, double y) =>
-            sprite.AddEventRelative(MoreEventTypes.VectorBy, LinearEase.Instance, startTime, endTime, x, y);
+            host.AddEventRelative(MoreEventTypes.VectorBy, LinearEase.Instance, startTime, endTime, x, y);
 
         /// <summary>
         /// Vector by relative size.
         /// </summary>
-        /// <param name="sprite">Specific sprite.</param>
+        /// <param name="host">Specific host.</param>
         /// <param name="easing">Easing. This parameter can be <see cref="EasingFunctionBase"/>,
         ///     <see cref="EasingType"/> or
         ///     index integer of <see cref="EasingType"/>.</param>
         /// <param name="startTime">Event start time.</param>
         /// <param name="endTime">Event end time.</param>
         /// <param name="vector">Relative vector.</param>
-        public static void VectorBy(this Sprite sprite,
+        public static void VectorBy(this IEventHost host,
             EasingFunctionBase easing,
             double startTime, double endTime,
             Vector2 vector) =>
-            sprite.AddEventRelative(MoreEventTypes.VectorBy, easing, startTime, endTime, vector.X, vector.Y);
+            host.AddEventRelative(MoreEventTypes.VectorBy, easing, startTime, endTime, vector.X, vector.Y);
 
         /// <summary>
         /// Vector by relative size.
         /// </summary>
-        /// <param name="sprite">Specific sprite.</param>
+        /// <param name="host">Specific host.</param>
         /// <param name="easing">Easing. This parameter can be <see cref="EasingFunctionBase"/>,
         ///     <see cref="EasingType"/> or
         ///     index integer of <see cref="EasingType"/>.</param>
@@ -353,33 +354,33 @@ namespace Coosu.Storyboard
         /// <param name="endTime">Event end time.</param>
         /// <param name="x">Relative x.</param>
         /// <param name="y">Relative y.</param>
-        public static void VectorBy(this Sprite sprite,
+        public static void VectorBy(this IEventHost host,
             EasingFunctionBase easing,
             double startTime, double endTime,
             double x, double y) =>
-            sprite.AddEventRelative(MoreEventTypes.VectorBy, easing, startTime, endTime, x, y);
+            host.AddEventRelative(MoreEventTypes.VectorBy, easing, startTime, endTime, x, y);
 
         #endregion
 
-        private static void AddEventRelative(this Sprite sprite, EventType e, EasingFunctionBase easing,
+        private static void AddEventRelative(this IEventHost host, EventType e, EasingFunctionBase easing,
             double startTime, double endTime,
             double x)
         {
-            sprite.AddEvent(new RelativeEvent(e, easing, startTime, endTime, new[] { x }));
+            host.AddEvent(new RelativeEvent(e, easing, startTime, endTime, new[] { x }));
         }
 
-        private static void AddEventRelative(this Sprite sprite, EventType e, EasingFunctionBase easing,
+        private static void AddEventRelative(this IEventHost host, EventType e, EasingFunctionBase easing,
             double startTime, double endTime,
             double x, double y)
         {
-            sprite.AddEvent(new RelativeEvent(e, easing, startTime, endTime, new[] { x, y }));
+            host.AddEvent(new RelativeEvent(e, easing, startTime, endTime, new[] { x, y }));
         }
 
-        private static void AddEventRelative(this Sprite sprite, EventType e, EasingFunctionBase easing,
+        private static void AddEventRelative(this IEventHost host, EventType e, EasingFunctionBase easing,
             double startTime, double endTime,
             double x, double y, double z)
         {
-            sprite.AddEvent(new RelativeEvent(e, easing, startTime, endTime, new[] { x, y, z }));
+            host.AddEvent(new RelativeEvent(e, easing, startTime, endTime, new[] { x, y, z }));
         }
     }
 }

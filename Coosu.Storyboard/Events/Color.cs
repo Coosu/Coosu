@@ -3,7 +3,7 @@ using Coosu.Storyboard.Easing;
 
 namespace Coosu.Storyboard.Events
 {
-    public sealed class Color : CommonEvent
+    public sealed class Color : BasicEvent
     {
         public override EventType EventType => EventTypes.Color;
 

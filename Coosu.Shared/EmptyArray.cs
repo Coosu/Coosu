@@ -2,7 +2,7 @@
 using System;
 #endif
 
-namespace Coosu.Storyboard.Utils
+namespace Coosu.Shared
 {
     public static class EmptyArray<T>
     {

@@ -4,7 +4,6 @@ using System.Linq;
 using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Extensions.Optimizing;
 using Coosu.Storyboard.Storybrew;
-using OpenTK;
 using StorybrewCommon.Scripting;
 using StorybrewCommon.Storyboarding;
 
@@ -23,7 +22,7 @@ namespace Coosu.Storyboard
         /// <param name="brewObjectGenerator">Specific storybrew <see cref="StoryboardObjectGenerator"/>.</param>
         /// <param name="configureSettings">Configure compressing options.</param>
         public static void ExecuteBrew(this Layer layer, StoryboardObjectGenerator brewObjectGenerator,
-            Action<CompressSettings>? configureSettings = null)
+            Action<CompressOptions>? configureSettings = null)
         {
             ExecuteBrew(layer, brewObjectGenerator.GetLayer(layer.Name), configureSettings);
         }
@@ -35,12 +34,12 @@ namespace Coosu.Storyboard
         /// <param name="brewLayer">Specific storybrew <see cref="StoryboardLayer"/>.</param>
         /// <param name="configureSettings">Configure compressing options.</param>
         public static void ExecuteBrew(this Layer layer, StoryboardLayer brewLayer,
-            Action<CompressSettings>? configureSettings = null)
+            Action<CompressOptions>? configureSettings = null)
         {
             void EventHandler(object _, ProcessErrorEventArgs e) => throw new Exception(e.Message);
 
             var compressor = new SpriteCompressor(layer);
-            configureSettings?.Invoke(compressor.Settings);
+            configureSettings?.Invoke(compressor.Options);
 
             compressor.ErrorOccured += EventHandler;
             compressor.CompressAsync().Wait();
@@ -60,13 +59,13 @@ namespace Coosu.Storyboard
         /// <param name="brewLayer">Specific storybrew <see cref="StoryboardLayer"/>.</param>
         /// <param name="configureSettings">Configure compressing options.</param>
         public static void ExecuteBrew(this Sprite sprite, StoryboardLayer brewLayer,
-            Action<CompressSettings>? configureSettings = null)
+            Action<CompressOptions>? configureSettings = null)
         {
             InnerExecuteBrew(sprite, brewLayer, true, configureSettings);
         }
 
         private static void InnerExecuteBrew(Sprite sprite, StoryboardLayer brewLayer,
-            bool optimize, Action<CompressSettings>? configureSettings)
+            bool optimize, Action<CompressOptions>? configureSettings)
         {
             if (optimize)
             {
@@ -74,7 +73,7 @@ namespace Coosu.Storyboard
 
                 var sceneObjects = new List<ISceneObject> { sprite };
                 var compressor = new SpriteCompressor(sceneObjects);
-                configureSettings?.Invoke(compressor.Settings);
+                configureSettings?.Invoke(compressor.Options);
 
                 compressor.ErrorOccured += EventHandler;
                 compressor.CompressAsync().Wait();
@@ -89,12 +88,12 @@ namespace Coosu.Storyboard
                     (int)animation.FrameDelay,
                     StorybrewInteropHelper.ConvertLoopType(animation.LoopType),
                     StorybrewInteropHelper.ConvertOrigin(animation.OriginType),
-                    new Vector2((float)animation.DefaultX,
+                    new OpenTK.Vector2((float)animation.DefaultX,
                         (float)animation.DefaultY));
             else
                 brewObj = brewLayer.CreateSprite(sprite.ImagePath,
                     StorybrewInteropHelper.ConvertOrigin(sprite.OriginType),
-                    new Vector2((float)sprite.DefaultX, (float)sprite.DefaultY)
+                    new OpenTK.Vector2((float)sprite.DefaultX, (float)sprite.DefaultY)
                 );
 
             InnerExecuteBrew(sprite, brewObj);
@@ -115,8 +114,8 @@ namespace Coosu.Storyboard
 
         private static void InnerExecuteBrew(IEventHost eventHost, OsbSprite brewObj)
         {
-            foreach (var commonEvent in eventHost.Events)
-                StorybrewInteropHelper.ExecuteEvent(commonEvent, brewObj);
+            foreach (var keyEvent in eventHost.Events)
+                StorybrewInteropHelper.ExecuteEvent(keyEvent, brewObj);
         }
     }
 }

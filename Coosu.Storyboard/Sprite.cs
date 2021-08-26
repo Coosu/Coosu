@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Coosu.Shared;
 using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Events;
 using Coosu.Storyboard.Utils;
@@ -28,12 +29,12 @@ namespace Coosu.Storyboard
         public double DefaultY { get; set; }
         public double DefaultX { get; set; }
 
-        public double ZDistance { get; set; }
-        public int CameraId { get; set; }
+        public double DefaultZ { get; set; }
+        public string CameraIdentifier { get; set; } = "00000000-0000-0000-0000-000000000000";
 
         // EventHosts
-        public ICollection<ICommonEvent> Events { get; set; } =
-            new SortedSet<ICommonEvent>(new EventTimingComparer());
+        public ICollection<IKeyEvent> Events { get; set; } =
+            new SortedSet<IKeyEvent>(new EventTimingComparer());
 
         // ISceneObject
         public List<Loop> LoopList { get; } = new();
@@ -186,7 +187,7 @@ namespace Coosu.Storyboard
             await ScriptHelper.WriteElementEventsAsync(writer, this, EnableGroupedSerialization);
         }
 
-        public void AddEvent(ICommonEvent @event)
+        public void AddEvent(IKeyEvent @event)
         {
             if (_isLooping)
                 LoopList[LoopList.Count - 1].AddEvent(@event);
@@ -200,10 +201,10 @@ namespace Coosu.Storyboard
         {
             var sprite = new Sprite(LayerType, OriginType, ImagePath, DefaultX, DefaultY)
             {
-                ZDistance = ZDistance,
-                CameraId = CameraId,
+                DefaultZ = DefaultZ,
+                CameraIdentifier = CameraIdentifier,
                 EnableGroupedSerialization = EnableGroupedSerialization,
-                Events = Events.Select(k => k.Clone()).Cast<ICommonEvent>().ToList(),
+                Events = Events.Select(k => k.Clone()).Cast<IKeyEvent>().ToList(),
             };
 
             sprite.LoopList.AddRange(LoopList.Select(k => k.Clone()).Cast<Loop>());

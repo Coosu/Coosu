@@ -1,9 +1,8 @@
-﻿using System;
-using Coosu.Storyboard.Easing;
+﻿using Coosu.Storyboard.Easing;
 
 namespace Coosu.Storyboard.Common
 {
-    public interface ICommonEvent : IEvent, IScriptable
+    public interface IKeyEvent : IEvent, IScriptable
     {
         EasingFunctionBase Easing { get; set; }
         double[] Start { get; set; }

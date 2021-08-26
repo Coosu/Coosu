@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Coosu.Shared;
 using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Utils;
 
@@ -17,8 +18,8 @@ namespace Coosu.Storyboard.Events
         public EventType EventType { get; } = EventTypes.Trigger;
 
         public bool EnableGroupedSerialization { get; set; } /*= true;*/
-        public ICollection<ICommonEvent> Events { get; set; } =
-            new SortedSet<ICommonEvent>(new EventTimingComparer());
+        public ICollection<IKeyEvent> Events { get; set; } =
+            new SortedSet<IKeyEvent>(new EventTimingComparer());
 
         public double StartTime { get; set; }
         public double EndTime { get; set; }
@@ -115,7 +116,7 @@ namespace Coosu.Storyboard.Events
         {
             StartTime += offset;
         }
-        public void AddEvent(ICommonEvent @event)
+        public void AddEvent(IKeyEvent @event)
         {
             Events.Add(@event);
         }
@@ -130,7 +131,7 @@ namespace Coosu.Storyboard.Events
         {
             var trigger = new Trigger(StartTime, EndTime, TriggerName)
             {
-                Events = Events.Select(k => k.Clone()).Cast<ICommonEvent>().ToList(),
+                Events = Events.Select(k => k.Clone()).Cast<IKeyEvent>().ToList(),
                 EnableGroupedSerialization = EnableGroupedSerialization
             };
             return trigger;

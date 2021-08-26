@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -14,7 +15,7 @@ namespace Coosu.Storyboard
     /// Coosu layer.
     /// <para>This is more of a group for controlling a set of sprites instead of osu!storyboard layer.</para>
     /// </summary>
-    public class Layer : IScriptable, IAdjustable
+    public class Layer : ISpriteHost, IAdjustable
     {
         /// <summary>
         /// Layer Z-distance.
@@ -425,7 +426,7 @@ namespace Coosu.Storyboard
 
                 int easing = int.MinValue, startTime = int.MinValue, endTime = int.MinValue;
 
-                if (EventTypes.IsCommonEvent(identifier))
+                if (EventTypes.IsBasicEvent(identifier))
                 {
                     easing = int.Parse(@params[1]);
                     if (easing is > 34 or < 0)
@@ -552,8 +553,8 @@ namespace Coosu.Storyboard
 
             void InjectEvent(Span<double> span)
             {
-                var commonEvent = CommonEvent.Create(eventType, (EasingType)easing, startTime, endTime, span);
-                currentObj.AddEvent(commonEvent);
+                var basicEvent = BasicEvent.Create(eventType, (EasingType)easing, startTime, endTime, span);
+                currentObj.AddEvent(basicEvent);
             }
         }
 
@@ -571,5 +572,39 @@ namespace Coosu.Storyboard
             AddObject(obj);
             return obj;
         }
+
+        #region ISpriteHost
+
+        public object Clone()
+        {
+            return new Layer(ZDistance, Name)
+            {
+                SceneObjects = SceneObjects.Select(k => k.Clone()).Cast<ISceneObject>().ToList()
+            };
+        }
+
+        public IEnumerator<Sprite> GetEnumerator()
+        {
+            return Sprites.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        public double MaxTime => SceneObjects.Count == 0 ? 0 : SceneObjects.Max(k => k.MaxTime);
+        public double MinTime => SceneObjects.Count == 0 ? 0 : SceneObjects.Min(k => k.MinTime);
+        public double MaxStartTime => SceneObjects.Count == 0 ? 0 : SceneObjects.Max(k => k.MaxStartTime);
+        public double MinEndTime => SceneObjects.Count == 0 ? 0 : SceneObjects.Min(k => k.MinEndTime);
+
+        public ICollection<Sprite> Sprites => SceneObjects
+            .Where(k => k is Sprite)
+            .Cast<Sprite>()
+            .ToList();
+
+        public Camera2 Camera2 { get; } = new();
+
+        #endregion
     }
 }
