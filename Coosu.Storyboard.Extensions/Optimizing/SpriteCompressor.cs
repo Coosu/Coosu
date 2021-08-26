@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Coosu.Shared;
 using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Events;
 using Coosu.Storyboard.Extensions.Computing;

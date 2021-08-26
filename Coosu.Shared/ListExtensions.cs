@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Coosu.Storyboard.Utils
+namespace Coosu.Shared
 {
     internal static class ListExtensions
     {

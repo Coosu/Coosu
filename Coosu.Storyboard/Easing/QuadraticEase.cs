@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Coosu.Storyboard.Easing
+﻿namespace Coosu.Storyboard.Easing
 {
     /// <summary>
     /// This class implements an easing function that gives a quadratic curve toward the destination

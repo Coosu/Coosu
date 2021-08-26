@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Coosu.Storyboard.Utils
+namespace Coosu.Shared
 {
     public static class NumericHelper
     {

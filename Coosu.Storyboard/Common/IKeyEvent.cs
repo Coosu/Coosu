@@ -1,5 +1,4 @@
-﻿using System;
-using Coosu.Storyboard.Easing;
+﻿using Coosu.Storyboard.Easing;
 
 namespace Coosu.Storyboard.Common
 {
