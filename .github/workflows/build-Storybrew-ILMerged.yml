@@ -1,0 +1,54 @@
+name: Build
+on:
+  push:
+    branches: [ 'ci/ilmerge' ]
+
+jobs:
+  build:
+    name: Build
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+        submodules: 'recursive'
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+
+    - name: dotnet Build Coosu.Storyboard.Storybrew ILMerged 
+      shell: pwsh
+      run: |
+        dotnet build Coosu.Storyboard.Storybrew --configuration Release --output ci-build
+        mkdir ILMerge -Force
+        mkdir artifact -Force
+        Invoke-WebRequest https://github.com/Milkitic/ILMerge/releases/download/3.0.41.49566/ILMerge-Windows.7z -OutFile "ILMerge/cli.zip"
+        7z x "ILMerge/cli.zip" -oILMerge/
+        .\ILMerge\ILMerge.exe .\ci-build\Coosu.Storyboard.Storybrew.dll .\ci-build\Coosu.Shared.dll .\ci-build\Coosu.Storyboard.dll .\ci-build\Coosu.Storyboard.Extensions.dll .\ci-build\System.Buffers.dll .\ci-build\System.Memory.dll .\ci-build\System.Numerics.Vectors.dll .\ci-build\System.Runtime.CompilerServices.Unsafe.dll .\ci-build\System.ValueTuple.dll /t:library /out:artifact\Coosu.Storyboard.Storybrew-ILMerged.dll
+        .\ci-build\CombineXml.ps1 "" ".\ci-build\"
+        copy .\ci-build\Coosu.Storyboard.Storybrew-ILMerged.xml .\artifact
+        
+    - name: action-minver
+      uses: thefringeninja/action-minver@2.0.0-preview1
+      id: version
+      with:
+        tag-prefix: v
+        minimum-major-minor: 1.0
+      
+    # - name: Pack via 7z
+    #   if: ${{ success() }}
+    #   run: |
+    #     mkdir -p ./ci-7zpack/
+    #     7z a "./ci-7zpack/Coosu.Storyboard.Storybrew-ILMerged.${{ steps.version.outputs.version }}.7z" "./Coosu.Storyboard.Storybrew-ILMerged.*"
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      if: ${{ success() }}
+      with:
+        name: Coosu.Storyboard.Storybrew-ILMerged.${{ steps.version.outputs.version }}
+        path: artifact/
+        if-no-files-found: error
