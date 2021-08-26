@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Coosu.Shared;
 using Coosu.Storyboard.Common;
-using Coosu.Storyboard.Utils;
 
 namespace Coosu.Storyboard.Extensions.Computing
 {

@@ -11,7 +11,7 @@ namespace Coosu.Storyboard.Extensibility
         {
             return Deserialize(split);
         }
-        
+
         string IActionParsingHandler.Serialize(BasicEvent raw)
         {
             return Serialize((T)raw);

@@ -48,7 +48,7 @@ namespace Coosu.Storyboard
                 DefaultY = DefaultY,
                 DefaultZ = DefaultZ,
                 OriginType = OriginType,
-                Events = Events.Select(k=>k.Clone()).Cast<IKeyEvent>().ToList()
+                Events = Events.Select(k => k.Clone()).Cast<IKeyEvent>().ToList()
             };
         }
     }

@@ -111,7 +111,11 @@ namespace Coosu.Storyboard.Extensibility
 
             return new T
             {
-                Easing = easing.ToEasingFunction(), StartTime = startTime, EndTime = endTime, Start = start, End = end
+                Easing = easing.ToEasingFunction(),
+                StartTime = startTime,
+                EndTime = endTime,
+                Start = start,
+                End = end
             };
         }
     }

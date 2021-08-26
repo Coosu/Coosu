@@ -16,7 +16,7 @@ namespace Coosu.Storyboard
             Size = size;
             Index = index;
         }
-        
+
         public bool Equals(EventType other)
         {
             return Flag == other.Flag;
