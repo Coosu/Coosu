@@ -275,7 +275,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             }
 
             if (host.Events.Any())
-                RemoveByObsoletedList(host, obsoleteList, keyEvents);
+                RemoveByInvisibleList(host, obsoleteList, keyEvents);
         }
 
         /// <summary>
@@ -303,9 +303,9 @@ namespace Coosu.Storyboard.Extensions.Optimizing
         }
 
         /// <summary>
-        /// 根据ObsoletedList，移除不必要的命令。
+        /// 根据InvisibleList，移除不必要的命令。
         /// </summary>
-        private void RemoveByObsoletedList(IDetailedEventHost host, TimeRange obsoleteList, HashSet<BasicEvent> keyEvents)
+        private void RemoveByInvisibleList(IDetailedEventHost host, TimeRange obsoleteList, HashSet<BasicEvent> keyEvents)
         {
             if (obsoleteList.TimingList.Count == 0) return;
             var groups = host.Events.GroupBy(k => k.EventType);
@@ -321,12 +321,12 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                             : list[i + 1];
 
                     /*
-                     * 若当前Event在某Obsolete Range内，且下一Event的StartTime也在此Obsolete Range内，则删除。
-                     * 若当前Event是此种类最后一个（无下一个Event），那么需要此Event在某Obsolete Range内，且此Obsolete Range持续到EventHost结束。
-                     * 另注意：若此Event为控制Obsolete Range的Event，则将其过滤。（判断是否正好在某段Obsolete Range的StartTime或EndTime上）
+                     * 若当前Event在某Invisible Range内，且下一Event的StartTime也在此Invisible Range内，则删除。
+                     * 若当前Event是此种类最后一个（无下一个Event），那么需要此Event在某Invisible Range内，且此Invisible Range持续到EventHost结束。
+                     * 另注意：若此Event为控制Invisible Range的Event，则将其过滤。（判断是否正好在某段Invisible Range的StartTime或EndTime上）
                     */
 
-                    // 判断是否此Event为控制Obsolete Range的Event。
+                    // 判断是否此Event为控制Invisible Range的Event。
                     if (!(nowE.OnInvisibleTimingRangeBound(obsoleteList) &&
                           EventExtensions.IneffectiveDictionary.ContainsKey(nowE.EventType)))
                     {
@@ -335,7 +335,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                         // 若当前Event是此种类最后一个（无下一个Event)。
                         if (nextE == null)
                         {
-                            // 判断是否此Event在某Obsolete Range内，且此Obsolete Range持续到EventHost结束。
+                            // 判断是否此Event在某Invisible Range内，且此Invisible Range持续到EventHost结束。
                             canRemove = nowE.InInvisibleTimingRange(obsoleteList, out var range) &&
                                         range.EndTime.Equals(host.MaxTime);
                             if (!canRemove) continue;
@@ -353,7 +353,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                                 {
                                     if (nowE.End[j].ToIcString().Length > nowE.Start[j].ToIcString().Length)
                                     {
-                                        RaiseSituationEvent(host, SituationType.ThisLastSingleInLastObsoleteToFixTail,
+                                        RaiseSituationEvent(host, SituationType.ThisLastSingleInLastInvisibleToFixTail,
                                             () => { nowE.End[j] = nowE.Start[j]; },
                                             nowE);
                                     }
@@ -361,14 +361,14 @@ namespace Coosu.Storyboard.Extensions.Optimizing
 
                                 if (nowE.IsSmallerThenMaxTime(host))
                                 {
-                                    RaiseSituationEvent(host, SituationType.ThisLastSingleInLastObsoleteToFixEndTime,
+                                    RaiseSituationEvent(host, SituationType.ThisLastSingleInLastInvisibleToFixEndTime,
                                         () => { nowE.EndTime = nowE.StartTime; },
                                         nowE);
                                 }
                             }
                             else
                             {
-                                RaiseSituationEvent(host, SituationType.ThisLastInLastObsoleteToRemove,
+                                RaiseSituationEvent(host, SituationType.ThisLastInLastInvisibleToRemove,
                                     () =>
                                     {
                                         RemoveEvent(host, list, nowE);
@@ -380,13 +380,13 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                         } // 若当前Event是此种类最后一个（无下一个Event)。
                         else // 若有下一个Event。
                         {
-                            // 判断是否此Event在某Obsolete Range内，且下一Event的StartTime也在此Obsolete Range内。
+                            // 判断是否此Event在某Invisible Range内，且下一Event的StartTime也在此Invisible Range内。
                             canRemove = obsoleteList.ContainsTimingPoint(out _,
                                 nowE.StartTime, nowE.EndTime, nextE.StartTime) /*&& !keyEvents.Contains(nowE)*/;
                             //目前限制：多个fadoutlist的控制节点不能删的只剩一个
                             if (canRemove)
                             {
-                                RaiseSituationEvent(host, SituationType.NextHeadAndThisInObsoleteToRemove,
+                                RaiseSituationEvent(host, SituationType.NextHeadAndThisInInvisibleToRemove,
                                     () =>
                                     {
                                         RemoveEvent(host, list, nowE);
@@ -395,7 +395,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                                     nowE, nextE);
                             }
                         } // 若有下一个Event。
-                    } // 判断是否此Event为控制Obsolete Range的Event。
+                    } // 判断是否此Event为控制Invisible Range的Event。
                 } // list的循环
             } // group的循环
         }
