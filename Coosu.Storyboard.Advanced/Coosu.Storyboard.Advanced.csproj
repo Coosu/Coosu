@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="$(TargetFramework) != 'net452'">
-    <UseWPF>true</UseWPF>
+    <UseWpf>true</UseWpf>
   </PropertyGroup>
 
   <ItemGroup Condition="$(TargetFramework) == 'net452'">
@@ -18,6 +18,9 @@
     <Reference Include="PresentationFramework">
       <HintPath>PresentationFramework.dll</HintPath>
     </Reference>
+    <Reference Include="WindowsBase">
+      <HintPath>WindowsBase.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>
@@ -25,10 +28,10 @@
   </ItemGroup>
 
   <ItemGroup Condition="$(TargetFramework) == 'net452'">
-    <None Update="PresentationCore.dll">
+    <None Update="*.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="PresentationFramework.dll">
+    <None Update="*.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
