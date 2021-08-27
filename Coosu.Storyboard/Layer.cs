@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Numerics;
 using System.Threading.Tasks;
 using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Events;
@@ -47,127 +46,6 @@ namespace Coosu.Storyboard
         /// Sprite list in this layer.
         /// </summary>
         public List<ISceneObject> SceneObjects { get; set; } = new();
-
-        #region Create Sprite
-
-        /// <summary>
-        /// Create a storyboard sprite.
-        /// </summary>
-        /// <param name="filePath">Image file path.</param>
-        /// <returns>Created sprite.</returns>
-        public Sprite CreateSprite(string filePath)
-        {
-            var obj = new Sprite(LayerType.Foreground, OriginType.Centre, filePath, 320, 240);
-            AddObject(obj);
-            return obj;
-        }
-
-        /// <summary>
-        /// Create a storyboard sprite.
-        /// </summary>
-        /// <param name="filePath">Image file path.</param>
-        /// <param name="originType">The sprite's origin.</param>
-        /// <returns>Created sprite.</returns>
-        public Sprite CreateSprite(string filePath, OriginType originType)
-        {
-            var obj = new Sprite(LayerType.Foreground, originType, filePath, 320, 240);
-            AddObject(obj);
-            return obj;
-        }
-
-        /// <summary>
-        /// Create a storyboard sprite.
-        /// </summary>
-        /// <param name="filePath">Image file path.</param>
-        /// <param name="layerType">The sprite's layer.</param>
-        /// <returns>Created sprite.</returns>
-        public Sprite CreateSprite(string filePath, LayerType layerType)
-        {
-            var obj = new Sprite(layerType, OriginType.Centre, filePath, 320, 240);
-            AddObject(obj);
-            return obj;
-        }
-
-        /// <summary>
-        /// Create a storyboard sprite.
-        /// </summary>
-        /// <param name="filePath">Image file path.</param>
-        /// <param name="layerType">The sprite's layer.</param>
-        /// <param name="originType">The sprite's origin.</param>
-        /// <returns>Created sprite.</returns>
-        public Sprite CreateSprite(string filePath, LayerType layerType, OriginType originType)
-        {
-            var obj = new Sprite(layerType, originType, filePath, 320, 240);
-            AddObject(obj);
-            return obj;
-        }
-
-        /// <summary>
-        /// Create a storyboard sprite.
-        /// </summary>
-        /// <param name="filePath">Image file path.</param>
-        /// <param name="layerType">The sprite's layer.</param>
-        /// <param name="originType">The sprite's origin.</param>
-        /// <param name="defaultLocation">The sprite's default location.</param>
-        /// <returns>Created sprite.</returns>
-        public Sprite CreateSprite(string filePath, LayerType layerType, OriginType originType, Vector2 defaultLocation)
-        {
-            var obj = new Sprite(layerType, originType, filePath, defaultLocation.X, defaultLocation.Y);
-            AddObject(obj);
-            return obj;
-        }
-
-        /// <summary>
-        /// Create a storyboard sprite.
-        /// </summary>
-        /// <param name="filePath">Image file path.</param>
-        /// <param name="layerType">The sprite's layer.</param>
-        /// <param name="originType">The sprite's origin.</param>
-        /// <param name="defaultX">The sprite's default x.</param>
-        /// <param name="defaultY">The sprite's default y.</param>
-        /// <returns>Created sprite.</returns>
-        public Sprite CreateSprite(string filePath, LayerType layerType, OriginType originType, double defaultX,
-            double defaultY)
-        {
-            var obj = new Sprite(layerType, originType, filePath, defaultX, defaultY);
-            AddObject(obj);
-            return obj;
-        }
-
-        #endregion
-
-        /// <summary>
-        /// Create a storyboard animation.
-        /// </summary>
-        /// <param name="filePath">Image file path.</param>
-        /// <param name="layerType">The animation's layer.</param>
-        /// <param name="originType">The animation's origin.</param>
-        /// <param name="defaultX">The animation's default x.</param>
-        /// <param name="defaultY">The animation's default y.</param>
-        /// <param name="frameCount">The animation's total frame count.</param>
-        /// <param name="frameDelay">The animation's frame delay between each frames.</param>
-        /// <param name="loopType">The animation's loop type.</param>
-        /// <returns>Created animation.</returns>
-        public Animation CreateAnimation(
-            string filePath,
-            LayerType layerType,
-            OriginType originType,
-            int defaultX, int defaultY,
-            int frameCount, double frameDelay, LoopType loopType)
-        {
-            var obj = new Animation(
-                layerType,
-                originType,
-                filePath,
-                defaultX,
-                defaultY,
-                frameCount,
-                frameDelay,
-                loopType
-            );
-            AddObject(obj);
-            return obj;
-        }
 
         public void AddObject(ISceneObject @object)
         {
@@ -596,13 +474,24 @@ namespace Coosu.Storyboard
             .Cast<Sprite>()
             .ToList();
 
+        public IList<ISpriteHost> SubHosts => SceneObjects
+            .Where(k => k is ISpriteHost)
+            .Cast<ISpriteHost>()
+            .ToList();
+
         public Camera2 Camera2 { get; } = new();
         public void AddSprite(Sprite sprite)
         {
             AddObject(sprite);
         }
 
-        public ISpriteHost BaseHost { get; internal set; }
+        public void AddSubHost(ISpriteHost spriteHost)
+        {
+            if (spriteHost is not ISceneObject iso) throw new InvalidCastException();
+            AddObject(iso);
+        }
+
+        public ISpriteHost? BaseHost => null;
 
         #endregion
     }

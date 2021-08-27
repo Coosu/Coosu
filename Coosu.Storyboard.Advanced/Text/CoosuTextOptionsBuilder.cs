@@ -1,8 +1,9 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace Coosu.Storyboard.Advanced.Texting
+namespace Coosu.Storyboard.Advanced.Text
 {
     public class CoosuTextOptionsBuilder
     {
@@ -110,7 +111,15 @@ namespace Coosu.Storyboard.Advanced.Texting
 
         public CoosuTextOptionsBuilder FillBy(string hexColor)
         {
-            Options.FillBrush = new BrushConverter().ConvertFrom(hexColor) as Brush ?? Brushes.White;
+            try
+            {
+                Options.FillBrush = new BrushConverter().ConvertFrom(hexColor) as Brush ?? Brushes.White;
+            }
+            catch
+            {
+                throw new Exception("Bad color format.");
+            }
+
             return this;
         }
 
@@ -129,7 +138,7 @@ namespace Coosu.Storyboard.Advanced.Texting
         public CoosuTextOptionsBuilder WithStroke(double strokeThickness)
         {
             Options.StrokeMode = OptionType.With;
-            return StrokeMethod(Brushes.White, strokeThickness);
+            return StrokeMethod(Brushes.Black, strokeThickness);
         }
 
         public CoosuTextOptionsBuilder WithStroke(string hexColor, double strokeThickness)
@@ -177,7 +186,7 @@ namespace Coosu.Storyboard.Advanced.Texting
         public CoosuTextOptionsBuilder WithShadow(double blurRadius = 5, double direction = -45, double depth = 5)
         {
             Options.ShadowMode = OptionType.With;
-            return ShadowMethod(Brushes.White, blurRadius, direction, depth);
+            return ShadowMethod(Brushes.Black, blurRadius, direction, depth);
         }
 
         public CoosuTextOptionsBuilder WithShadow(string hexColor,
@@ -230,7 +239,15 @@ namespace Coosu.Storyboard.Advanced.Texting
 
         private CoosuTextOptionsBuilder ShadowMethod(string hexColor, double blurRadius, double direction, double depth)
         {
-            Options.ShadowBrush = new BrushConverter().ConvertFrom(hexColor) as Brush ?? Brushes.Black;
+            try
+            {
+                Options.ShadowBrush = new BrushConverter().ConvertFrom(hexColor) as Brush;
+            }
+            catch
+            {
+                throw new Exception("Bad color format.");
+            }
+
             Options.ShadowBlurRadius = blurRadius;
             Options.ShadowDirection = direction;
             Options.ShadowDepth = depth;
@@ -257,7 +274,15 @@ namespace Coosu.Storyboard.Advanced.Texting
 
         private CoosuTextOptionsBuilder StrokeMethod(string hexColor, double strokeThickness)
         {
-            Options.StrokeBrush = new BrushConverter().ConvertFrom(hexColor) as Brush ?? Brushes.Black;
+            try
+            {
+                Options.StrokeBrush = new BrushConverter().ConvertFrom(hexColor) as Brush;
+            }
+            catch
+            {
+                throw new Exception("Bad color format.");
+            }
+
             Options.StrokeThickness = strokeThickness;
             return this;
         }

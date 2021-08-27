@@ -115,9 +115,15 @@ namespace Coosu.Storyboard
             Sprites.Add(sprite);
         }
 
-        public ISpriteHost BaseHost { get; internal set; }
+        public void AddSubHost(ISpriteHost spriteHost)
+        {
+            SubHosts.Add(spriteHost);
+        }
+
+        public ISpriteHost? BaseHost { get; internal set; }
 
         public IList<Sprite> Sprites { get; private set; } = new List<Sprite>();
+        public IList<ISpriteHost> SubHosts { get; private set; } = new List<ISpriteHost>();
 
         public IEnumerator<Sprite> GetEnumerator()
         {

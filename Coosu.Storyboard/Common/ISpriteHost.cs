@@ -10,8 +10,10 @@ namespace Coosu.Storyboard.Common
         double MaxStartTime { get; }
         double MinEndTime { get; }
         IList<Sprite> Sprites { get; }
+        IList<ISpriteHost> SubHosts { get; }
         Camera2 Camera2 { get; }
         void AddSprite(Sprite sprite);
-        ISpriteHost BaseHost { get; }
+        void AddSubHost(ISpriteHost spriteHost);
+        ISpriteHost? BaseHost { get; }
     }
 }

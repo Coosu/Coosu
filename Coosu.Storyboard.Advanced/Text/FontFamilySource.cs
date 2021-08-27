@@ -1,4 +1,4 @@
-﻿namespace Coosu.Storyboard.Advanced.Texting
+﻿namespace Coosu.Storyboard.Advanced.Text
 {
     public class FontFamilySource
     {

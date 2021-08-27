@@ -3,7 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace Coosu.Storyboard.Advanced.Texting
+namespace Coosu.Storyboard.Advanced.Text
 {
     public class CoosuTextOptions
     {
