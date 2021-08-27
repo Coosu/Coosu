@@ -50,9 +50,10 @@ jobs:
         mkdir ILMerge -Force
         Invoke-WebRequest https://github.com/Milkitic/ILMerge/releases/download/3.0.41.49566/ILMerge-Windows.7z -OutFile "ILMerge/cli.zip"
         7z x "ILMerge/cli.zip" -oILMerge/
-        .\ILMerge\ILMerge.exe .\ci-build\Coosu.Storyboard.Storybrew.dll .\ci-build\Coosu.Shared.dll .\ci-build\Coosu.Storyboard.dll .\ci-build\Coosu.Storyboard.Extensions.dll .\ci-build\Coosu.Storyboard.Advanced.dll .\ci-build\System.Buffers.dll .\ci-build\System.Memory.dll .\ci-build\System.Numerics.Vectors.dll .\ci-build\System.Runtime.CompilerServices.Unsafe.dll .\ci-build\System.ValueTuple.dll .\ci-build\PresentationCore.dll .\ci-build\PresentationFramework.dll /t:library /out:Coosu.Storyboard.Storybrew-ILMerged.dll
+        .\ILMerge\ILMerge.exe .\ci-build\Coosu.Storyboard.Storybrew.dll .\ci-build\Coosu.Shared.dll .\ci-build\Coosu.Storyboard.dll .\ci-build\Coosu.Storyboard.Extensions.dll .\ci-build\Coosu.Storyboard.Advanced.dll .\ci-build\System.Buffers.dll .\ci-build\System.Memory.dll .\ci-build\System.Numerics.Vectors.dll .\ci-build\System.Runtime.CompilerServices.Unsafe.dll .\ci-build\System.ValueTuple.dll /t:library /out:Coosu.Storyboard.Storybrew-ILMerged.dll
         .\ci-build\CombineXml.ps1 "" ".\ci-build\"
         copy .\ci-build\Coosu.Storyboard.Storybrew-ILMerged.xml .
+        copy .\ci-build\Presentation* .
         
     - name: action-minver
       uses: thefringeninja/action-minver@2.0.0-preview1
@@ -65,7 +66,7 @@ jobs:
       if: ${{ success() && startsWith(github.ref, 'refs/tags/') }}
       run: |
         mkdir -p ./ci-7zpack/
-        7z a "./ci-7zpack/Coosu.Storyboard.Storybrew-ILMerged.${{ steps.version.outputs.version }}.7z" "./Coosu.Storyboard.Storybrew-ILMerged.*"
+        7z a "./ci-7zpack/Coosu.Storyboard.Storybrew-ILMerged.${{ steps.version.outputs.version }}.7z" "./Coosu.Storyboard.Storybrew-ILMerged.*" "./Presentation*"
       
     - name: Create a new GitHub release if a new tag is pushed
       uses: softprops/action-gh-release@v1
