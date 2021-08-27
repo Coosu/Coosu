@@ -54,6 +54,7 @@ jobs:
         .\ci-build\CombineXml.ps1 "" ".\ci-build\"
         copy .\ci-build\Coosu.Storyboard.Storybrew-ILMerged.xml .
         copy .\ci-build\Presentation* .
+        copy .\ci-build\WindowsBase* .
         
     - name: action-minver
       uses: thefringeninja/action-minver@2.0.0-preview1
@@ -66,7 +67,7 @@ jobs:
       if: ${{ success() && startsWith(github.ref, 'refs/tags/') }}
       run: |
         mkdir -p ./ci-7zpack/
-        7z a "./ci-7zpack/Coosu.Storyboard.Storybrew-ILMerged.${{ steps.version.outputs.version }}.7z" "./Coosu.Storyboard.Storybrew-ILMerged.*" "./Presentation*"
+        7z a "./ci-7zpack/Coosu.Storyboard.Storybrew-ILMerged.${{ steps.version.outputs.version }}.7z" "./Coosu.Storyboard.Storybrew-ILMerged.*" "./Presentation*" "./WindowsBase*"
       
     - name: Create a new GitHub release if a new tag is pushed
       uses: softprops/action-gh-release@v1
