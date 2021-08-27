@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <UseWpf>true</UseWpf>
+    <TargetFramework>net452</TargetFramework>
+    <DisableImplicitNamespaceImports>true</DisableImplicitNamespaceImports>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Coosu.Storyboard.Storybrew\Coosu.Storyboard.Storybrew.csproj" />
+    <ProjectReference Include="..\..\Libraries\storybrew\common\common.csproj" />
+  </ItemGroup>
+
+</Project>

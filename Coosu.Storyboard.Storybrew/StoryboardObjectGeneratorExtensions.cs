@@ -34,7 +34,7 @@ namespace Coosu.Storyboard
                 // ignored
             }
 
-            var configFile = Path.Combine(targetProjectDir, "config.yaml");
+            var configFile = Path.Combine(targetProjectDir, "config.json");
             return configFile;
         }
 

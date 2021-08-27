@@ -115,6 +115,8 @@ namespace Coosu.Storyboard
             Sprites.Add(sprite);
         }
 
+        public ISpriteHost BaseHost { get; internal set; }
+
         public IList<Sprite> Sprites { get; private set; } = new List<Sprite>();
 
         public IEnumerator<Sprite> GetEnumerator()

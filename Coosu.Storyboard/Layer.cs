@@ -602,6 +602,8 @@ namespace Coosu.Storyboard
             AddObject(sprite);
         }
 
+        public ISpriteHost BaseHost { get; internal set; }
+
         #endregion
     }
 }

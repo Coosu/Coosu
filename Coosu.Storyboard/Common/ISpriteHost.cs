@@ -12,5 +12,6 @@ namespace Coosu.Storyboard.Common
         IList<Sprite> Sprites { get; }
         Camera2 Camera2 { get; }
         void AddSprite(Sprite sprite);
+        ISpriteHost BaseHost { get; }
     }
 }
