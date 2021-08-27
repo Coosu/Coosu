@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <UseWpf>true</UseWpf>
+    <OutputType>Exe</OutputType>
     <TargetFramework>net452</TargetFramework>
     <DisableImplicitNamespaceImports>true</DisableImplicitNamespaceImports>
   </PropertyGroup>
