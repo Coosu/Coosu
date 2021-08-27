@@ -6,16 +6,15 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using StorybrewCommon.Scripting;
-using Tiny;
-using Tiny.Formats.Yaml;
 
 // ReSharper disable once CheckNamespace
 namespace Coosu.Storyboard
 {
     public static class StoryboardObjectGeneratorExtensions
     {
-
         public static string GetProjectConfigPath(this StoryboardObjectGenerator brewObjectGenerator)
         {
             var brewPath = AppDomain.CurrentDomain.BaseDirectory;
@@ -39,28 +38,31 @@ namespace Coosu.Storyboard
             return configFile;
         }
 
-        public static T GetStore<T>(this StoryboardObjectGenerator generator, Func<TinyToken, T> property)
+        public static T GetStore<T>(this StoryboardObjectGenerator generator, Func<JToken, T> property)
         {
             var path = generator.GetProjectConfigPath();
             using (new FileLocker(path))
             {
-                if (!File.Exists(path)) File.WriteAllText(path, "");
-
-                var root = TinyToken.Read(path);
+                if (!File.Exists(path)) File.WriteAllText(path, "{}");
+                var text = File.ReadAllText(path);
+                var root = JToken.Parse(text);
 
                 return property.Invoke(root);
             }
         }
 
-        public static void SetStore(this StoryboardObjectGenerator generator, Action<TinyToken> configuration)
+        public static void SetStore(this StoryboardObjectGenerator generator, Action<JToken> configuration)
         {
             var path = generator.GetProjectConfigPath();
             using (new FileLocker(path))
             {
-                var root = TinyToken.Read(path);
+                if (!File.Exists(path)) File.WriteAllText(path, "{}");
+                var text = File.ReadAllText(path);
+                var root = JToken.Parse(text);
 
                 configuration.Invoke(root);
-                root.Write(path);
+                var save = root.ToString(Formatting.Indented);
+                File.WriteAllText(path, save);
             }
         }
     }
