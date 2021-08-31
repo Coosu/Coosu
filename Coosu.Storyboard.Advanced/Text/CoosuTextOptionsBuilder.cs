@@ -186,7 +186,7 @@ namespace Coosu.Storyboard.Advanced.Text
         public CoosuTextOptionsBuilder WithShadow(double blurRadius = 5, double direction = -45, double depth = 5)
         {
             Options.ShadowMode = OptionType.With;
-            return ShadowMethod(Brushes.Black, blurRadius, direction, depth);
+            return ShadowMethod(Colors.Black, blurRadius, direction, depth);
         }
 
         public CoosuTextOptionsBuilder WithShadow(string hexColor,
@@ -203,17 +203,17 @@ namespace Coosu.Storyboard.Advanced.Text
             return ShadowMethod(a, r, g, b, blurRadius, direction, depth);
         }
 
-        public CoosuTextOptionsBuilder WithShadow(Brush brush,
+        public CoosuTextOptionsBuilder WithShadow(Color color,
             double blurRadius = 5, double direction = -45, double depth = 5)
         {
             Options.ShadowMode = OptionType.With;
-            return ShadowMethod(brush, blurRadius, direction, depth);
+            return ShadowMethod(color, blurRadius, direction, depth);
         }
 
         public CoosuTextOptionsBuilder WithShadowOnly(double blurRadius = 5, double direction = -45, double depth = 5)
         {
             Options.ShadowMode = OptionType.Only;
-            return ShadowMethod(Brushes.White, blurRadius, direction, depth);
+            return ShadowMethod(Colors.White, blurRadius, direction, depth);
         }
 
         public CoosuTextOptionsBuilder WithShadowOnly(string hexColor,
@@ -230,18 +230,18 @@ namespace Coosu.Storyboard.Advanced.Text
             return ShadowMethod(a, r, g, b, blurRadius, direction, depth);
         }
 
-        public CoosuTextOptionsBuilder WithShadowOnly(Brush brush,
+        public CoosuTextOptionsBuilder WithShadowOnly(Color color,
             double blurRadius = 5, double direction = -45, double depth = 5)
         {
             Options.ShadowMode = OptionType.Only;
-            return ShadowMethod(brush, blurRadius, direction, depth);
+            return ShadowMethod(color, blurRadius, direction, depth);
         }
 
         private CoosuTextOptionsBuilder ShadowMethod(string hexColor, double blurRadius, double direction, double depth)
         {
             try
             {
-                Options.ShadowBrush = new BrushConverter().ConvertFrom(hexColor) as Brush;
+                Options.ShadowColor = (Color)new ColorConverter().ConvertFrom(hexColor);
             }
             catch
             {
@@ -256,16 +256,16 @@ namespace Coosu.Storyboard.Advanced.Text
 
         private CoosuTextOptionsBuilder ShadowMethod(byte a, byte r, byte g, byte b, double blurRadius, double direction, double depth)
         {
-            Options.ShadowBrush = new SolidColorBrush(Color.FromArgb(a, r, g, b));
+            Options.ShadowColor = Color.FromArgb(a, r, g, b);
             Options.ShadowBlurRadius = blurRadius;
             Options.ShadowDirection = direction;
             Options.ShadowDepth = depth;
             return this;
         }
 
-        private CoosuTextOptionsBuilder ShadowMethod(Brush brush, double blurRadius, double direction, double depth)
+        private CoosuTextOptionsBuilder ShadowMethod(Color color, double blurRadius, double direction, double depth)
         {
-            Options.ShadowBrush = brush;
+            Options.ShadowColor = color;
             Options.ShadowBlurRadius = blurRadius;
             Options.ShadowDirection = direction;
             Options.ShadowDepth = depth;

@@ -10,9 +10,7 @@ namespace Coosu.Storyboard.Advanced.Text
         internal bool IsInitialFamily = true;
         public string? FileIdentifier { get; set; }
         public bool RightToLeft { get; set; } = false;
-        //xs
         public double XScale { get; set; } = 1;
-        //ys
         public double YScale { get; set; } = 1;
         public double WordGap { get; set; }
         public double LineGap { get; set; }
@@ -33,12 +31,12 @@ namespace Coosu.Storyboard.Advanced.Text
         public double StrokeThickness { get; set; }
         //sdon;sd
         public OptionType ShadowMode { get; set; }
-        public Brush? ShadowBrush { get; set; }
+        public Color? ShadowColor { get; set; }
         public double ShadowBlurRadius { get; set; } = 5;
         public double ShadowDirection { get; set; } = -45;
         public double ShadowDepth { get; set; } = 5;
 
-        internal static CoosuTextOptions Default { get; } = new CoosuTextOptions()
+        internal static CoosuTextOptions Default { get; } = new()
         {
             FileIdentifier = "default"
         };

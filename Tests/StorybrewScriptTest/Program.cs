@@ -169,7 +169,8 @@ namespace StorybrewScriptTest
                 Color.FromArgb(3, 3, 2, 5), 45);
             var coosuTextOptions = new CoosuTextOptions
             {
-                ShadowBrush = linearGradientBrush,
+                ShadowColor = Colors.Orange,
+                FillBrush = linearGradientBrush
             };
 
             var jsonSerializerSettings = new JsonSerializerSettings

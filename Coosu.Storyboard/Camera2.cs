@@ -26,6 +26,7 @@ namespace Coosu.Storyboard
 
         public void AddEvent(IKeyEvent @event)
         {
+            throw new NotImplementedException("The camera transform is currently not implemented.");
             Events.Add(@event);
         }
 
