@@ -6,10 +6,10 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:text="clr-namespace:Coosu.Storyboard.Advanced.Text"
     x:Name="self"
-    Width="800"
-    Height="450"
     d:DataContext="{d:DesignInstance Type=text:TextControlVm,
                                      IsDesignTimeCreatable=False}"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
     Background="#240521"
     mc:Ignorable="d">
     <Grid>

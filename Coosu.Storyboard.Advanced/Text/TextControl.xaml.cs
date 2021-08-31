@@ -202,6 +202,7 @@ namespace Coosu.Storyboard.Advanced.Text
             InitializeComponent();
             DataContext = _viewModel = new TextControlVm();
             Loaded += MainWindow_Loaded;
+            Compute();
         }
 
         private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
