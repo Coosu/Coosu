@@ -7,7 +7,7 @@ using Coosu.Storyboard.Common;
 // ReSharper disable once CheckNamespace
 namespace Coosu.Storyboard
 {
-    public static class SpriteHostExtensions
+    public static class AdvancedSpriteHostExtensions
     {
         public static SpriteGroup CreateText(this ISpriteHost spriteHost,
             string text,

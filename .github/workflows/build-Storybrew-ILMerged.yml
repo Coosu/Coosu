@@ -33,6 +33,7 @@ jobs:
         copy .\ci-build\Coosu.Storyboard.Storybrew-ILMerged.xml .\artifact
         copy .\ci-build\Presentation* .\artifact
         copy .\ci-build\WindowsBase.* .\artifact
+        copy .\ci-build\System.Xaml.* .\artifact
         
     - name: action-minver
       uses: thefringeninja/action-minver@2.0.0-preview1
