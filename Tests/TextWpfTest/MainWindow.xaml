@@ -12,6 +12,6 @@
     Height="450"
     mc:Ignorable="d">
     <Grid>
-        <text:TextControl/>
+        <text:TextControl />
     </Grid>
 </Window>

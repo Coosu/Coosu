@@ -23,8 +23,8 @@ namespace Coosu.Storyboard.Advanced.Text
         private double _shadowBlurRadius = 5;
         private double _shadowDirection = -45;
         private double _shadowDepth = 5;
-        private FontFamily _fontFamily =
-            (FontFamily)new FontFamilyConverter().ConvertFrom("D:/GitHub/98.xaml/ControlTest/Resources/simsun.ttf#simsun");
+        private FontFamily _fontFamily = (FontFamily)new FontFamilyConverter()
+                .ConvertFrom("D:/GitHub/98.xaml/ControlTest/Resources/simsun.ttf#simsun");
 
         private double _shadowOpacity = 0.6;
         //(FontFamily)new FontFamilyConverter().ConvertFrom("arial,simsun");
