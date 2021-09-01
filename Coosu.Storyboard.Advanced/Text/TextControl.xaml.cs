@@ -24,7 +24,7 @@ namespace Coosu.Storyboard.Advanced.Text
 {
     public class TextControlVm : INotifyPropertyChanged
     {
-        private string? _text = "milkitic";
+        private IList<char>? _text = "milkitic".Distinct().ToArray();
         private IList<double>? _widths;
         private FontStyle _fontStyle = FontStyles.Normal;
         private FontWeight _fontWeight = FontWeights.Normal;
@@ -42,7 +42,7 @@ namespace Coosu.Storyboard.Advanced.Text
         private double _shadowOpacity = 0.6;
         //(FontFamily)new FontFamilyConverter().ConvertFrom("arial,simsun");
 
-        public string? Text
+        public IList<char>? Text
         {
             get => _text;
             set
@@ -221,7 +221,7 @@ namespace Coosu.Storyboard.Advanced.Text
             InitializeComponent();
 
             _textContext = textContext;
-            _viewModel.Text = textContext.Text;
+            _viewModel.Text = textContext.Text.Distinct().ToArray();
             var textOptions = textContext.TextOptions;
             _viewModel.FontStyle = textOptions.FontStyle;
             _viewModel.FontWeight = textOptions.FontWeight;
@@ -302,6 +302,9 @@ namespace Coosu.Storyboard.Advanced.Text
 
         public async Task<Dictionary<char, double>> SaveImageAndGetWidth()
         {
+            Compute();
+            await Task.Delay(16);
+
             using var fileLocker = new FileLocker(_textContext.CachePath);
             if (!File.Exists(_textContext.CachePath))
                 File.WriteAllText(_textContext.CachePath, "{}");

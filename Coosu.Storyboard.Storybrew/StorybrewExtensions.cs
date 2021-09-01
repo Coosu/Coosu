@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Coosu.Storyboard.Advanced.UI;
 using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Extensions.Optimizing;
 using Coosu.Storyboard.Storybrew;
@@ -52,6 +53,8 @@ namespace Coosu.Storyboard
             {
                 InnerExecuteBrew(sprite, brewLayer, false, configureSettings);
             }
+
+            UiThreadHelper.Shutdown();
         }
 
         private static void InnerExecuteBrew(Sprite sprite, StoryboardLayer brewLayer,
