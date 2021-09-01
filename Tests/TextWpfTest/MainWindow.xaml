@@ -5,7 +5,6 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:TextWpfTest"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:text="clr-namespace:Coosu.Storyboard.Advanced.Text;assembly=Coosu.Storyboard.Advanced"
     x:Name="self"
     Title="MainWindow"
     Width="800" Loaded="MainWindow_OnLoaded"

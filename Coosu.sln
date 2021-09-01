@@ -27,8 +27,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Coosu.Storyboard.Extensions
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ParsingPerformanceTest", "Tests\ParsingPerformanceTest\ParsingPerformanceTest.csproj", "{EB1E4AF8-5C13-450D-9B61-64AA11021695}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Coosu.Storyboard.Storybrew", "Coosu.Storyboard.Storybrew\Coosu.Storyboard.Storybrew.csproj", "{DBE04CF2-5668-4DDB-9BEA-6BBB01147785}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libraries", "Libraries", "{B51D984D-1E6F-4A3B-9F61-7477656719A3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "common", "Libraries\storybrew\common\common.csproj", "{F0EDCCEC-4B64-4CE8-801F-1377E3384DC4}"
@@ -43,13 +41,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "brewlib", "brewlib", "{A685
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "brewlib", "Libraries\storybrew\brewlib\brewlib.csproj", "{A4F7CC21-B769-424B-AB59-89E93D781762}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Coosu.Storyboard.Advanced", "Coosu.Storyboard.Advanced\Coosu.Storyboard.Advanced.csproj", "{D5A46300-D64D-42A0-B8AD-620FCF2398F8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Coosu.Storyboard.Storybrew", "Coosu.Storyboard.Storybrew\Coosu.Storyboard.Storybrew.csproj", "{D5A46300-D64D-42A0-B8AD-620FCF2398F8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StorybrewScriptTest", "Tests\StorybrewScriptTest\StorybrewScriptTest.csproj", "{E304F42F-8518-4C59-B918-1D025C6BCD9B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TextWpfTest", "Tests\TextWpfTest\TextWpfTest.csproj", "{8CAEC15B-C36D-45B2-A7DE-2B8B6E756158}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoslynTest", "Tests\RoslynTest\RoslynTest.csproj", "{FB0F0960-A3BB-4C26-8B15-0B9147C61EDE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RoslynTest", "Tests\RoslynTest\RoslynTest.csproj", "{FB0F0960-A3BB-4C26-8B15-0B9147C61EDE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -124,12 +122,6 @@ Global
 		{EB1E4AF8-5C13-450D-9B61-64AA11021695}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EB1E4AF8-5C13-450D-9B61-64AA11021695}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EB1E4AF8-5C13-450D-9B61-64AA11021695}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DBE04CF2-5668-4DDB-9BEA-6BBB01147785}.Build|Any CPU.ActiveCfg = Release|Any CPU
-		{DBE04CF2-5668-4DDB-9BEA-6BBB01147785}.Build|Any CPU.Build.0 = Release|Any CPU
-		{DBE04CF2-5668-4DDB-9BEA-6BBB01147785}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DBE04CF2-5668-4DDB-9BEA-6BBB01147785}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DBE04CF2-5668-4DDB-9BEA-6BBB01147785}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DBE04CF2-5668-4DDB-9BEA-6BBB01147785}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F0EDCCEC-4B64-4CE8-801F-1377E3384DC4}.Build|Any CPU.ActiveCfg = Build|Any CPU
 		{F0EDCCEC-4B64-4CE8-801F-1377E3384DC4}.Build|Any CPU.Build.0 = Build|Any CPU
 		{F0EDCCEC-4B64-4CE8-801F-1377E3384DC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU

@@ -31,14 +31,12 @@ jobs:
         dotnet build Coosu.Shared --configuration Release
         dotnet build Coosu.Storyboard --configuration Release
         dotnet build Coosu.Storyboard.Extensions --configuration Release
-        dotnet build Coosu.Storyboard.Advanced --configuration Release
         dotnet build Coosu.Storyboard.OsbX --configuration Release
         dotnet build Coosu.Beatmap --configuration Release
         dotnet build Coosu.Api --configuration Release
         dotnet pack Coosu.Shared --configuration Release --output ci-pack
         dotnet pack Coosu.Storyboard --configuration Release --output ci-pack
         dotnet pack Coosu.Storyboard.Extensions --configuration Release --output ci-pack
-        dotnet pack Coosu.Storyboard.Advanced --configuration Release --output ci-pack
         dotnet pack Coosu.Storyboard.OsbX --configuration Release --output ci-pack
         dotnet pack Coosu.Beatmap --configuration Release --output ci-pack
         dotnet pack Coosu.Api --configuration Release --output ci-pack
@@ -50,7 +48,7 @@ jobs:
         mkdir ILMerge -Force
         Invoke-WebRequest https://github.com/Milkitic/ILMerge/releases/download/3.0.41.49566/ILMerge-Windows.7z -OutFile "ILMerge/cli.zip"
         7z x "ILMerge/cli.zip" -oILMerge/
-        .\ILMerge\ILMerge.exe .\ci-build\Coosu.Storyboard.Storybrew.dll .\ci-build\Coosu.Shared.dll .\ci-build\Coosu.Storyboard.dll .\ci-build\Coosu.Storyboard.Extensions.dll .\ci-build\Coosu.Storyboard.Advanced.dll .\ci-build\System.Buffers.dll .\ci-build\System.Memory.dll .\ci-build\System.Numerics.Vectors.dll .\ci-build\System.Runtime.CompilerServices.Unsafe.dll .\ci-build\System.ValueTuple.dll .\ci-build\Newtonsoft.Json.dll /t:library /out:Coosu.Storyboard.Storybrew-ILMerged.dll
+        .\ILMerge\ILMerge.exe .\ci-build\Coosu.Storyboard.Storybrew.dll .\ci-build\Coosu.Shared.dll .\ci-build\Coosu.Storyboard.dll .\ci-build\Coosu.Storyboard.Extensions.dll .\ci-build\System.Buffers.dll .\ci-build\System.Memory.dll .\ci-build\System.Numerics.Vectors.dll .\ci-build\System.Runtime.CompilerServices.Unsafe.dll .\ci-build\System.ValueTuple.dll .\ci-build\Newtonsoft.Json.dll /t:library /out:Coosu.Storyboard.Storybrew-ILMerged.dll
         .\ci-build\CombineXml.ps1 "" ".\ci-build\"
         copy .\ci-build\Coosu.Storyboard.Storybrew-ILMerged.xml .
         copy .\ci-build\Presentation* .
@@ -83,7 +81,6 @@ jobs:
           ./ci-pack/Coosu.Shared.${{ steps.version.outputs.version }}.nupkg
           ./ci-pack/Coosu.Storyboard.${{ steps.version.outputs.version }}.nupkg
           ./ci-pack/Coosu.Storyboard.Extensions.${{ steps.version.outputs.version }}.nupkg
-          ./ci-pack/Coosu.Storyboard.Advanced.${{ steps.version.outputs.version }}.nupkg
           ./ci-pack/Coosu.Storyboard.OsbX.${{ steps.version.outputs.version }}.nupkg
           ./ci-pack/Coosu.Beatmap.${{ steps.version.outputs.version }}.nupkg
           ./ci-pack/Coosu.Api.${{ steps.version.outputs.version }}.nupkg
@@ -95,7 +92,6 @@ jobs:
         dotnet nuget push "./ci-pack/Coosu.Shared.${{ steps.version.outputs.version }}.nupkg"  --api-key ${{secrets.MILKI_COOSU_TOKEN}} --source "github"
         dotnet nuget push "./ci-pack/Coosu.Storyboard.${{ steps.version.outputs.version }}.nupkg"  --api-key ${{secrets.MILKI_COOSU_TOKEN}} --source "github"
         dotnet nuget push "./ci-pack/Coosu.Storyboard.Extensions.${{ steps.version.outputs.version }}.nupkg"  --api-key ${{secrets.MILKI_COOSU_TOKEN}} --source "github"
-        dotnet nuget push "./ci-pack/Coosu.Storyboard.Advanced.${{ steps.version.outputs.version }}.nupkg"  --api-key ${{secrets.MILKI_COOSU_TOKEN}} --source "github"
         dotnet nuget push "./ci-pack/Coosu.Storyboard.OsbX.${{ steps.version.outputs.version }}.nupkg"  --api-key ${{secrets.MILKI_COOSU_TOKEN}} --source "github"
         dotnet nuget push "./ci-pack/Coosu.Beatmap.${{ steps.version.outputs.version }}.nupkg"  --api-key ${{secrets.MILKI_COOSU_TOKEN}} --source "github"
         dotnet nuget push "./ci-pack/Coosu.Api.${{ steps.version.outputs.version }}.nupkg"  --api-key ${{secrets.MILKI_COOSU_TOKEN}} --source "github"
@@ -122,15 +118,6 @@ jobs:
       uses: Rebel028/publish-nuget@v2.6.3
       with:
         PROJECT_FILE_PATH: Coosu.Storyboard.Extensions/Coosu.Storyboard.Extensions.csproj
-        VERSION_STATIC: ${{ steps.version.outputs.version }}
-        NUGET_KEY: ${{secrets.NUGET_API_KEY}}
-        GITHUB_USER: Milkitic
-        TAG_COMMIT: false
-
-    - name: Nuget Publish Coosu.Storyboard.Advanced
-      uses: Rebel028/publish-nuget@v2.6.3
-      with:
-        PROJECT_FILE_PATH: Coosu.Storyboard.Advanced/Coosu.Storyboard.Advanced.csproj
         VERSION_STATIC: ${{ steps.version.outputs.version }}
         NUGET_KEY: ${{secrets.NUGET_API_KEY}}
         GITHUB_USER: Milkitic
