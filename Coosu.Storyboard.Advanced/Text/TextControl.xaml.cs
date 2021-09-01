@@ -312,8 +312,8 @@ namespace Coosu.Storyboard.Advanced.Text
                 File.WriteAllText(_textContext.CachePath, "{}");
             var cache = JsonConvert.DeserializeObject<CacheObj>(File.ReadAllText(_textContext.CachePath))!;
             var baseId = _textContext.TextOptions.GetBaseId();
-            var strokeId = _textContext.TextOptions.GetBaseId();
-            var shadowId = _textContext.TextOptions.GetStrokeId();
+            var strokeId = _textContext.TextOptions.GetStrokeId();
+            var shadowId = _textContext.TextOptions.GetShadowId();
 
             bool forceReBase = false, forceReStroke = false, forceReShadow = false;
 
