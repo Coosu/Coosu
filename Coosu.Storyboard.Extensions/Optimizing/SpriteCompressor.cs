@@ -15,6 +15,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
 {
     public class SpriteCompressor : IDisposable
     {
+        private readonly Layer? _layer;
         public CompressOptions Options { get; }
         public event EventHandler<CompressorEventArgs>? OperationStart;
         public event EventHandler<CompressorEventArgs>? OperationEnd;
@@ -26,7 +27,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
 
         //private int _threadCount = 1;
 
-        private readonly ICollection<Sprite> _sprites;
+        private ICollection<Sprite> _targetSprites;
 
         private readonly object _runLock = new();
         private readonly object _pauseThreadLock = new();
@@ -40,7 +41,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
 
         public SpriteCompressor(ICollection<ISceneObject> sprites, CompressOptions? compressSettings = null)
         {
-            _sprites = sprites
+            _targetSprites = sprites
                 .Where(k => k is Sprite)
                 .Cast<Sprite>()
                 .ToList();
@@ -50,7 +51,8 @@ namespace Coosu.Storyboard.Extensions.Optimizing
 
         public SpriteCompressor(Layer layer, CompressOptions? compressSettings = null)
         {
-            _sprites = layer.SceneObjects
+            _layer = layer;
+            _targetSprites = layer.SceneObjects
                 .Where(k => k is Sprite)
                 .Cast<Sprite>()
                 .ToList();
@@ -84,6 +86,16 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             }
 
             _cancelToken = new CancellationTokenSource();
+
+            if (_layer != null)
+            {
+                if (_layer.ExpandSubHosts())
+                    _targetSprites = _layer.SceneObjects
+                        .Where(k => k is Sprite)
+                        .Cast<Sprite>()
+                        .ToList();
+            }
+
             var uselessSprites = new ConcurrentBag<Sprite>();
             var possibleBgs = new ConcurrentBag<Sprite>();
 
@@ -126,11 +138,11 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             {
                 object indexLock = new();
                 int index = 0;
-                int total = _sprites.Count;
+                int total = _targetSprites.Count;
                 var mrs = new ManualResetEventSlim(true);
                 try
                 {
-                    _sprites
+                    _targetSprites
                         .AsParallel()
                         .WithCancellation(_cancelToken?.Token ?? CancellationToken.None)
                         .WithDegreeOfParallelism(Options.ThreadCount)
@@ -184,7 +196,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             //_pauseThreadLock = null;
             _cancelToken?.Dispose();
 
-            _sprites?.Clear();
+            _targetSprites?.Clear();
         }
 
 

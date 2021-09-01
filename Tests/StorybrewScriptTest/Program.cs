@@ -22,7 +22,6 @@ namespace StorybrewScriptTest
 
     class Program
     {
-
         static void Main(string[] args)
         {
             var generatorContext = new MyContext();

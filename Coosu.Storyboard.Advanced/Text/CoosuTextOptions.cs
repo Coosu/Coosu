@@ -77,6 +77,7 @@ namespace Coosu.Storyboard.Advanced.Text
         {
             var availableObj = new
             {
+                ShowBase,
                 FontStyle,
                 FontWeight,
                 FontSize,
@@ -90,6 +91,7 @@ namespace Coosu.Storyboard.Advanced.Text
         {
             var availableObj = new
             {
+                ShowStroke,
                 FontStyle,
                 FontWeight,
                 FontSize,
@@ -104,6 +106,7 @@ namespace Coosu.Storyboard.Advanced.Text
         {
             var availableObj = new
             {
+                ShowShadow,
                 FontStyle,
                 FontWeight,
                 FontSize,

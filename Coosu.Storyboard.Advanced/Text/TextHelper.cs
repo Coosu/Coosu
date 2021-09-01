@@ -35,7 +35,7 @@ namespace Coosu.Storyboard.Advanced.Text
             var u = c >= 33 && c <= 126 && !WindowsInvalidPathChars.Contains(c)
                 ? (WindowsInvalidFileNameChars.Contains(c)
                     ? CharToUnicode(c)
-                    : (c >= 65 && c <= 90 ? c + "u" : c.ToString())
+                    : (c >= 65 && c <= 90 ? "_" + c + "u" : "_" + c)
                 )
                 : CharToUnicode(c);
 

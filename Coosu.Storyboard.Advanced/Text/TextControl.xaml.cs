@@ -339,7 +339,7 @@ namespace Coosu.Storyboard.Advanced.Text
                     Shadow = shadowId,
                     Stroke = strokeId
                 };
-                File.WriteAllText(_textContext.CachePath, JsonConvert.SerializeObject(cache));
+                File.WriteAllText(_textContext.CachePath, JsonConvert.SerializeObject(cache, Formatting.Indented));
             }
 
             return _widthDict;

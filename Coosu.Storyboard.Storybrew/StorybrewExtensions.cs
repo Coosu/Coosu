@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using Coosu.Storyboard.Advanced;
-using Coosu.Storyboard.Advanced.Text;
 using Coosu.Storyboard.Advanced.UI;
 using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Extensions.Optimizing;
@@ -53,6 +50,8 @@ namespace Coosu.Storyboard
             compressor.CompressAsync().Wait();
             compressor.ErrorOccured -= EventHandler;
             if (layer.SceneObjects.Count == 0) return;
+
+            layer.WriteScriptAsync(Console.Out).Wait();
 
             foreach (var sprite in layer.SceneObjects.Where(k => k is Sprite).Cast<Sprite>())
             {

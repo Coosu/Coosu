@@ -13,9 +13,12 @@
     Background="#240521"
     mc:Ignorable="d">
     <Grid>
+        <Grid.Resources>
+            <text:DebugConverter x:Key="DebugConverter" />
+        </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition />
-            <RowDefinition />
+            <RowDefinition Height="Auto" />
             <RowDefinition />
             <RowDefinition />
             <RowDefinition Height="Auto" />
@@ -163,7 +166,7 @@
             VerticalContentAlignment="Center"
             AcceptsReturn="True"
             FontSize="13"
-            Text="{Binding Text, UpdateSourceTrigger=PropertyChanged}"
+            Text="{Binding Text, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource DebugConverter}}"
             TextChanged="TextBox_OnTextChanged" />
     </Grid>
 </UserControl>
