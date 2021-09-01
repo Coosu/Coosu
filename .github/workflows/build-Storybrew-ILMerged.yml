@@ -28,7 +28,9 @@ jobs:
         mkdir artifact -Force
         Invoke-WebRequest https://github.com/Milkitic/ILMerge/releases/download/3.0.41.49566/ILMerge-Windows.7z -OutFile "ILMerge/cli.zip"
         7z x "ILMerge/cli.zip" -oILMerge/
-        .\ILMerge\ILMerge.exe .\ci-build\Coosu.Storyboard.Storybrew.dll .\ci-build\Coosu.Shared.dll .\ci-build\Coosu.Storyboard.dll .\ci-build\Coosu.Storyboard.Extensions.dll .\ci-build\Coosu.Storyboard.Advanced.dll .\ci-build\System.Buffers.dll .\ci-build\System.Memory.dll .\ci-build\System.Numerics.Vectors.dll .\ci-build\System.Runtime.CompilerServices.Unsafe.dll .\ci-build\System.ValueTuple.dll .\ci-build\Newtonsoft.Json.dll /t:library /out:artifact\Coosu.Storyboard.Storybrew-ILMerged.dll
+        .\ILMerge\ILMerge.exe .\ci-build\Coosu.Storyboard.Storybrew.dll .\ci-build\Coosu.Shared.dll .\ci-build\Coosu.Storyboard.dll .\ci-build\Coosu.Storyboard.Extensions.dll .\ci-build\System.Buffers.dll .\ci-build\System.Memory.dll .\ci-build\System.Numerics.Vectors.dll .\ci-build\System.Runtime.CompilerServices.Unsafe.dll .\ci-build\System.ValueTuple.dll .\ci-build\Newtonsoft.Json.dll /t:library /out:artifact\Coosu.Storyboard.Storybrew-ILMerged.dll
+        move .\ci-build\Coosu.Storyboard.Advanced.dll .\artifact
+        move .\ci-build\Coosu.Storyboard.Advanced.xml .\artifact
         .\ci-build\CombineXml.ps1 "" ".\ci-build\"
         copy .\ci-build\Coosu.Storyboard.Storybrew-ILMerged.xml .\artifact
         copy .\ci-build\Presentation* .\artifact
