@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
 using Coosu.Storyboard.Advanced.UI;
 
 namespace Coosu.Storyboard.Advanced.Text
@@ -15,18 +14,28 @@ namespace Coosu.Storyboard.Advanced.Text
         private static TimeSpan _delayTime = TimeSpan.FromMilliseconds(500);
         public static Dictionary<char, double> ProcessText(TextContext textContext)
         {
-            UiThreadHelper.EnsureUiThreadAlive();
             Dictionary<char, double> dict = null!;
-            Application.Current.Dispatcher.Invoke(() =>
+            var uiThread = new Thread(() =>
             {
                 var textControl = new TextControl(textContext);
-                var window = new WindowBase { Content = new DpiDecorator { Child = textControl } };
-
+                var window = new WindowBase { Content /*= new DpiDecorator { Child*/ = textControl/* } */};
+                
+                window.Shown += (s, e) =>
+                {
+                    dict = textControl.SaveImageAndGetWidth();
+                    Thread.Sleep(1000);
+                    window.Close();
+                    System.Windows.Threading.Dispatcher.ExitAllFrames();
+                };
                 window.Show();
-                dict = textControl.SaveImageAndGetWidth();
-                window.Close();
-            });
-
+                System.Windows.Threading.Dispatcher.Run();
+            })
+            {
+                IsBackground = true
+            };
+            uiThread.SetApartmentState(ApartmentState.STA);
+            uiThread.Start();
+            uiThread.Join();
             return dict;
         }
 

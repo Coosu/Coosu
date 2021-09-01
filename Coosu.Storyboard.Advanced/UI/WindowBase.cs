@@ -20,6 +20,36 @@ namespace Coosu.Storyboard.Advanced.UI
             Opacity = 0;
         }
 
+        public bool IsShown { get; private set; }
+
+        /// <summary>
+        /// 窗体显示事件
+        /// </summary>
+        public static readonly RoutedEvent ShownEvent = EventManager.RegisterRoutedEvent
+            ("Shown", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(WindowBase));
+
+        /// <summary>
+        /// 当窗体显示时发生。
+        /// </summary>
+        public event RoutedEventHandler Shown
+        {
+            add => AddHandler(ShownEvent, value);
+            remove => RemoveHandler(ShownEvent, value);
+        }
+
+        protected sealed override void OnContentRendered(EventArgs e)
+        {
+            base.OnContentRendered(e);
+
+            if (IsShown)
+                return;
+
+            IsShown = true;
+
+            var args = new RoutedEventArgs(ShownEvent, this);
+            RaiseEvent(args);
+        }
+
         protected override void OnSourceInitialized(EventArgs e)
         {
             base.OnSourceInitialized(e);
