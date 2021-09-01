@@ -22,7 +22,7 @@ using System.Windows.Media;
 
 namespace StorybrewScriptTest
 {
-    public class Class : StoryboardObjectGenerator
+    public class DemoEffect : StoryboardObjectGenerator
     {
         public override void Generate()
         {
@@ -30,7 +30,7 @@ namespace StorybrewScriptTest
             //layer.Camera2.Scale(12345, 2);
             //layer.Camera2.ScaleBy(EasingType.QuartOut, 12345, 15345, 1);
 
-            SpriteGroup textGroup = layer.CreateText("LYRIC lyric here... owo!~|\"/\\á测试<>",
+            SpriteGroup textGroup = layer.CreateText("🥰🥰 LYRIC lyric here... owo!~|\"/\\á测试<>",
                 12345,
                 320, 240,
                 OriginType.Centre,

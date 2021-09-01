@@ -26,29 +26,74 @@ namespace Coosu.Storyboard
 
         private static void DelayExecuteText(TextContext textContext, StoryboardObjectGenerator storyboardObjectGenerator)
         {
-            var text = textContext.Text;
+            var text = textContext.Text.Where(k => k >= 32 && k != 127).ToArray();
             var textOptions = textContext.TextOptions;
             var layer = textContext.Layer;
-            var origin = textContext.Origin;
             var spriteGroup = textContext.SpriteGroup;
             var startTime = textContext.StartTime;
+            var unitOrigin = textContext.TextOptions.Origin;
 
             textContext.BeatmapsetDir = storyboardObjectGenerator.MapsetPath;
             textContext.CachePath = storyboardObjectGenerator.GetProjectCachePath();
             var dict = TextHelper.ProcessText(textContext);
-            var totalCalculateWidth = 0;
-            var totalCalculateHeight = 0;
-            for (var i = 0; i < text.Length; i++)
-            {
-                var c = text[i];
-                var unicode = TextHelper.CharToUnicode(c);
-                var fileName = unicode + "_" + textOptions.FileIdentifier;
-                var path = Path.Combine(Directories.CoosuTextDir, fileName + ".png");
 
-                var x = 0;
-                var y = 0;
-                spriteGroup.CreateSprite(path, layer, origin, x, y);
-            }
+            var sprites = spriteGroup.ToArray();
+            var totalWidth = text.Select(k => dict[k]).Sum();
+
+            var calculateX = spriteGroup.DefaultX - totalWidth / 2;
+            int j = 0;
+            if (textOptions.ShowBase)
+                for (var i = 0; i < text.Length; i++, j++)
+                {
+                    var c = text[i];
+                    var sprite = sprites[j];
+                    var width = dict[c];
+                    if (c == ' ')
+                    {
+                        calculateX += width;
+                        continue;
+                    }
+
+                    sprite.DefaultY += spriteGroup.DefaultY;
+                    sprite.DefaultX += calculateX + width / 2;
+                    calculateX += width;
+                }
+
+            calculateX = spriteGroup.DefaultX - totalWidth / 2;
+            if (textOptions.ShowStroke)
+                for (var i = 0; i < text.Length; i++, j++)
+                {
+                    var c = text[i];
+                    var sprite = sprites[j];
+                    var width = dict[c];
+                    if (c == ' ')
+                    {
+                        calculateX += width;
+                        continue;
+                    }
+
+                    sprite.DefaultY += spriteGroup.DefaultY;
+                    sprite.DefaultX += calculateX + width / 2;
+                    calculateX += width;
+                }
+
+            calculateX = spriteGroup.DefaultX - totalWidth / 2;
+            if (textOptions.ShowShadow)
+                for (var i = 0; i < text.Length; i++, j++)
+                {
+                    var c = text[i];
+                    var sprite = sprites[j];
+                    var width = dict[c];
+                    if (c == ' ')
+                    {
+                        calculateX += width;
+                        continue;
+                    }
+
+                    sprite.DefaultY += spriteGroup.DefaultY;
+                    sprite.DefaultX += calculateX + width / 2;
+                    calculateX += width;
+                }
         }
     }
 }

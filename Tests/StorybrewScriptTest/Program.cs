@@ -26,7 +26,7 @@ namespace StorybrewScriptTest
         static void Main(string[] args)
         {
             var generatorContext = new MyContext();
-            var cls = new Class();
+            var cls = new DemoEffect();
             cls.Generate(generatorContext);
             //new int[3].AsParallel()
             //    .WithDegreeOfParallelism(Environment.ProcessorCount + 1)

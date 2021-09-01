@@ -221,7 +221,7 @@ namespace Coosu.Storyboard.Advanced.Text
             InitializeComponent();
 
             _textContext = textContext;
-            _viewModel.Text = textContext.Text.Distinct().Where(k => k >= 32 && k != 127).ToArray();
+            _viewModel.Text = textContext.Text.Distinct().ToArray();
             var textOptions = textContext.TextOptions;
             _viewModel.FontStyle = textOptions.FontStyle;
             _viewModel.FontWeight = textOptions.FontWeight;
@@ -257,11 +257,9 @@ namespace Coosu.Storyboard.Advanced.Text
             }
 
             _viewModel.FontFamily = (FontFamily)new FontFamilyConverter().ConvertFrom(sb.ToString());
-            _showBase = textOptions.StrokeMode != OptionType.Only &&
-                        textOptions.ShadowMode != OptionType.Only;
-            _showStroke = textOptions.StrokeMode != OptionType.None &&
-                          textOptions.ShadowMode != OptionType.Only;
-            _showShadow = textOptions.ShadowMode != OptionType.None;
+            _showBase = textOptions.ShowBase;
+            _showStroke = textOptions.ShowStroke;
+            _showShadow = textOptions.ShowShadow;
 
             if (!_showBase) ComputingBaseControl.ItemsSource = null;
             if (!_showStroke) StrokeOnlyControl.ItemsSource = null;

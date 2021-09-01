@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using Coosu.Storyboard.Advanced;
 using Coosu.Storyboard.Advanced.Text;
 using Coosu.Storyboard.Common;
@@ -43,6 +44,7 @@ namespace Coosu.Storyboard
             OriginType origin = OriginType.Centre,
             CoosuTextOptions? textOptions = null)
         {
+            var textArr = text.Where(k => k >= 32 && k != 127).ToArray();
             textOptions ??= CoosuTextOptions.Default;
             if (textOptions.FileIdentifier == null)
                 throw new ArgumentNullException("textOptions.FileIdentifier",
@@ -69,27 +71,52 @@ namespace Coosu.Storyboard
             layer1.Tags["text:" + spriteGroup.Camera2.CameraIdentifier] = new TextContext
             {
                 Layer = layer,
-                Origin = origin,
                 StartTime = startTime,
-                Text = text,
+                Text = textArr,
                 TextOptions = textOptions,
                 SpriteGroup = spriteGroup
             };
             //var dict = TextHelper.ProcessText(new TextContext()).Result;
             //var totalCalculateWidth = 0;
             //var totalCalculateHeight = 0;
-            //for (var i = 0; i < text.Length; i++)
-            //{
-            //    var c = text[i];
-            //    var unicode = TextHelper.CharToUnicode(c);
-            //    var fileName = unicode + "_" + textOptions.FileIdentifier;
-            //    var path = Path.Combine(Directories.CoosuTextDir, fileName + ".png");
+            if (textOptions.ShowBase)
+            {
+                for (var i = 0; i < textArr.Length; i++)
+                {
+                    var c = textArr[i];
+                    var fileName = TextHelper.ConvertToFileName(c, textOptions.FileIdentifier + "_", "");
+                    var filePath = Path.Combine(Directories.CoosuTextDir, fileName);
 
-            //    var x = 0;
-            //    var y = 0;
-            //    spriteGroup.CreateSprite(path, layer, origin, x, y);
-            //}
+                    spriteGroup.CreateSprite(filePath, layer, textOptions.Origin, 0, 0);
+                }
+            }
 
+            if (textOptions.ShowStroke)
+            {
+                for (var i = 0; i < textArr.Length; i++)
+                {
+                    var c = textArr[i];
+                    var fileName = TextHelper.ConvertToFileName(c, textOptions.FileIdentifier + "_", "_st");
+                    var filePath = Path.Combine(Directories.CoosuTextDir, fileName);
+
+                    spriteGroup.CreateSprite(filePath, layer, textOptions.Origin, 0, 0);
+                }
+            }
+
+            if (textOptions.ShowShadow)
+            {
+                for (var i = 0; i < textArr.Length; i++)
+                {
+                    var c = textArr[i];
+                    var fileName = TextHelper.ConvertToFileName(c, textOptions.FileIdentifier + "_", "_bl");
+                    var filePath = Path.Combine(Directories.CoosuTextDir, fileName);
+                    var r = textOptions.ShadowDepth;
+                    var deg = textOptions.ShadowDirection;
+                    var x = r * Math.Cos(deg / 180d * Math.PI);
+                    var y = r * Math.Sin(deg / 180d * Math.PI);
+                    spriteGroup.CreateSprite(filePath, layer, textOptions.Origin, x, y);
+                }
+            }
             spriteHost.AddSubHost(spriteGroup);
             return spriteGroup;
         }
