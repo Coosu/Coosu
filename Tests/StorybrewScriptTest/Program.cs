@@ -52,7 +52,7 @@ namespace StorybrewScriptTest
         public override OsbAnimation CreateAnimation(string path, int frameCount, double frameDelay, OsbLoopType loopType, OsbOrigin origin,
             Vector2 initialPosition)
         {
-            var storyboardObject = new EditorOsbAnimation()
+            var storyboardObject = new EditorOsbAnimation
             {
                 TexturePath = path,
                 Origin = origin,

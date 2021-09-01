@@ -221,7 +221,7 @@ namespace Coosu.Storyboard.Advanced.Text
             InitializeComponent();
 
             _textContext = textContext;
-            _viewModel.Text = textContext.Text.Distinct().ToArray();
+            _viewModel.Text = textContext.Text.Distinct().Where(k => k >= 32 && k != 127).ToArray();
             var textOptions = textContext.TextOptions;
             _viewModel.FontStyle = textOptions.FontStyle;
             _viewModel.FontWeight = textOptions.FontWeight;
@@ -379,7 +379,7 @@ namespace Coosu.Storyboard.Advanced.Text
                 var target = (FrameworkElement)contentControl.Content;
                 var c = (char)target.Tag;
                 if (_widthDict[c] <= 0) continue;
-
+                if (c == ' ') continue;
                 var fileName = TextHelper.ConvertToFileName(c, prefix, postFix);
                 var filePath = Path.Combine(coosuTextDir, fileName);
 
