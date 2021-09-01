@@ -46,7 +46,7 @@ namespace StorybrewScriptTest
                     .FillBy("#43221451")
                     .FillLinearGradientBy("#43221451", "#000000", 60)
                     .WithStroke("#FF131451", 5)
-                    .WithShadow("#000000", 5, -60, 4));
+                    .WithShadow("#000000", 10, -60, 4));
 
             //textGroup.MoveYBy(0, 12345, 15123, -30);
             //textGroup.Rotate(12345, 0.5);

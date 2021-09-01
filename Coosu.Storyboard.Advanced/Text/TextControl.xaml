@@ -125,7 +125,7 @@
                                 <SolidColorBrush Color="{Binding ElementName=self, Path=DataContext.ShadowColor}" />
                             </TextBlock.Foreground>
                             <TextBlock.Effect>
-                                <BlurEffect Radius="{Binding ElementName=self, Path=DataContext.ShadowBlurRadius}" />
+                                <BlurEffect Radius="{Binding ElementName=self, Path=DataContext.ShadowBlurRadius}" RenderingBias="Quality" />
                             </TextBlock.Effect>
                         </TextBlock>
                     </ContentControl>
