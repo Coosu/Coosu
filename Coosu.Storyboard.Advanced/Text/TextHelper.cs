@@ -6,9 +6,15 @@ namespace Coosu.Storyboard.Advanced.Text
 {
     public class TextHelper
     {
-        public static string ConvertToFileName(string name, string postFix)
+        public static string ConvertToFileName(char c, string prefix, string postFix)
         {
-            var fileName = StringToUnicode(name) + postFix + ".png";
+            var fileName = prefix + CharToUnicode(c) + postFix + ".png";
+            return fileName;
+        }
+
+        public static string ConvertToFileName(string name, string prefix, string postFix)
+        {
+            var fileName = prefix + StringToUnicode(name) + postFix + ".png";
             return fileName;
         }
 

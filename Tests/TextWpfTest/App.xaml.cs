@@ -44,7 +44,7 @@ namespace TextWpfTest
 
         private void App_OnStartup(object sender, StartupEventArgs e)
         {
-            var control = new TextControl();
+            var control = new TextControl(new TextContext());
             var image = FromControlToImage(new Size(800, 450), control);
             image.Save("haha.png");
         }

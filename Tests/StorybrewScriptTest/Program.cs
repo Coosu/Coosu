@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Numerics;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -105,6 +101,25 @@ namespace StorybrewScriptTest
 
         static void Main(string[] args)
         {
+            var linearGradientBrush = new LinearGradientBrush(Color.FromArgb(3, 3, 2, 5),
+                Color.FromArgb(3, 3, 2, 5), 45);
+            var coosuTextOptions = new CoosuTextOptions
+            {
+                ShadowColor = Colors.Orange,
+                FillBrush = linearGradientBrush
+            };
+
+            var jsonSerializerSettings = new JsonSerializerSettings
+            {
+                Formatting = Formatting.Indented
+            };
+
+            jsonSerializerSettings.Converters.Add(new BrushJsonConverter());
+            var json1 = JsonConvert.SerializeObject(coosuTextOptions, jsonSerializerSettings);
+            Console.WriteLine(json1);
+
+            var obj = JsonConvert.DeserializeObject<CoosuTextOptions>(json1, jsonSerializerSettings);
+
             var layer = new Layer("coosu default layer");
             layer.Camera2.Scale(12345, 2);
             layer.Camera2.ScaleBy(EasingType.QuartOut, 12345, 15345, 1);
@@ -165,24 +180,6 @@ namespace StorybrewScriptTest
             var split = str.Split('\"');
             var split1 = str.Split(new[] { "\"" }, StringSplitOptions.RemoveEmptyEntries);
 
-            var linearGradientBrush = new LinearGradientBrush(Color.FromArgb(3, 3, 2, 5),
-                Color.FromArgb(3, 3, 2, 5), 45);
-            var coosuTextOptions = new CoosuTextOptions
-            {
-                ShadowColor = Colors.Orange,
-                FillBrush = linearGradientBrush
-            };
-
-            var jsonSerializerSettings = new JsonSerializerSettings
-            {
-                Formatting = Formatting.Indented
-            };
-
-            jsonSerializerSettings.Converters.Add(new BrushJsonConverter());
-            var json1 = JsonConvert.SerializeObject(coosuTextOptions, jsonSerializerSettings);
-            Console.WriteLine(json1);
-
-            var obj = JsonConvert.DeserializeObject<CoosuTextOptions>(json1, jsonSerializerSettings);
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using Newtonsoft.Json;
 
 namespace Coosu.Storyboard.Advanced.Text
 {
@@ -40,5 +41,48 @@ namespace Coosu.Storyboard.Advanced.Text
         {
             FileIdentifier = "default"
         };
+
+        public string GetBaseId()
+        {
+            var availableObj = new
+            {
+                FontStyle,
+                FontWeight,
+                FontSize,
+                FontFamilies,
+                FillBrush,
+            };
+            return JsonConvert.SerializeObject(availableObj, new BrushJsonConverter());
+        }
+
+        public string GetStrokeId()
+        {
+            var availableObj = new
+            {
+                FontStyle,
+                FontWeight,
+                FontSize,
+                FontFamilies,
+                StrokeBrush,
+                StrokeThickness,
+            };
+            return JsonConvert.SerializeObject(availableObj, new BrushJsonConverter());
+        }
+
+        public string GetShadowId()
+        {
+            var availableObj = new
+            {
+                FontStyle,
+                FontWeight,
+                FontSize,
+                FontFamilies,
+                ShadowColor,
+                ShadowBlurRadius,
+                ShadowDirection,
+                ShadowDepth,
+            };
+            return JsonConvert.SerializeObject(availableObj, new BrushJsonConverter());
+        }
     }
 }

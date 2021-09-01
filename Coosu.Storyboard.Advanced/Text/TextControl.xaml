@@ -21,7 +21,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <ItemsControl x:Name="ComputingStandardControl" ItemsSource="{Binding Text}">
+        <ItemsControl x:Name="ComputingBaseControl" ItemsSource="{Binding Text}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <Border Margin="{Binding ElementName=self, Path=DataContext.StrokeThickness}">
@@ -32,6 +32,7 @@
                             FontStyle="{Binding ElementName=self, Path=DataContext.FontStyle}"
                             FontWeight="{Binding ElementName=self, Path=DataContext.FontWeight}"
                             Foreground="{Binding ElementName=self, Path=DataContext.FillBrush}"
+                            Tag="{Binding}"
                             Text="{Binding}" />
                     </Border>
                 </DataTemplate>
@@ -42,7 +43,7 @@
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
         </ItemsControl>
-        <ItemsControl
+        <!--<ItemsControl
             x:Name="CombinedControl"
             Grid.Row="1"
             ItemsSource="{Binding Text}">
@@ -76,7 +77,7 @@
                     <StackPanel Orientation="Horizontal" />
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
-        </ItemsControl>
+        </ItemsControl>-->
         <ItemsControl
             x:Name="StrokeOnlyControl"
             Grid.Row="2"
@@ -93,6 +94,7 @@
                             FontWeight="{Binding ElementName=self, Path=DataContext.FontWeight}"
                             Stroke="{Binding ElementName=self, Path=DataContext.StrokeBrush}"
                             StrokeThickness="{Binding ElementName=self, Path=DataContext.StrokeThickness}"
+                            Tag="{Binding}"
                             Text="{Binding}" />
                     </Border>
                 </DataTemplate>
@@ -117,6 +119,7 @@
                             FontStyle="{Binding ElementName=self, Path=DataContext.FontStyle}"
                             FontWeight="{Binding ElementName=self, Path=DataContext.FontWeight}"
                             Opacity="{Binding ElementName=self, Path=DataContext.ShadowOpacity}"
+                            Tag="{Binding}"
                             Text="{Binding}">
                             <TextBlock.Foreground>
                                 <SolidColorBrush Color="{Binding ElementName=self, Path=DataContext.ShadowColor}" />
