@@ -120,7 +120,7 @@ namespace Coosu.Storyboard
             SubHosts.Add(spriteHost);
         }
 
-        public ISpriteHost? BaseHost { get; internal set; }
+        public ISpriteHost? BaseHost { get; set; }
 
         public IList<Sprite> Sprites { get; private set; } = new List<Sprite>();
         public IList<ISpriteHost> SubHosts { get; private set; } = new List<ISpriteHost>();

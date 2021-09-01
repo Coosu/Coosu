@@ -9,6 +9,10 @@ namespace Coosu.Storyboard.Advanced.Text
     public class CoosuTextOptions
     {
         internal bool IsInitialFamily = true;
+        public string? StrokeBrushJson { get; private set; }
+        public string FillBrushJson { get; private set; } = JsonConvert.SerializeObject(Brushes.White, new BrushJsonConverter());
+        private Brush _fillBrush;
+        private Brush? _strokeBrush;
         public string? FileIdentifier { get; set; }
         public bool RightToLeft { get; set; } = false;
         public double XScale { get; set; } = 1;
@@ -24,10 +28,28 @@ namespace Coosu.Storyboard.Advanced.Text
         public int FontSize { get; set; } = 36;
         public List<FontFamilySource> FontFamilies { get; set; } = new() { "Arial" };
 
-        public Brush FillBrush { get; set; } = Brushes.White;
+        public Brush FillBrush
+        {
+            get => _fillBrush;
+            set
+            {
+                _fillBrush = value;
+                FillBrushJson = JsonConvert.SerializeObject(value, new BrushJsonConverter());
+            }
+        }
+
         //ston;st
         public OptionType StrokeMode { get; set; }
-        public Brush? StrokeBrush { get; set; }
+
+        public Brush? StrokeBrush
+        {
+            get { return _strokeBrush; }
+            set
+            {
+                StrokeBrushJson = JsonConvert.SerializeObject(value, new BrushJsonConverter());
+                _strokeBrush = value;
+            }
+        }
 
         public double StrokeThickness { get; set; }
         //sdon;sd
@@ -50,9 +72,9 @@ namespace Coosu.Storyboard.Advanced.Text
                 FontWeight,
                 FontSize,
                 FontFamilies,
-                FillBrush,
+                FillBrushJson,
             };
-            return JsonConvert.SerializeObject(availableObj, new BrushJsonConverter());
+            return JsonConvert.SerializeObject(availableObj);
         }
 
         public string GetStrokeId()
@@ -63,10 +85,10 @@ namespace Coosu.Storyboard.Advanced.Text
                 FontWeight,
                 FontSize,
                 FontFamilies,
-                StrokeBrush,
+                StrokeBrushJson,
                 StrokeThickness,
             };
-            return JsonConvert.SerializeObject(availableObj, new BrushJsonConverter());
+            return JsonConvert.SerializeObject(availableObj);
         }
 
         public string GetShadowId()
@@ -82,7 +104,7 @@ namespace Coosu.Storyboard.Advanced.Text
                 ShadowDirection,
                 ShadowDepth,
             };
-            return JsonConvert.SerializeObject(availableObj, new BrushJsonConverter());
+            return JsonConvert.SerializeObject(availableObj);
         }
     }
 }

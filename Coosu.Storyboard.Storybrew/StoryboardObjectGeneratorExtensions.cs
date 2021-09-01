@@ -15,27 +15,14 @@ namespace Coosu.Storyboard
 {
     public static class StoryboardObjectGeneratorExtensions
     {
+        public static string GetProjectCachePath(this StoryboardObjectGenerator brewObjectGenerator)
+        {
+            return GetProjectPath(brewObjectGenerator, "cache");
+        }
+
         public static string GetProjectConfigPath(this StoryboardObjectGenerator brewObjectGenerator)
         {
-            var brewPath = AppDomain.CurrentDomain.BaseDirectory;
-            var coosuPath = Path.Combine(brewPath, ".coosu");
-            var coosuProjectDir = Path.Combine(coosuPath, "projects");
-
-            var projectPath = brewObjectGenerator.ProjectPath;
-            var projectName = Path.GetFileName(projectPath);
-
-            var targetProjectDir = Path.Combine(coosuProjectDir, projectName);
-            try
-            {
-                Directory.CreateDirectory(targetProjectDir);
-            }
-            catch
-            {
-                // ignored
-            }
-
-            var configFile = Path.Combine(targetProjectDir, "config.json");
-            return configFile;
+            return GetProjectPath(brewObjectGenerator, "config");
         }
 
         public static T GetStore<T>(this StoryboardObjectGenerator generator, Func<JToken, T> property)
@@ -64,6 +51,29 @@ namespace Coosu.Storyboard
                 var save = root.ToString(Formatting.Indented);
                 File.WriteAllText(path, save);
             }
+        }
+
+        private static string GetProjectPath(StoryboardObjectGenerator brewObjectGenerator, string name)
+        {
+            var brewPath = AppDomain.CurrentDomain.BaseDirectory;
+            var coosuPath = Path.Combine(brewPath, ".coosu");
+            var coosuProjectDir = Path.Combine(coosuPath, "projects");
+
+            var projectPath = brewObjectGenerator.ProjectPath;
+            var projectName = Path.GetFileName(projectPath);
+
+            var targetProjectDir = Path.Combine(coosuProjectDir, projectName);
+            try
+            {
+                Directory.CreateDirectory(targetProjectDir);
+            }
+            catch
+            {
+                // ignored
+            }
+
+            var configFile = Path.Combine(targetProjectDir, name + ".json");
+            return configFile;
         }
     }
 }

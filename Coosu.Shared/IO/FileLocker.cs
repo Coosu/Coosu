@@ -17,7 +17,8 @@ namespace Coosu.Shared.IO
             var fi = new FileInfo(_lockPath);
             if (fi.Exists && DateTime.Now - fi.CreationTime > TimeSpan.FromSeconds(30))
             {
-                throw new Exception("Failed: waiting for too long. Please check the .lock file.");
+                fi.Delete();
+                //throw new Exception("Failed: waiting for too long. Please check the .lock file.");
             }
 
             bool success = false;

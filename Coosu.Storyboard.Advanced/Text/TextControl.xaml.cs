@@ -226,8 +226,11 @@ namespace Coosu.Storyboard.Advanced.Text
             _viewModel.FontStyle = textOptions.FontStyle;
             _viewModel.FontWeight = textOptions.FontWeight;
             _viewModel.FontSize = textOptions.FontSize;
-            _viewModel.FillBrush = textOptions.FillBrush;
-            _viewModel.StrokeBrush = textOptions.StrokeBrush;
+            _viewModel.FillBrush =
+                JsonConvert.DeserializeObject<Brush>(textOptions.FillBrushJson, new BrushJsonConverter());
+            if (textOptions.StrokeBrushJson != null)
+                _viewModel.StrokeBrush =
+                    JsonConvert.DeserializeObject<Brush>(textOptions.StrokeBrushJson, new BrushJsonConverter());
             _viewModel.StrokeThickness = textOptions.StrokeThickness;
             if (textOptions.ShadowColor != null)
             {
@@ -300,10 +303,9 @@ namespace Coosu.Storyboard.Advanced.Text
         }
 
 
-        public async Task<Dictionary<char, double>> SaveImageAndGetWidth()
+        public Dictionary<char, double> SaveImageAndGetWidth()
         {
             Compute();
-            await Task.Delay(16);
 
             using var fileLocker = new FileLocker(_textContext.CachePath);
             if (!File.Exists(_textContext.CachePath))
@@ -347,42 +349,43 @@ namespace Coosu.Storyboard.Advanced.Text
 
         private void Regenerate(bool forceReBase, bool forceReStroke, bool forceReShadow)
         {
-            var coosuTextDir = Path.Combine(_textContext.BeatmapsetPath, Directories.CoosuTextDir);
+            var coosuTextDir = Path.Combine(_textContext.BeatmapsetDir, Directories.CoosuTextDir);
             if (!Directory.Exists(coosuTextDir))
                 Directory.CreateDirectory(coosuTextDir);
             var prefix = _textContext.TextOptions.FileIdentifier + "_";
             if (_showBase)
             {
-                var borders = FindVisualChildren<Border>(ComputingBaseControl).ToArray();
+                var borders = FindVisualChildren<ContentControl>(ComputingBaseControl).ToArray();
                 Save(borders, prefix, "", coosuTextDir, forceReBase);
             }
 
             if (_showStroke)
             {
-                var borders = FindVisualChildren<Border>(StrokeOnlyControl).ToArray();
+                var borders = FindVisualChildren<ContentControl>(StrokeOnlyControl).ToArray();
                 Save(borders, prefix, "_st", coosuTextDir, forceReStroke);
             }
 
             if (_showShadow)
             {
-                var borders = FindVisualChildren<Border>(ShadowOnlyControl).ToArray();
+                var borders = FindVisualChildren<ContentControl>(ShadowOnlyControl).ToArray();
                 Save(borders, prefix, "_bl", coosuTextDir, forceReShadow);
             }
         }
 
-        private static void Save(IEnumerable<Border> borders, string prefix, string postFix, string coosuTextDir, bool force)
+        private void Save(IEnumerable<ContentControl> contentControls, string prefix, string postFix, string coosuTextDir, bool force)
         {
-            foreach (var border in borders)
+            foreach (var contentControl in contentControls)
             {
-                var target = (TextBlock)border.Child;
+                var target = (FrameworkElement)contentControl.Content;
                 var c = (char)target.Tag;
+                if (_widthDict[c] <= 0) continue;
 
                 var fileName = TextHelper.ConvertToFileName(c, prefix, postFix);
                 var filePath = Path.Combine(coosuTextDir, fileName);
 
                 if (File.Exists(filePath) && !force) continue;
-
-                var image = GetImageByVisual(new Size(target.ActualWidth, target.ActualHeight), target);
+                var image = GetImageByVisual(new Size(contentControl.ActualWidth + _viewModel.StrokeThickness * 2,
+                        contentControl.ActualHeight + _viewModel.StrokeThickness * 2), contentControl);
                 image.Save(filePath);
                 image.Dispose();
             }

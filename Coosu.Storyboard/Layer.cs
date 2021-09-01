@@ -492,6 +492,7 @@ namespace Coosu.Storyboard
         }
 
         public ISpriteHost? BaseHost => null;
+        public Dictionary<string, object> Tags { get; } = new();
 
         #endregion
     }

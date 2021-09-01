@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using Coosu.Storyboard.Advanced;
+using Coosu.Storyboard.Advanced.Text;
 using Coosu.Storyboard.Advanced.UI;
 using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Extensions.Optimizing;
@@ -14,7 +17,7 @@ namespace Coosu.Storyboard
     /// <summary>
     /// Storybrew extension methods for Coosu.
     /// </summary>
-    public static class StorybrewExtensions
+    public static partial class StorybrewExtensions
     {
         /// <summary>
         /// Executing Coosu commands and optimizing automatically in storybrew.
@@ -38,6 +41,8 @@ namespace Coosu.Storyboard
         public static void ExecuteBrew(this Layer layer, StoryboardObjectGenerator brewObjectGenerator,
             Action<CompressOptions>? configureSettings = null)
         {
+            DelayExecuteContexts(layer, brewObjectGenerator);
+
             var brewLayer = brewObjectGenerator.GetLayer(layer.Name);
             void EventHandler(object _, ProcessErrorEventArgs e) => throw new Exception(e.Message);
 

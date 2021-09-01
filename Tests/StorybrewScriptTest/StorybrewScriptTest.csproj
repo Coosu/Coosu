@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Coosu.Storyboard.Storybrew\Coosu.Storyboard.Storybrew.csproj" />
-    <ProjectReference Include="..\..\Libraries\storybrew\common\common.csproj" />
+    <ProjectReference Include="..\..\Libraries\storybrew\editor\editor.csproj" />
   </ItemGroup>
 
 </Project>

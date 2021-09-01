@@ -58,25 +58,7 @@ namespace Coosu.Storyboard.Advanced.UI
 
         public static void Shutdown()
         {
-            Application?.Shutdown();
-        }
-
-        private static TimeSpan _delayTime = TimeSpan.FromMilliseconds(500);
-        internal static async Task<Dictionary<char, double>> ProcessText(TextContext textContext)
-        {
-            EnsureUiThreadAlive();
-            Dictionary<char, double> dict = null!;
-            await Application.Current.Dispatcher.InvokeAsync(async () =>
-            {
-                var textControl = new TextControl(textContext);
-                var window = new WindowBase { Content = new DpiDecorator { Child = textControl } };
-
-                window.Show();
-                dict = await textControl.SaveImageAndGetWidth();
-                window.Close();
-            });
-
-            return dict;
+            Application?.Dispatcher.Invoke(() => Application?.Shutdown());
         }
     }
 }

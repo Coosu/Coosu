@@ -1,11 +1,33 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using Coosu.Storyboard.Advanced.UI;
 
 namespace Coosu.Storyboard.Advanced.Text
 {
-    public class TextHelper
+    public static class TextHelper
     {
+        private static TimeSpan _delayTime = TimeSpan.FromMilliseconds(500);
+        public static Dictionary<char, double> ProcessText(TextContext textContext)
+        {
+            UiThreadHelper.EnsureUiThreadAlive();
+            Dictionary<char, double> dict = null!;
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                var textControl = new TextControl(textContext);
+                var window = new WindowBase { Content = new DpiDecorator { Child = textControl } };
+
+                window.Show();
+                dict = textControl.SaveImageAndGetWidth();
+                window.Close();
+            });
+
+            return dict;
+        }
+
         public static string ConvertToFileName(char c, string prefix, string postFix)
         {
             var fileName = prefix + CharToUnicode(c) + postFix + ".png";

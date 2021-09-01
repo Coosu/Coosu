@@ -48,22 +48,49 @@ namespace Coosu.Storyboard
                 throw new ArgumentNullException("textOptions.FileIdentifier",
                     "The text's FileIdentifier shouldn't be null.");
 
-            var spriteGroup = new SpriteGroup(initialX, initialY, spriteHost.Camera2.DefaultZ, origin);
-            var totalCalculateWidth = 0;
-            var totalCalculateHeight = 0;
-            for (var i = 0; i < text.Length; i++)
+            var spriteGroup = new SpriteGroup(initialX, initialY, spriteHost.Camera2.DefaultZ, origin)
             {
-                var c = text[i];
-                var unicode = TextHelper.CharToUnicode(c);
-                var fileName = unicode + "_" + textOptions.FileIdentifier;
-                var path = Path.Combine(Directories.CoosuTextDir, fileName + ".png");
-
-                var x = 0;
-                var y = 0;
-                spriteGroup.CreateSprite(path, layer, origin, x, y);
+                Camera2 =
+                {
+                    CameraIdentifier = Guid.NewGuid().ToString()
+                },
+                BaseHost = spriteHost,
+            };
+            ISpriteHost @base = spriteHost;
+            ISpriteHost tempHost = spriteHost;
+            while (tempHost.BaseHost != null)
+            {
+                @base = tempHost.BaseHost;
+                tempHost = tempHost.BaseHost;
             }
 
-            spriteHost.AddSubHost(spriteHost);
+            var layer1 = (Layer)@base;
+
+            layer1.Tags["text:" + spriteGroup.Camera2.CameraIdentifier] = new TextContext
+            {
+                Layer = layer,
+                Origin = origin,
+                StartTime = startTime,
+                Text = text,
+                TextOptions = textOptions,
+                SpriteGroup = spriteGroup
+            };
+            //var dict = TextHelper.ProcessText(new TextContext()).Result;
+            //var totalCalculateWidth = 0;
+            //var totalCalculateHeight = 0;
+            //for (var i = 0; i < text.Length; i++)
+            //{
+            //    var c = text[i];
+            //    var unicode = TextHelper.CharToUnicode(c);
+            //    var fileName = unicode + "_" + textOptions.FileIdentifier;
+            //    var path = Path.Combine(Directories.CoosuTextDir, fileName + ".png");
+
+            //    var x = 0;
+            //    var y = 0;
+            //    spriteGroup.CreateSprite(path, layer, origin, x, y);
+            //}
+
+            spriteHost.AddSubHost(spriteGroup);
             return spriteGroup;
         }
     }

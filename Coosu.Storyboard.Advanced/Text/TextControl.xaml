@@ -24,7 +24,7 @@
         <ItemsControl x:Name="ComputingBaseControl" ItemsSource="{Binding Text}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Border Margin="{Binding ElementName=self, Path=DataContext.StrokeThickness}">
+                    <ContentControl Margin="{Binding ElementName=self, Path=DataContext.StrokeThickness}">
                         <TextBlock
                             Margin="{Binding ElementName=self, Path=DataContext.ShadowBlurRadius}"
                             FontFamily="{Binding ElementName=self, Path=DataContext.FontFamily}"
@@ -34,7 +34,7 @@
                             Foreground="{Binding ElementName=self, Path=DataContext.FillBrush}"
                             Tag="{Binding}"
                             Text="{Binding}" />
-                    </Border>
+                    </ContentControl>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
             <ItemsControl.ItemsPanel>
@@ -49,7 +49,7 @@
             ItemsSource="{Binding Text}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Border Margin="{Binding ElementName=self, Path=DataContext.StrokeThickness}">
+                    <ContentControl Margin="{Binding ElementName=self, Path=DataContext.StrokeThickness}">
                         <text:OutlinedTextBlock
                             Margin="{Binding ElementName=self, Path=DataContext.ShadowBlurRadius}"
                             Fill="{Binding ElementName=self, Path=DataContext.FillBrush}"
@@ -84,7 +84,7 @@
             ItemsSource="{Binding Text}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Border Margin="{Binding ElementName=self, Path=DataContext.StrokeThickness}">
+                    <ContentControl Margin="{Binding ElementName=self, Path=DataContext.StrokeThickness}">
                         <text:OutlinedTextBlock
                             Margin="{Binding ElementName=self, Path=DataContext.ShadowBlurRadius}"
                             Fill="Transparent"
@@ -96,7 +96,7 @@
                             StrokeThickness="{Binding ElementName=self, Path=DataContext.StrokeThickness}"
                             Tag="{Binding}"
                             Text="{Binding}" />
-                    </Border>
+                    </ContentControl>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
             <ItemsControl.ItemsPanel>
@@ -111,7 +111,7 @@
             ItemsSource="{Binding Text}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Border Margin="{Binding ElementName=self, Path=DataContext.StrokeThickness}">
+                    <ContentControl Margin="{Binding ElementName=self, Path=DataContext.StrokeThickness}">
                         <TextBlock
                             Margin="{Binding ElementName=self, Path=DataContext.ShadowBlurRadius}"
                             FontFamily="{Binding ElementName=self, Path=DataContext.FontFamily}"
@@ -128,7 +128,7 @@
                                 <BlurEffect Radius="{Binding ElementName=self, Path=DataContext.ShadowBlurRadius}" />
                             </TextBlock.Effect>
                         </TextBlock>
-                    </Border>
+                    </ContentControl>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
             <ItemsControl.ItemsPanel>
