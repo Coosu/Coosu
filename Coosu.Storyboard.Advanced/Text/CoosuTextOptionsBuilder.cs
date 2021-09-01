@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -106,6 +107,42 @@ namespace Coosu.Storyboard.Advanced.Text
             }
 
             Options.FontFamilies.Add(new FontFamilySource(fontFamilyName));
+            return this;
+        }
+
+        public CoosuTextOptionsBuilder FillLinearGradientBy(string hexColor0, string hexColor1, 
+            Vector2 startPint, Vector2 endPoint)
+        {
+            try
+            {
+                Options.FillBrush = new LinearGradientBrush(
+                    (Color)new ColorConverter().ConvertFrom(hexColor0),
+                    (Color)new ColorConverter().ConvertFrom(hexColor1),
+                    new Point(startPint.X, startPint.Y),
+                    new Point(endPoint.X, endPoint.Y));
+            }
+            catch
+            {
+                throw new Exception("Bad color format.");
+            }
+
+            return this;
+        }
+
+        public CoosuTextOptionsBuilder FillLinearGradientBy(string hexColor0, string hexColor1, double angle)
+        {
+            try
+            {
+                Options.FillBrush = new LinearGradientBrush(
+                    (Color)new ColorConverter().ConvertFrom(hexColor0),
+                    (Color)new ColorConverter().ConvertFrom(hexColor1),
+                    angle);
+            }
+            catch
+            {
+                throw new Exception("Bad color format.");
+            }
+
             return this;
         }
 

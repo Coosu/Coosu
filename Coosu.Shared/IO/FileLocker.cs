@@ -23,6 +23,7 @@ namespace Coosu.Shared.IO
 
             bool success = false;
             var sw = Stopwatch.StartNew();
+            bool notified = false;
             while (!success)
             {
                 if (sw.Elapsed >= TimeSpan.FromSeconds(30))
@@ -30,10 +31,13 @@ namespace Coosu.Shared.IO
                 try
                 {
                     using var fs = new FileStream(_lockPath, FileMode.CreateNew);
+                    Console.WriteLine($"Thread #{Thread.CurrentThread.ManagedThreadId}: Get the lock");
                     success = true;
                 }
                 catch
                 {
+                    if (!notified) Console.WriteLine($"Thread #{Thread.CurrentThread.ManagedThreadId}: Waiting for lock");
+                    notified = true;
                     Thread.Sleep(1);
                     // ignored
                 }

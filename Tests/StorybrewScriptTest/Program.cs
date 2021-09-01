@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,8 +25,14 @@ namespace StorybrewScriptTest
 
         static void Main(string[] args)
         {
+            var generatorContext = new MyContext();
             var cls = new Class();
-            cls.Generate(new MyContext());
+            cls.Generate(generatorContext);
+            //new int[3].AsParallel()
+            //    .WithDegreeOfParallelism(Environment.ProcessorCount + 1)
+            //    .ForAll(k =>
+            //    {
+            //    });
         }
     }
 
