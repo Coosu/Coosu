@@ -289,6 +289,12 @@ namespace Coosu.Storyboard.Extensions.Optimizing
 
             if (host.Events.Any())
                 RemoveByInvisibleList(host, obsoleteList, keyEvents);
+
+            foreach (var hostEvent in host.Events)
+            {
+                if (hostEvent.StartTime.Equals(hostEvent.EndTime) && !hostEvent.IsStatic)
+                    hostEvent.Start = hostEvent.End.ToArray();
+            }
         }
 
         /// <summary>

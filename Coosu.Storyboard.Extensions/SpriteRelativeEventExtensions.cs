@@ -13,6 +13,28 @@ namespace Coosu.Storyboard
     public static class SpriteRelativeEventExtensions
     {
         #region Move
+        /// <summary>
+        /// Move by relative displacement.
+        /// </summary>
+        /// <param name="host">Specific host.</param>
+        /// <param name="time">Event start time.</param>
+        /// <param name="point">Relative displacement.</param>
+        public static void MoveBy(this IEventHost host,
+            double time,
+            Vector2 point) =>
+            host.AddEventRelative(MoreEventTypes.MoveBy, LinearEase.Instance, time, time, point.X, point.Y);
+        
+        /// <summary>
+        /// Move by relative displacement.
+        /// </summary>
+        /// <param name="host">Specific host.</param>
+        /// <param name="time">Event start time.</param>
+        /// <param name="x">Relative x.</param>
+        /// <param name="y">Relative y.</param>
+        public static void MoveBy(this IEventHost host,
+            double time,
+            double x, double y) =>
+            host.AddEventRelative(MoreEventTypes.MoveBy, LinearEase.Instance, time, time, x, y);
 
         /// <summary>
         /// Move by relative displacement.

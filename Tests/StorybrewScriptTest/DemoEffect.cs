@@ -45,8 +45,8 @@ namespace StorybrewScriptTest
                     .Reverse()
                     .FillBy("#43221451")
                     .FillLinearGradientBy("#43221451", "#000000", 60)
-                    //.WithStroke("#FF831451", 2)
-                    //.WithShadow("#000000", 10, -60, 4)
+            //.WithStroke("#FF831451", 2)
+            //.WithShadow("#000000", 10, -60, 4)
             );
 
             //textGroup.MoveYBy(0, 12345, 15123, -30);
@@ -62,11 +62,15 @@ namespace StorybrewScriptTest
             foreach (var sprite in textGroup)
             {
                 var y = i % 2 == 0 ? 80 : -80;
-                sprite.MoveY(new PowerEase
-                {
-                    EasingMode = EasingMode.EaseOut,
-                    Power = 32
-                }, 12345, 15123, sprite.DefaultY + y, sprite.DefaultY);
+                sprite.MoveYBy(0, 12345, 12345, -y);
+                i++;
+                sprite.MoveYBy(0
+                    //new PowerEase
+                    //{
+                    //    EasingMode = EasingMode.EaseOut,
+                    //    Power = 32
+                    //}
+                    , 12345, 15123, y);
                 i++;
             }
 
