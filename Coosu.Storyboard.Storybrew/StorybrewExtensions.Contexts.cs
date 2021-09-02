@@ -66,7 +66,7 @@ namespace Coosu.Storyboard
                 {
                     var c = text[i];
                     var sprite = sprites[j];
-                    var width = dict[c] * textOptions.XScale;
+                    var width = dict[c];
                     if (c == ' ')
                     {
                         calculateX += (width + textOptions.WordGap) * textOptions.XScale;
@@ -84,7 +84,7 @@ namespace Coosu.Storyboard
                 {
                     var c = text[i];
                     var sprite = sprites[j];
-                    var width = dict[c] * textOptions.XScale;
+                    var width = dict[c];
                     if (c == ' ')
                     {
                         calculateX += (width + textOptions.WordGap) * textOptions.XScale;
