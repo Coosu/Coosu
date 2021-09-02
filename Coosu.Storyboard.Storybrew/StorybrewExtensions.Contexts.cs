@@ -39,8 +39,9 @@ namespace Coosu.Storyboard
 
             var sprites = spriteGroup.ToArray();
             var totalWidth = text.Select(k => dict[k]).Sum();
+            var actualWidth = (totalWidth + (text.Length - 1) * textOptions.WordGap) * textOptions.XScale;
 
-            var calculateX = spriteGroup.DefaultX - totalWidth / 2;
+            var calculateX = spriteGroup.DefaultX - actualWidth / 2;
             int j = 0;
             if (textOptions.ShowBase)
                 for (var i = 0; i < text.Length; i++, j++)
@@ -50,49 +51,49 @@ namespace Coosu.Storyboard
                     var width = dict[c];
                     if (c == ' ')
                     {
-                        calculateX += width;
+                        calculateX += (width + textOptions.WordGap) * textOptions.XScale;
                         continue;
                     }
 
                     sprite.DefaultY += spriteGroup.DefaultY;
                     sprite.DefaultX += calculateX + width / 2;
-                    calculateX += width;
+                    calculateX += (width + textOptions.WordGap) * textOptions.XScale;
                 }
 
-            calculateX = spriteGroup.DefaultX - totalWidth / 2;
+            calculateX = spriteGroup.DefaultX - actualWidth / 2;
             if (textOptions.ShowStroke)
                 for (var i = 0; i < text.Length; i++, j++)
                 {
                     var c = text[i];
                     var sprite = sprites[j];
-                    var width = dict[c];
+                    var width = dict[c] * textOptions.XScale;
                     if (c == ' ')
                     {
-                        calculateX += width;
+                        calculateX += (width + textOptions.WordGap) * textOptions.XScale;
                         continue;
                     }
 
                     sprite.DefaultY += spriteGroup.DefaultY;
                     sprite.DefaultX += calculateX + width / 2;
-                    calculateX += width;
+                    calculateX += (width + textOptions.WordGap) * textOptions.XScale;
                 }
 
-            calculateX = spriteGroup.DefaultX - totalWidth / 2;
+            calculateX = spriteGroup.DefaultX - actualWidth / 2;
             if (textOptions.ShowShadow)
                 for (var i = 0; i < text.Length; i++, j++)
                 {
                     var c = text[i];
                     var sprite = sprites[j];
-                    var width = dict[c];
+                    var width = dict[c] * textOptions.XScale;
                     if (c == ' ')
                     {
-                        calculateX += width;
+                        calculateX += (width + textOptions.WordGap) * textOptions.XScale;
                         continue;
                     }
 
                     sprite.DefaultY += spriteGroup.DefaultY;
                     sprite.DefaultX += calculateX + width / 2;
-                    calculateX += width;
+                    calculateX += (width + textOptions.WordGap) * textOptions.XScale;
                 }
         }
     }

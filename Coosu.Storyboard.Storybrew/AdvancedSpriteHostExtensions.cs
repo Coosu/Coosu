@@ -44,8 +44,10 @@ namespace Coosu.Storyboard
             OriginType origin = OriginType.Centre,
             CoosuTextOptions? textOptions = null)
         {
-            var textArr = text.Where(k => k >= 32 && k != 127).ToArray();
             textOptions ??= CoosuTextOptions.Default;
+            var enumerable = text.Where(k => k >= 32 && k != 127);
+            if (textOptions.RightToLeft) enumerable = enumerable.Reverse();
+            var textArr = enumerable.ToArray();
             if (textOptions.FileIdentifier == null)
                 throw new ArgumentNullException("textOptions.FileIdentifier",
                     "The text's FileIdentifier shouldn't be null.");
@@ -79,6 +81,7 @@ namespace Coosu.Storyboard
             //var dict = TextHelper.ProcessText(new TextContext()).Result;
             //var totalCalculateWidth = 0;
             //var totalCalculateHeight = 0;
+            bool scale = !textOptions.XScale.Equals(1) || !textOptions.YScale.Equals(1);
             if (textOptions.ShowBase)
             {
                 for (var i = 0; i < textArr.Length; i++)
@@ -88,6 +91,7 @@ namespace Coosu.Storyboard
                     var filePath = Path.Combine(Directories.CoosuTextDir, fileName);
 
                     var sprite = spriteGroup.CreateSprite(filePath, layer, textOptions.Origin, 0, 0);
+                    if (scale) sprite.Vector(startTime, textOptions.XScale, textOptions.YScale);
                     sprite.Tag = i;
                 }
             }
@@ -101,6 +105,7 @@ namespace Coosu.Storyboard
                     var filePath = Path.Combine(Directories.CoosuTextDir, fileName);
 
                     var sprite = spriteGroup.CreateSprite(filePath, layer, textOptions.Origin, 0, 0);
+                    if (scale) sprite.Vector(startTime, textOptions.XScale, textOptions.YScale);
                     sprite.Tag = i;
                 }
             }
@@ -117,6 +122,7 @@ namespace Coosu.Storyboard
                     var x = r * Math.Cos(deg / 180d * Math.PI);
                     var y = r * Math.Sin(deg / 180d * Math.PI);
                     var sprite = spriteGroup.CreateSprite(filePath, layer, textOptions.Origin, x, y);
+                    if (scale) sprite.Vector(startTime, textOptions.XScale, textOptions.YScale);
                     sprite.Tag = i;
                 }
             }
