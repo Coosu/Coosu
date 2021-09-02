@@ -53,6 +53,7 @@ namespace Coosu.Storyboard
                     var width = dict[c];
                     if (c == ' ')
                     {
+                        j--;
                         calculateX += (width + textOptions.WordGap) * textOptions.XScale;
                         continue;
                     }
@@ -71,6 +72,7 @@ namespace Coosu.Storyboard
                     var width = dict[c];
                     if (c == ' ')
                     {
+                        j--;
                         calculateX += (width + textOptions.WordGap) * textOptions.XScale;
                         continue;
                     }
@@ -89,6 +91,7 @@ namespace Coosu.Storyboard
                     var width = dict[c];
                     if (c == ' ')
                     {
+                        j--;
                         calculateX += (width + textOptions.WordGap) * textOptions.XScale;
                         continue;
                     }
