@@ -41,9 +41,11 @@ namespace Coosu.Storyboard
             var totalWidth = text.Select(k => dict[k]).Sum();
             var actualWidth = (totalWidth + (text.Length - 1) * textOptions.WordGap) * textOptions.XScale;
 
-            var calculateX = spriteGroup.DefaultX - actualWidth / 2;
+            double calculateX;
             int j = 0;
-            if (textOptions.ShowBase)
+
+            calculateX = spriteGroup.DefaultX - actualWidth / 2;
+            if (textOptions.ShowShadow)
                 for (var i = 0; i < text.Length; i++, j++)
                 {
                     var c = text[i];
@@ -79,7 +81,7 @@ namespace Coosu.Storyboard
                 }
 
             calculateX = spriteGroup.DefaultX - actualWidth / 2;
-            if (textOptions.ShowShadow)
+            if (textOptions.ShowBase)
                 for (var i = 0; i < text.Length; i++, j++)
                 {
                     var c = text[i];

@@ -82,15 +82,18 @@ namespace Coosu.Storyboard
             //var totalCalculateWidth = 0;
             //var totalCalculateHeight = 0;
             bool scale = !textOptions.XScale.Equals(1) || !textOptions.YScale.Equals(1);
-            if (textOptions.ShowBase)
+            if (textOptions.ShowShadow)
             {
                 for (var i = 0; i < textArr.Length; i++)
                 {
                     var c = textArr[i];
-                    var fileName = TextHelper.ConvertToFileName(c, textOptions.FileIdentifier + "_", "");
+                    var fileName = TextHelper.ConvertToFileName(c, textOptions.FileIdentifier + "_", "_bl");
                     var filePath = Path.Combine(Directories.CoosuTextDir, fileName);
-
-                    var sprite = spriteGroup.CreateSprite(filePath, layer, textOptions.Origin, 0, 0);
+                    var r = textOptions.ShadowDepth;
+                    var deg = textOptions.ShadowDirection;
+                    var x = r * Math.Cos(deg / 180d * Math.PI);
+                    var y = r * Math.Sin(deg / 180d * Math.PI);
+                    var sprite = spriteGroup.CreateSprite(filePath, layer, textOptions.Origin, x, y);
                     if (scale) sprite.Vector(startTime, textOptions.XScale, textOptions.YScale);
                     sprite.Tag = i;
                 }
@@ -110,18 +113,15 @@ namespace Coosu.Storyboard
                 }
             }
 
-            if (textOptions.ShowShadow)
+            if (textOptions.ShowBase)
             {
                 for (var i = 0; i < textArr.Length; i++)
                 {
                     var c = textArr[i];
-                    var fileName = TextHelper.ConvertToFileName(c, textOptions.FileIdentifier + "_", "_bl");
+                    var fileName = TextHelper.ConvertToFileName(c, textOptions.FileIdentifier + "_", "");
                     var filePath = Path.Combine(Directories.CoosuTextDir, fileName);
-                    var r = textOptions.ShadowDepth;
-                    var deg = textOptions.ShadowDirection;
-                    var x = r * Math.Cos(deg / 180d * Math.PI);
-                    var y = r * Math.Sin(deg / 180d * Math.PI);
-                    var sprite = spriteGroup.CreateSprite(filePath, layer, textOptions.Origin, x, y);
+
+                    var sprite = spriteGroup.CreateSprite(filePath, layer, textOptions.Origin, 0, 0);
                     if (scale) sprite.Vector(startTime, textOptions.XScale, textOptions.YScale);
                     sprite.Tag = i;
                 }
