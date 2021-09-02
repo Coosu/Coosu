@@ -87,6 +87,7 @@ namespace Coosu.Storyboard
                 for (var i = 0; i < textArr.Length; i++)
                 {
                     var c = textArr[i];
+                    if (c == ' ') continue;
                     var fileName = TextHelper.ConvertToFileName(c, textOptions.FileIdentifier + "_", "_bl");
                     var filePath = Path.Combine(Directories.CoosuTextDir, fileName);
                     var r = textOptions.ShadowDepth;
@@ -104,6 +105,7 @@ namespace Coosu.Storyboard
                 for (var i = 0; i < textArr.Length; i++)
                 {
                     var c = textArr[i];
+                    if (c == ' ') continue;
                     var fileName = TextHelper.ConvertToFileName(c, textOptions.FileIdentifier + "_", "_st");
                     var filePath = Path.Combine(Directories.CoosuTextDir, fileName);
 
@@ -118,6 +120,7 @@ namespace Coosu.Storyboard
                 for (var i = 0; i < textArr.Length; i++)
                 {
                     var c = textArr[i];
+                    if (c == ' ') continue;
                     var fileName = TextHelper.ConvertToFileName(c, textOptions.FileIdentifier + "_", "");
                     var filePath = Path.Combine(Directories.CoosuTextDir, fileName);
 
