@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using Coosu.Storyboard.Advanced.Text;
 
 namespace Coosu.Storyboard.Advanced.UI
 {

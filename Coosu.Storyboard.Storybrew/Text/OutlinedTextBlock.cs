@@ -6,7 +6,7 @@ using System.Windows.Documents;
 using System.Windows.Markup;
 using System.Windows.Media;
 
-namespace Coosu.Storyboard.Advanced.Text
+namespace Coosu.Storyboard.Storybrew.Text
 {
     /// <summary>
     /// https://stackoverflow.com/questions/93650/apply-stroke-to-a-textblock-in-wpf

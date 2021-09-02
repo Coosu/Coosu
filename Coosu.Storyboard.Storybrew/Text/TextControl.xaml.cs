@@ -11,6 +11,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Coosu.Shared.IO;
+using Coosu.Storyboard.Advanced;
 using Newtonsoft.Json;
 using Brush = System.Windows.Media.Brush;
 using Brushes = System.Windows.Media.Brushes;
@@ -20,7 +21,7 @@ using FontFamily = System.Windows.Media.FontFamily;
 using FontStyle = System.Windows.FontStyle;
 using Size = System.Windows.Size;
 
-namespace Coosu.Storyboard.Advanced.Text
+namespace Coosu.Storyboard.Storybrew.Text
 {
     public class TextControlVm : INotifyPropertyChanged
     {

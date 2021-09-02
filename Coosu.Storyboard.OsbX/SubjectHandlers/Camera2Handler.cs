@@ -59,6 +59,7 @@ namespace Coosu.Storyboard.OsbX.SubjectHandlers
     {
         public ObjectType ObjectType { get; } = 99;
         public int? RowInSource { get; set; }
+        public object Tag { get; set; }
         public double DefaultY { get; set; }
         public double DefaultX { get; set; }
         public double DefaultZ { get; set; }

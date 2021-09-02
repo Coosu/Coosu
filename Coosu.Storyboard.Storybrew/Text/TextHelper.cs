@@ -4,10 +4,9 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using Coosu.Storyboard.Advanced.UI;
 
-namespace Coosu.Storyboard.Advanced.Text
+namespace Coosu.Storyboard.Storybrew.Text
 {
     public static class TextHelper
     {
@@ -15,6 +14,7 @@ namespace Coosu.Storyboard.Advanced.Text
         public static Dictionary<char, double> ProcessText(TextContext textContext)
         {
             Dictionary<char, double> dict = null!;
+            // todo: don't need to create for each time
             var uiThread = new Thread(() =>
             {
                 var textControl = new TextControl(textContext);

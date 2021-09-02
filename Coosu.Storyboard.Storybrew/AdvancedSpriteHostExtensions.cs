@@ -2,8 +2,8 @@
 using System.IO;
 using System.Linq;
 using Coosu.Storyboard.Advanced;
-using Coosu.Storyboard.Advanced.Text;
 using Coosu.Storyboard.Common;
+using Coosu.Storyboard.Storybrew.Text;
 
 // ReSharper disable once CheckNamespace
 namespace Coosu.Storyboard
@@ -87,7 +87,8 @@ namespace Coosu.Storyboard
                     var fileName = TextHelper.ConvertToFileName(c, textOptions.FileIdentifier + "_", "");
                     var filePath = Path.Combine(Directories.CoosuTextDir, fileName);
 
-                    spriteGroup.CreateSprite(filePath, layer, textOptions.Origin, 0, 0);
+                    var sprite = spriteGroup.CreateSprite(filePath, layer, textOptions.Origin, 0, 0);
+                    sprite.Tag = i;
                 }
             }
 
@@ -99,7 +100,8 @@ namespace Coosu.Storyboard
                     var fileName = TextHelper.ConvertToFileName(c, textOptions.FileIdentifier + "_", "_st");
                     var filePath = Path.Combine(Directories.CoosuTextDir, fileName);
 
-                    spriteGroup.CreateSprite(filePath, layer, textOptions.Origin, 0, 0);
+                    var sprite = spriteGroup.CreateSprite(filePath, layer, textOptions.Origin, 0, 0);
+                    sprite.Tag = i;
                 }
             }
 
@@ -114,9 +116,11 @@ namespace Coosu.Storyboard
                     var deg = textOptions.ShadowDirection;
                     var x = r * Math.Cos(deg / 180d * Math.PI);
                     var y = r * Math.Sin(deg / 180d * Math.PI);
-                    spriteGroup.CreateSprite(filePath, layer, textOptions.Origin, x, y);
+                    var sprite = spriteGroup.CreateSprite(filePath, layer, textOptions.Origin, x, y);
+                    sprite.Tag = i;
                 }
             }
+
             spriteHost.AddSubHost(spriteGroup);
             return spriteGroup;
         }

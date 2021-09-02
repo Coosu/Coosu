@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using Coosu.Storyboard.Advanced.Text;
+using Coosu.Storyboard.Storybrew.Text;
 
 namespace TextWpfTest
 {

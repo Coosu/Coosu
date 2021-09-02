@@ -29,6 +29,8 @@ namespace Coosu.Storyboard
 
         public ObjectType ObjectType { get; } = 10;
         public int? RowInSource { get; set; }
+        public object Tag { get; set; }
+
         public async Task WriteHeaderAsync(TextWriter writer)
         {
         }

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Coosu.Storyboard.Advanced;
-using Coosu.Storyboard.Advanced.Text;
+using Coosu.Storyboard.Storybrew.Text;
 using StorybrewCommon.Scripting;
 
 // ReSharper disable once CheckNamespace
