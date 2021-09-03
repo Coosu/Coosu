@@ -111,7 +111,7 @@ namespace Coosu.Animation.WPF
                     imagePath += ".jpg";
                 }
 
-                var origin = ParseOrigin(sprite.OriginType);
+                var origin = Anchors.FromOriginType(sprite.OriginType);
                 var x = sprite.DefaultX;
                 var y = sprite.DefaultY;
                 if (!System.IO.File.Exists(imagePath))
@@ -239,33 +239,6 @@ namespace Coosu.Animation.WPF
             }
 
             Console.WriteLine(sw.ElapsedMilliseconds);
-        }
-
-        private Origin<double> ParseOrigin(OriginType originType)
-        {
-            switch (originType)
-            {
-                case OriginType.TopLeft:
-                    return Origins.TopLeft;
-                case OriginType.TopCentre:
-                    return Origins.TopCenter;
-                case OriginType.TopRight:
-                    return Origins.TopRight;
-                case OriginType.CentreLeft:
-                    return Origins.CenterLeft;
-                case OriginType.Centre:
-                    return Origins.Center;
-                case OriginType.CentreRight:
-                    return Origins.CenterRight;
-                case OriginType.BottomLeft:
-                    return Origins.BottomLeft;
-                case OriginType.BottomCentre:
-                    return Origins.BottomCenter;
-                case OriginType.BottomRight:
-                    return Origins.BottomRight;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(originType), originType, null);
-            }
         }
 
         private Random _rnd = new();

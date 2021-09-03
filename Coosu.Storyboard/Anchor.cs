@@ -1,8 +1,8 @@
-﻿namespace Coosu.Animation
+﻿namespace Coosu.Storyboard
 {
-    public struct Origin<T>
+    public struct Anchor<T>
     {
-        public Origin(T x, T y)
+        public Anchor(T x, T y)
         {
             X = x;
             Y = y;

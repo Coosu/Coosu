@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Numerics;
 using System.Text;
 using System.Threading;
 using Coosu.Shared.IO;
+using Coosu.Shared.Numerics;
 using Coosu.Storyboard.Storybrew.UI;
 using Newtonsoft.Json;
 
@@ -14,7 +14,7 @@ namespace Coosu.Storyboard.Storybrew.Text
 {
     public static class TextHelper
     {
-        public static Dictionary<char, Vector2> ProcessText(TextContext textContext)
+        public static Dictionary<char, Vector2D> ProcessText(TextContext textContext)
         {
             CacheObj? cache = null;
             var cachePath = textContext.CachePath;
@@ -40,7 +40,7 @@ namespace Coosu.Storyboard.Storybrew.Text
                 }
             }
 
-            Dictionary<char, Vector2> dict = null!;
+            Dictionary<char, Vector2D> dict = null!;
             var uiThread = new Thread(() =>
             {
                 var textControl = new TextControl(textContext);

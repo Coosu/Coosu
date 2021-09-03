@@ -1,4 +1,4 @@
-﻿using System.Numerics;
+﻿using Coosu.Shared.Numerics;
 using Coosu.Storyboard.Common;
 
 namespace Coosu.Storyboard
@@ -11,7 +11,7 @@ namespace Coosu.Storyboard
         /// <param name="filePath">Image file path.</param>
         /// <returns>Created sprite.</returns>
         public static Sprite CreateSprite(
-            this ISpriteHost spriteHost, 
+            this ISpriteHost spriteHost,
             string filePath)
         {
             var obj = new Sprite(LayerType.Foreground, OriginType.Centre, filePath, 320, 240);
@@ -26,7 +26,7 @@ namespace Coosu.Storyboard
         /// <param name="originType">The sprite's origin.</param>
         /// <returns>Created sprite.</returns>
         public static Sprite CreateSprite(
-            this ISpriteHost spriteHost, 
+            this ISpriteHost spriteHost,
             string filePath,
             OriginType originType)
         {
@@ -42,8 +42,8 @@ namespace Coosu.Storyboard
         /// <param name="layerType">The sprite's layer.</param>
         /// <returns>Created sprite.</returns>
         public static Sprite CreateSprite(
-            this ISpriteHost spriteHost, 
-            string filePath, 
+            this ISpriteHost spriteHost,
+            string filePath,
             LayerType layerType)
         {
             var obj = new Sprite(layerType, OriginType.Centre, filePath, 320, 240);
@@ -59,8 +59,8 @@ namespace Coosu.Storyboard
         /// <param name="originType">The sprite's origin.</param>
         /// <returns>Created sprite.</returns>
         public static Sprite CreateSprite(
-            this ISpriteHost spriteHost, 
-            string filePath, 
+            this ISpriteHost spriteHost,
+            string filePath,
             LayerType layerType,
             OriginType originType)
         {
@@ -78,11 +78,11 @@ namespace Coosu.Storyboard
         /// <param name="defaultLocation">The sprite's default location.</param>
         /// <returns>Created sprite.</returns>
         public static Sprite CreateSprite(
-            this ISpriteHost spriteHost, 
-            string filePath, 
+            this ISpriteHost spriteHost,
+            string filePath,
             LayerType layerType,
             OriginType originType,
-            Vector2 defaultLocation)
+            Vector2D defaultLocation)
         {
             var obj = new Sprite(layerType, originType, filePath, defaultLocation.X, defaultLocation.Y);
             spriteHost.AddSprite(obj);
@@ -101,7 +101,7 @@ namespace Coosu.Storyboard
         public static Sprite CreateSprite(
             this ISpriteHost spriteHost,
             string filePath,
-            LayerType layerType, 
+            LayerType layerType,
             OriginType originType,
             double defaultX, double defaultY)
         {

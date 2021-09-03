@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Windows.Controls;
+using Coosu.Shared.Numerics;
 using Coosu.Storyboard.Storybrew.Text;
 using StorybrewCommon.Scripting;
 
@@ -37,13 +34,21 @@ namespace Coosu.Storyboard
             var dict = TextHelper.ProcessText(textContext);
 
             var sprites = spriteGroup.ToArray();
-            var totalWidth = text.Select(k => dict[k].X).Sum();
-            var actualWidth = (totalWidth + (text.Length - 1) * textOptions.WordGap) * textOptions.XScale;
+            var totalLen = textOptions.Orientation switch
+            {
+                Orientation.Horizontal => text.Select(k => dict[k].X).Sum(),
+                Orientation.Vertical when textOptions.RotateBy90 => text.Select(k => dict[k].X).Sum(),
+                _ => text.Select(k => dict[k].Y).Sum()
+            };
+            var actualLen = textOptions.Orientation switch
+            {
+                Orientation.Horizontal => (totalLen + (text.Length - 1) * textOptions.WordGap) * textOptions.XScale,
+                _ => (totalLen + (text.Length - 1) * textOptions.WordGap) * textOptions.YScale
+            }; ;
 
-            double calculateX;
+            Vector2D calOffset;
             int j = 0;
-
-            calculateX = spriteGroup.DefaultX - actualWidth / 2;
+            calOffset = ResetOffset(spriteGroup, actualLen);
             if (textOptions.ShowShadow)
                 for (var i = 0; i < text.Length; i++, j++)
                 {
@@ -53,16 +58,16 @@ namespace Coosu.Storyboard
                     if (c == ' ')
                     {
                         j--;
-                        calculateX += (width + textOptions.WordGap) * textOptions.XScale;
+                        calOffset += (width + textOptions.WordGap) * textOptions.XScale;
                         continue;
                     }
 
                     sprite.DefaultY += spriteGroup.DefaultY;
-                    sprite.DefaultX += calculateX + width / 2;
-                    calculateX += (width + textOptions.WordGap) * textOptions.XScale;
+                    sprite.DefaultX += calOffset + width / 2;
+                    calOffset += (width + textOptions.WordGap) * textOptions.XScale;
                 }
 
-            calculateX = spriteGroup.DefaultX - actualWidth / 2;
+            calOffset = spriteGroup.DefaultX - actualLen / 2;
             if (textOptions.ShowStroke)
                 for (var i = 0; i < text.Length; i++, j++)
                 {
@@ -72,16 +77,16 @@ namespace Coosu.Storyboard
                     if (c == ' ')
                     {
                         j--;
-                        calculateX += (width + textOptions.WordGap) * textOptions.XScale;
+                        calOffset += (width + textOptions.WordGap) * textOptions.XScale;
                         continue;
                     }
 
                     sprite.DefaultY += spriteGroup.DefaultY;
-                    sprite.DefaultX += calculateX + width / 2;
-                    calculateX += (width + textOptions.WordGap) * textOptions.XScale;
+                    sprite.DefaultX += calOffset + width / 2;
+                    calOffset += (width + textOptions.WordGap) * textOptions.XScale;
                 }
 
-            calculateX = spriteGroup.DefaultX - actualWidth / 2;
+            calOffset = spriteGroup.DefaultX - actualLen / 2;
             if (textOptions.ShowBase)
                 for (var i = 0; i < text.Length; i++, j++)
                 {
@@ -91,14 +96,21 @@ namespace Coosu.Storyboard
                     if (c == ' ')
                     {
                         j--;
-                        calculateX += (width + textOptions.WordGap) * textOptions.XScale;
+                        calOffset += (width + textOptions.WordGap) * textOptions.XScale;
                         continue;
                     }
 
                     sprite.DefaultY += spriteGroup.DefaultY;
-                    sprite.DefaultX += calculateX + width / 2;
-                    calculateX += (width + textOptions.WordGap) * textOptions.XScale;
+                    sprite.DefaultX += calOffset + width / 2;
+                    calOffset += (width + textOptions.WordGap) * textOptions.XScale;
                 }
+        }
+
+        private static Vector2D ResetOffset(SpriteGroup spriteGroup, Vector2D actualSize)
+        {
+            var anchor = Anchors.FromOriginType(spriteGroup.Camera2.OriginType);
+            return new Vector2D((float)(spriteGroup.DefaultX - actualSize.X * anchor.X),
+                (float)(spriteGroup.DefaultY - actualSize.Y * anchor.Y));
         }
     }
 }

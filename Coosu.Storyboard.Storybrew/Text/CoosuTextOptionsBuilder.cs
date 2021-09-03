@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using Coosu.Shared.Numerics;
 
 namespace Coosu.Storyboard.Storybrew.Text
 {
@@ -112,7 +112,7 @@ namespace Coosu.Storyboard.Storybrew.Text
         }
 
         public CoosuTextOptionsBuilder FillLinearGradientBy(string hexColor0, string hexColor1,
-            Vector2 startPint, Vector2 endPoint)
+            Vector2D startPint, Vector2D endPoint)
         {
             try
             {

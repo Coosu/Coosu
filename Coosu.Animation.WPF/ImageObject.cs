@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,9 +7,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-using System.Windows.Media.Effects;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using Coosu.Storyboard;
 using SysAni = System.Windows.Media.Animation;
 
 namespace Coosu.Animation.WPF
@@ -55,7 +53,7 @@ namespace Coosu.Animation.WPF
 
         private double PlayTime => Storyboard.GetCurrentTime().TotalMilliseconds;
 
-        public Origin<double> Origin { get; }
+        public Anchor<double> Anchor { get; }
 
         public double OriginHeight { get; }
 
@@ -66,12 +64,12 @@ namespace Coosu.Animation.WPF
         internal StoryboardCanvasHost Host { get; set; }
         public bool IsFinished { get; set; } = false;
 
-        internal ImageObject(FrameworkElement image, double width, double height, Origin<double> origin, double defaultX,
+        internal ImageObject(FrameworkElement image, double width, double height, Anchor<double> anchor, double defaultX,
             double defaultY, SysAni.Storyboard storyboard = null)
         {
             _image = image;
-            Origin = origin;
-            _image.RenderTransformOrigin = new Point(origin.X, origin.Y);
+            Anchor = anchor;
+            _image.RenderTransformOrigin = new Point(anchor.X, anchor.Y);
 
             _image.RenderTransform = InitTransformGroup(width, height, defaultX, defaultY);
 
@@ -103,7 +101,7 @@ namespace Coosu.Animation.WPF
                 var rotateTransform = new RotateTransform(0);
                 var flipTransform = new ScaleTransform(1, 1);
                 var translateTransform =
-                    new TranslateTransform(defaultX - width * Origin.X, defaultY - height * Origin.Y);
+                    new TranslateTransform(defaultX - width * Anchor.X, defaultY - height * Anchor.Y);
 
                 _group = new TransformGroup();
                 _group.Children.Add(scaleTransform);
@@ -236,12 +234,12 @@ namespace Coosu.Animation.WPF
         {
             if (_firstMX == null)
             {
-                _firstMX = ((Vector2<double>)(actions.First().StartParam)).X - OriginWidth * Origin.X;
+                _firstMX = ((Vector2<double>)(actions.First().StartParam)).X - OriginWidth * Anchor.X;
             }
 
             if (_firstMY == null)
             {
-                _firstMY = ((Vector2<double>)(actions.First().StartParam)).Y - OriginHeight * Origin.Y;
+                _firstMY = ((Vector2<double>)(actions.First().StartParam)).Y - OriginHeight * Anchor.Y;
             }
 
             foreach (var transformAction in actions)
@@ -252,16 +250,16 @@ namespace Coosu.Animation.WPF
                 var endP = (Vector2<double>)transformAction.EndParam;
                 _transformList.Add((TranslateTransform.XProperty, new DoubleAnimation
                 {
-                    From = startP.X - OriginWidth * Origin.X,
-                    To = endP.X - OriginWidth * Origin.X,
+                    From = startP.X - OriginWidth * Anchor.X,
+                    To = endP.X - OriginWidth * Anchor.X,
                     EasingFunction = ConvertEasing(transformAction.Easing),
                     BeginTime = TimeSpan.FromMilliseconds(transformAction.StartTime - (_groupMode ? 0 : MinTime)),
                     Duration = duration
                 }));
                 _transformList.Add((TranslateTransform.YProperty, new DoubleAnimation
                 {
-                    From = startP.Y - OriginHeight * Origin.Y,
-                    To = endP.Y - OriginHeight * Origin.Y,
+                    From = startP.Y - OriginHeight * Anchor.Y,
+                    To = endP.Y - OriginHeight * Anchor.Y,
                     EasingFunction = ConvertEasing(transformAction.Easing),
                     BeginTime = TimeSpan.FromMilliseconds(transformAction.StartTime - (_groupMode ? 0 : MinTime)),
                     Duration = duration
@@ -273,11 +271,11 @@ namespace Coosu.Animation.WPF
         {
             if (_firstMX == null && isHorizon)
             {
-                _firstMX = (double)(actions.First().StartParam) - OriginWidth * Origin.X;
+                _firstMX = (double)(actions.First().StartParam) - OriginWidth * Anchor.X;
             }
             else if (_firstMY == null && !isHorizon)
             {
-                _firstMY = (double)(actions.First().StartParam) - OriginHeight * Origin.Y;
+                _firstMY = (double)(actions.First().StartParam) - OriginHeight * Anchor.Y;
             }
 
             foreach (var transformAction in actions)
@@ -290,8 +288,8 @@ namespace Coosu.Animation.WPF
                 {
                     _transformList.Add((TranslateTransform.XProperty, new DoubleAnimation
                     {
-                        From = startP - OriginWidth * Origin.X,
-                        To = endP - OriginWidth * Origin.X,
+                        From = startP - OriginWidth * Anchor.X,
+                        To = endP - OriginWidth * Anchor.X,
                         EasingFunction = ConvertEasing(transformAction.Easing),
                         BeginTime = TimeSpan.FromMilliseconds(transformAction.StartTime - (_groupMode ? 0 : MinTime)),
                         Duration = duration
@@ -301,8 +299,8 @@ namespace Coosu.Animation.WPF
                 {
                     _transformList.Add((TranslateTransform.YProperty, new DoubleAnimation
                     {
-                        From = startP - OriginHeight * Origin.Y,
-                        To = endP - OriginHeight * Origin.Y,
+                        From = startP - OriginHeight * Anchor.Y,
+                        To = endP - OriginHeight * Anchor.Y,
                         EasingFunction = ConvertEasing(transformAction.Easing),
                         BeginTime = TimeSpan.FromMilliseconds(transformAction.StartTime - (_groupMode ? 0 : MinTime)),
                         Duration = duration
@@ -407,7 +405,7 @@ namespace Coosu.Animation.WPF
                     Blend = new VisualBrush { Visual = _image }
                 },
                 RenderTransform = InitTransformGroup(OriginWidth, OriginHeight, _defaultX, _defaultY),
-                RenderTransformOrigin = new Point(Origin.X, Origin.Y)
+                RenderTransformOrigin = new Point(Anchor.X, Anchor.Y)
             };
 
             foreach (var transformAction in actions)
@@ -558,8 +556,8 @@ namespace Coosu.Animation.WPF
 
                 rotTrans.Angle = _firstRotate ?? 0;
 
-                transTrans.X = _firstMX ?? _defaultX - OriginWidth * Origin.X;
-                transTrans.Y = _firstMY ?? _defaultY - OriginHeight * Origin.Y;
+                transTrans.X = _firstMX ?? _defaultX - OriginWidth * Anchor.X;
+                transTrans.Y = _firstMY ?? _defaultY - OriginHeight * Anchor.Y;
 
                 if (ClearAfterFinish)
                 {

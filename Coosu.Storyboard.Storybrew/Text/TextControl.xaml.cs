@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,6 +11,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Coosu.Shared.IO;
+using Coosu.Shared.Numerics;
 using Newtonsoft.Json;
 using Brush = System.Windows.Media.Brush;
 using Brushes = System.Windows.Media.Brushes;
@@ -26,7 +26,7 @@ namespace Coosu.Storyboard.Storybrew.Text
     public class TextControlVm : INotifyPropertyChanged
     {
         private IList<char>? _text = "milkitic".Distinct().ToArray();
-        private IList<Vector2>? _sizes;
+        private IList<Vector2D>? _sizes;
         private FontStyle _fontStyle = FontStyles.Normal;
         private FontWeight _fontWeight = FontWeights.Normal;
         private int _fontSize = 36;
@@ -186,7 +186,7 @@ namespace Coosu.Storyboard.Storybrew.Text
             }
         }
 
-        public IList<Vector2>? Sizes
+        public IList<Vector2D>? Sizes
         {
             get => _sizes;
             set
@@ -215,7 +215,7 @@ namespace Coosu.Storyboard.Storybrew.Text
         private readonly bool _showBase;
         private readonly bool _showStroke;
         private readonly bool _showShadow;
-        private Dictionary<char, Vector2> _sizeDict = new();
+        private Dictionary<char, Vector2D> _sizeDict = new();
 
         public TextControl(TextContext textContext)
         {
@@ -277,8 +277,8 @@ namespace Coosu.Storyboard.Storybrew.Text
 
         private void Compute()
         {
-            var dic = new Dictionary<char, Vector2>();
-            var list = new List<Vector2>();
+            var dic = new Dictionary<char, Vector2D>();
+            var list = new List<Vector2D>();
             foreach (var obj in ComputingBaseControl.Items)
             {
                 var c = (char)obj!;
@@ -293,7 +293,7 @@ namespace Coosu.Storyboard.Storybrew.Text
                     var height = cp.ActualHeight - _viewModel.ShadowBlurRadius * 2 - _viewModel.StrokeThickness * 2;
                     width = Math.Round(width, 4);
                     height = Math.Round(height, 4);
-                    var vector2 = new Vector2((float)width, (float)height);
+                    var vector2 = new Vector2D(width, height);
                     if (!dic.ContainsKey(c)) dic.Add(c, vector2);
                     list.Add(vector2);
                 }
@@ -304,7 +304,7 @@ namespace Coosu.Storyboard.Storybrew.Text
         }
 
 
-        public Dictionary<char, Vector2> SaveImageAndGetWidth()
+        public Dictionary<char, Vector2D> SaveImageAndGetWidth()
         {
             Compute();
 

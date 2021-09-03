@@ -1,4 +1,4 @@
-﻿using System.Numerics;
+﻿using Coosu.Shared.Numerics;
 using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Easing;
 using Coosu.Storyboard.Extensions;
@@ -21,9 +21,9 @@ namespace Coosu.Storyboard
         /// <param name="point">Relative displacement.</param>
         public static void MoveBy(this IEventHost host,
             double time,
-            Vector2 point) =>
+            Vector2D point) =>
             host.AddEventRelative(MoreEventTypes.MoveBy, LinearEase.Instance, time, time, point.X, point.Y);
-        
+
         /// <summary>
         /// Move by relative displacement.
         /// </summary>
@@ -45,7 +45,7 @@ namespace Coosu.Storyboard
         /// <param name="point">Relative displacement.</param>
         public static void MoveBy(this IEventHost host,
             double startTime, double endTime,
-            Vector2 point) =>
+            Vector2D point) =>
             host.AddEventRelative(MoreEventTypes.MoveBy, LinearEase.Instance, startTime, endTime, point.X, point.Y);
 
         /// <summary>
@@ -74,7 +74,7 @@ namespace Coosu.Storyboard
         public static void MoveBy(this IEventHost host,
             EasingFunctionBase easing,
             double startTime, double endTime,
-            Vector2 point) =>
+            Vector2D point) =>
             host.AddEventRelative(MoreEventTypes.MoveBy, easing, startTime, endTime, point.X, point.Y);
 
         /// <summary>
@@ -267,7 +267,7 @@ namespace Coosu.Storyboard
         /// <param name="color">Relative color. The range of each value is 0-255.</param>
         public static void ColorBy(this IEventHost host,
             double startTime, double endTime,
-            Vector3 color) =>
+            Vector3D color) =>
             host.AddEventRelative(MoreEventTypes.ColorBy, LinearEase.Instance, startTime, endTime, color.X, color.Y,
                 color.Z);
 
@@ -298,7 +298,7 @@ namespace Coosu.Storyboard
         public static void ColorBy(this IEventHost host,
             EasingFunctionBase easing,
             double startTime, double endTime,
-            Vector3 color) =>
+            Vector3D color) =>
             host.AddEventRelative(MoreEventTypes.ColorBy, easing, startTime, endTime, color.X, color.Y, color.Z);
 
         /// <summary>
@@ -332,7 +332,7 @@ namespace Coosu.Storyboard
         /// <param name="vector">Relative vector.</param>
         public static void VectorBy(this IEventHost host,
             double startTime, double endTime,
-            Vector2 vector) =>
+            Vector2D vector) =>
             host.AddEventRelative(MoreEventTypes.VectorBy, LinearEase.Instance, startTime, endTime, vector.X,
                 vector.Y);
 
@@ -362,7 +362,7 @@ namespace Coosu.Storyboard
         public static void VectorBy(this IEventHost host,
             EasingFunctionBase easing,
             double startTime, double endTime,
-            Vector2 vector) =>
+            Vector2D vector) =>
             host.AddEventRelative(MoreEventTypes.VectorBy, easing, startTime, endTime, vector.X, vector.Y);
 
         /// <summary>

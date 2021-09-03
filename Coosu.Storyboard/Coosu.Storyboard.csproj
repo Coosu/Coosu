@@ -6,10 +6,6 @@
     <PackageTags>osu, osu!</PackageTags>
   </PropertyGroup>
 
-  <ItemGroup Condition="$(TargetFramework) == 'net452'">
-    <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
-  </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Coosu.Shared\Coosu.Shared.csproj" />
   </ItemGroup>
