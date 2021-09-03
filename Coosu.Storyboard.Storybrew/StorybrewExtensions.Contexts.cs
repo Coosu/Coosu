@@ -34,83 +34,78 @@ namespace Coosu.Storyboard
             var dict = TextHelper.ProcessText(textContext);
 
             var sprites = spriteGroup.ToArray();
-            var totalLen = textOptions.Orientation switch
+            var totalW = textOptions.Orientation switch
             {
                 Orientation.Horizontal => text.Select(k => dict[k].X).Sum(),
                 Orientation.Vertical when textOptions.RotateBy90 => text.Select(k => dict[k].X).Sum(),
                 _ => text.Select(k => dict[k].Y).Sum()
             };
-            var actualLen = textOptions.Orientation switch
+            var actualW = textOptions.Orientation switch
             {
-                Orientation.Horizontal => (totalLen + (text.Length - 1) * textOptions.WordGap) * textOptions.XScale,
-                _ => (totalLen + (text.Length - 1) * textOptions.WordGap) * textOptions.YScale
-            }; ;
+                Orientation.Horizontal => (totalW + (text.Length - 1) * textOptions.WordGap) * textOptions.XScale,
+                _ => (totalW + (text.Length - 1) * textOptions.WordGap) * textOptions.YScale
+            };
+            var actualH = dict.Values.Max(k => k.Y);
 
-            Vector2D calOffset;
             int j = 0;
-            calOffset = ResetOffset(spriteGroup, actualLen);
+            var calOffset = ResetOffset(spriteGroup, textOptions.Orientation, new Vector2D(actualW, actualH));
             if (textOptions.ShowShadow)
                 for (var i = 0; i < text.Length; i++, j++)
-                {
-                    var c = text[i];
-                    var sprite = sprites[j];
-                    var width = dict[c].X;
-                    if (c == ' ')
-                    {
-                        j--;
-                        calOffset += (width + textOptions.WordGap) * textOptions.XScale;
-                        continue;
-                    }
+                    RepositionSprite(i);
 
-                    sprite.DefaultY += spriteGroup.DefaultY;
-                    sprite.DefaultX += calOffset + width / 2;
-                    calOffset += (width + textOptions.WordGap) * textOptions.XScale;
-                }
-
-            calOffset = spriteGroup.DefaultX - actualLen / 2;
+            calOffset = ResetOffset(spriteGroup, textOptions.Orientation, new Vector2D(actualW, actualH));
             if (textOptions.ShowStroke)
                 for (var i = 0; i < text.Length; i++, j++)
-                {
-                    var c = text[i];
-                    var sprite = sprites[j];
-                    var width = dict[c].X;
-                    if (c == ' ')
-                    {
-                        j--;
-                        calOffset += (width + textOptions.WordGap) * textOptions.XScale;
-                        continue;
-                    }
+                    RepositionSprite(i);
 
-                    sprite.DefaultY += spriteGroup.DefaultY;
-                    sprite.DefaultX += calOffset + width / 2;
-                    calOffset += (width + textOptions.WordGap) * textOptions.XScale;
-                }
-
-            calOffset = spriteGroup.DefaultX - actualLen / 2;
+            calOffset = ResetOffset(spriteGroup, textOptions.Orientation, new Vector2D(actualW, actualH));
             if (textOptions.ShowBase)
                 for (var i = 0; i < text.Length; i++, j++)
-                {
-                    var c = text[i];
-                    var sprite = sprites[j];
-                    var width = dict[c].X;
-                    if (c == ' ')
-                    {
-                        j--;
-                        calOffset += (width + textOptions.WordGap) * textOptions.XScale;
-                        continue;
-                    }
+                    RepositionSprite(i);
 
-                    sprite.DefaultY += spriteGroup.DefaultY;
-                    sprite.DefaultX += calOffset + width / 2;
-                    calOffset += (width + textOptions.WordGap) * textOptions.XScale;
+            void RepositionSprite(int i)
+            {
+                var c = text[i];
+                var sprite = sprites[j];
+
+                var isVertical = textOptions.Orientation == Orientation.Vertical;
+                var useYAdd = isVertical && textOptions.RotateBy90 == false;
+
+                var addition = useYAdd ? dict[c].Y : dict[c].X;
+                if (c == ' ')
+                {
+                    j--;
+                    calOffset.X += (addition + textOptions.WordGap) *
+                                   (isVertical ? textOptions.YScale : textOptions.XScale);
                 }
+
+                if (isVertical)
+                {
+                    sprite.DefaultY += calOffset.X + addition / 2;
+                    sprite.DefaultX += calOffset.Y + addition / 2;
+                }
+                else
+                {
+                    sprite.DefaultX += calOffset.X + addition / 2;
+                    sprite.DefaultY += calOffset.Y + addition / 2;
+                }
+
+                calOffset.X += (addition + textOptions.WordGap) *
+                               (isVertical ? textOptions.YScale : textOptions.XScale);
+            }
         }
 
-        private static Vector2D ResetOffset(SpriteGroup spriteGroup, Vector2D actualSize)
+        private static Vector2D ResetOffset(SpriteGroup spriteGroup,
+            Orientation orientation,
+            Vector2D actualSize)
         {
             var anchor = Anchors.FromOriginType(spriteGroup.Camera2.OriginType);
-            return new Vector2D((float)(spriteGroup.DefaultX - actualSize.X * anchor.X),
-                (float)(spriteGroup.DefaultY - actualSize.Y * anchor.Y));
+            if (orientation == Orientation.Horizontal)
+                return new Vector2D(spriteGroup.DefaultX - actualSize.X * anchor.X,
+                    spriteGroup.DefaultY - actualSize.Y * anchor.Y);
+
+            return new Vector2D(spriteGroup.DefaultX - actualSize.Y * anchor.X,
+                spriteGroup.DefaultY - actualSize.X * anchor.Y);
         }
     }
 }

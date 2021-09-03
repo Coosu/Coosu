@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Windows.Controls;
 using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Storybrew;
 using Coosu.Storyboard.Storybrew.Text;
@@ -95,7 +96,7 @@ namespace Coosu.Storyboard
                     var x = r * Math.Cos(deg / 180d * Math.PI);
                     var y = r * Math.Sin(deg / 180d * Math.PI);
                     var sprite = spriteGroup.CreateSprite(filePath, layer, textOptions.Origin, x, y);
-                    if (scale) sprite.Vector(startTime, textOptions.XScale, textOptions.YScale);
+                    if (scale) AdjustScale(sprite, startTime, textOptions);
                     sprite.Tag = i;
                 }
             }
@@ -110,7 +111,7 @@ namespace Coosu.Storyboard
                     var filePath = Path.Combine(Directories.CoosuTextDir, fileName);
 
                     var sprite = spriteGroup.CreateSprite(filePath, layer, textOptions.Origin, 0, 0);
-                    if (scale) sprite.Vector(startTime, textOptions.XScale, textOptions.YScale);
+                    if (scale) AdjustScale(sprite, startTime, textOptions);
                     sprite.Tag = i;
                 }
             }
@@ -125,13 +126,32 @@ namespace Coosu.Storyboard
                     var filePath = Path.Combine(Directories.CoosuTextDir, fileName);
 
                     var sprite = spriteGroup.CreateSprite(filePath, layer, textOptions.Origin, 0, 0);
-                    if (scale) sprite.Vector(startTime, textOptions.XScale, textOptions.YScale);
+                    if (scale) AdjustScale(sprite, startTime, textOptions);
                     sprite.Tag = i;
                 }
             }
 
             spriteHost.AddSubHost(spriteGroup);
             return spriteGroup;
+        }
+
+        private static void AdjustScale(IEventHost sprite, double startTime, CoosuTextOptions textOptions)
+        {
+            var isVertical = textOptions.Orientation == Orientation.Vertical;
+            var useYAdd = isVertical && textOptions.RotateBy90 == false;
+            if (!isVertical)
+            {
+                sprite.Vector(startTime, textOptions.XScale, textOptions.YScale);
+            }
+            else if (!useYAdd)
+            {
+                sprite.Vector(startTime, textOptions.YScale, textOptions.XScale);
+                sprite.Rotate(startTime, Math.PI / 2);
+            }
+            else
+            {
+                sprite.Vector(startTime, textOptions.XScale, textOptions.YScale);
+            }
         }
     }
 }
