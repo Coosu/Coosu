@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using Coosu.Storyboard.Advanced;
 using Coosu.Storyboard.Common;
+using Coosu.Storyboard.Storybrew;
 using Coosu.Storyboard.Storybrew.Text;
 
 // ReSharper disable once CheckNamespace

@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace Coosu.Storyboard.Advanced
+namespace Coosu.Storyboard.Storybrew
 {
     public static class Directories
     {

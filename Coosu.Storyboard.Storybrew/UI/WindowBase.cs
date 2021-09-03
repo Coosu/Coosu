@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
 
-namespace Coosu.Storyboard.Advanced.UI
+namespace Coosu.Storyboard.Storybrew.UI
 {
     public class WindowBase : Window
     {

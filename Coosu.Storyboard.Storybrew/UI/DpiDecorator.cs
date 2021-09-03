@@ -2,7 +2,7 @@
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace Coosu.Storyboard.Advanced.UI
+namespace Coosu.Storyboard.Storybrew.UI
 {
     public class DpiDecorator : Decorator
     {

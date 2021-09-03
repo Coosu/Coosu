@@ -1,25 +1,51 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading;
-using Coosu.Storyboard.Advanced.UI;
+using Coosu.Shared.IO;
+using Coosu.Storyboard.Storybrew.UI;
+using Newtonsoft.Json;
 
 namespace Coosu.Storyboard.Storybrew.Text
 {
     public static class TextHelper
     {
-        private static TimeSpan _delayTime = TimeSpan.FromMilliseconds(500);
-        public static Dictionary<char, double> ProcessText(TextContext textContext)
+        public static Dictionary<char, Vector2> ProcessText(TextContext textContext)
         {
-            Dictionary<char, double> dict = null!;
-            // todo: don't need to create for each time
+            CacheObj? cache = null;
+            var cachePath = textContext.CachePath;
+            using (new FileLocker(cachePath))
+                if (File.Exists(cachePath))
+                    cache = JsonConvert.DeserializeObject<CacheObj>(File.ReadAllText(cachePath))!;
+
+            var textOptions = textContext.TextOptions;
+            if (cache != null &&
+                cache.FontIdentifier.TryGetValue(textOptions.FileIdentifier!, out var fontTypeObj) &&
+                fontTypeObj != null)
+            {
+                var baseId = textOptions.GetBaseId();
+                var strokeId = textOptions.GetStrokeId();
+                var shadowId = textOptions.GetShadowId();
+                if (fontTypeObj.Stroke == strokeId && fontTypeObj.Base == baseId && fontTypeObj.Shadow == shadowId)
+                {
+                    if (textContext.Text.Distinct().All(k => fontTypeObj.SizeMapping.ContainsKey(k)))
+                    {
+                        // use cache to avoid creating ui thread for each time
+                        return fontTypeObj.SizeMapping;
+                    }
+                }
+            }
+
+            Dictionary<char, Vector2> dict = null!;
             var uiThread = new Thread(() =>
             {
                 var textControl = new TextControl(textContext);
                 var window = new WindowBase { Content /*= new DpiDecorator { Child*/ = textControl/* } */};
-                
+
                 window.Shown += (s, e) =>
                 {
                     dict = textControl.SaveImageAndGetWidth();

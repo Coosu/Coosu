@@ -10,7 +10,7 @@ namespace Coosu.Beatmap
         public OsuFile OsuFile { get; }
         public GamePlay GamePlay { get; }
 
-        public string OsbFileName => File.EscapeFileName(string.Format("{0} - {1} ({2}).osb"
+        public string OsbFileName => PathUtils.EscapeFileName(string.Format("{0} - {1} ({2}).osb"
             , OsuFile.Metadata.Artist,
             OsuFile.Metadata.Title,
             OsuFile.Metadata.Creator));

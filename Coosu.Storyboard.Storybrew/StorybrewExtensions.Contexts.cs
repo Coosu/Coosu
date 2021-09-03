@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Coosu.Storyboard.Advanced;
 using Coosu.Storyboard.Storybrew.Text;
 using StorybrewCommon.Scripting;
 
@@ -38,7 +37,7 @@ namespace Coosu.Storyboard
             var dict = TextHelper.ProcessText(textContext);
 
             var sprites = spriteGroup.ToArray();
-            var totalWidth = text.Select(k => dict[k]).Sum();
+            var totalWidth = text.Select(k => dict[k].X).Sum();
             var actualWidth = (totalWidth + (text.Length - 1) * textOptions.WordGap) * textOptions.XScale;
 
             double calculateX;
@@ -50,7 +49,7 @@ namespace Coosu.Storyboard
                 {
                     var c = text[i];
                     var sprite = sprites[j];
-                    var width = dict[c];
+                    var width = dict[c].X;
                     if (c == ' ')
                     {
                         j--;
@@ -69,7 +68,7 @@ namespace Coosu.Storyboard
                 {
                     var c = text[i];
                     var sprite = sprites[j];
-                    var width = dict[c];
+                    var width = dict[c].X;
                     if (c == ' ')
                     {
                         j--;
@@ -88,7 +87,7 @@ namespace Coosu.Storyboard
                 {
                     var c = text[i];
                     var sprite = sprites[j];
-                    var width = dict[c];
+                    var width = dict[c].X;
                     if (c == ' ')
                     {
                         j--;

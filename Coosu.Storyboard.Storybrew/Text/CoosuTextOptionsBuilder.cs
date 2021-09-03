@@ -3,7 +3,6 @@ using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using Coosu.Storyboard.Advanced;
 
 namespace Coosu.Storyboard.Storybrew.Text
 {

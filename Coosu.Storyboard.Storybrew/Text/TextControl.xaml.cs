@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,7 +12,6 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Coosu.Shared.IO;
-using Coosu.Storyboard.Advanced;
 using Newtonsoft.Json;
 using Brush = System.Windows.Media.Brush;
 using Brushes = System.Windows.Media.Brushes;
@@ -26,7 +26,7 @@ namespace Coosu.Storyboard.Storybrew.Text
     public class TextControlVm : INotifyPropertyChanged
     {
         private IList<char>? _text = "milkitic".Distinct().ToArray();
-        private IList<double>? _widths;
+        private IList<Vector2>? _sizes;
         private FontStyle _fontStyle = FontStyles.Normal;
         private FontWeight _fontWeight = FontWeights.Normal;
         private int _fontSize = 36;
@@ -186,13 +186,13 @@ namespace Coosu.Storyboard.Storybrew.Text
             }
         }
 
-        public IList<double>? Widths
+        public IList<Vector2>? Sizes
         {
-            get => _widths;
+            get => _sizes;
             set
             {
-                if (Equals(value, _widths)) return;
-                _widths = value;
+                if (Equals(value, _sizes)) return;
+                _sizes = value;
                 OnPropertyChanged();
             }
         }
@@ -215,7 +215,7 @@ namespace Coosu.Storyboard.Storybrew.Text
         private readonly bool _showBase;
         private readonly bool _showStroke;
         private readonly bool _showShadow;
-        private Dictionary<char, double> _widthDict = new();
+        private Dictionary<char, Vector2> _sizeDict = new();
 
         public TextControl(TextContext textContext)
         {
@@ -277,8 +277,8 @@ namespace Coosu.Storyboard.Storybrew.Text
 
         private void Compute()
         {
-            var dic = new Dictionary<char, double>();
-            var list = new List<double>();
+            var dic = new Dictionary<char, Vector2>();
+            var list = new List<Vector2>();
             foreach (var obj in ComputingBaseControl.Items)
             {
                 var c = (char)obj!;
@@ -290,19 +290,21 @@ namespace Coosu.Storyboard.Storybrew.Text
                 {
                     var cp = (ContentPresenter)ComputingBaseControl.ItemContainerGenerator.ContainerFromItem(c);
                     var width = cp.ActualWidth - _viewModel.ShadowBlurRadius * 2 - _viewModel.StrokeThickness * 2;
+                    var height = cp.ActualHeight - _viewModel.ShadowBlurRadius * 2 - _viewModel.StrokeThickness * 2;
                     width = Math.Round(width, 4);
-                    if (!dic.ContainsKey(c))
-                        dic.Add(c, width);
-                    list.Add(width);
+                    height = Math.Round(height, 4);
+                    var vector2 = new Vector2((float)width, (float)height);
+                    if (!dic.ContainsKey(c)) dic.Add(c, vector2);
+                    list.Add(vector2);
                 }
             }
 
-            _viewModel.Widths = list;
-            _widthDict = dic;
+            _viewModel.Sizes = list;
+            _sizeDict = dic;
         }
 
 
-        public Dictionary<char, double> SaveImageAndGetWidth()
+        public Dictionary<char, Vector2> SaveImageAndGetWidth()
         {
             Compute();
 
@@ -338,12 +340,18 @@ namespace Coosu.Storyboard.Storybrew.Text
                 {
                     Base = baseId,
                     Shadow = shadowId,
-                    Stroke = strokeId
+                    Stroke = strokeId,
+                    SizeMapping = _sizeDict
                 };
-                File.WriteAllText(_textContext.CachePath, JsonConvert.SerializeObject(cache, Formatting.Indented));
+            }
+            else
+            {
+                cache.FontIdentifier[_textContext.TextOptions.FileIdentifier!].SizeMapping = _sizeDict;
             }
 
-            return _widthDict;
+            File.WriteAllText(_textContext.CachePath, JsonConvert.SerializeObject(cache, Formatting.Indented));
+
+            return _sizeDict;
         }
 
         private void Regenerate(bool forceReBase, bool forceReStroke, bool forceReShadow)
@@ -377,7 +385,7 @@ namespace Coosu.Storyboard.Storybrew.Text
             {
                 var target = (FrameworkElement)contentControl.Content;
                 var c = (char)target.Tag;
-                if (_widthDict[c] <= 0) continue;
+                if (_sizeDict[c].X <= 0 || _sizeDict[c].Y <= 0) continue;
                 if (c == ' ') continue;
                 var fileName = TextHelper.ConvertToFileName(c, prefix, postFix);
                 var filePath = Path.Combine(coosuTextDir, fileName);

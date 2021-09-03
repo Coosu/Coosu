@@ -5,7 +5,7 @@ using System.Xml;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace Coosu.Storyboard.Advanced
+namespace Coosu.Storyboard.Storybrew
 {
     public class BrushJsonConverter : JsonConverter
     {

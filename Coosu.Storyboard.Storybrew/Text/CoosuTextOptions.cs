@@ -2,7 +2,6 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using Coosu.Storyboard.Advanced;
 using Newtonsoft.Json;
 
 namespace Coosu.Storyboard.Storybrew.Text

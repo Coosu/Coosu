@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Coosu.Storyboard.Advanced.UI;
 using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Extensions.Optimizing;
 using Coosu.Storyboard.Storybrew;
+using Coosu.Storyboard.Storybrew.UI;
 using StorybrewCommon.Scripting;
 using StorybrewCommon.Storyboarding;
 

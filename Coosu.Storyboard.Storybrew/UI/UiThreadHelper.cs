@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace Coosu.Storyboard.Advanced.UI
+namespace Coosu.Storyboard.Storybrew.UI
 {
     public static class UiThreadHelper
     {

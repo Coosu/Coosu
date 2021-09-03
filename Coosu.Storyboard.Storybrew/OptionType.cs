@@ -1,4 +1,4 @@
-﻿namespace Coosu.Storyboard.Advanced
+﻿namespace Coosu.Storyboard.Storybrew
 {
     public enum OptionType
     {
