@@ -44,9 +44,10 @@ namespace Coosu.Storyboard.Storybrew.Text
             return this;
         }
 
-        public CoosuTextOptionsBuilder WithVerticalLayout()
+        public CoosuTextOptionsBuilder WithVerticalLayout(bool rotateBy90 = false)
         {
             Options.Orientation = Orientation.Vertical;
+            Options.RotateBy90 = rotateBy90;
             return this;
         }
 
@@ -110,7 +111,7 @@ namespace Coosu.Storyboard.Storybrew.Text
             return this;
         }
 
-        public CoosuTextOptionsBuilder FillLinearGradientBy(string hexColor0, string hexColor1, 
+        public CoosuTextOptionsBuilder FillLinearGradientBy(string hexColor0, string hexColor1,
             Vector2 startPint, Vector2 endPoint)
         {
             try

@@ -9,7 +9,7 @@ namespace Coosu.Storyboard.Storybrew.Text
     public class CoosuTextOptions
     {
         internal bool IsInitialFamily = true;
-        private Brush _fillBrush;
+        private Brush _fillBrush = Brushes.White;
         private Brush? _strokeBrush;
 
         public string? StrokeBrushJson { get; private set; }
@@ -23,6 +23,7 @@ namespace Coosu.Storyboard.Storybrew.Text
         public double LineGap { get; set; }
         public OriginType Origin { get; set; } = OriginType.Centre;
         public Orientation Orientation { get; set; } = Orientation.Horizontal;
+        public bool RotateBy90 { get; set; }
         //fsnm;fsob;fsit
         public FontStyle FontStyle { get; set; } = FontStyles.Normal;
         //fw400
