@@ -10,9 +10,9 @@ namespace Coosu.Storyboard.Storybrew
 
     public record FontTypeObj
     {
-        public Dictionary<char, Vector2D> SizeMapping { get; set; }
-        public string Base { get; set; }
-        public string Stroke { get; set; }
-        public string Shadow { get; set; }
+        public Dictionary<char, Vector2D>? SizeMapping { get; set; }
+        public string? Base { get; set; }
+        public string? Stroke { get; set; }
+        public string? Shadow { get; set; }
     }
 }

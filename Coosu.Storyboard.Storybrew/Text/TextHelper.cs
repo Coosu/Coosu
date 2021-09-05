@@ -32,7 +32,7 @@ namespace Coosu.Storyboard.Storybrew.Text
                 var shadowId = textOptions.GetShadowId();
                 if (fontTypeObj.Stroke == strokeId && fontTypeObj.Base == baseId && fontTypeObj.Shadow == shadowId)
                 {
-                    if (textContext.Text.Distinct().All(k => fontTypeObj.SizeMapping.ContainsKey(k)))
+                    if (fontTypeObj.SizeMapping != null && textContext.Text.Distinct().All(k => fontTypeObj.SizeMapping.ContainsKey(k)))
                     {
                         // use cache to avoid creating ui thread for each time
                         return fontTypeObj.SizeMapping;
