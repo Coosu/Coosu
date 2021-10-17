@@ -77,6 +77,7 @@ namespace Coosu.Storyboard
                     j--;
                     calOffset.X += (addition + textOptions.WordGap) *
                                    (isVertical ? textOptions.YScale : textOptions.XScale);
+                    return;
                 }
 
                 if (isVertical)
@@ -87,7 +88,8 @@ namespace Coosu.Storyboard
                 else
                 {
                     sprite.DefaultX += calOffset.X + addition / 2;
-                    sprite.DefaultY += calOffset.Y + addition / 2;
+                    sprite.DefaultY = calOffset.Y;
+                    //sprite.DefaultY += calOffset.Y + addition / 2;
                 }
 
                 calOffset.X += (addition + textOptions.WordGap) *
@@ -102,7 +104,7 @@ namespace Coosu.Storyboard
             var anchor = Anchors.FromOriginType(spriteGroup.Camera2.OriginType);
             if (orientation == Orientation.Horizontal)
                 return new Vector2D(spriteGroup.DefaultX - actualSize.X * anchor.X,
-                    spriteGroup.DefaultY - actualSize.Y * anchor.Y);
+                    spriteGroup.DefaultY/* - actualSize.Y * anchor.Y*/);
 
             return new Vector2D(spriteGroup.DefaultX - actualSize.Y * anchor.X,
                 spriteGroup.DefaultY - actualSize.X * anchor.Y);
