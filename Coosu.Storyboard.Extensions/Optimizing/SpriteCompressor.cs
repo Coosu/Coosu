@@ -21,8 +21,8 @@ namespace Coosu.Storyboard.Extensions.Optimizing
         public event EventHandler<CompressorEventArgs>? OperationEnd;
         public event EventHandler<ProcessErrorEventArgs>? ErrorOccured; //lock
         //public EventHandler<SituationEventArgs> ElementFound; //lock
-        public event EventHandler<SituationEventArgs>? SituationFound; //lock
-        public event EventHandler<SituationEventArgs>? SituationChanged; //lock
+        public event AsyncEventHandler<SituationEventArgs>? SituationFound; //lock
+        public event AsyncEventHandler<SituationEventArgs>? SituationChanged; //lock
         public event EventHandler<ProgressEventArgs>? ProgressChanged;
 
         //private int _threadCount = 1;
@@ -31,8 +31,8 @@ namespace Coosu.Storyboard.Extensions.Optimizing
 
         private readonly object _runLock = new();
         private readonly object _pauseThreadLock = new();
-        private readonly object _situationFoundLock = new();
-        private readonly object _situationChangedLock = new();
+        private readonly SemaphoreSlim _situationFoundLock = new SemaphoreSlim(1, 1);
+        private readonly SemaphoreSlim _situationChangedLock = new SemaphoreSlim(1, 1);
 
         private CancellationTokenSource? _cancelToken;
         private readonly ICollection<ISceneObject> _sourceSprites;
@@ -635,12 +635,12 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             eventList.Remove(e);
         }
 
-        private void RaiseSituationEvent(IDetailedEventHost host, SituationType situationType, Action continueAction, params IKeyEvent[] events)
+        private async Task RaiseSituationEvent(IDetailedEventHost host, SituationType situationType, Action continueAction, params IKeyEvent[] events)
         {
-            RaiseSituationEvent(host, situationType, continueAction, null, events);
+            await RaiseSituationEvent(host, situationType, continueAction, null, events);
         }
 
-        private void RaiseSituationEvent(IDetailedEventHost host, SituationType situationType, Action continueAction,
+        private async Task RaiseSituationEvent(IDetailedEventHost host, SituationType situationType, Action continueAction,
             Action? breakAction, params IKeyEvent[] events)
         {
             var sprite = host is ISubEventHost e ? e.BaseObject as Sprite : host as Sprite;
@@ -653,10 +653,17 @@ namespace Coosu.Storyboard.Extensions.Optimizing
 
             if (SituationFound != null)
             {
-                lock (_situationFoundLock)
+                await _situationFoundLock.WaitAsync();
+
+                try
                 {
-                    SituationFound?.Invoke(this, args);
+                    await SituationFound.Invoke(this, args);
                 }
+                finally
+                {
+                    _situationFoundLock.Release();
+                }
+
             }
 
             if (args.Continue)
@@ -665,9 +672,15 @@ namespace Coosu.Storyboard.Extensions.Optimizing
 
                 if (SituationChanged != null)
                 {
-                    lock (_situationChangedLock)
+                    await _situationChangedLock.WaitAsync();
+
+                    try
                     {
-                        SituationChanged?.Invoke(this, args);
+                        await SituationChanged.Invoke(this, args);
+                    }
+                    finally
+                    {
+                        _situationChangedLock.Release();
                     }
                 }
             }
