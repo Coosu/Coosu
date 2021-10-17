@@ -83,6 +83,11 @@ namespace StorybrewScriptTest
             };
             return storyboardObject;
         }
+
+        public override void Discard(StoryboardObject storyboardObject)
+        {
+            
+        }
     }
 
     internal class MyContext : GeneratorContext

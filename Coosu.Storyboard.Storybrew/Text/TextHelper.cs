@@ -57,11 +57,29 @@ namespace Coosu.Storyboard.Storybrew.Text
                 System.Windows.Threading.Dispatcher.Run();
             })
             {
-                IsBackground = true
+                IsBackground = false
             };
             uiThread.SetApartmentState(ApartmentState.STA);
             uiThread.Start();
             uiThread.Join();
+            try
+            {
+                uiThread.Interrupt();
+            }
+            catch
+            {
+                // ignored
+            }
+
+            try
+            {
+                uiThread.Abort();
+            }
+            catch
+            {
+                // ignored
+            }
+
             return dict;
         }
 
