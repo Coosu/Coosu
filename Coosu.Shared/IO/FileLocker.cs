@@ -9,13 +9,14 @@ namespace Coosu.Shared.IO
     {
         private readonly string _path;
         private readonly string _lockPath;
+        private readonly FileStream _fs;
 
         public FileLocker(string path)
         {
             _path = path;
             _lockPath = Path.Combine(Path.GetDirectoryName(path), Path.GetFileName(path) + ".lock");
             var fi = new FileInfo(_lockPath);
-            if (fi.Exists && DateTime.Now - fi.CreationTime > TimeSpan.FromSeconds(30))
+            if (fi.Exists && DateTime.Now - fi.CreationTime > TimeSpan.FromSeconds(100))
             {
                 fi.Delete();
                 //throw new Exception("Failed: waiting for too long. Please check the .lock file.");
@@ -30,7 +31,7 @@ namespace Coosu.Shared.IO
                     throw new Exception("Failed: waiting for too long. Please check the .lock file.");
                 try
                 {
-                    using var fs = new FileStream(_lockPath, FileMode.CreateNew);
+                    _fs = new FileStream(_lockPath, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None);
                     Console.WriteLine($"Thread #{Thread.CurrentThread.ManagedThreadId}: Get the lock");
                     success = true;
                 }
@@ -46,6 +47,7 @@ namespace Coosu.Shared.IO
 
         public void Dispose()
         {
+            _fs?.Dispose();
             System.IO.File.Delete(_lockPath);
         }
     }

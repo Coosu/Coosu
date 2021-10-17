@@ -336,17 +336,42 @@ namespace Coosu.Storyboard.Storybrew.Text
 
             if (forceReBase || forceReStroke || forceReShadow)
             {
-                cache.FontIdentifier[_textContext.TextOptions.FileIdentifier!] = new FontTypeObj
+                if (!cache.FontIdentifier.ContainsKey(_textContext.TextOptions.FileIdentifier!)||
+                    cache.FontIdentifier[_textContext.TextOptions.FileIdentifier!] == null)
+                    cache.FontIdentifier[_textContext.TextOptions.FileIdentifier!] = new FontTypeObj
+                    {
+                        Base = baseId,
+                        Shadow = shadowId,
+                        Stroke = strokeId,
+                        SizeMapping = _sizeDict
+                    };
+                else
                 {
-                    Base = baseId,
-                    Shadow = shadowId,
-                    Stroke = strokeId,
-                    SizeMapping = _sizeDict
-                };
+                    var obj = cache.FontIdentifier[_textContext.TextOptions.FileIdentifier!];
+                    obj.Base = baseId;
+                    obj.Shadow = shadowId;
+                    obj.Stroke = strokeId;
+                    if (obj.SizeMapping == null) obj.SizeMapping = _sizeDict;
+                    else
+                    {
+                        foreach (var kvp in _sizeDict)
+                        {
+                            obj.SizeMapping[kvp.Key] = kvp.Value;
+                        }
+                    }
+                }
             }
             else
             {
-                cache.FontIdentifier[_textContext.TextOptions.FileIdentifier!].SizeMapping = _sizeDict;
+                var obj = cache.FontIdentifier[_textContext.TextOptions.FileIdentifier!];
+                if (obj.SizeMapping == null) obj.SizeMapping = _sizeDict;
+                else
+                {
+                    foreach (var kvp in _sizeDict)
+                    {
+                        obj.SizeMapping[kvp.Key] = kvp.Value;
+                    }
+                }
             }
 
             File.WriteAllText(_textContext.CachePath, JsonConvert.SerializeObject(cache, Formatting.Indented));

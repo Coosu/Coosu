@@ -11,13 +11,24 @@ namespace Coosu.Storyboard
     {
         private static void DelayExecuteContexts(Layer layer, StoryboardObjectGenerator brewObjectGenerator)
         {
-            foreach (var layerTag in layer.Tags)
-            {
-                if (layerTag.Key.StartsWith("text:"))
+            layer.Tags
+                .AsParallel()
+                //.WithDegreeOfParallelism(1)
+                .ForAll(layerTag =>
                 {
-                    DelayExecuteText((TextContext)layerTag.Value, brewObjectGenerator);
-                }
-            }
+                    if (layerTag.Key.StartsWith("text:"))
+                    {
+                        DelayExecuteText((TextContext)layerTag.Value, brewObjectGenerator);
+                    }
+                });
+
+            //foreach (var layerTag in layer.Tags)
+            //{
+            //    if (layerTag.Key.StartsWith("text:"))
+            //    {
+            //        DelayExecuteText((TextContext)layerTag.Value, brewObjectGenerator);
+            //    }
+            //}
         }
 
         private static void DelayExecuteText(TextContext textContext, StoryboardObjectGenerator storyboardObjectGenerator)
