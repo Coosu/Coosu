@@ -42,6 +42,7 @@ namespace Coosu.Api.V2.RequestModels
         //sort=xxx_desc
         public BeatmapsetSearchSort? Sort { get; set; }
         public bool IsSortAscending { get; set; }
+        public int Page { get; set; }
 
         public string GetQueryString()
         {
@@ -203,6 +204,12 @@ namespace Coosu.Api.V2.RequestModels
 
                 if (sb.Length > 0) sb.Append('&');
                 sb.Append(("sort=" + result) + (IsSortAscending ? "_asc" : "_desc"));
+            }
+
+            if (Page > 1)
+            {
+                if (sb.Length > 0) sb.Append('&');
+                sb.Append("page=" + Page);
             }
 
             return sb.ToString();
