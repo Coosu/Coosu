@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace Coosu.Api.V2.ResponseModels
 {
-    public partial class Beatmapset
+    public class BeatmapsetSearch
     {
         [JsonProperty("artist")]
         public string Artist { get; set; }
@@ -100,27 +99,6 @@ namespace Coosu.Api.V2.ResponseModels
         public string Tags { get; set; }
 
         [JsonProperty("beatmaps")]
-        public Beatmap[] Beatmaps { get; set; }
-
-        [JsonProperty("converts")]
-        public Beatmap[] Converts { get; set; }
-
-        [JsonProperty("description")]
-        public BeatmapsetDescription Description { get; set; }
-
-        [JsonProperty("genre")]
-        public Genre Genre { get; set; }
-
-        [JsonProperty("language")]
-        public Genre Language { get; set; }
-
-        [JsonProperty("ratings")]
-        public int[] Ratings { get; set; }
-
-        [JsonProperty("recent_favourites")]
-        public UserLight[] RecentFavourites { get; set; }
-
-        [JsonProperty("user")]
-        public UserLight User { get; set; }
+        public BeatmapSearch[] Beatmaps { get; set; }
     }
 }
