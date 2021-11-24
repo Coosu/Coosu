@@ -3,8 +3,11 @@ using Newtonsoft.Json;
 
 namespace Coosu.Api.V2.ResponseModels
 {
-    public partial class Beatmap
+    public partial class BeatmapSearch
     {
+        [JsonProperty("beatmapset_id")]
+        public long BeatmapsetId { get; set; }
+
         [JsonProperty("difficulty_rating")]
         public double DifficultyRating { get; set; }
 
@@ -20,20 +23,20 @@ namespace Coosu.Api.V2.ResponseModels
         [JsonProperty("total_length")]
         public long TotalLength { get; set; }
 
+        [JsonProperty("user_id")]
+        public long UserId { get; set; }
+
         [JsonProperty("version")]
         public string Version { get; set; }
 
         [JsonProperty("accuracy")]
-        public long Accuracy { get; set; }
+        public double Accuracy { get; set; }
 
         [JsonProperty("ar")]
         public double Ar { get; set; }
 
-        [JsonProperty("beatmapset_id")]
-        public long BeatmapsetId { get; set; }
-
         [JsonProperty("bpm")]
-        public double? Bpm { get; set; }
+        public long Bpm { get; set; }
 
         [JsonProperty("convert")]
         public bool Convert { get; set; }
@@ -80,10 +83,10 @@ namespace Coosu.Api.V2.ResponseModels
         [JsonProperty("url")]
         public string Url { get; set; }
 
-        [JsonProperty("failtimes")]
-        public Failtimes Failtimes { get; set; }
+        [JsonProperty("checksum")]
+        public string Checksum { get; set; }
 
-        [JsonProperty("max_combo", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("max_combo")]
         public long? MaxCombo { get; set; }
     }
 }

@@ -1,7 +1,8 @@
-﻿using Coosu.Api.HttpClient;
+﻿using System;
+using Coosu.Api.HttpClient;
+using Coosu.Api.V2.RequestModels;
 using Coosu.Api.V2.ResponseModels;
 using Newtonsoft.Json;
-using System;
 
 namespace Coosu.Api.V2
 {
@@ -22,8 +23,8 @@ namespace Coosu.Api.V2
         }
 
         /// <summary>
-        /// Similar to Get User but with authenticated user (token owner) as user id.
-        /// <code>scope = identify</code>
+        /// Get beatmap detail
+        /// <code>scope = public</code>
         /// </summary>
         /// <param name="id">b id</param>
         /// <returns></returns>
@@ -37,8 +38,8 @@ namespace Coosu.Api.V2
         }
 
         /// <summary>
-        /// Similar to Get User but with authenticated user (token owner) as user id.
-        /// <code>scope = identify</code>
+        /// Get beatmapset detail
+        /// <code>scope = public</code>
         /// </summary>
         /// <param name="id">s id</param>
         /// <returns></returns>
@@ -48,6 +49,37 @@ namespace Coosu.Api.V2
             var json = _httpClient.HttpGet(OsuClientV2.BaseUri + route);
 
             var obj = JsonConvert.DeserializeObject<Beatmapset>(json);
+            return obj;
+        }
+
+        /// <summary>
+        /// Search beatmaps
+        /// <code>scope = identify/public</code>
+        /// </summary>
+        /// <param name="query">keywords.</param>
+        /// <returns></returns>
+        public BeatmapsetSearchResult SearchBeatmapset(string? query)
+        {
+            return SearchBeatmapset(new SearchOptions
+            {
+                Query = query
+            });
+        }
+
+        /// <summary>
+        /// Search beatmaps
+        /// <code>scope = identify/public</code>
+        /// </summary>
+        /// <param name="searchOptions">Search options.</param>
+        /// <returns></returns>
+        public BeatmapsetSearchResult SearchBeatmapset(SearchOptions? searchOptions = null)
+        {
+            string route = $"/beatmapsets/search/";
+            var options = searchOptions?.GetQueryString();
+            var actualRoute = string.IsNullOrWhiteSpace(options) ? route : route + "filters?" + options;
+            var json = _httpClient.HttpGet(OsuClientV2.BaseUri + actualRoute);
+
+            var obj = JsonConvert.DeserializeObject<BeatmapsetSearchResult>(json);
             return obj;
         }
 

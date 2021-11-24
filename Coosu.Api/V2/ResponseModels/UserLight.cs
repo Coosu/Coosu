@@ -13,8 +13,10 @@ namespace Coosu.Api.V2.ResponseModels
 
         [JsonProperty("default_group")]
         public string DefaultGroup { get; set; }
+
         [JsonProperty("id")]
         public long Id { get; set; }
+
         [JsonProperty("is_active")]
         public bool IsActive { get; set; }
 
@@ -37,7 +39,7 @@ namespace Coosu.Api.V2.ResponseModels
         public bool PmFriendsOnly { get; set; }
 
         [JsonProperty("profile_colour")]
-        public string ProfileColor { get; set; }
+        public string ProfileColour { get; set; }
 
         [JsonProperty("username")]
         public string Username { get; set; }

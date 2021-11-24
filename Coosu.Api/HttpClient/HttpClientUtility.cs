@@ -28,17 +28,17 @@ namespace Coosu.Api.HttpClient
 
         private readonly System.Net.Http.HttpClient _httpClient;
 
-        public HttpClientUtility(Socks5ProxyOptions socks5ProxyOptions = null) : this(TimeSpan.FromSeconds(8), 3, socks5ProxyOptions)
+        public HttpClientUtility(Socks5ProxyOptions? socks5ProxyOptions = null) : this(TimeSpan.FromSeconds(8), 3, socks5ProxyOptions)
         {
         }
 
-        public HttpClientUtility(TimeSpan timeout, Socks5ProxyOptions socks5ProxyOptions = null) : this(timeout, 3, socks5ProxyOptions)
+        public HttpClientUtility(TimeSpan timeout, Socks5ProxyOptions? socks5ProxyOptions = null) : this(timeout, 3, socks5ProxyOptions)
         {
         }
 
-        public HttpClientUtility(TimeSpan timeout, int retryCount, Socks5ProxyOptions socks5ProxyOptions = null)
+        public HttpClientUtility(TimeSpan timeout, int retryCount, Socks5ProxyOptions? socks5ProxyOptions = null)
         {
-            socks5ProxyOptions = socks5ProxyOptions ?? new Socks5ProxyOptions();
+            socks5ProxyOptions ??= new Socks5ProxyOptions();
 
             Timeout = timeout;
             RetryCount = retryCount;

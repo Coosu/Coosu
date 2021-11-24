@@ -15,8 +15,4 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="V2\RequestModels\" />
-  </ItemGroup>
-
 </Project>
