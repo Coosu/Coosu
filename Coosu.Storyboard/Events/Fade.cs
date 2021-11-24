@@ -3,7 +3,7 @@ using Coosu.Storyboard.Easing;
 
 namespace Coosu.Storyboard.Events
 {
-    public sealed class Fade : CommonEvent
+    public sealed class Fade : BasicEvent
     {
         public override EventType EventType => EventTypes.Fade;
 

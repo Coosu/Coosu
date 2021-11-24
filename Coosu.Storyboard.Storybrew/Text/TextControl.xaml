@@ -1,0 +1,172 @@
+﻿<UserControl
+    x:Class="Coosu.Storyboard.Storybrew.Text.TextControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:text="clr-namespace:Coosu.Storyboard.Storybrew.Text"
+    x:Name="self"
+    d:DataContext="{d:DesignInstance Type=text:TextControlVm,
+                                     IsDesignTimeCreatable=False}"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    Background="#240521"
+    mc:Ignorable="d">
+    <Grid>
+        <Grid.Resources>
+            <text:DebugConverter x:Key="DebugConverter" />
+        </Grid.Resources>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <ItemsControl x:Name="ComputingBaseControl" ItemsSource="{Binding Text}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <ContentControl Margin="{Binding ElementName=self, Path=DataContext.StrokeThickness}">
+                        <TextBlock
+                            Margin="{Binding ElementName=self, Path=DataContext.ShadowBlurRadius}"
+                            FontFamily="{Binding ElementName=self, Path=DataContext.FontFamily}"
+                            FontSize="{Binding ElementName=self, Path=DataContext.FontSize}"
+                            FontStyle="{Binding ElementName=self, Path=DataContext.FontStyle}"
+                            FontWeight="{Binding ElementName=self, Path=DataContext.FontWeight}"
+                            Foreground="{Binding ElementName=self, Path=DataContext.FillBrush}"
+                            Tag="{Binding}"
+                            Text="{Binding}" />
+                    </ContentControl>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+        </ItemsControl>
+        <!--<ItemsControl
+            x:Name="CombinedControl"
+            Grid.Row="1"
+            ItemsSource="{Binding Text}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <ContentControl Margin="{Binding ElementName=self, Path=DataContext.StrokeThickness}">
+                        <text:OutlinedTextBlock
+                            Margin="{Binding ElementName=self, Path=DataContext.ShadowBlurRadius}"
+                            Fill="{Binding ElementName=self, Path=DataContext.FillBrush}"
+                            FontFamily="{Binding ElementName=self, Path=DataContext.FontFamily}"
+                            FontSize="{Binding ElementName=self, Path=DataContext.FontSize}"
+                            FontStyle="{Binding ElementName=self, Path=DataContext.FontStyle}"
+                            FontWeight="{Binding ElementName=self, Path=DataContext.FontWeight}"
+                            Stroke="{Binding ElementName=self, Path=DataContext.StrokeBrush}"
+                            StrokeThickness="{Binding ElementName=self, Path=DataContext.StrokeThickness}"
+                            Text="{Binding}">
+                            <text:OutlinedTextBlock.Effect>
+                                <DropShadowEffect
+                                    BlurRadius="{Binding ElementName=self, Path=DataContext.ShadowBlurRadius}"
+                                    Direction="{Binding ElementName=self, Path=DataContext.ShadowDirection}"
+                                    Opacity="{Binding ElementName=self, Path=DataContext.ShadowOpacity}"
+                                    ShadowDepth="{Binding ElementName=self, Path=DataContext.ShadowDepth}"
+                                    Color="{Binding ElementName=self, Path=DataContext.ShadowColor}" />
+                            </text:OutlinedTextBlock.Effect>
+                        </text:OutlinedTextBlock>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+        </ItemsControl>-->
+        <ItemsControl
+            x:Name="StrokeOnlyControl"
+            Grid.Row="2"
+            ItemsSource="{Binding Text}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <ContentControl Margin="{Binding ElementName=self, Path=DataContext.StrokeThickness}">
+                        <text:OutlinedTextBlock
+                            Margin="{Binding ElementName=self, Path=DataContext.ShadowBlurRadius}"
+                            Fill="Transparent"
+                            FontFamily="{Binding ElementName=self, Path=DataContext.FontFamily}"
+                            FontSize="{Binding ElementName=self, Path=DataContext.FontSize}"
+                            FontStyle="{Binding ElementName=self, Path=DataContext.FontStyle}"
+                            FontWeight="{Binding ElementName=self, Path=DataContext.FontWeight}"
+                            Stroke="{Binding ElementName=self, Path=DataContext.StrokeBrush}"
+                            StrokeThickness="{Binding ElementName=self, Path=DataContext.StrokeThickness}"
+                            Tag="{Binding}"
+                            Text="{Binding}" />
+                    </ContentControl>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+        </ItemsControl>
+        <ItemsControl
+            x:Name="ShadowOnlyControl"
+            Grid.Row="3"
+            ItemsSource="{Binding Text}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <ContentControl Margin="{Binding ElementName=self, Path=DataContext.StrokeThickness}">
+                        <TextBlock
+                            Margin="{Binding ElementName=self, Path=DataContext.ShadowBlurRadius}"
+                            FontFamily="{Binding ElementName=self, Path=DataContext.FontFamily}"
+                            FontSize="{Binding ElementName=self, Path=DataContext.FontSize}"
+                            FontStyle="{Binding ElementName=self, Path=DataContext.FontStyle}"
+                            FontWeight="{Binding ElementName=self, Path=DataContext.FontWeight}"
+                            Opacity="{Binding ElementName=self, Path=DataContext.ShadowOpacity}"
+                            Tag="{Binding}"
+                            Text="{Binding}">
+                            <TextBlock.Foreground>
+                                <SolidColorBrush Color="{Binding ElementName=self, Path=DataContext.ShadowColor}" />
+                            </TextBlock.Foreground>
+                            <TextBlock.Effect>
+                                <BlurEffect Radius="{Binding ElementName=self, Path=DataContext.ShadowBlurRadius}" RenderingBias="Quality" />
+                            </TextBlock.Effect>
+                        </TextBlock>
+                    </ContentControl>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+        </ItemsControl>
+        <ItemsControl
+            Grid.Row="4"
+            Background="White"
+            ItemsSource="{Binding Sizes}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border>
+                        <TextBlock Margin="5" Text="{Binding}" />
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+        </ItemsControl>
+        <TextBox
+            Grid.Row="5"
+            Height="28"
+            Margin="4"
+            Padding="2,0"
+            VerticalAlignment="Center"
+            VerticalContentAlignment="Center"
+            AcceptsReturn="True"
+            FontSize="13"
+            Text="{Binding Text, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource DebugConverter}}"
+            TextChanged="TextBox_OnTextChanged" />
+    </Grid>
+</UserControl>

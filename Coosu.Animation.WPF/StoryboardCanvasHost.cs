@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using static System.Windows.Controls.Canvas;
+using Coosu.Storyboard;
 
 namespace Coosu.Animation.WPF
 {
@@ -24,7 +24,7 @@ namespace Coosu.Animation.WPF
         }
 
         public virtual ImageObject CreateElement(FrameworkElement ui,
-            Origin<double> origin,
+            Anchor<double> anchor,
             double width,
             double height,
             int zIndex,
@@ -34,7 +34,7 @@ namespace Coosu.Animation.WPF
             //Canvas.Children.Add(ui);
 
             Panel.SetZIndex(ui, zIndex);
-            var ele = new ImageObject(ui, width, height, origin, defaultX, defaultY)
+            var ele = new ImageObject(ui, width, height, anchor, defaultX, defaultY)
             {
                 Host = this
             };

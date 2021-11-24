@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <UseWpf>true</UseWpf>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net472</TargetFramework>
+    <DisableImplicitNamespaceImports>true</DisableImplicitNamespaceImports>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Coosu.Beatmap\Coosu.Beatmap.csproj" />
+    <ProjectReference Include="..\..\Coosu.Storyboard.Storybrew\Coosu.Storyboard.Storybrew.csproj" />
+    <ProjectReference Include="..\..\Libraries\storybrew\editor\editor.csproj" />
+  </ItemGroup>
+
+</Project>

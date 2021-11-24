@@ -2,8 +2,8 @@
 {
     public enum EasingMode
     {
-        EaseIn,    
-        EaseOut,   
-        EaseInOut, 
+        EaseIn,
+        EaseOut,
+        EaseInOut,
     }
 }

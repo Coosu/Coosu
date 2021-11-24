@@ -8,7 +8,7 @@ namespace Coosu.Storyboard.Utils
 {
     public static class ScriptHelper
     {
-        public static async Task WriteGroupedEventAsync(TextWriter writer, IEnumerable<ICommonEvent> events, int index)
+        public static async Task WriteGroupedEventAsync(TextWriter writer, IEnumerable<IKeyEvent> events, int index)
         {
             var indent = new string(' ', index);
             var groupedEvents = events
@@ -17,7 +17,7 @@ namespace Coosu.Storyboard.Utils
                 .ThenBy(k => k.EventType.Index)
                 .GroupBy(k => k.EventType);
             foreach (var grouping in groupedEvents)
-                foreach (ICommonEvent e in grouping)
+                foreach (IKeyEvent e in grouping)
                 {
                     await writer.WriteAsync(indent);
                     await e.WriteScriptAsync(writer);
@@ -25,12 +25,12 @@ namespace Coosu.Storyboard.Utils
                 }
         }
 
-        public static async Task WriteSequentialEventAsync(TextWriter writer, IEnumerable<ICommonEvent> events, int index)
+        public static async Task WriteSequentialEventAsync(TextWriter writer, IEnumerable<IKeyEvent> events, int index)
         {
             var indent = new string(' ', index);
-            foreach (ICommonEvent e in events
+            foreach (IKeyEvent e in events
                 .OrderBy(k => k.StartTime)
-                .ThenBy(k=>k.EndTime)
+                .ThenBy(k => k.EndTime)
                 .ThenBy(k => k.EventType.Index))
             {
                 await writer.WriteAsync(indent);
@@ -39,7 +39,7 @@ namespace Coosu.Storyboard.Utils
             }
         }
 
-        public static async Task WriteHostEventsAsync(TextWriter writer, IEventHost host, bool group)
+        public static async Task WriteHostEventsAsync(TextWriter writer, IDetailedEventHost host, bool group)
         {
             if (group)
                 await WriteGroupedEventAsync(writer, host.Events, 1);
@@ -47,18 +47,21 @@ namespace Coosu.Storyboard.Utils
                 await WriteSequentialEventAsync(writer, host.Events, 1);
         }
 
-        public static async Task WriteElementEventsAsync(TextWriter writer, ISceneObject sprite, bool group)
+        public static async Task WriteElementEventsAsync(TextWriter writer, ISceneObject sceneObject, bool group)
         {
-            foreach (var loop in sprite.LoopList)
-                await WriteSubEventHostAsync(writer, loop, @group);
-         
-            if (group)
-                await WriteGroupedEventAsync(writer, sprite.Events, 1);
-            else
-                await WriteSequentialEventAsync(writer, sprite.Events, 1);
+            var sprite = sceneObject as Sprite;
+            if (sprite != null)
+                foreach (var loop in sprite.LoopList)
+                    await WriteSubEventHostAsync(writer, loop, @group);
 
-            foreach (var trigger in sprite.TriggerList)
-                await WriteSubEventHostAsync(writer, trigger, @group);
+            if (group)
+                await WriteGroupedEventAsync(writer, sceneObject.Events, 1);
+            else
+                await WriteSequentialEventAsync(writer, sceneObject.Events, 1);
+
+            if (sprite != null)
+                foreach (var trigger in sprite.TriggerList)
+                    await WriteSubEventHostAsync(writer, trigger, @group);
         }
 
         public static async Task WriteSubEventHostAsync(TextWriter writer, ISubEventHost subEventHost, bool group)

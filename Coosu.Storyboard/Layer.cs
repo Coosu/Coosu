@@ -1,8 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Numerics;
 using System.Threading.Tasks;
 using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Events;
@@ -14,15 +14,8 @@ namespace Coosu.Storyboard
     /// Coosu layer.
     /// <para>This is more of a group for controlling a set of sprites instead of osu!storyboard layer.</para>
     /// </summary>
-    public class Layer : IScriptable, IAdjustable
+    public class Layer : ISpriteHost, IAdjustable
     {
-        /// <summary>
-        /// Layer Z-distance.
-        /// The default value is 1.
-        /// The range of the value is from 0 to <see cref="double.MaxValue"/>
-        /// </summary>
-        public double ZDistance { get; set; }
-
         /// <summary>
         /// Layer name.
         /// </summary>
@@ -34,18 +27,18 @@ namespace Coosu.Storyboard
         /// <param name="name"></param>
         public Layer(string name = "CoosuDefaultLayer")
         {
-            ZDistance = 1;
+            Camera2.DefaultZ = 1;
             Name = name;
         }
 
         /// <summary>
         /// Create a new layer.
         /// </summary>
-        /// <param name="zDistance">Layer Z-distance.</param>
+        /// <param name="defaultZ">Layer Z-distance.</param>
         /// <param name="name">Layer name.</param>
-        public Layer(double zDistance, string name = "CoosuDefaultLayer")
+        public Layer(double defaultZ, string name = "CoosuDefaultLayer")
         {
-            ZDistance = zDistance;
+            Camera2.DefaultZ = defaultZ;
             Name = name;
         }
 
@@ -53,127 +46,6 @@ namespace Coosu.Storyboard
         /// Sprite list in this layer.
         /// </summary>
         public List<ISceneObject> SceneObjects { get; set; } = new();
-
-        #region Create Sprite
-
-        /// <summary>
-        /// Create a storyboard sprite.
-        /// </summary>
-        /// <param name="filePath">Image file path.</param>
-        /// <returns>Created sprite.</returns>
-        public Sprite CreateSprite(string filePath)
-        {
-            var obj = new Sprite(LayerType.Foreground, OriginType.Centre, filePath, 320, 240);
-            AddObject(obj);
-            return obj;
-        }
-
-        /// <summary>
-        /// Create a storyboard sprite.
-        /// </summary>
-        /// <param name="filePath">Image file path.</param>
-        /// <param name="originType">The sprite's origin.</param>
-        /// <returns>Created sprite.</returns>
-        public Sprite CreateSprite(string filePath, OriginType originType)
-        {
-            var obj = new Sprite(LayerType.Foreground, originType, filePath, 320, 240);
-            AddObject(obj);
-            return obj;
-        }
-
-        /// <summary>
-        /// Create a storyboard sprite.
-        /// </summary>
-        /// <param name="filePath">Image file path.</param>
-        /// <param name="layerType">The sprite's layer.</param>
-        /// <returns>Created sprite.</returns>
-        public Sprite CreateSprite(string filePath, LayerType layerType)
-        {
-            var obj = new Sprite(layerType, OriginType.Centre, filePath, 320, 240);
-            AddObject(obj);
-            return obj;
-        }
-
-        /// <summary>
-        /// Create a storyboard sprite.
-        /// </summary>
-        /// <param name="filePath">Image file path.</param>
-        /// <param name="layerType">The sprite's layer.</param>
-        /// <param name="originType">The sprite's origin.</param>
-        /// <returns>Created sprite.</returns>
-        public Sprite CreateSprite(string filePath, LayerType layerType, OriginType originType)
-        {
-            var obj = new Sprite(layerType, originType, filePath, 320, 240);
-            AddObject(obj);
-            return obj;
-        }
-
-        /// <summary>
-        /// Create a storyboard sprite.
-        /// </summary>
-        /// <param name="filePath">Image file path.</param>
-        /// <param name="layerType">The sprite's layer.</param>
-        /// <param name="originType">The sprite's origin.</param>
-        /// <param name="defaultLocation">The sprite's default location.</param>
-        /// <returns>Created sprite.</returns>
-        public Sprite CreateSprite(string filePath, LayerType layerType, OriginType originType, Vector2 defaultLocation)
-        {
-            var obj = new Sprite(layerType, originType, filePath, defaultLocation.X, defaultLocation.Y);
-            AddObject(obj);
-            return obj;
-        }
-
-        /// <summary>
-        /// Create a storyboard sprite.
-        /// </summary>
-        /// <param name="filePath">Image file path.</param>
-        /// <param name="layerType">The sprite's layer.</param>
-        /// <param name="originType">The sprite's origin.</param>
-        /// <param name="defaultX">The sprite's default x.</param>
-        /// <param name="defaultY">The sprite's default y.</param>
-        /// <returns>Created sprite.</returns>
-        public Sprite CreateSprite(string filePath, LayerType layerType, OriginType originType, double defaultX,
-            double defaultY)
-        {
-            var obj = new Sprite(layerType, originType, filePath, defaultX, defaultY);
-            AddObject(obj);
-            return obj;
-        }
-
-        #endregion
-
-        /// <summary>
-        /// Create a storyboard animation.
-        /// </summary>
-        /// <param name="filePath">Image file path.</param>
-        /// <param name="layerType">The animation's layer.</param>
-        /// <param name="originType">The animation's origin.</param>
-        /// <param name="defaultX">The animation's default x.</param>
-        /// <param name="defaultY">The animation's default y.</param>
-        /// <param name="frameCount">The animation's total frame count.</param>
-        /// <param name="frameDelay">The animation's frame delay between each frames.</param>
-        /// <param name="loopType">The animation's loop type.</param>
-        /// <returns>Created animation.</returns>
-        public Animation CreateAnimation(
-            string filePath,
-            LayerType layerType,
-            OriginType originType,
-            int defaultX, int defaultY,
-            int frameCount, double frameDelay, LoopType loopType)
-        {
-            var obj = new Animation(
-                layerType,
-                originType,
-                filePath,
-                defaultX,
-                defaultY,
-                frameCount,
-                frameDelay,
-                loopType
-            );
-            AddObject(obj);
-            return obj;
-        }
 
         public void AddObject(ISceneObject @object)
         {
@@ -425,7 +297,7 @@ namespace Coosu.Storyboard
 
                 int easing = int.MinValue, startTime = int.MinValue, endTime = int.MinValue;
 
-                if (EventTypes.IsCommonEvent(identifier))
+                if (EventTypes.IsBasicEvent(identifier))
                 {
                     easing = int.Parse(@params[1]);
                     if (easing is > 34 or < 0)
@@ -552,8 +424,8 @@ namespace Coosu.Storyboard
 
             void InjectEvent(Span<double> span)
             {
-                var commonEvent = CommonEvent.Create(eventType, (EasingType)easing, startTime, endTime, span);
-                currentObj.AddEvent(commonEvent);
+                var basicEvent = BasicEvent.Create(eventType, (EasingType)easing, startTime, endTime, span);
+                currentObj.AddEvent(basicEvent);
             }
         }
 
@@ -571,5 +443,57 @@ namespace Coosu.Storyboard
             AddObject(obj);
             return obj;
         }
+
+        #region ISpriteHost
+
+        public object Clone()
+        {
+            return new Layer(Camera2.DefaultZ, Name)
+            {
+                SceneObjects = SceneObjects.Select(k => k.Clone()).Cast<ISceneObject>().ToList()
+            };
+        }
+
+        public IEnumerator<Sprite> GetEnumerator()
+        {
+            return Sprites.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        public double MaxTime => SceneObjects.Count == 0 ? 0 : SceneObjects.Max(k => k.MaxTime);
+        public double MinTime => SceneObjects.Count == 0 ? 0 : SceneObjects.Min(k => k.MinTime);
+        public double MaxStartTime => SceneObjects.Count == 0 ? 0 : SceneObjects.Max(k => k.MaxStartTime);
+        public double MinEndTime => SceneObjects.Count == 0 ? 0 : SceneObjects.Min(k => k.MinEndTime);
+
+        public IList<Sprite> Sprites => SceneObjects
+            .Where(k => k is Sprite)
+            .Cast<Sprite>()
+            .ToList();
+
+        public IList<ISpriteHost> SubHosts => SceneObjects
+            .Where(k => k is ISpriteHost)
+            .Cast<ISpriteHost>()
+            .ToList();
+
+        public Camera2 Camera2 { get; } = new();
+        public void AddSprite(Sprite sprite)
+        {
+            AddObject(sprite);
+        }
+
+        public void AddSubHost(ISpriteHost spriteHost)
+        {
+            if (spriteHost is not ISceneObject iso) throw new InvalidCastException();
+            AddObject(iso);
+        }
+
+        public ISpriteHost? BaseHost => null;
+        public Dictionary<string, object> Tags { get; } = new();
+
+        #endregion
     }
 }

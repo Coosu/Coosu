@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using Coosu.Storyboard;
 
 namespace Coosu.Animation.WPF
 {
@@ -18,7 +19,7 @@ namespace Coosu.Animation.WPF
         }
 
         public override ImageObject CreateElement(FrameworkElement ui,
-            Origin<double> origin,
+            Anchor<double> anchor,
             double width,
             double height,
             int zIndex,
@@ -27,7 +28,7 @@ namespace Coosu.Animation.WPF
         {
             Panel.SetZIndex(ui, zIndex);
             //Canvas.Children.Add(ui);
-            var ele = new ImageObject(ui, width, height, origin, defaultX, defaultY, Storyboard)
+            var ele = new ImageObject(ui, width, height, anchor, defaultX, defaultY, Storyboard)
             {
                 Host = this
             };

@@ -76,7 +76,7 @@ namespace Coosu.Storyboard
             return false;
         }
 
-        public bool OnTimingRange(out RangeValue<double> patterned, double timingPoint)
+        public bool OnTimingRangeBound(out RangeValue<double> patterned, double timingPoint)
         {
             //int i = 0;
             foreach (var range in TimingList)

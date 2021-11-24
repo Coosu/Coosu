@@ -3,7 +3,7 @@ using Coosu.Storyboard.Easing;
 
 namespace Coosu.Storyboard.Events
 {
-    public sealed class Vector : CommonEvent
+    public sealed class Vector : BasicEvent
     {
         public override EventType EventType => EventTypes.Vector;
 

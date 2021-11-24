@@ -205,7 +205,7 @@ namespace Coosu.Beatmap
 
         public string GetPath(string newDiffName)
         {
-            return Shared.IO.File.EscapeFileName(string.Format("{0} - {1} ({2}){3}.osu",
+            return Shared.IO.PathUtils.EscapeFileName(string.Format("{0} - {1} ({2}){3}.osu",
                 Metadata.Artist,
                 Metadata.Title,
                 Metadata.Creator,

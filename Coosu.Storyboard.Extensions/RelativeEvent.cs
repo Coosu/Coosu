@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Coosu.Shared;
 using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Easing;
 using Coosu.Storyboard.Utils;
@@ -10,7 +11,7 @@ using Coosu.Storyboard.Utils;
 namespace Coosu.Storyboard.Extensions
 {
     [DebuggerDisplay("Expression = {DebuggerDisplay}")]
-    public class RelativeEvent : ICommonEvent
+    public class RelativeEvent : IKeyEvent
     {
         private string DebuggerDisplay => this.GetHeaderString();
         public EventType EventType { get; }

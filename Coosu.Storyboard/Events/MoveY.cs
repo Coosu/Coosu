@@ -4,7 +4,7 @@ using Coosu.Storyboard.Easing;
 
 namespace Coosu.Storyboard.Events
 {
-    public sealed class MoveY : CommonEvent, IPositionAdjustable
+    public sealed class MoveY : BasicEvent, IPositionAdjustable
     {
         public override EventType EventType => EventTypes.MoveY;
 

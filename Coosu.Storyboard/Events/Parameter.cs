@@ -6,7 +6,7 @@ using Coosu.Storyboard.Utils;
 
 namespace Coosu.Storyboard.Events
 {
-    public sealed class Parameter : CommonEvent
+    public sealed class Parameter : BasicEvent
     {
         public override EventType EventType => EventTypes.Parameter;
         public override bool IsStatic => true;

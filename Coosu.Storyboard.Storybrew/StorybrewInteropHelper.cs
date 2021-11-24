@@ -8,7 +8,7 @@ namespace Coosu.Storyboard.Storybrew
 {
     public static class StorybrewInteropHelper
     {
-        public static void ExecuteEvent(ICommonEvent e, OsbSprite brewObj)
+        public static void ExecuteEvent(IKeyEvent e, OsbSprite brewObj)
         {
             var easing = ConvertEasing(e.Easing.GetEasingType());
             if (e.EventType == EventTypes.Scale)

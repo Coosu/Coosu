@@ -64,23 +64,23 @@ namespace Coosu.Storyboard.OsbX
                 return "";
             }
 
-            foreach (var commonEvent in sceneObject.Events)
+            foreach (var keyEvent in sceneObject.Events)
             {
-                var actionHandler = subjectHandler.GetActionHandler(commonEvent.EventType.Flag);
+                var actionHandler = subjectHandler.GetActionHandler(keyEvent.EventType.Flag);
                 if (actionHandler == null)
                 {
-                    Console.WriteLine($"Cannot find action handler for `{commonEvent.EventType.Flag}`: Skipped.");
+                    Console.WriteLine($"Cannot find action handler for `{keyEvent.EventType.Flag}`: Skipped.");
                     continue;
                 }
 
                 try
                 {
-                    var result = " " + actionHandler.Serialize(commonEvent);
+                    var result = " " + actionHandler.Serialize(keyEvent);
                     sb.AppendLine(result);
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error while serializing action: `{commonEvent.EventType.Flag}`\r\n{ex}");
+                    Console.WriteLine($"Error while serializing action: `{keyEvent.EventType.Flag}`\r\n{ex}");
                 }
             }
 
@@ -95,7 +95,7 @@ namespace Coosu.Storyboard.OsbX
         public static async Task<Scene> DeserializeObjectAsync(TextReader reader)
         {
             ISubjectParsingHandler lastSubjectHandler = null;
-            IEventHost lastSubject = null;
+            IDetailedEventHost lastSubject = null;
             //int lastDeep = 0;
             var line = await reader.ReadLineAsync();
             int l = 0;
@@ -127,7 +127,7 @@ namespace Coosu.Storyboard.OsbX
                             try
                             {
                                 var sprite = handler.Deserialize(split);
-                                var eg = em.GetOrAddLayer(sprite.ZDistance);
+                                var eg = em.GetOrAddLayer(sprite.CameraIdentifier);
                                 eg.AddObject(sprite);
 
                                 lastSubject = sprite;
