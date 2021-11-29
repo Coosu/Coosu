@@ -1,6 +1,6 @@
-﻿using Coosu.Api.HttpClient;
+﻿using System;
+using Coosu.Api.HttpClient;
 using Coosu.Api.V2.ResponseModels;
-using System;
 
 namespace Coosu.Api.V2
 {

@@ -1,7 +1,7 @@
-﻿using Coosu.Api.HttpClient;
+﻿using System;
+using Coosu.Api.HttpClient;
 using Coosu.Api.V2.ResponseModels;
 using Newtonsoft.Json;
-using System;
 using HttpUtility = System.Web.HttpUtility;
 
 namespace Coosu.Api.V2

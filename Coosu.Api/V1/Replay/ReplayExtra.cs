@@ -5,7 +5,7 @@ using Coosu.Api.V1.Internal;
 using Coosu.Api.V1.Score;
 
 namespace Coosu.Api.V1.Replay
-{  
+{
     /// <summary>
     /// Replay extra metadata and methods.
     /// </summary>

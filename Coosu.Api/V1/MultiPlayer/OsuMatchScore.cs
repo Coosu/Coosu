@@ -1,6 +1,6 @@
-﻿using Newtonsoft.Json;
-using Coosu.Api.V1.Internal;
+﻿using Coosu.Api.V1.Internal;
 using Coosu.Api.V1.Score;
+using Newtonsoft.Json;
 
 namespace Coosu.Api.V1.MultiPlayer
 {

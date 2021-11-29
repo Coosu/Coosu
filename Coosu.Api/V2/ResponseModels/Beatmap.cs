@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Coosu.Api.V2.ResponseModels
 {
-    public partial class Beatmap
+    public partial class Beatmap : IBeatmap
     {
         [JsonProperty("beatmapset_id")]
         public long BeatmapsetId { get; set; }

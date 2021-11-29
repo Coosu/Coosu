@@ -1,8 +1,8 @@
-﻿using Coosu.Api.HttpClient;
+﻿using System;
+using System.Collections.Generic;
+using Coosu.Api.HttpClient;
 using Coosu.Api.V2.ResponseModels;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 
 namespace Coosu.Api.V2
 {

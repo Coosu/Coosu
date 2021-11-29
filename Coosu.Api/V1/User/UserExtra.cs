@@ -2,7 +2,7 @@
 using Coosu.Api.V1.Internal;
 
 namespace Coosu.Api.V1.User
-{ 
+{
     /// <summary>
     /// User extra metadata and methods.
     /// </summary>

@@ -23,13 +23,13 @@
         /// <summary>
         /// Count of Hit-50.
         /// </summary>
-        int Count50 { get; } 
-        
+        int Count50 { get; }
+
         /// <summary>
         /// Count of Miss.
         /// </summary>
-        int CountMiss { get; } 
-        
+        int CountMiss { get; }
+
         /// <summary>
         /// Max combo of the score.
         /// </summary>
