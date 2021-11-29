@@ -9,13 +9,13 @@ namespace Coosu.Api.V2.ResponseModels
         public string? AvatarUrl { get; set; }
 
         [JsonProperty("country_code")]
-        public string CountryCode { get; set; }
+        public string? CountryCode { get; set; }
 
         [JsonProperty("default_group")]
         public string DefaultGroup { get; set; }
 
         [JsonProperty("id")]
-        public long Id { get; set; }
+        public long? Id { get; set; }
 
         [JsonProperty("is_active")]
         public bool IsActive { get; set; }
