@@ -30,7 +30,7 @@ namespace Coosu.Api.V2.ResponseModels
         public string Version { get; set; }
 
         [JsonProperty("accuracy")]
-        public double Accuracy { get; set; }
+        public double Od { get; set; }
 
         [JsonProperty("ar")]
         public double Ar { get; set; }
@@ -57,7 +57,7 @@ namespace Coosu.Api.V2.ResponseModels
         public object DeletedAt { get; set; }
 
         [JsonProperty("drain")]
-        public long Drain { get; set; }
+        public double Hp { get; set; }
 
         [JsonProperty("hit_length")]
         public long HitLength { get; set; }

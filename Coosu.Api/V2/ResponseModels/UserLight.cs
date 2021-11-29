@@ -6,7 +6,7 @@ namespace Coosu.Api.V2.ResponseModels
     public class UserLight
     {
         [JsonProperty("avatar_url")]
-        public string AvatarUrl { get; set; }
+        public string? AvatarUrl { get; set; }
 
         [JsonProperty("country_code")]
         public string CountryCode { get; set; }
@@ -39,7 +39,7 @@ namespace Coosu.Api.V2.ResponseModels
         public bool PmFriendsOnly { get; set; }
 
         [JsonProperty("profile_colour")]
-        public string ProfileColour { get; set; }
+        public string? ProfileColour { get; set; }
 
         [JsonProperty("username")]
         public string Username { get; set; }
