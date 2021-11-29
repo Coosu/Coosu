@@ -13,7 +13,7 @@ namespace CoosuUnitTest.Api
             var client = new AuthorizationClient();
             var publicToken = client.GetPublicToken(11169, "");
             var v2 = new OsuClientV2(publicToken);
-            var beatmaps = v2.Beatmap.SearchBeatmapset(new SearchOptions()
+            var beatmaps = v2.Beatmap.SearchBeatmapset(new SearchOptions
             {
                 BeatmapsetStatus = BeatmapsetStatus.Any,
                 Gamemode = GameMode.Osu,
