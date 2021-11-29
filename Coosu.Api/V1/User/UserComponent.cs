@@ -4,7 +4,7 @@
     /// User ID.
     /// </summary>
     public sealed class UserId : UserComponent
-    {  
+    {
         /// <summary>
         /// Initialize a user ID.
         /// </summary>

@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 
 namespace Coosu.Api.V2.ResponseModels
 {
-    public partial class Beatmapset
+    public partial class Beatmapset : IBeatmapset
     {
         [JsonProperty("artist")]
         public string Artist { get; set; }
@@ -122,5 +122,11 @@ namespace Coosu.Api.V2.ResponseModels
 
         [JsonProperty("user")]
         public UserLight User { get; set; }
+
+        IBeatmap[] IBeatmapset.Beatmaps
+        {
+            get => Beatmaps;
+            set => Beatmaps = value.Cast<Beatmap>().ToArray();
+        }
     }
 }

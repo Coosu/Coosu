@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Linq;
 using Newtonsoft.Json;
 
 namespace Coosu.Api.V2.ResponseModels
 {
-    public class BeatmapsetSearch
+    public class BeatmapsetSearch : IBeatmapset
     {
         [JsonProperty("artist")]
         public string Artist { get; set; }
@@ -97,8 +98,13 @@ namespace Coosu.Api.V2.ResponseModels
 
         [JsonProperty("tags")]
         public string Tags { get; set; }
-
         [JsonProperty("beatmaps")]
         public BeatmapSearch[] Beatmaps { get; set; }
+
+        IBeatmap[] IBeatmapset.Beatmaps
+        {
+            get => Beatmaps;
+            set => Beatmaps = value.Cast<BeatmapSearch>().ToArray();
+        }
     }
 }

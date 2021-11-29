@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Coosu.Api.HttpClient;
 using Coosu.Api.V1.Beatmap;
 using Coosu.Api.V1.Internal;
@@ -10,6 +8,8 @@ using Coosu.Api.V1.MultiPlayer;
 using Coosu.Api.V1.Replay;
 using Coosu.Api.V1.Score;
 using Coosu.Api.V1.User;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 [assembly: CLSCompliant(true)]
 
@@ -19,7 +19,7 @@ namespace Coosu.Api.V1
     /// Client to access osu!API via HTTP connection.
     /// </summary>
     public class OsuClient
-    { 
+    {
         /// <summary>
         /// Osu api key.
         /// </summary>

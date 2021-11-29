@@ -1,6 +1,6 @@
 ﻿using System;
-using Newtonsoft.Json;
 using Coosu.Api.V1.Internal;
+using Newtonsoft.Json;
 
 namespace Coosu.Api.V1.User
 {
@@ -15,7 +15,7 @@ namespace Coosu.Api.V1.User
         [JsonProperty("user_id")]
         [JsonConverter(typeof(ParseStringConverter))]
         public long UserId { get; set; }
-        
+
         /// <summary>
         /// User name.
         /// </summary>
