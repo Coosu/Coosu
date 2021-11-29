@@ -5,6 +5,9 @@ namespace Coosu.Api.V2.ResponseModels
 {
     public partial class Beatmap
     {
+        [JsonProperty("beatmapset_id")]
+        public long BeatmapsetId { get; set; }
+
         [JsonProperty("difficulty_rating")]
         public double DifficultyRating { get; set; }
 
@@ -20,17 +23,17 @@ namespace Coosu.Api.V2.ResponseModels
         [JsonProperty("total_length")]
         public long TotalLength { get; set; }
 
+        [JsonProperty("user_id")]
+        public long UserId { get; set; }
+
         [JsonProperty("version")]
         public string Version { get; set; }
 
         [JsonProperty("accuracy")]
-        public long Accuracy { get; set; }
+        public double Od { get; set; }
 
         [JsonProperty("ar")]
         public double Ar { get; set; }
-
-        [JsonProperty("beatmapset_id")]
-        public long BeatmapsetId { get; set; }
 
         [JsonProperty("bpm")]
         public double? Bpm { get; set; }
@@ -54,7 +57,7 @@ namespace Coosu.Api.V2.ResponseModels
         public object DeletedAt { get; set; }
 
         [JsonProperty("drain")]
-        public long Drain { get; set; }
+        public double Hp { get; set; }
 
         [JsonProperty("hit_length")]
         public long HitLength { get; set; }
@@ -78,7 +81,10 @@ namespace Coosu.Api.V2.ResponseModels
         public long Ranked { get; set; }
 
         [JsonProperty("url")]
-        public string Url { get; set; }
+        public string? Url { get; set; }
+
+        [JsonProperty("checksum")]
+        public string Checksum { get; set; }
 
         [JsonProperty("failtimes")]
         public Failtimes Failtimes { get; set; }
