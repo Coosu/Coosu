@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
+using System.Numerics;
 using Coosu.Beatmap.Internal;
+using Coosu.Shared;
 
 namespace Coosu.Beatmap.Sections.HitObject
 {
     public class SliderInfo
     {
         public SliderType SliderType { get; set; }
-        public Vector2<float>[] CurvePoints { get; set; }
+        public Vector2[] CurvePoints { get; set; }
         public int Repeat { get; set; }
         public decimal PixelLength { get; set; }
         public HitsoundType[] EdgeHitsounds { get; set; }
@@ -17,8 +18,8 @@ namespace Coosu.Beatmap.Sections.HitObject
         public ObjectSamplesetType[] EdgeAdditions { get; set; }
 
         //extension
-        public Vector2<float> StartPoint { get; }
-        public Vector2<float> EndPoint => CurvePoints.Last();
+        public Vector2 StartPoint { get; }
+        public Vector2 EndPoint => CurvePoints.Last();
 
         public double StartTime => _offset;
         public double EndTime => Edges[Edges.Length - 1].Offset;
@@ -27,15 +28,15 @@ namespace Coosu.Beatmap.Sections.HitObject
         private SliderEdge[] _edges;
         private SliderTick[] _ticks;
         private SliderTick[] _ballTrail;
-        private List<List<Vector2<float>>> _rawBezierData;
-        private List<double> _rawBezierLengthData;
+        private List<List<Vector2>>? _rawBezierData;
+        private List<double>? _rawBezierLengthData;
 
         private readonly int _offset;
         private readonly double _beatDuration;
         private readonly double _sliderMultiplier;
         private readonly double _tickRate;
 
-        public SliderInfo(Vector2<float> startPoint, int offset, double beatDuration, double sliderMultiplier, double tickRate, decimal pixelLength)
+        public SliderInfo(Vector2 startPoint, int offset, double beatDuration, double sliderMultiplier, double tickRate, decimal pixelLength)
         {
             StartPoint = startPoint;
             PixelLength = pixelLength;
@@ -115,7 +116,7 @@ namespace Coosu.Beatmap.Sections.HitObject
                     ticks = GetPerfectDiscreteBallData(intervalMilliseconds);
                     break;
                 default:
-                    ticks = Array.Empty<SliderTick>();
+                    ticks = EmptyArray<SliderTick>.Value;
                     break;
             }
             return ticks.ToArray();
@@ -140,12 +141,12 @@ namespace Coosu.Beatmap.Sections.HitObject
         {
             if (Math.Round(interval - _singleElapsedTime) >= 0)
             {
-                return Array.Empty<SliderTick>();
+                return EmptyArray<SliderTick>.Value;
             }
 
-            Vector2<float> p1;
-            Vector2<float> p2;
-            Vector2<float> p3;
+            Vector2 p1;
+            Vector2 p2;
+            Vector2 p3;
             try
             {
                 p1 = StartPoint;
@@ -194,7 +195,7 @@ namespace Coosu.Beatmap.Sections.HitObject
                 var x = circle.p.X + circle.r * Math.Cos(offsetRad);
                 var y = circle.p.Y + circle.r * Math.Sin(offsetRad);
 
-                ticks.Add(new SliderTick(_offset + offset, new Vector2<float>((float)x, (float)y)));
+                ticks.Add(new SliderTick(_offset + offset, new Vector2((float)x, (float)y)));
             }
 
             if (Repeat > 1)
@@ -218,13 +219,9 @@ namespace Coosu.Beatmap.Sections.HitObject
             }
 
             return ticks.ToArray();
-            //var degStart = radStart / Math.PI * 180;
-            //var degMid = radMid / Math.PI * 180;
-            //var degEnd = radEnd / Math.PI * 180;
-            //return Array.Empty<SliderTick>();
         }
 
-        private static (Vector2<float> p, double r) GetCircle(Vector2<float> p1, Vector2<float> p2, Vector2<float> p3)
+        private static (Vector2 p, double r) GetCircle(Vector2 p1, Vector2 p2, Vector2 p3)
         {
             var e = 2 * (p2.X - p1.X);
             var f = 2 * (p2.Y - p1.Y);
@@ -235,7 +232,7 @@ namespace Coosu.Beatmap.Sections.HitObject
             var x = (g * b - c * f) / (e * b - a * f);
             var y = (a * g - c * e) / (a * f - b * e);
             var r = Math.Pow(Math.Pow(x - p1.X, 2) + Math.Pow(y - p1.Y, 2), 0.5);
-            return (new Vector2<float>((float)x, (float)y), r);
+            return (new Vector2((float)x, (float)y), r);
         }
 
         // todo: not cut by rhythm
@@ -243,7 +240,7 @@ namespace Coosu.Beatmap.Sections.HitObject
         {
             if (Math.Round(interval - _singleElapsedTime) >= 0)
             {
-                return Array.Empty<SliderTick>();
+                return EmptyArray<SliderTick>.Value;
             }
 
             var totalLength = RawBezierLengthData.Sum();
@@ -260,7 +257,7 @@ namespace Coosu.Beatmap.Sections.HitObject
 
                 var (index, lenInPart) = CalculateWhichPart(relativeLen); // can be optimized
                 var len = RawBezierLengthData[index];
-                var tickPoint = Bezier.CalcPoint((float)(lenInPart / len), RawGroupedBezierData[index]);
+                var tickPoint = BezierHelper.Compute(RawGroupedBezierData[index], (float)(lenInPart / len));
                 ticks.Add(new SliderTick(_offset + offset, tickPoint));
             }
 
@@ -287,9 +284,9 @@ namespace Coosu.Beatmap.Sections.HitObject
             return ticks.ToArray();
         }
 
-        private List<List<Vector2<float>>> RawGroupedBezierData => _rawBezierData ?? (_rawBezierData = GetGroupedBezier());
+        private List<List<Vector2>> RawGroupedBezierData => _rawBezierData ??= GetGroupedBezier();
 
-        private List<double> RawBezierLengthData => _rawBezierLengthData ?? (_rawBezierLengthData = GetBezierLengths(RawGroupedBezierData));
+        private List<double> RawBezierLengthData => _rawBezierLengthData ??= GetBezierLengths(RawGroupedBezierData);
 
         public override string ToString()
         {
@@ -330,19 +327,19 @@ namespace Coosu.Beatmap.Sections.HitObject
                 edgeSampleStr);
         }
 
-        private static List<double> GetBezierLengths(List<List<Vector2<float>>> value)
+        private static List<double> GetBezierLengths(List<List<Vector2>> value)
         {
             var list = new List<double>();
             foreach (var controlPoints in value)
             {
-                var points = Bezier.GetBezierTrail(controlPoints, 0.05f);
+                var points = BezierHelper.GetBezierTrail(controlPoints, 20);
                 double dis = 0;
-                if (points.Length <= 1)
+                if (points.Count <= 1)
                 {
                 }
                 else
                 {
-                    for (int j = 0; j < points.Length - 1; j++)
+                    for (int j = 0; j < points.Count - 1; j++)
                     {
                         dis += Math.Pow(
                             Math.Pow(points[j].X - points[j + 1].X, 2) +
@@ -357,13 +354,13 @@ namespace Coosu.Beatmap.Sections.HitObject
             return list;
         }
 
-        private List<List<Vector2<float>>> GetGroupedBezier()
+        private List<List<Vector2>> GetGroupedBezier()
         {
             var copiedCurvePoints = CurvePoints.ToList();
             copiedCurvePoints.Insert(0, StartPoint);
 
-            var list = new List<List<Vector2<float>>>();
-            var current = new List<Vector2<float>>();
+            var list = new List<List<Vector2>>();
+            var current = new List<Vector2>();
             list.Add(current);
             for (int i = 0; i < copiedCurvePoints.Count; i++)
             {
@@ -378,7 +375,7 @@ namespace Coosu.Beatmap.Sections.HitObject
 
                 if (Math.Abs(@this.X - next.X) < 0.01 && Math.Abs(@this.Y - next.Y) < 0.01)
                 {
-                    current = new List<Vector2<float>>();
+                    current = new List<Vector2>();
                     list.Add(current);
                 }
             }
@@ -435,7 +432,7 @@ namespace Coosu.Beatmap.Sections.HitObject
     public struct SliderEdge
     {
         public double Offset { get; set; }
-        public Vector2<float> Point { get; set; }
+        public Vector2 Point { get; set; }
         public HitsoundType EdgeHitsound { get; set; }
         public ObjectSamplesetType EdgeSample { get; set; }
         public ObjectSamplesetType EdgeAddition { get; set; }
@@ -443,13 +440,13 @@ namespace Coosu.Beatmap.Sections.HitObject
 
     public struct SliderTick
     {
-        public SliderTick(double offset, Vector2<float> point)
+        public SliderTick(double offset, Vector2 point)
         {
             Offset = offset;
             Point = point;
         }
 
         public double Offset { get; set; }
-        public Vector2<float> Point { get; set; }
+        public Vector2 Point { get; set; }
     }
 }

@@ -1,5 +1,5 @@
-﻿using Coosu.Beatmap.Configurable;
-using System.IO;
+﻿using System.IO;
+using Coosu.Beatmap.Configurable;
 
 namespace Coosu.Beatmap.Sections.Event
 {

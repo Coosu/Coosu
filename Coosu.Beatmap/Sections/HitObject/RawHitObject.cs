@@ -1,8 +1,7 @@
-﻿using Coosu.Beatmap.Configurable;
-using Coosu.Beatmap.Internal;
-using System;
+﻿using System;
 using System.IO;
-using System.Runtime.Serialization;
+using Coosu.Beatmap.Configurable;
+using Coosu.Beatmap.Internal;
 
 namespace Coosu.Beatmap.Sections.HitObject
 {

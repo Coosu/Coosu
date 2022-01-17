@@ -1,12 +1,12 @@
-﻿using Coosu.Beatmap.Configurable;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Numerics;
+using Coosu.Beatmap.Configurable;
 using Coosu.Beatmap.Internal;
 using Coosu.Beatmap.Sections.HitObject;
 using Coosu.Beatmap.Sections.Timing;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
-using System.Linq;
 
 namespace Coosu.Beatmap.Sections
 {
@@ -90,12 +90,12 @@ namespace Coosu.Beatmap.Sections
             var curveInfo = infos[0].SpanSplit("|");
             var sliderType = infos[0].Split('|')[0];
 
-            var points = new Vector2<float>[curveInfo.Length - 1]; // curvePoints skip 1
+            var points = new Vector2[curveInfo.Length - 1]; // curvePoints skip 1
             for (var i = 1; i < curveInfo.Length; i++)
             {
                 var point = curveInfo[i];
                 var xy = point.SpanSplit(":");
-                points[i - 1] = new Vector2<float>(int.Parse(xy[0]), int.Parse(xy[1]));
+                points[i - 1] = new Vector2(int.Parse(xy[0]), int.Parse(xy[1]));
             }
 
             // repeat
@@ -182,7 +182,7 @@ namespace Coosu.Beatmap.Sections
             }
             else lastLine = lastLines[0];
 
-            hitObject.SliderInfo = new SliderInfo(new Vector2<float>(hitObject.X, hitObject.Y),
+            hitObject.SliderInfo = new SliderInfo(new Vector2(hitObject.X, hitObject.Y),
                 hitObject.Offset,
                 lastRedLine.Factor,
                 _difficulty.SliderMultiplier * lastLine.Multiple,

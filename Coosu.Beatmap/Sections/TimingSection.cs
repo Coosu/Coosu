@@ -1,10 +1,10 @@
-﻿using Coosu.Beatmap.Configurable;
-using Coosu.Beatmap.Sections.Timing;
-using Coosu.Shared.Mathematics;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Coosu.Beatmap.Configurable;
+using Coosu.Beatmap.Sections.Timing;
+using Coosu.Shared.Mathematics;
 
 namespace Coosu.Beatmap.Sections
 {

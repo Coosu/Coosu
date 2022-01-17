@@ -1,11 +1,10 @@
-﻿using Coosu.Beatmap.Configurable;
-using Coosu.Beatmap.Sections.Event;
-using Coosu.Shared.Mathematics;
-using System.Collections.Generic;
-using System.Globalization;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Coosu.Beatmap.Configurable;
+using Coosu.Beatmap.Sections.Event;
+using Coosu.Shared.Mathematics;
 using Coosu.Storyboard;
 
 namespace Coosu.Beatmap.Sections
