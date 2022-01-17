@@ -3,38 +3,25 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using Coosu.Beatmap.Internal;
+using Coosu.Beatmap.Utils;
 using Coosu.Shared;
 
 namespace Coosu.Beatmap.Sections.HitObject
 {
     public class SliderInfo
     {
-        public SliderType SliderType { get; set; }
-        public Vector2[] CurvePoints { get; set; }
-        public int Repeat { get; set; }
-        public decimal PixelLength { get; set; }
-        public HitsoundType[] EdgeHitsounds { get; set; }
-        public ObjectSamplesetType[] EdgeSamples { get; set; }
-        public ObjectSamplesetType[] EdgeAdditions { get; set; }
-
-        //extension
-        public Vector2 StartPoint { get; }
-        public Vector2 EndPoint => CurvePoints.Last();
-
-        public double StartTime => _offset;
-        public double EndTime => Edges[Edges.Length - 1].Offset;
-
-        private double _singleElapsedTime;
-        private SliderEdge[] _edges;
-        private SliderTick[] _ticks;
-        private SliderTick[] _ballTrail;
-        private List<List<Vector2>>? _rawBezierData;
-        private List<double>? _rawBezierLengthData;
+        private SliderEdge[]? _edges;
+        private SliderTick[]? _ticks;
+        private SliderTick[]? _ballTrail;
+        private IReadOnlyList<List<Vector2>>? _groupedPoints;
+        private IReadOnlyList<double>? _groupedBezierLengths;
 
         private readonly int _offset;
         private readonly double _beatDuration;
         private readonly double _sliderMultiplier;
         private readonly double _tickRate;
+        private readonly double _singleElapsedTime;
+        private Vector2[] _curvePoints;
 
         public SliderInfo(Vector2 startPoint, int offset, double beatDuration, double sliderMultiplier, double tickRate, decimal pixelLength)
         {
@@ -46,6 +33,27 @@ namespace Coosu.Beatmap.Sections.HitObject
             _tickRate = tickRate;
             _singleElapsedTime = (double)(PixelLength / (100 * (decimal)_sliderMultiplier) * (decimal)_beatDuration);
         }
+
+        public SliderType SliderType { get; set; }
+
+        public Vector2[] CurvePoints
+        {
+            get => _curvePoints;
+            set { _curvePoints = value; _groupedPoints = null; }
+        }
+
+        public IReadOnlyList<IReadOnlyList<Vector2>> GroupedPoints => _groupedPoints ??= GetGroupedPoints();
+        public int Repeat { get; set; }
+        public decimal PixelLength { get; set; }
+        public HitsoundType[]? EdgeHitsounds { get; set; }
+        public ObjectSamplesetType[]? EdgeSamples { get; set; }
+        public ObjectSamplesetType[]? EdgeAdditions { get; set; }
+
+        public double StartTime => _offset;
+        public double EndTime => Edges[Edges.Length - 1].Offset;
+
+        public Vector2 StartPoint { get; }
+        public Vector2 EndPoint => CurvePoints.Last();
 
         public SliderEdge[] Edges
         {
@@ -103,6 +111,8 @@ namespace Coosu.Beatmap.Sections.HitObject
             }
         }
 
+        private IReadOnlyList<double> GroupedBezierLengths => _groupedBezierLengths ??= GetGroupedBezierLengths(GroupedPoints);
+
         public SliderTick[] GetDiscreteSliderTrailData(double intervalMilliseconds)
         {
             SliderTick[] ticks;
@@ -122,12 +132,75 @@ namespace Coosu.Beatmap.Sections.HitObject
             return ticks.ToArray();
         }
 
+        /// <summary>
+        /// osu!lazer implementation to compute approximated data.
+        /// </summary>
+        /// <returns></returns>
+        public IReadOnlyList<Vector2> ComputeApproximatedData()
+        {
+            IReadOnlyList<Vector2> ticks;
+            switch (SliderType)
+            {
+                case SliderType.Bezier:
+                case SliderType.Linear:
+                    ticks = ComputeBezierApproximatedData();
+                    break;
+                case SliderType.Perfect:
+                    ticks = ComputePerfectApproximatedData();
+                    break;
+                default:
+                    ticks = EmptyArray<Vector2>.Value;
+                    break;
+            }
+
+            return ticks;
+        }
+
+        public override string ToString()
+        {
+            var sampleList = new List<(ObjectSamplesetType, ObjectSamplesetType)>();
+            string edgeSampleStr;
+            string edgeHitsoundStr;
+            if (EdgeSamples != null)
+            {
+                for (var i = 0; i < EdgeSamples.Length; i++)
+                {
+                    var objectSamplesetType = EdgeSamples[i];
+                    var objectAdditionType = EdgeAdditions[i];
+                    sampleList.Add((objectSamplesetType, objectAdditionType));
+                }
+
+                edgeSampleStr = "," + string.Join("|", sampleList.Select(k => $"{(int)k.Item1}:{(int)k.Item2}"));
+            }
+            else
+            {
+                edgeSampleStr = "";
+            }
+
+            if (EdgeHitsounds != null)
+            {
+                edgeHitsoundStr = "," + string.Join("|", EdgeHitsounds.Select(k => $"{(int)k}"));
+            }
+            else
+            {
+                edgeHitsoundStr = "";
+            }
+
+            return string.Format("{0}|{1},{2},{3}{4}{5}",
+                SliderType.ParseToCode(),
+                string.Join("|", CurvePoints.Select(k => $"{k.X}:{k.Y}")),
+                Repeat,
+                PixelLength,
+                edgeHitsoundStr,
+                edgeSampleStr);
+        }
+
         private (int index, double lenInPart) CalculateWhichPart(double relativeLen)
         {
             double sum = 0;
-            for (var i = 0; i < RawBezierLengthData.Count; i++)
+            for (var i = 0; i < GroupedBezierLengths.Count; i++)
             {
-                var len = RawBezierLengthData[i];
+                var len = GroupedBezierLengths[i];
                 sum += len;
                 if (relativeLen < sum) return (i, len - (sum - relativeLen));
             }
@@ -137,9 +210,9 @@ namespace Coosu.Beatmap.Sections.HitObject
 
         // todo: not cut by rhythm
         // todo: i forget math
-        private SliderTick[] GetPerfectDiscreteBallData(double interval)
+        private SliderTick[] GetPerfectDiscreteBallData(double fixedInterval)
         {
-            if (Math.Round(interval - _singleElapsedTime) >= 0)
+            if (Math.Round(fixedInterval - _singleElapsedTime) >= 0)
             {
                 return EmptyArray<SliderTick>.Value;
             }
@@ -156,7 +229,7 @@ namespace Coosu.Beatmap.Sections.HitObject
             catch (IndexOutOfRangeException)
             {
                 this.SliderType = SliderType.Linear;
-                return GetBezierDiscreteBallData(interval);
+                return GetBezierDiscreteBallData(fixedInterval);
             }
 
             var circle = GetCircle(p1, p2, p3);
@@ -184,9 +257,9 @@ namespace Coosu.Beatmap.Sections.HitObject
 
             var ticks = new List<SliderTick>();
 
-            for (int i = 1; i * interval < _singleElapsedTime; i++)
+            for (int i = 1; i * fixedInterval < _singleElapsedTime; i++)
             {
-                var offset = i * interval; // 当前tick的相对时间
+                var offset = i * fixedInterval; // 当前tick的相对时间
                 if (Edges.Any(k => Math.Abs(k.Offset - _offset - offset) < 0.01))
                     continue;
                 var ratio = offset / _singleElapsedTime; // 相对整个滑条的时间比例，=距离比例
@@ -236,19 +309,19 @@ namespace Coosu.Beatmap.Sections.HitObject
         }
 
         // todo: not cut by rhythm
-        private SliderTick[] GetBezierDiscreteBallData(double interval)
+        private SliderTick[] GetBezierDiscreteBallData(double fixedInterval)
         {
-            if (Math.Round(interval - _singleElapsedTime) >= 0)
+            if (Math.Round(fixedInterval - _singleElapsedTime) >= 0)
             {
                 return EmptyArray<SliderTick>.Value;
             }
 
-            var totalLength = RawBezierLengthData.Sum();
+            var totalLength = GroupedBezierLengths.Sum();
             var ticks = new List<SliderTick>();
 
-            for (int i = 1; i * interval < _singleElapsedTime; i++)
+            for (int i = 1; i * fixedInterval < _singleElapsedTime; i++)
             {
-                var offset = i * interval; // 当前tick的相对时间
+                var offset = i * fixedInterval; // 当前tick的相对时间
                 if (Edges.Any(k => Math.Abs(k.Offset - _offset - offset) < 0.01))
                     continue;
 
@@ -256,8 +329,8 @@ namespace Coosu.Beatmap.Sections.HitObject
                 var relativeLen = totalLength * ratio; // 至滑条头的距离
 
                 var (index, lenInPart) = CalculateWhichPart(relativeLen); // can be optimized
-                var len = RawBezierLengthData[index];
-                var tickPoint = BezierHelper.Compute(RawGroupedBezierData[index], (float)(lenInPart / len));
+                var len = GroupedBezierLengths[index];
+                var tickPoint = BezierHelper.Compute(GroupedPoints[index], (float)(lenInPart / len));
                 ticks.Add(new SliderTick(_offset + offset, tickPoint));
             }
 
@@ -284,148 +357,82 @@ namespace Coosu.Beatmap.Sections.HitObject
             return ticks.ToArray();
         }
 
-        private List<List<Vector2>> RawGroupedBezierData => _rawBezierData ??= GetGroupedBezier();
-
-        private List<double> RawBezierLengthData => _rawBezierLengthData ??= GetBezierLengths(RawGroupedBezierData);
-
-        public override string ToString()
+        private IReadOnlyList<Vector2> ComputePerfectApproximatedData()
         {
-            var sampleList = new List<(ObjectSamplesetType, ObjectSamplesetType)>();
-            string edgeSampleStr;
-            string edgeHitsoundStr;
-            if (EdgeSamples != null)
+            Vector2 p1;
+            Vector2 p2;
+            Vector2 p3;
+            try
             {
-                for (var i = 0; i < EdgeSamples.Length; i++)
-                {
-                    var objectSamplesetType = EdgeSamples[i];
-                    var objectAdditionType = EdgeAdditions[i];
-                    sampleList.Add((objectSamplesetType, objectAdditionType));
-                }
-
-                edgeSampleStr = "," + string.Join("|", sampleList.Select(k => $"{(int)k.Item1}:{(int)k.Item2}"));
+                p1 = StartPoint;
+                p2 = CurvePoints[0];
+                p3 = CurvePoints[1];
             }
-            else
+            catch (IndexOutOfRangeException)
             {
-                edgeSampleStr = "";
+                return ComputeBezierApproximatedData();
             }
 
-            if (EdgeHitsounds != null)
-            {
-                edgeHitsoundStr = "," + string.Join("|", EdgeHitsounds.Select(k => $"{(int)k}"));
-            }
-            else
-            {
-                edgeHitsoundStr = "";
-            }
-
-            return string.Format("{0}|{1},{2},{3}{4}{5}",
-                SliderType.ParseToCode(),
-                string.Join("|", CurvePoints.Select(k => $"{k.X}:{k.Y}")),
-                Repeat,
-                PixelLength,
-                edgeHitsoundStr,
-                edgeSampleStr);
+            return PathApproximator.ApproximateCircularArc(new[] { p1, p2, p3 });
         }
 
-        private static List<double> GetBezierLengths(List<List<Vector2>> value)
+        private IReadOnlyList<Vector2> ComputeBezierApproximatedData()
         {
-            var list = new List<double>();
-            foreach (var controlPoints in value)
+            var points = new List<Vector2>();
+            for (var i = 0; i < GroupedPoints.Count; i++)
             {
-                var points = BezierHelper.GetBezierTrail(controlPoints, 20);
-                double dis = 0;
-                if (points.Count <= 1)
-                {
-                }
-                else
-                {
-                    for (int j = 0; j < points.Count - 1; j++)
-                    {
-                        dis += Math.Pow(
-                            Math.Pow(points[j].X - points[j + 1].X, 2) +
-                            Math.Pow(points[j].Y - points[j + 1].Y, 2),
-                            0.5);
-                    }
-                }
+                var groupedPoint = GroupedPoints[i];
+                var bezierTrail = PathApproximator.ApproximateBezier(groupedPoint);
 
-                list.Add(dis);
+                points.AddRange(bezierTrail.Select(k => new Vector2(k.X, k.Y)));
             }
 
-            return list;
+            return points;
         }
 
-        private List<List<Vector2>> GetGroupedBezier()
+        private static IReadOnlyList<double> GetGroupedBezierLengths(IReadOnlyList<IReadOnlyList<Vector2>> groupedBezierPoints)
         {
-            var copiedCurvePoints = CurvePoints.ToList();
-            copiedCurvePoints.Insert(0, StartPoint);
-
-            var list = new List<List<Vector2>>();
-            var current = new List<Vector2>();
-            list.Add(current);
-            for (int i = 0; i < copiedCurvePoints.Count; i++)
+            var array = new double[groupedBezierPoints.Count];
+            for (var i = 0; i < groupedBezierPoints.Count; i++)
             {
-                var @this = copiedCurvePoints[i];
-                current.Add(@this);
-                if (i == copiedCurvePoints.Count - 1)
-                {
-                    break;
-                }
-
-                var next = copiedCurvePoints[i + 1];
-
-                if (Math.Abs(@this.X - next.X) < 0.01 && Math.Abs(@this.Y - next.Y) < 0.01)
-                {
-                    current = new List<Vector2>();
-                    list.Add(current);
-                }
+                var controlPoints = groupedBezierPoints[i];
+                var length = BezierHelper.Length(controlPoints);
+                array[i] = length;
             }
 
-            return list;
-        }
-    }
-
-    public class ReversableList<T>
-    {
-        private (int index, T element)? _current;
-        private readonly List<T> _list;
-        //private readonly bool _initialReverse;
-        private bool _currentReverse = false;
-        public ReversableList(List<T> list/*, bool initialReverse = false*/)
-        {
-            _list = list;
-            //_initialReverse = initialReverse;
+            return array;
         }
 
-        public (int index, T element) GetNext()
+        private List<List<Vector2>> GetGroupedPoints()
         {
-            if (_current == null)
-            {
-                _current = (0, _list[0]);
-                _currentReverse = false;
+            IReadOnlyList<Vector2> rawPoints = CurvePoints;
 
-                return _current.Value;
-            }
-            else
-            {
-                if (!_currentReverse && _current.Value.index == _list.Count - 1)
-                {
-                    _currentReverse = false;
-                    var index = _list.Count - 1;
-                    _current = (index, _list[index]);
-                }
-                else if (_currentReverse && _current.Value.index == 0)
-                {
-                    _currentReverse = true;
-                    _current = (0, _list[0]);
-                }
-                else
-                {
-                    var index = _currentReverse ? _current.Value.index - 1 : _current.Value.index + 1;
-                    _current = (index, _list[index]);
-                }
+            var groupedPoints = new List<List<Vector2>>();
+            var currentGroup = new List<Vector2>();
 
-                return _current.Value;
+            Vector2? nextPoint = default;
+            for (var i = -1; i < rawPoints.Count - 1; i++)
+            {
+                var thisPoint = i == -1 ? StartPoint : rawPoints[i];
+                nextPoint = rawPoints[i + 1];
+                currentGroup.Add(thisPoint);
+                if (thisPoint.Equals(nextPoint))
+                {
+                    groupedPoints.Add(currentGroup);
+                    currentGroup = new List<Vector2>();
+                }
             }
+
+            if (nextPoint != null)
+                currentGroup.Add(nextPoint.Value);
+            groupedPoints.Add(currentGroup);
+
+            if (groupedPoints.Count == 0 && rawPoints.Count != 0)
+            {
+                currentGroup.AddRange(rawPoints);
+            }
+
+            return groupedPoints;
         }
     }
 
