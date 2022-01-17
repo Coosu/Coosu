@@ -1,4 +1,4 @@
-﻿namespace Coosu.Beatmap
+﻿namespace Coosu.Shared.Numerics
 {
     public struct Vector3<T>
     {

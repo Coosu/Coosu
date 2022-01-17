@@ -4,7 +4,7 @@ using System.Linq;
 using System.Numerics;
 using Coosu.Shared;
 
-namespace Coosu.Beatmap
+namespace Coosu.Beatmap.Utils
 {
     public static class BezierHelper
     {

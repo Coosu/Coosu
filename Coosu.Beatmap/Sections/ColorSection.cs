@@ -1,4 +1,5 @@
 ﻿using Coosu.Beatmap.Configurable;
+using Coosu.Shared.Numerics;
 
 namespace Coosu.Beatmap.Sections
 {

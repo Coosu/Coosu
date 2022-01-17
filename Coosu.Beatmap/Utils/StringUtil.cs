@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Coosu.Beatmap
+namespace Coosu.Beatmap.Utils
 {
     public static class StringUtil
     {

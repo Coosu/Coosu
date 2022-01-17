@@ -7,6 +7,7 @@ using Coosu.Beatmap.Configurable;
 using Coosu.Beatmap.Internal;
 using Coosu.Beatmap.Sections.HitObject;
 using Coosu.Beatmap.Sections.Timing;
+using Coosu.Beatmap.Utils;
 
 namespace Coosu.Beatmap.Sections
 {
