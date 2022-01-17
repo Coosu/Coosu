@@ -148,6 +148,11 @@ namespace Coosu.Beatmap.Sections.HitObject
                 case SliderType.Perfect:
                     ticks = ComputePerfectApproximatedData();
                     break;
+#pragma warning disable CS0618 // 类型或成员已过时
+                case SliderType.Catmull:
+#pragma warning restore CS0618 // 类型或成员已过时
+                    ticks = ComputeCatmullApproximatedData();
+                    break;
                 default:
                     ticks = EmptyArray<Vector2>.Value;
                     break;
@@ -388,6 +393,15 @@ namespace Coosu.Beatmap.Sections.HitObject
             }
 
             return points;
+        }
+
+        private IReadOnlyList<Vector2> ComputeCatmullApproximatedData()
+        {
+            var all = CurvePoints.ToList();
+            all.Insert(0, StartPoint);
+
+            var catmullTrail = PathApproximator.ApproximateCatmull(all);
+            return catmullTrail;
         }
 
         private static IReadOnlyList<double> GetGroupedBezierLengths(IReadOnlyList<IReadOnlyList<Vector2>> groupedBezierPoints)
