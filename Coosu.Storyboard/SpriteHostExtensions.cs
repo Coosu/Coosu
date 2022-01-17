@@ -1,4 +1,5 @@
-﻿using Coosu.Shared.Numerics;
+﻿using Coosu.Shared;
+using Coosu.Shared.Numerics;
 using Coosu.Storyboard.Common;
 
 namespace Coosu.Storyboard

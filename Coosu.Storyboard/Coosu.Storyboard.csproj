@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	  <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net45;net472;netcoreapp3.1;net5.0;net6.0</TargetFrameworks>
     <Description>Coosu.Storyboard is library to read and write osu!storyboard data of .osb file.</Description>
     <PackageTags>osu, osu!</PackageTags>
   </PropertyGroup>

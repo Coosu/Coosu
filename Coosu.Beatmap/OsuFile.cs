@@ -1,11 +1,11 @@
-﻿using Coosu.Beatmap.Configurable;
-using Coosu.Beatmap.Sections;
-using Coosu.Beatmap.Sections.Event;
-using Coosu.Beatmap.Sections.Timing;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using Coosu.Beatmap.Configurable;
+using Coosu.Beatmap.Sections;
+using Coosu.Beatmap.Sections.Event;
+using Coosu.Beatmap.Sections.Timing;
 
 namespace Coosu.Beatmap
 {

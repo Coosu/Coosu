@@ -1,10 +1,9 @@
-﻿using Coosu.Beatmap.Internal;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
+using Coosu.Beatmap.Internal;
 
 namespace Coosu.Beatmap.Configurable
 {
@@ -165,7 +164,7 @@ namespace Coosu.Beatmap.Configurable
                     }
                 }
 
-                if (value == null) 
+                if (value == null)
                     value = rawObj.ToString();
                 textWriter.WriteLine($"{key}{KeyValueFlag}{value}");
             }

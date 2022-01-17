@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Coosu.Beatmap.Configurable
+﻿namespace Coosu.Beatmap.Configurable
 {
     public abstract class Config
     {

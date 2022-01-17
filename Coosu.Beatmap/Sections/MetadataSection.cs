@@ -1,7 +1,6 @@
-﻿using Coosu.Beatmap.Configurable;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Text;
+using Coosu.Beatmap.Configurable;
 
 namespace Coosu.Beatmap.Sections
 {

@@ -1,73 +1,226 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
+using System.Numerics;
+using Coosu.Shared;
 
 namespace Coosu.Beatmap
 {
-    public static class Bezier
+    public static class BezierHelper
     {
-        /// <summary>
-        /// 绘制n阶贝塞尔曲线路径
-        /// </summary>
-        /// <param name="points">输入点</param>
-        /// <param name="step">步长,步长越小，轨迹点越密集</param>
-        /// <returns></returns>
-        public static Vector2<float>[] GetBezierTrail(IReadOnlyList<Vector2<float>> points, float step)
+        // Legendre-Gauss abscissae with n=24 (x_i values, defined at i=n as the roots of the nth order Legendre polynomial Pn(x))
+        private static readonly float[] TValues =
         {
-            var curvePoints = new List<Vector2<float>>();
-            float t = 0F;
-            do
-            {
-                Vector2<float> result = CalcPoint(t, points);    // 计算插值点
-                t += step;
-                curvePoints.Add(result);
-            }
-            while (t <= 1 && points.Count > 1);    // 一个点的情况直接跳出.
+            -0.0640568928626056260850430826247450385909f,
+             0.0640568928626056260850430826247450385909f,
+            -0.1911188674736163091586398207570696318404f,
+             0.1911188674736163091586398207570696318404f,
+            -0.3150426796961633743867932913198102407864f,
+             0.3150426796961633743867932913198102407864f,
+            -0.4337935076260451384870842319133497124524f,
+             0.4337935076260451384870842319133497124524f,
+            -0.5454214713888395356583756172183723700107f,
+             0.5454214713888395356583756172183723700107f,
+            -0.6480936519369755692524957869107476266696f,
+             0.6480936519369755692524957869107476266696f,
+            -0.7401241915785543642438281030999784255232f,
+             0.7401241915785543642438281030999784255232f,
+            -0.8200019859739029219539498726697452080761f,
+             0.8200019859739029219539498726697452080761f,
+            -0.8864155270044010342131543419821967550873f,
+             0.8864155270044010342131543419821967550873f,
+            -0.9382745520027327585236490017087214496548f,
+             0.9382745520027327585236490017087214496548f,
+            -0.9747285559713094981983919930081690617411f,
+             0.9747285559713094981983919930081690617411f,
+            -0.9951872199970213601799974097007368118745f,
+             0.9951872199970213601799974097007368118745f,
+        };
 
-            return curvePoints.ToArray();  // 曲线轨迹上的所有坐标点
+        // Legendre-Gauss weights with n=24 (w_i values, defined by a function linked to in the Bezier primer article)
+        private static readonly float[] CValues =
+        {
+            0.1279381953467521569740561652246953718517f,
+            0.1279381953467521569740561652246953718517f,
+            0.1258374563468282961213753825111836887264f,
+            0.1258374563468282961213753825111836887264f,
+            0.1216704729278033912044631534762624256070f,
+            0.1216704729278033912044631534762624256070f,
+            0.1155056680537256013533444839067835598622f,
+            0.1155056680537256013533444839067835598622f,
+            0.1074442701159656347825773424466062227946f,
+            0.1074442701159656347825773424466062227946f,
+            0.0976186521041138882698806644642471544279f,
+            0.0976186521041138882698806644642471544279f,
+            0.0861901615319532759171852029837426671850f,
+            0.0861901615319532759171852029837426671850f,
+            0.0733464814110803057340336152531165181193f,
+            0.0733464814110803057340336152531165181193f,
+            0.0592985849154367807463677585001085845412f,
+            0.0592985849154367807463677585001085845412f,
+            0.0442774388174198061686027482113382288593f,
+            0.0442774388174198061686027482113382288593f,
+            0.0285313886289336631813078159518782864491f,
+            0.0285313886289336631813078159518782864491f,
+            0.0123412297999871995468056670700372915759f,
+            0.0123412297999871995468056670700372915759f,
+        };
+
+        public static float ArcFunction(IReadOnlyList<Vector2> points, float t)
+        {
+            var vec = Compute(points, t);
+            var l = vec.X * vec.X + vec.Y * vec.Y;
+#if NETCOREAPP3_1_OR_GREATER
+            return MathF.Sqrt(l);
+#else
+            return (float)Math.Sqrt(l);
+#endif
         }
 
-        /// <summary>
-        /// n阶贝塞尔曲线插值计算函数
-        /// 根据起点，n个控制点，终点 计算贝塞尔曲线插值
-        /// </summary>
-        /// <param name="ratio">当前插值位置0~1 ，0为起点，1为终点</param>
-        /// <param name="points">起点，n-1个控制点，终点</param>
-        /// <returns></returns>
-        public static Vector2<float> CalcPoint(float ratio, IReadOnlyList<Vector2<float>> points)
+        public static IList<Vector2> GetBezierTrail(IReadOnlyList<Vector2> points, int count)
         {
-            float sumX = 0, sumY = 0;
-            var count = points.Count;
-            for (int i = 0; i < count; i++)
+            var allPoints = new List<Vector2>();
+            for (int s = 0; s <= count; s++)
             {
-                int order = count - 1; // 阶数
-                var combination = CalcCombination(order, i);
-                sumX += (float)(combination * points[i].X * Math.Pow(1 - ratio, order - i) * Math.Pow(ratio, i));
-                sumY += (float)(combination * points[i].Y * Math.Pow(1 - ratio, order - i) * Math.Pow(ratio, i));
+                var t = s / (float)count;
+                var Vector2 = Compute(points, t);
+                allPoints.Add(Vector2);
             }
 
-            var vector2 = new Vector2<float>(sumX, sumY);
-            return vector2;
+            return allPoints;
         }
 
-        /// <summary>
-        /// 计算组合数公式
-        /// </summary>
-        /// <param name="n"></param>
-        /// <param name="k"></param>
-        /// <returns></returns>
-        private static ulong CalcCombination(int n, int k)
+        public static Vector2 Compute(IReadOnlyList<Vector2> points, float t)
         {
-            ulong[] result = new ulong[n + 1];
-            for (int i = 1; i <= n; i++)
+            if (t == 0)
             {
-                result[i] = 1;
-                for (int j = i - 1; j >= 1; j--)
-                    result[j] += result[j - 1];
-                result[0] = 1;
+                return points[0];
             }
 
-            return result[k];
+            // constant?
+            if (points.Count == 1)
+            {
+                return points[0];
+            }
+
+            if (Math.Abs(t - 1) < 0.0000001)
+            {
+                return points[points.Count - 1];
+            }
+
+            var nt = 1 - t;
+
+            // linear?
+            if (points.Count == 2)
+            {
+                var ret = new Vector2(
+                     nt * points[0].X + t * points[1].X,
+                     nt * points[0].Y + t * points[1].Y
+                );
+                return ret;
+            }
+
+            // quadratic/cubic curve?
+            if (points.Count <= 4)
+            {
+                var nt2 = nt * nt;
+                var t2 = t * t;
+                if (points.Count == 3)
+                {
+                    var a = nt2;
+                    var b = nt * t * 2;
+                    var c = t2;
+
+                    var ret = new Vector2(
+                        a * points[0].X + b * points[1].X + c * points[2].X,
+                        a * points[0].Y + b * points[1].Y + c * points[2].Y
+                    );
+                    return ret;
+                }
+                else
+                {
+                    var a = nt2 * nt;
+                    var b = nt2 * t * 3;
+                    var c = nt * t2 * 3;
+                    var d = t * t2;
+
+                    var ret = new Vector2(
+                        a * points[0].X + b * points[1].X + c * points[2].X + d * points[3].X,
+                        a * points[0].Y + b * points[1].Y + c * points[2].Y + d * points[3].Y
+                    );
+                    return ret;
+                }
+            }
+
+            // higher order curves: use de Casteljau's computation
+            unsafe
+            {
+                var span = stackalloc Vector2[points.Count];
+                for (var i = 0; i < points.Count; i++)
+                {
+                    span[i] = points[i];
+                }
+
+                int j = points.Count;
+                while (j > 1)
+                {
+                    for (int i = 0; i < j; i++)
+                    {
+                        if (i != j - 1)
+                        {
+                            span[i] = nt * span[i] + t * span[i + 1];
+                        }
+                        else
+                        {
+                            span[i] = nt * span[i];
+                        }
+                    }
+
+                    j--;
+                }
+
+                return span[0];
+            }
+        }
+
+        public static IEnumerable<IReadOnlyList<Vector2>> Derive(IReadOnlyList<Vector2> controlPoints)
+        {
+            for (int d = controlPoints.Count, c = d - 1; d > 1; d--, c--)
+            {
+                var list = new List<Vector2>();
+
+                for (var j = 0; j < c; j++)
+                {
+                    var dpt = new Vector2(
+                        c * (controlPoints[j + 1].X - controlPoints[j].X),
+                        c * (controlPoints[j + 1].Y - controlPoints[j].Y)
+                    );
+
+                    list.Add(dpt);
+                }
+
+                yield return list;
+                controlPoints = list;
+            }
+
+            yield return EmptyArray<Vector2>.Value;
+        }
+
+        public static float Length(IReadOnlyList<Vector2> controlPoints)
+        {
+            const float z = 0.5f;
+            float sum = 0;
+
+            var derivedVector2 = Derive(controlPoints).First();
+
+            for (int i = 0; i < TValues.Length; i++)
+            {
+                var t = z * TValues[i] + z;
+                var arc = ArcFunction(derivedVector2, t);
+                sum += CValues[i] * arc;
+            }
+
+            return z * sum;
         }
     }
 

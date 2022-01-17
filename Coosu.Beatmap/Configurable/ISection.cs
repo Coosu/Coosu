@@ -1,6 +1,4 @@
-﻿using System.IO;
-
-namespace Coosu.Beatmap.Configurable
+﻿namespace Coosu.Beatmap.Configurable
 {
     public interface ISection : ISerializeWritable
     {

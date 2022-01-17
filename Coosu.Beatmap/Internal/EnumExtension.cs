@@ -1,5 +1,5 @@
-﻿using Coosu.Beatmap.Sections.HitObject;
-using System;
+﻿using System;
+using Coosu.Beatmap.Sections.HitObject;
 
 namespace Coosu.Beatmap.Internal
 {

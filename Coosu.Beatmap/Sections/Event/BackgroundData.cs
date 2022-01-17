@@ -1,7 +1,6 @@
-﻿using System;
-using Coosu.Beatmap.Configurable;
-using System.Globalization;
+﻿using System.Globalization;
 using System.IO;
+using Coosu.Beatmap.Configurable;
 
 namespace Coosu.Beatmap.Sections.Event
 {

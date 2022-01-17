@@ -1,8 +1,7 @@
-﻿using Coosu.Beatmap.Configurable;
-using Coosu.Beatmap.Sections.GamePlay;
-using System;
+﻿using System;
 using System.Globalization;
 using System.IO;
+using Coosu.Beatmap.Configurable;
 
 namespace Coosu.Beatmap.Sections.Timing
 {
@@ -54,7 +53,7 @@ namespace Coosu.Beatmap.Sections.Timing
                 Offset,
                 Factor.ToString(CultureInfo.InvariantCulture),
                 Rhythm,
-                (int) TimingSampleset + 1,
+                (int)TimingSampleset + 1,
                 Track,
                 Volume,
                 Convert.ToInt32(!Inherit),
