@@ -13,11 +13,6 @@ namespace Coosu.Beatmap.Utils
     {
         private const float bezier_tolerance = 0.25f;
 
-        /// <summary>
-        /// The amount of pieces to calculate for each control point quadruplet.
-        /// </summary>
-        private const int catmull_detail = 50;
-
         private const float circular_arc_tolerance = 0.1f;
 
         /// <summary>
@@ -137,9 +132,9 @@ namespace Coosu.Beatmap.Utils
         /// Creates a piecewise-linear approximation of a Catmull-Rom spline.
         /// </summary>
         /// <returns>A list of vectors representing the piecewise-linear approximation.</returns>
-        public static List<Vector2> ApproximateCatmull(IReadOnlyList<Vector2> controlPoints)
+        public static List<Vector2> ApproximateCatmull(IReadOnlyList<Vector2> controlPoints, int catmullDetail = 50)
         {
-            var result = new List<Vector2>((controlPoints.Count - 1) * catmull_detail * 2);
+            var result = new List<Vector2>((controlPoints.Count - 1) * catmullDetail * 2);
 
             for (int i = 0; i < controlPoints.Count - 1; i++)
             {
@@ -148,10 +143,10 @@ namespace Coosu.Beatmap.Utils
                 var v3 = i < controlPoints.Count - 1 ? controlPoints[i + 1] : v2 + v2 - v1;
                 var v4 = i < controlPoints.Count - 2 ? controlPoints[i + 2] : v3 + v3 - v2;
 
-                for (int c = 0; c < catmull_detail; c++)
+                for (int c = 0; c < catmullDetail; c++)
                 {
-                    result.Add(catmullFindPoint(ref v1, ref v2, ref v3, ref v4, (float)c / catmull_detail));
-                    result.Add(catmullFindPoint(ref v1, ref v2, ref v3, ref v4, (float)(c + 1) / catmull_detail));
+                    result.Add(CatmullFindPoint(ref v1, ref v2, ref v3, ref v4, (float)c / catmullDetail));
+                    result.Add(CatmullFindPoint(ref v1, ref v2, ref v3, ref v4, (float)(c + 1) / catmullDetail));
                 }
             }
 
@@ -444,7 +439,7 @@ namespace Coosu.Beatmap.Utils
         /// <param name="vec4">The fourth vector.</param>
         /// <param name="t">The parameter at which to find the point on the spline, in the range [0, 1].</param>
         /// <returns>The point on the spline at <paramref name="t"/>.</returns>
-        private static Vector2 catmullFindPoint(ref Vector2 vec1, ref Vector2 vec2, ref Vector2 vec3, ref Vector2 vec4, float t)
+        public static Vector2 CatmullFindPoint(ref Vector2 vec1, ref Vector2 vec2, ref Vector2 vec3, ref Vector2 vec4, float t)
         {
             float t2 = t * t;
             float t3 = t * t2;
