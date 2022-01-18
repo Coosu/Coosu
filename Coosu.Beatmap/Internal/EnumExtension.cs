@@ -17,9 +17,13 @@ namespace Coosu.Beatmap.Internal
             };
         }
 
-        internal static T ParseToEnum<T>(this string value)
+        internal static T ParseToEnum<T>(this string value) where T : struct
         {
+#if NETCOREAPP3_1_OR_GREATER
+            return Enum.Parse<T>(value);
+#else
             return (T)Enum.Parse(typeof(T), value);
+#endif
         }
 
         internal static string ParseToCode(this SliderType sliderType)
