@@ -11,7 +11,7 @@ namespace Coosu.Beatmap.Sections
     [SectionProperty("TimingPoints")]
     public class TimingSection : Section
     {
-        public List<TimingPoint> TimingList { get; set; }
+        public List<TimingPoint> TimingList { get; set; } = new();
         public double MinTime => TimingList.Count == 0 ? 0 : TimingList.Min(t => t.Offset);
         public double MaxTime => TimingList.Count == 0 ? 0 : TimingList.Max(t => t.Offset);
 
@@ -19,9 +19,6 @@ namespace Coosu.Beatmap.Sections
 
         public override void Match(string line)
         {
-            if (TimingList == null)
-                TimingList = new List<TimingPoint>();
-
             string[] param = line.Split(',');
             double offset = double.Parse(param[0]);
             double factor = double.Parse(param[1]);
@@ -47,7 +44,7 @@ namespace Coosu.Beatmap.Sections
                 Positive = positive
             });
         }
-        
+
         public override void AppendSerializedString(TextWriter textWriter)
         {
             textWriter.WriteLine($"[{SectionName}]");

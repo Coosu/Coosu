@@ -47,12 +47,16 @@ namespace Coosu.Beatmap.Configurable
 
         public override void Match(string line)
         {
-            MatchKeyValue(line, out var key, out var value);
+            MatchKeyValue(line, out var keySpan, out var valueSpan);
+            var key = keySpan.ToString();
+#if !NETCOREAPP3_1_OR_GREATER
+            
+#endif
             var prop = _propertyInfos.FirstOrDefault(k => k.name == key).propInfo;
             if (prop == null)
             {
                 UndefinedPairs ??= new Dictionary<string, string>();
-                UndefinedPairs.Add(key, value);
+                UndefinedPairs.Add(key, valueSpan.ToString());
             }
             else
             {
@@ -62,38 +66,41 @@ namespace Coosu.Beatmap.Configurable
                 if (attr != null)
                 {
                     var converter = attr.GetConverter();
-                    prop.SetValue(this, converter.ReadSection(value, propType));
+                    prop.SetValue(this, converter.ReadSection(valueSpan, propType));
                 }
                 else if (propType.BaseType == typeof(Enum))
                 {
-                    prop.SetValue(this, Enum.Parse(propType, value));
+#if NET6_0_OR_GREATER
+                    prop.SetValue(this, Enum.Parse(propType, valueSpan));
+#else
+                    prop.SetValue(this, Enum.Parse(propType, valueSpan.ToString()));
+#endif
                 }
                 else
                 {
-                    if (ValueConvert.ConvertValue(value, propType, out var converted))
+                    if (ValueConvert.ConvertValue(valueSpan, propType, out var converted))
                     {
                         prop.SetValue(this, converted);
                     }
                     else
                     {
-                        throw new MissingMethodException($"Can not convert {{{value}}} to type {propType}.");
+                        throw new MissingMethodException($"Can not convert {{{valueSpan.ToString()}}} to type {propType}.");
                     }
                 }
             }
         }
 
-        protected void MatchKeyValue(string line, out string key, out string value)
+        protected void MatchKeyValue(string line, out ReadOnlySpan<char> keySpan, out ReadOnlySpan<char> valueSpan)
         {
             int index = MatchFlag(line);
             if (index == -1)
                 throw new Exception($"Unknown Key-Value: {line}");
-
-            key = line.Substring(0, index);
+            keySpan = line.AsSpan(0, index);
             if (TrimPairs)
-                key = key.Trim();
-            value = line.Substring(index + KeyValueFlag.Length);
+                keySpan = keySpan.Trim();
+            valueSpan = line.AsSpan(index + KeyValueFlag.Length);
             if (TrimPairs)
-                value = value.Trim();
+                valueSpan = valueSpan.Trim();
         }
 
         protected int MatchFlag(string line)

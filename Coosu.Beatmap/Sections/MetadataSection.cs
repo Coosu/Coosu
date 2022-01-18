@@ -32,7 +32,7 @@ namespace Coosu.Beatmap.Sections
         [SectionProperty("Source")] public string Source { get; set; }
 
         [SectionProperty("Tags")]
-        [SectionConverter(typeof(SplitConverter), " ")]
+        [SectionConverter(typeof(SplitConverter), ' ')]
         public List<string> TagList { get; set; }
 
         [SectionProperty("BeatmapID")] public int BeatmapId { get; set; } = -1;

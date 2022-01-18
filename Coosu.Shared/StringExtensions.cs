@@ -10,6 +10,12 @@ namespace Coosu.Shared
             return new CharSplitEnumerator(str.AsSpan(), c);
         }
 
+        public static CharSplitEnumerator SpanSplit(this ReadOnlySpan<char> span, char c)
+        {
+            // LineSplitEnumerator is a struct so there is no allocation here
+            return new CharSplitEnumerator(span, c);
+        }
+        
         // Must be a ref struct as it contains a ReadOnlySpan<char>
         public ref struct CharSplitEnumerator
         {
@@ -35,8 +41,8 @@ namespace Coosu.Shared
                 var index = span.IndexOf(_c);
                 if (index == -1) // The string is composed of only one line
                 {
-                    _str = ReadOnlySpan<char>.Empty; // The remaining string is an empty string
-                    Current = ReadOnlySpan<char>.Empty;
+                    Current = _str; // The remaining string
+                    _str = ReadOnlySpan<char>.Empty; 
                     return true;
                 }
 

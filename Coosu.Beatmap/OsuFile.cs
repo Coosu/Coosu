@@ -12,8 +12,6 @@ namespace Coosu.Beatmap
     public class LocalOsuFile : OsuFile
     {
         public string OriginPath { get; internal set; }
-        public bool ReadSuccess { get; set; } = true;
-        public Exception ReadException { get; set; }
     }
 
     public class OsuFile : Config
@@ -30,27 +28,17 @@ namespace Coosu.Beatmap
 
         public static async Task<LocalOsuFile> ReadFromFileAsync(string path, Action<ReadOptions> readOptionFactory = null)
         {
-            return await Task.Run(() =>
-            {
 #if NETFRAMEWORK
-                var targetPath = path?.StartsWith(@"\\?\") == true ? path : @"\\?\" + path;
+            var targetPath = path?.StartsWith(@"\\?\") == true ? path : @"\\?\" + path;
 #else
-                var targetPath = path;
+            var targetPath = path;
 #endif
-                try
-                {
-                    using (var sr = new StreamReader(targetPath))
-                    {
-                        var localOsuFile = ConfigConvert.DeserializeObject<LocalOsuFile>(sr, readOptionFactory);
-                        localOsuFile.OriginPath = targetPath;
-                        return localOsuFile;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    return new LocalOsuFile { ReadSuccess = false, ReadException = ex, OriginPath = targetPath };
-                }
-            }).ConfigureAwait(false);
+            using var sr = new StreamReader(targetPath);
+            var localOsuFile = await Task
+                .Run(() => ConfigConvert.DeserializeObject<LocalOsuFile>(sr, readOptionFactory))
+                .ConfigureAwait(false);
+            localOsuFile.OriginPath = targetPath;
+            return localOsuFile;
         }
 
         public override string ToString() => Path;

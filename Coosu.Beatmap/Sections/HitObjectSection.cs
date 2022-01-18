@@ -7,49 +7,42 @@ using Coosu.Beatmap.Configurable;
 using Coosu.Beatmap.Internal;
 using Coosu.Beatmap.Sections.HitObject;
 using Coosu.Beatmap.Sections.Timing;
-using Coosu.Beatmap.Utils;
 
 namespace Coosu.Beatmap.Sections
 {
     [SectionProperty("HitObjects")]
     public class HitObjectSection : Section
     {
-        private readonly TimingSection _timingPoints;
+        private readonly List<TimingPoint> _timingPoints;
         private readonly DifficultySection _difficulty;
-        private readonly GeneralSection _general;
-        public List<RawHitObject> HitObjectList { get; set; } = new List<RawHitObject>();
+        public List<RawHitObject> HitObjectList { get; set; } = new();
 
         public double MinTime => HitObjectList.Count == 0 ? 0 : HitObjectList.Min(t => t.Offset);
         public double MaxTime => HitObjectList.Count == 0 ? 0 : HitObjectList.Max(t => t.Offset);
 
         public HitObjectSection(OsuFile osuFile)
         {
-            _timingPoints = osuFile.TimingPoints;
+            _timingPoints = osuFile.TimingPoints.TimingList;
+            _timingPoints.Sort(new TimingPointComparer());
             _difficulty = osuFile.Difficulty;
-            _general = osuFile.General;
         }
 
         public RawHitObject this[int index] => HitObjectList[index];
 
         public override void Match(string line)
         {
-            int xNext = line.IndexOf(',');
-            int yNext = line.IndexOf(',', xNext + 1);
-            int offsetNext = line.IndexOf(',', yNext + 1);
-            int typeNext = line.IndexOf(',', offsetNext + 1);
-            int hitsoundNext = line.IndexOf(',', typeNext + 1);
+            var xNext = line.IndexOf(',');
+            var yNext = line.IndexOf(',', xNext + 1);
+            var offsetNext = line.IndexOf(',', yNext + 1);
+            var typeNext = line.IndexOf(',', offsetNext + 1);
+            var hitsoundNext = line.IndexOf(',', typeNext + 1);
 
 #if NETCOREAPP3_1_OR_GREATER
-            var spanX = line.AsSpan(0, xNext);
-            var spanY = line.AsSpan(xNext + 1, yNext - xNext - 1);
-            var spanOffset = line.AsSpan(yNext + 1, offsetNext - yNext - 1);
-            var spanType = line.AsSpan(offsetNext + 1, typeNext - offsetNext - 1);
-            var spanHitsound = line.AsSpan(typeNext + 1, hitsoundNext - typeNext - 1);
-            var x = int.Parse(spanX);
-            var y = int.Parse(spanY);
-            var offset = int.Parse(spanOffset);
-            var type = (RawObjectType)int.Parse(spanType);
-            var hitsound = (HitsoundType)int.Parse(spanHitsound);
+            var x = int.Parse(line.AsSpan(0, xNext));
+            var y = int.Parse(line.AsSpan(xNext + 1, yNext - xNext - 1));
+            var offset = int.Parse(line.AsSpan(yNext + 1, offsetNext - yNext - 1));
+            var type = (RawObjectType)int.Parse(line.AsSpan(offsetNext + 1, typeNext - offsetNext - 1));
+            var hitsound = (HitsoundType)int.Parse(line.AsSpan(typeNext + 1, hitsoundNext - typeNext - 1));
 #else
             string[] param = line.Split(',');
             var x = int.Parse(param[0]);
@@ -178,14 +171,14 @@ namespace Coosu.Beatmap.Sections
                 }
             }
 
-            TimingPoint? lastRedLine = _timingPoints.TimingList
+            TimingPoint? lastRedLine = _timingPoints
                 .LastOrDefault(t => !t.Inherit && t.Offset + 0.5 <= hitObject.Offset);
 
             // hitobjects before red lines is allowed
-            lastRedLine ??= _timingPoints.TimingList.First(t => !t.Inherit);
+            lastRedLine ??= _timingPoints.First(t => !t.Inherit);
 
             // ReSharper disable once ReplaceWithSingleCallToLastOrDefault
-            TimingPoint? lastLine = _timingPoints.TimingList
+            TimingPoint? lastLine = _timingPoints
                 .Where(t => t.Offset - 0.5 >= lastRedLine.Offset && t.Offset + 0.5 <= hitObject.Offset)
                 //.OrderBy(k => k.Offset)
                 //.ThenBy(k => k.Inherit) // 1 red + 1 green is allowed, and green has a higher priority.

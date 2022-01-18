@@ -7,7 +7,7 @@ namespace Coosu.Beatmap.Sections
     public class EditorSection : KeyValueSection
     {
         [SectionProperty("Bookmarks")]
-        [SectionConverter(typeof(Int32SplitConverter), ",")]
+        [SectionConverter(typeof(Int32SplitConverter), ',')]
         public List<int> Bookmarks { get; set; }
 
         [SectionProperty("DistanceSpacing")]

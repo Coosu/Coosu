@@ -7,7 +7,7 @@ namespace Coosu.Beatmap.Sections.HitObject
 {
     public class RawHitObject : SerializeWritableObject
     {
-        private string _extras = "0:0:0:0:";
+        private string? _extras = "0:0:0:0:";
         private bool _extraInitial;
         private bool _extraAnyUpdated;
         private ObjectSamplesetType _sampleSet;
@@ -48,10 +48,10 @@ namespace Coosu.Beatmap.Sections.HitObject
             }
         }
         public HitsoundType Hitsound { get; set; }
-        public SliderInfo SliderInfo { get; set; }
+        public SliderInfo? SliderInfo { get; set; }
         public int HoldEnd { get; set; }
 
-        public string Extras
+        public string? Extras
         {
             get => _extras;
             set
