@@ -78,14 +78,14 @@ namespace Coosu.Beatmap
             {
                 var str = line.Replace(verFlag, "");
                 if (!int.TryParse(str, out var verNum))
-                    throw new BadOsuFormatException("未知的osu版本: " + str);
+                    throw new BadOsuFormatException("Unknown osu file format: " + str);
                 if (verNum < 5)
                     throw new VersionNotSupportedException(verNum);
                 Version = verNum;
             }
             else
             {
-                throw new BadOsuFormatException("存在问题头声明: " + line);
+                throw new BadOsuFormatException("Invalid header declaration: " + line);
             }
         }
 
