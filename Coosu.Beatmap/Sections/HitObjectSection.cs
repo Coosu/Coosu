@@ -103,7 +103,7 @@ namespace Coosu.Beatmap.Sections
             int repeat = int.Parse(infos[1]);
 
             // length
-            decimal pixelLength = decimal.Parse(infos[2]);
+            var pixelLength = double.Parse(infos[2]);
 
             // edge hitsounds
             HitsoundType[] edgeHitsounds;
@@ -189,7 +189,7 @@ namespace Coosu.Beatmap.Sections
                 _difficulty.SliderMultiplier * lastLine.Multiple,
                 _difficulty.SliderTickRate, pixelLength)
             {
-                CurvePoints = points,
+                ControlPoints = points,
                 EdgeAdditions = edgeAdditions,
                 EdgeHitsounds = edgeHitsounds,
                 EdgeSamples = edgeSamples,

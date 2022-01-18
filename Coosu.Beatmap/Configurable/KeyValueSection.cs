@@ -10,7 +10,7 @@ namespace Coosu.Beatmap.Configurable
     public abstract class KeyValueSection : Section
     {
         [SectionIgnore]
-        public Dictionary<string, string> UndefinedPairs { get; private set; }
+        public Dictionary<string, string>? UndefinedPairs { get; private set; }
 
         public KeyValueSection()
         {
@@ -47,14 +47,11 @@ namespace Coosu.Beatmap.Configurable
 
         public override void Match(string line)
         {
-            if (!MatchKeyValue(line, out var key, out var value))
-                throw new Exception("Unknown Key-Value: " + line);
-
+            MatchKeyValue(line, out var key, out var value);
             var prop = _propertyInfos.FirstOrDefault(k => k.name == key).propInfo;
             if (prop == null)
             {
-                if (UndefinedPairs == null)
-                    UndefinedPairs = new Dictionary<string, string>();
+                UndefinedPairs ??= new Dictionary<string, string>();
                 UndefinedPairs.Add(key, value);
             }
             else
@@ -85,15 +82,11 @@ namespace Coosu.Beatmap.Configurable
             }
         }
 
-        protected bool MatchKeyValue(string line, out string key, out string value)
+        protected void MatchKeyValue(string line, out string key, out string value)
         {
             int index = MatchFlag(line);
             if (index == -1)
-            {
-                key = null;
-                value = null;
-                return false;
-            }
+                throw new Exception($"Unknown Key-Value: {line}");
 
             key = line.Substring(0, index);
             if (TrimPairs)
@@ -101,7 +94,6 @@ namespace Coosu.Beatmap.Configurable
             value = line.Substring(index + KeyValueFlag.Length);
             if (TrimPairs)
                 value = value.Trim();
-            return true;
         }
 
         protected int MatchFlag(string line)
@@ -112,12 +104,14 @@ namespace Coosu.Beatmap.Configurable
 
         public override void AppendSerializedString(TextWriter textWriter)
         {
-            textWriter.WriteLine($"[{SectionName}]");
+            textWriter.Write("[");
+            textWriter.Write(SectionName);
+            textWriter.WriteLine("]");
 
             foreach (var (prop, name) in _propertyInfos)
             {
                 string key = name;
-                string value = null;
+                string? value = null;
                 var rawObj = prop.GetValue(this);
                 if (rawObj is null) continue;
 
@@ -132,17 +126,12 @@ namespace Coosu.Beatmap.Configurable
                     var enumAttr = prop.GetCustomAttribute<SectionEnumAttribute>(false);
                     if (enumAttr != null)
                     {
-                        switch (enumAttr.Option)
+                        value = enumAttr.Option switch
                         {
-                            case EnumParseOption.Index:
-                                value = ((int)rawObj).ToString();
-                                break;
-                            case EnumParseOption.String:
-                                value = rawObj.ToString();
-                                break;
-                            default:
-                                throw new ArgumentOutOfRangeException();
-                        }
+                            EnumParseOption.Index => ((int)rawObj).ToString(),
+                            EnumParseOption.String => rawObj.ToString(),
+                            _ => throw new ArgumentOutOfRangeException()
+                        };
                     }
                 }
                 else if (prop.GetMethod.ReturnType == typeof(bool))
@@ -150,23 +139,19 @@ namespace Coosu.Beatmap.Configurable
                     var boolAttr = prop.GetCustomAttribute<SectionBoolAttribute>(false);
                     if (boolAttr != null)
                     {
-                        switch (boolAttr.Option)
+                        value = boolAttr.Option switch
                         {
-                            case BoolParseOption.ZeroOne:
-                                value = Convert.ToInt32(rawObj).ToString();
-                                break;
-                            case BoolParseOption.String:
-                                value = rawObj.ToString();
-                                break;
-                            default:
-                                throw new ArgumentOutOfRangeException();
-                        }
+                            BoolParseOption.ZeroOne => Convert.ToInt32(rawObj).ToString(),
+                            BoolParseOption.String => rawObj.ToString(),
+                            _ => throw new ArgumentOutOfRangeException()
+                        };
                     }
                 }
 
-                if (value == null)
-                    value = rawObj.ToString();
-                textWriter.WriteLine($"{key}{KeyValueFlag}{value}");
+                value ??= rawObj.ToString();
+                textWriter.Write(key);
+                textWriter.Write(KeyValueFlag);
+                textWriter.WriteLine(value);
             }
         }
 

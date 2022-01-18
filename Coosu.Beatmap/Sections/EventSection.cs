@@ -1,37 +1,47 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using Coosu.Beatmap.Configurable;
 using Coosu.Beatmap.Sections.Event;
 using Coosu.Shared.Mathematics;
-using Coosu.Storyboard;
 
 namespace Coosu.Beatmap.Sections
 {
     [SectionProperty("Events")]
     public class EventSection : Section
     {
-        public BackgroundData BackgroundInfo { get; set; }
-        public VideoData VideoInfo { get; set; }
-        public List<StoryboardSampleData> SampleInfo { get; set; } = new List<StoryboardSampleData>();
-        public List<RangeValue<int>> Breaks { get; set; } = new List<RangeValue<int>>();
-        public Layer Layer { get; set; }
-
-        public EventSection(OsuFile osuFile)
-        {
-            _options = osuFile.Options;
-        }
-
-        private readonly StringBuilder _sbInfo = new StringBuilder();
-        private readonly Dictionary<string, StringBuilder> _unknownSection = new Dictionary<string, StringBuilder>();
-        private string _currentSection;
-        private ReadOptions _options;
-
         private const string SectionBgVideo = "//Background and Video events";
         private const string SectionBreak = "//Break Periods";
         private const string SectionStoryboard = "//Storyboard";
         private const string SectionSbSamples = "//Storyboard Sound Samples";
+
+        private readonly StringBuilder _sbInfo = new();
+        private readonly Dictionary<string, StringBuilder> _unknownSection = new();
+        private string? _currentSection;
+        private readonly ReadOptions _options;
+
+        public EventSection(Config osuFile)
+        {
+            _options = osuFile.Options;
+        }
+
+        public BackgroundData? BackgroundInfo { get; set; }
+        public VideoData? VideoInfo { get; set; }
+        public List<StoryboardSampleData> SampleInfo { get; set; } = new();
+        public List<RangeValue<int>> Breaks { get; set; } = new();
+
+        /// <summary>
+        /// Raw storyboard text
+        /// <para>
+        /// For detailed analyzing, use <see href="https://www.nuget.org/packages/Coosu.Storyboard/"/> package for parsing storyboard elements.
+        /// </para>
+        /// </summary>
+        public string? StoryboardText { get; set; }
+
+        [Obsolete("After version 2.1.1, layer parsing has been removed.")]
+        public object? Layer { get; } = null;
 
         public override void Match(string line)
         {
@@ -47,14 +57,19 @@ namespace Coosu.Beatmap.Sections
                         _currentSection = SectionBreak;
                         break;
                     case SectionSbSamples:
-                        if (!_options.StoryboardIgnored) Layer = Layer.ParseFromText(_sbInfo.ToString().Trim('\r', '\n'));
+                        if (!_options.StoryboardIgnored)
+                        {
+                            StoryboardText = _sbInfo.ToString();
+                            _sbInfo.Clear();
+                        }
+
                         _currentSection = SectionSbSamples;
                         break;
                     default:
                         if (section.StartsWith(SectionStoryboard))
                         {
                             _currentSection = SectionStoryboard;
-                            _sbInfo.AppendLine(line);
+                            if (!_options.StoryboardIgnored) _sbInfo.AppendLine(line);
                         }
                         else
                         {
@@ -87,8 +102,6 @@ namespace Coosu.Beatmap.Sections
 
                             BackgroundInfo = new BackgroundData
                             {
-                                Unknown1 = infos[0],
-                                Unknown2 = infos[1],
                                 Filename = infos[2].Trim('"'),
                                 X = x,
                                 Y = y
@@ -119,7 +132,7 @@ namespace Coosu.Beatmap.Sections
                         if (!_options.StoryboardIgnored) _sbInfo.AppendLine(line);
                         break;
                     default:
-                        _unknownSection[_currentSection].AppendLine(line);
+                        if (_currentSection != null) _unknownSection[_currentSection].AppendLine(line);
                         break;
                 }
             }
@@ -129,20 +142,20 @@ namespace Coosu.Beatmap.Sections
         {
             textWriter.WriteLine($"[{SectionName}]");
             textWriter.WriteLine(SectionBgVideo);
-            textWriter.WriteLine(VideoInfo); //optimize
-            textWriter.WriteLine(BackgroundInfo); //optimize
+            VideoInfo?.AppendSerializedString(textWriter);
+            BackgroundInfo?.AppendSerializedString(textWriter);
             textWriter.WriteLine(SectionBreak);
             foreach (var range in Breaks)
             {
                 textWriter.WriteLine($"2,{range.StartTime},{range.EndTime}");
             }
 
-            textWriter.WriteLine(_sbInfo.ToString().TrimEnd('\r', '\n'));
+            textWriter.WriteLine(StoryboardText?.TrimEnd('\r', '\n'));
             textWriter.WriteLine(SectionSbSamples);
             var validSampleList = SampleInfo.Where(k => k.Volume > 0);
             foreach (var sampleData in validSampleList)
             {
-                textWriter.WriteLine(sampleData); //optimize
+                sampleData.AppendSerializedString(textWriter);
             }
 
             foreach (var pair in _unknownSection)

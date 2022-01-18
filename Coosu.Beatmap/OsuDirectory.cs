@@ -4,14 +4,15 @@ using System.Threading.Tasks;
 
 namespace Coosu.Beatmap.Management
 {
-    public class OsuFileManager
+    public class OsuDirectory
     {
         public List<OsuFile> FileList { get; } = new List<OsuFile>();
 
-        public OsuFileManager()
+        public OsuDirectory()
         {
 
         }
+
         public async Task LoadFromDirectoryAsync(string path)
         {
             DirectoryInfo di = new DirectoryInfo(path);

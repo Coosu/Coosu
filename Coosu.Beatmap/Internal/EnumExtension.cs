@@ -18,24 +18,20 @@ namespace Coosu.Beatmap.Internal
                 else if (value == "C")
                     value = "Catmull";
             }
+
             return (T)Enum.Parse(typeof(T), value);
         }
 
         internal static string ParseToCode(this SliderType sliderType)
         {
-            switch (sliderType)
+            return sliderType switch
             {
-                case SliderType.Linear:
-                    return "L";
-                case SliderType.Perfect:
-                    return "P";
-                case SliderType.Bezier:
-                    return "B";
-                case SliderType.Catmull:
-                    return "C";
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(sliderType), sliderType, null);
-            }
+                SliderType.Linear => "L",
+                SliderType.Perfect => "P",
+                SliderType.Bezier => "B",
+                SliderType.Catmull => "C",
+                _ => throw new ArgumentOutOfRangeException(nameof(sliderType), sliderType, null)
+            };
         }
     }
 }

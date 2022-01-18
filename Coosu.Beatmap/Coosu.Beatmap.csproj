@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Coosu.Storyboard\Coosu.Storyboard.csproj" />
+    <ProjectReference Include="..\Coosu.Shared\Coosu.Shared.csproj" />
   </ItemGroup>
 
 </Project>
