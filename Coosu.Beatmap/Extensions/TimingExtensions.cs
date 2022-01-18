@@ -54,7 +54,7 @@ namespace Coosu.Beatmap
         {
             TimingPoint[] points = timingSection.TimingList
                 .Where(t => !t.Inherit)
-                .Where(t => Math.Abs(t.Offset - offset) < 1)
+                .Where(t => t.Offset + 0.5 <= offset)
                 .ToArray();
             return points.Length == 0 ? timingSection.TimingList.First(t => !t.Inherit) : points.Last();
         }
@@ -68,8 +68,8 @@ namespace Coosu.Beatmap
                 return timingSection.TimingList.First();
             var timing = lines.Max(t => t.Offset);
             var samePositionPoints = timingSection.TimingList
-                .Where(t => Math.Abs(t.Offset - timing) < 1).
-                ToArray();
+                .Where(t => Math.Abs(t.Offset - timing) < 1)
+                .ToArray();
             TimingPoint point;
             if (samePositionPoints.Length > 1)
             {

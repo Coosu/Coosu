@@ -33,15 +33,33 @@ namespace Coosu.Beatmap.Sections
 
         public override void Match(string line)
         {
-            string[] param = line.SpanSplit(",");
+            int xNext = line.IndexOf(',');
+            int yNext = line.IndexOf(',', xNext + 1);
+            int offsetNext = line.IndexOf(',', yNext + 1);
+            int typeNext = line.IndexOf(',', offsetNext + 1);
+            int hitsoundNext = line.IndexOf(',', typeNext + 1);
 
+#if NETCOREAPP3_1_OR_GREATER
+            var spanX = line.AsSpan(0, xNext);
+            var spanY = line.AsSpan(xNext + 1, yNext - xNext - 1);
+            var spanOffset = line.AsSpan(yNext + 1, offsetNext - yNext - 1);
+            var spanType = line.AsSpan(offsetNext + 1, typeNext - offsetNext - 1);
+            var spanHitsound = line.AsSpan(typeNext + 1, hitsoundNext - typeNext - 1);
+            var x = int.Parse(spanX);
+            var y = int.Parse(spanY);
+            var offset = int.Parse(spanOffset);
+            var type = (RawObjectType)int.Parse(spanType);
+            var hitsound = (HitsoundType)int.Parse(spanHitsound);
+#else
+            string[] param = line.Split(',');
             var x = int.Parse(param[0]);
             var y = int.Parse(param[1]);
             var offset = int.Parse(param[2]);
-            var type = (RawObjectType)Enum.Parse(typeof(RawObjectType), param[3]);
-            var hitsound = (HitsoundType)Enum.Parse(typeof(HitsoundType), param[4]);
-            var others = string.Join(",", param.Skip(5));
+            var type = (RawObjectType)int.Parse(param[3]);
+            var hitsound = (HitsoundType)int.Parse(param[4]);
+#endif
 
+            var others = line.Substring(hitsoundNext + 1);
             var hitObject = new RawHitObject
             {
                 X = x,
@@ -80,7 +98,7 @@ namespace Coosu.Beatmap.Sections
 
         private void ToSlider(RawHitObject hitObject, string others)
         {
-            var infos = others.SpanSplit(",");
+            var infos = others.Split(',');
 
             // extra
             string notSureExtra = infos[infos.Length - 1];
@@ -88,15 +106,24 @@ namespace Coosu.Beatmap.Sections
             hitObject.Extras = supportExtra ? notSureExtra : null;
 
             // slider curve
-            var curveInfo = infos[0].SpanSplit("|");
-            var sliderType = infos[0].Split('|')[0];
+            var curveInfo = infos[0];
+            //var controlPointsInfo = curveInfo.AsSpan(2);
+            var controlPoints = curveInfo.Split('|');
+            var sliderType = curveInfo[0];
 
-            var points = new Vector2[curveInfo.Length - 1]; // curvePoints skip 1
-            for (var i = 1; i < curveInfo.Length; i++)
+            var points = new Vector2[controlPoints.Length - 1]; // curvePoints skip 1
+            for (var i = 1; i < controlPoints.Length; i++)
             {
-                var point = curveInfo[i];
-                var xy = point.SpanSplit(":");
+                var point = controlPoints[i];
+#if NETCOREAPP3_1_OR_GREATER
+                var indexOfColon = point.IndexOf(':');
+                var spanX = point.AsSpan(0, indexOfColon);
+                var spanY = point.AsSpan(indexOfColon + 1, point.Length - indexOfColon - 1);
+                points[i - 1] = new Vector2(int.Parse(spanX), int.Parse(spanY));
+#else
+                var xy = point.Split(':');
                 points[i - 1] = new Vector2(int.Parse(xy[0]), int.Parse(xy[1]));
+#endif
             }
 
             // repeat
@@ -106,9 +133,9 @@ namespace Coosu.Beatmap.Sections
             var pixelLength = double.Parse(infos[2]);
 
             // edge hitsounds
-            HitsoundType[] edgeHitsounds;
-            ObjectSamplesetType[] edgeSamples;
-            ObjectSamplesetType[] edgeAdditions;
+            HitsoundType[]? edgeHitsounds;
+            ObjectSamplesetType[]? edgeSamples;
+            ObjectSamplesetType[]? edgeAdditions;
             if (infos.Length == 3)
             {
                 edgeHitsounds = null;
@@ -117,76 +144,59 @@ namespace Coosu.Beatmap.Sections
             }
             else if (infos.Length == 4)
             {
-                edgeHitsounds = infos[3].SpanSplit("|").Select(t => t.ParseToEnum<HitsoundType>()).ToArray();
+                edgeHitsounds = infos[3]
+                    .Split('|')
+                    .Select(t => (HitsoundType)int.Parse(t))
+                    .ToArray();
                 edgeSamples = null;
                 edgeAdditions = null;
             }
             else
             {
-                edgeHitsounds = infos[3].SpanSplit("|").Select(t => t.ParseToEnum<HitsoundType>()).ToArray();
-                string[] edgeAdditionsStrArr = infos[4].SpanSplit("|");
+                edgeHitsounds = infos[3]
+                    .Split('|')
+                    .Select(t => (HitsoundType)int.Parse(t))
+                    .ToArray();
+                string[] edgeAdditionsStrArr = infos[4].Split('|');
                 edgeSamples = new ObjectSamplesetType[repeat + 1];
                 edgeAdditions = new ObjectSamplesetType[repeat + 1];
 
                 for (int i = 0; i < edgeAdditionsStrArr.Length; i++)
                 {
-                    var sampAdd = edgeAdditionsStrArr[i].SpanSplit(":");
-                    edgeSamples[i] = sampAdd[0].ParseToEnum<ObjectSamplesetType>();
-                    edgeAdditions[i] = sampAdd[1].ParseToEnum<ObjectSamplesetType>();
+#if NETCOREAPP3_1_OR_GREATER
+                    var xy = edgeAdditionsStrArr[i];
+                    var indexOfColon = xy.IndexOf(':');
+                    var spanX = xy.AsSpan(0, indexOfColon);
+                    var spanY = xy.AsSpan(indexOfColon + 1, xy.Length - indexOfColon - 1);
+                    edgeSamples[i] = (ObjectSamplesetType)int.Parse(spanX);
+                    edgeAdditions[i] = (ObjectSamplesetType)int.Parse(spanY);
+#else
+                    var sampAdd = edgeAdditionsStrArr[i].Split(':');
+                    edgeSamples[i] = (ObjectSamplesetType)int.Parse(sampAdd[0]);
+                    edgeAdditions[i] = (ObjectSamplesetType)int.Parse(sampAdd[1]);
+#endif
                 }
             }
 
-            TimingPoint[] lastRedLinesIfExsist = _timingPoints.TimingList.Where(t => !t.Inherit)
-                .Where(t => t.Offset <= hitObject.Offset).ToArray();
-            TimingPoint lastRedLine;
+            TimingPoint? lastRedLine = _timingPoints.TimingList
+                .LastOrDefault(t => !t.Inherit && t.Offset + 0.5 <= hitObject.Offset);
 
-            // hitobjects before lines is allowed
-            if (lastRedLinesIfExsist.Length == 0)
-                lastRedLine = _timingPoints.TimingList.First(t => !t.Inherit);
-            else
-            {
-                double lastRedLineOffset = lastRedLinesIfExsist.Max(t => t.Offset);
+            // hitobjects before red lines is allowed
+            lastRedLine ??= _timingPoints.TimingList.First(t => !t.Inherit);
 
-                //duplicate red lines, select the last one
-                lastRedLine = _timingPoints.TimingList.Last(t => t.Offset == lastRedLineOffset && !t.Inherit);
-            }
-
-            TimingPoint[] lastLinesIfExist = _timingPoints.TimingList.Where(t => t.Offset <= hitObject.Offset).ToArray();
-            TimingPoint[] lastLines; // 1 red + 1 green is allowed
-            TimingPoint lastLine;
-
-            // hitobjects before lines is allowed
-            if (lastLinesIfExist.Length == 0)
-                lastLines = new[] { _timingPoints.TimingList.First(t => !t.Inherit) }; //red line multiple default 1.0
-            else
-            {
-                double lastLineOffset = lastLinesIfExist.Max(t => t.Offset);
-                // 1 red + 1 green is allowed, so maybe here are two results
-                lastLines = _timingPoints.TimingList.Where(t => t.Offset == lastLineOffset).ToArray();
-            }
-
-            if (lastLines.Length > 1)
-            {
-                lastLine = lastLines.LastOrDefault(k => k.Inherit) ?? lastLines.Last(k => !k.Inherit);
-
-                //if (lastLines.Length == 2)
-                //{
-                //    if (lastLines[0].Inherit != lastLines[1].Inherit)
-                //    {
-                //        lastLine = lastLines.First(t => t.Inherit);
-                //    }
-                //    else
-                //        throw new RepeatTimingSectionException("存在同一时刻两条相同类型的Timing Section。");
-                //}
-                //else
-                //    throw new RepeatTimingSectionException("存在同一时刻多条Timing Section。");
-            }
-            else lastLine = lastLines[0];
+            // ReSharper disable once ReplaceWithSingleCallToLastOrDefault
+            TimingPoint? lastLine = _timingPoints.TimingList
+                .Where(t => t.Offset - 0.5 >= lastRedLine.Offset && t.Offset + 0.5 <= hitObject.Offset)
+                //.OrderBy(k => k.Offset)
+                //.ThenBy(k => k.Inherit) // 1 red + 1 green is allowed, and green has a higher priority.
+                .LastOrDefault();
+            // hitobjects before red lines is allowed
+            lastLine ??= lastRedLine;
 
             hitObject.SliderInfo = new SliderInfo(new Vector2(hitObject.X, hitObject.Y),
                 hitObject.Offset,
-                lastRedLine.Factor,
-                _difficulty.SliderMultiplier * lastLine.Multiple,
+                lastRedLine?.Factor ?? 0,
+                _difficulty.SliderMultiplier * (lastLine?.Multiple ?? 0),
                 _difficulty.SliderTickRate, pixelLength)
             {
                 ControlPoints = points,
@@ -194,13 +204,13 @@ namespace Coosu.Beatmap.Sections
                 EdgeHitsounds = edgeHitsounds,
                 EdgeSamples = edgeSamples,
                 Repeat = repeat,
-                SliderType = sliderType.ParseToEnum<SliderType>()
+                SliderType = sliderType.SliderFlagToEnum()
             };
         }
 
         private void ToSpinner(RawHitObject hitObject, string others)
         {
-            var infos = others.SpanSplit(",");
+            var infos = others.Split(',');
             var holdEnd = infos[0];
             hitObject.HoldEnd = int.Parse(holdEnd);
             if (infos.Length > 1)
@@ -212,7 +222,7 @@ namespace Coosu.Beatmap.Sections
 
         private void ToHold(RawHitObject hitObject, string others)
         {
-            var index = others.SpanIndexOf(":");
+            var index = others.IndexOf(':');
 
             var holdEnd = others.Substring(0, index);
             var extra = others.Substring(index + 1);

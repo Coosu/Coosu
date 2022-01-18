@@ -5,20 +5,20 @@ namespace Coosu.Beatmap.Internal
 {
     public static class EnumExtension
     {
+        internal static SliderType SliderFlagToEnum(this char flag)
+        {
+            return flag switch
+            {
+                'L' => SliderType.Linear,
+                'P' => SliderType.Perfect,
+                'B' => SliderType.Bezier,
+                'C' => SliderType.Catmull,
+                _ => throw new ArgumentOutOfRangeException(nameof(flag), flag, null)
+            };
+        }
+
         internal static T ParseToEnum<T>(this string value)
         {
-            if (typeof(T) == typeof(SliderType))
-            {
-                if (value == "L")
-                    value = "Linear";
-                else if (value == "P")
-                    value = "Perfect";
-                else if (value == "B")
-                    value = "Bezier";
-                else if (value == "C")
-                    value = "Catmull";
-            }
-
             return (T)Enum.Parse(typeof(T), value);
         }
 

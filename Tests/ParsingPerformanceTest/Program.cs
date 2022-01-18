@@ -22,8 +22,8 @@ namespace ParsingPerformanceTest
     {
         static void Main(string[] args)
         {
-            //var osu = LocalCoosuNs.Beatmap.OsuFile.ReadFromFileAsync(@"C:\Users\milkitic\Downloads\1376486 Risshuu feat. Choko - Take [no video]\Risshuu feat. Choko - Take (yf_bmp) [Ta~ke take take take take take tatata~].osu").Result;
-            //if (!osu.ReadSuccess) throw osu.ReadException;
+            var osu = LocalCoosuNs.Beatmap.OsuFile.ReadFromFileAsync(@"C:\Users\milkitic\Downloads\1376486 Risshuu feat. Choko - Take [no video]\Risshuu feat. Choko - Take (yf_bmp) [Ta~ke take take take take take tatata~].osu").Result;
+            if (!osu.ReadSuccess) throw osu.ReadException;
             //var osu2 = NugetCoosuNs.Beatmap.OsuFile.ReadFromFileAsync(@"C:\Users\milkitic\Downloads\1376486 Risshuu feat. Choko - Take [no video]\Risshuu feat. Choko - Take (yf_bmp) [Ta~ke take take take take take tatata~].osu").Result;
             //if (!osu.ReadSuccess) throw osu2.ReadException;
             //var xp = new CsvExporter(CsvSeparator.CurrentCulture);
@@ -46,7 +46,7 @@ namespace ParsingPerformanceTest
         }
     }
 
-    //[SimpleJob(RuntimeMoniker.Net472)]
+    [SimpleJob(RuntimeMoniker.Net472)]
     [SimpleJob(RuntimeMoniker.Net60)]
     [MemoryDiagnoser]
     [Orderer(SummaryOrderPolicy.FastestToSlowest)]
@@ -59,7 +59,7 @@ namespace ParsingPerformanceTest
             _path = @"C:\Users\milkitic\Downloads\1376486 Risshuu feat. Choko - Take [no video]\Risshuu feat. Choko - Take (yf_bmp) [Ta~ke take take take take take tatata~].osu";
         }
 
-        [Benchmark]
+        [Benchmark(/*Baseline = true*/)]
         public async Task<object?> LocalCoosu()
         {
             var osu = await LocalCoosuNs.Beatmap.OsuFile.ReadFromFileAsync(_path);
