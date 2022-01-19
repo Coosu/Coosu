@@ -16,6 +16,7 @@ namespace Coosu.Beatmap.Sections
     {
         private readonly List<TimingPoint> _timingPoints;
         private readonly DifficultySection _difficulty;
+        private readonly SpanSplitArgs _e = new();
         public List<RawHitObject> HitObjectList { get; set; } = new();
 
         public double MinTime => HitObjectList.Count == 0 ? 0 : HitObjectList.Min(t => t.Offset);
@@ -32,28 +33,41 @@ namespace Coosu.Beatmap.Sections
 
         public override void Match(string line)
         {
-            var xNext = line.IndexOf(',');
-            var yNext = line.IndexOf(',', xNext + 1);
-            var offsetNext = line.IndexOf(',', yNext + 1);
-            var typeNext = line.IndexOf(',', offsetNext + 1);
-            var hitsoundNext = line.IndexOf(',', typeNext + 1);
+            int x = default;
+            int y = default;
+            int offset = default;
+            RawObjectType type = default;
+            HitsoundType hitsound = default;
+            ReadOnlySpan<char> others = default;
 
+            int i = -1;
+            _e.Canceled = false;
+            foreach (var span in line.SpanSplit(',', _e))
+            {
+                i++;
 #if NETCOREAPP3_1_OR_GREATER
-            var x = int.Parse(line.AsSpan(0, xNext));
-            var y = int.Parse(line.AsSpan(xNext + 1, yNext - xNext - 1));
-            var offset = int.Parse(line.AsSpan(yNext + 1, offsetNext - yNext - 1));
-            var type = (RawObjectType)int.Parse(line.AsSpan(offsetNext + 1, typeNext - offsetNext - 1));
-            var hitsound = (HitsoundType)int.Parse(line.AsSpan(typeNext + 1, hitsoundNext - typeNext - 1));
+                switch (i)
+                {
+                    case 0: x = int.Parse(span); break;
+                    case 1: y = int.Parse(span); break;
+                    case 2: offset = int.Parse(span); break;
+                    case 3: type = (RawObjectType)int.Parse(span); break;
+                    case 4: hitsound = (HitsoundType)int.Parse(span); _e.Canceled = true; break;
+                    default: others = span; break;
+                }
 #else
-            string[] param = line.Split(',');
-            var x = int.Parse(param[0]);
-            var y = int.Parse(param[1]);
-            var offset = int.Parse(param[2]);
-            var type = (RawObjectType)int.Parse(param[3]);
-            var hitsound = (HitsoundType)int.Parse(param[4]);
+                switch (i)
+                {
+                    case 0: x = int.Parse(span.ToString()); break;
+                    case 1: y = int.Parse(span.ToString()); break;
+                    case 2: offset = int.Parse(span.ToString()); break;
+                    case 3: type = (RawObjectType)int.Parse(span.ToString()); break;
+                    case 4: hitsound = (HitsoundType)int.Parse(span.ToString()); _e.Canceled = true; break;
+                    default: others = span; break;
+                }
 #endif
+            }
 
-            var others = line.Substring(hitsoundNext + 1);
             var hitObject = new RawHitObject
             {
                 X = x,
@@ -84,15 +98,15 @@ namespace Coosu.Beatmap.Sections
             HitObjectList.Add(hitObject);
         }
 
-        private void ToCircle(RawHitObject hitObject, string others)
+        private void ToCircle(RawHitObject hitObject, ReadOnlySpan<char> others)
         {
             // extra
-            hitObject.Extras = others;
+            hitObject.Extras = others.ToString();
         }
 
-        private void ToSlider(RawHitObject hitObject, string others)
+        private void ToSlider(RawHitObject hitObject, ReadOnlySpan<char> others)
         {
-            var infos = others.Split(',');
+            var infos = others.ToString().Split(',');
 
             // extra
             string notSureExtra = infos[infos.Length - 1];
@@ -140,7 +154,7 @@ namespace Coosu.Beatmap.Sections
             int repeat = int.Parse(infos[1]);
 
             // length
-            var pixelLength = float.Parse(infos[2]);
+            var pixelLength = double.Parse(infos[2]);
 
             // edge hitsounds
             List<HitsoundType>? edgeHitsounds;
@@ -235,9 +249,10 @@ namespace Coosu.Beatmap.Sections
             };
         }
 
-        private void ToSpinner(RawHitObject hitObject, string others)
+        private void ToSpinner(RawHitObject hitObject, ReadOnlySpan<char> others)
         {
-            var infos = others.Split(',');
+            var s = others.ToString();
+            var infos = s.Split(',');
             var holdEnd = infos[0];
             hitObject.HoldEnd = int.Parse(holdEnd);
             if (infos.Length > 1)
@@ -247,12 +262,13 @@ namespace Coosu.Beatmap.Sections
             }
         }
 
-        private void ToHold(RawHitObject hitObject, string others)
+        private void ToHold(RawHitObject hitObject, ReadOnlySpan<char> others)
         {
-            var index = others.IndexOf(':');
+            var s = others.ToString();
+            var index = s.IndexOf(':');
 
-            var holdEnd = others.Substring(0, index);
-            var extra = others.Substring(index + 1);
+            var holdEnd = s.Substring(0, index);
+            var extra = s.Substring(index + 1);
             hitObject.HoldEnd = int.Parse(holdEnd);
             hitObject.Extras = extra;
         }

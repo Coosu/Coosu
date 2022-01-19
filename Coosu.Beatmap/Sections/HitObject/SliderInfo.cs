@@ -8,7 +8,7 @@ namespace Coosu.Beatmap.Sections.HitObject
 {
     public sealed class SliderInfo
     {
-        public SliderInfo(Vector2 startPoint, int offset, double beatDuration, double sliderMultiplier, float tickRate, float pixelLength)
+        public SliderInfo(Vector2 startPoint, int offset, double beatDuration, double sliderMultiplier, float tickRate, double pixelLength)
         {
             StartPoint = startPoint;
             PixelLength = pixelLength;
@@ -24,7 +24,7 @@ namespace Coosu.Beatmap.Sections.HitObject
         public SliderType SliderType { get; set; }
         public IReadOnlyList<Vector2> ControlPoints { get; set; }
         public int Repeat { get; set; }
-        public float PixelLength { get; set; }
+        public double PixelLength { get; set; }
         public IReadOnlyList<HitsoundType>? EdgeHitsounds { get; set; }
         public ObjectSamplesetType[]? EdgeSamples { get; set; }
         public ObjectSamplesetType[]? EdgeAdditions { get; set; }

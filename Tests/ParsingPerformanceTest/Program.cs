@@ -2,8 +2,10 @@
 extern alias localbuild;
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
@@ -22,11 +24,29 @@ namespace ParsingPerformanceTest
     {
         static void Main(string[] args)
         {
-            var fi = new FileInfo(@"F:\milkitic\Songs\1376486 Risshuu feat. Choko - Take\Risshuu feat. Choko - Take (yf_bmp) [Ta~ke take take take take take tatata~].osu");
+            var fi = new FileInfo(@"test.osu");
+            //var fi = new FileInfo(@"F:\milkitic\Songs\1376486 Risshuu feat. Choko - Take\Risshuu feat. Choko - Take (yf_bmp) [Ta~ke take take take take take tatata~].osu");
             if (!fi.Exists)
                 throw new FileNotFoundException("Test file does not exists: " + fi.FullName);
             Environment.SetEnvironmentVariable("test_osu_path", fi.FullName);
-            var osu = LocalCoosuNs.Beatmap.OsuFile.ReadFromFileAsync(@"test.osu").Result;
+
+            //Thread.Sleep(1000);
+            //var list = new List<object>();
+
+            //for (int i = 0; i < 100; i++)
+            //{
+            //    var osu = LocalCoosuNs.Beatmap.OsuFile.ReadFromFileAsync(@"test.osu").Result;
+            //    list.Add(osu);
+            //}
+
+            //list.Clear();
+            //GC.Collect();
+            //for (int i = 0; i < 100; i++)
+            //{
+            //    var osu = NugetCoosuNs.Beatmap.OsuFile.ReadFromFileAsync(@"test.osu").Result;
+            //    list.Add(osu);
+            //}
+
             //var osu2 = NugetCoosuNs.Beatmap.OsuFile.ReadFromFileAsync(@"test.osu").Result;
             //if (!osu.ReadSuccess) throw osu2.ReadException;
             //var xp = new CsvExporter(CsvSeparator.CurrentCulture);
@@ -49,7 +69,7 @@ namespace ParsingPerformanceTest
         }
     }
 
-    //[SimpleJob(RuntimeMoniker.Net472)]
+    [SimpleJob(RuntimeMoniker.Net472)]
     [SimpleJob(RuntimeMoniker.Net60)]
     [MemoryDiagnoser]
     [Orderer(SummaryOrderPolicy.FastestToSlowest)]

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Coosu.Beatmap.Configurable;
 using Coosu.Beatmap.Sections.Timing;
+using Coosu.Shared;
 using Coosu.Shared.Mathematics;
 
 namespace Coosu.Beatmap.Sections
@@ -19,18 +20,49 @@ namespace Coosu.Beatmap.Sections
 
         public override void Match(string line)
         {
-            string[] param = line.Split(',');
-            double offset = double.Parse(param[0]);
-            double factor = double.Parse(param[1]);
-            int rhythm = int.Parse(param[2]);
-            var timingSampleset = param.Length > 3
-                ? (TimingSamplesetType)(int.Parse(param[3]) - 1)
-                : TimingSamplesetType.None;
-            var track = param.Length > 4 ? int.Parse(param[4]) : 0;
-            var volume = param.Length > 5 ? int.Parse(param[5]) : 0;
-            var inherit = param.Length > 6 && !Convert.ToBoolean(int.Parse(param[6]));
-            var kiai = param.Length > 7 && Convert.ToBoolean(int.Parse(param[7]));
-            var positive = factor >= 0;
+            double offset = default;
+            double factor = default;
+            int rhythm = default;
+            var timingSampleset = TimingSamplesetType.None;
+            ushort track = default;
+            byte volume = default;
+            bool inherit = default;
+            bool kiai = default;
+            bool positive = default;
+
+            int i = -1;
+            foreach (var span in line.SpanSplit(','))
+            {
+                i++;
+#if NETCOREAPP3_1_OR_GREATER
+                switch (i)
+                {
+                    case 0: offset = double.Parse(span); break;
+                    case 1: factor = double.Parse(span); break;
+                    case 2: rhythm = int.Parse(span); break;
+                    case 3: timingSampleset = (TimingSamplesetType)(byte.Parse(span) - 1); break;
+                    case 4: track = ushort.Parse(span); break;
+                    case 5: volume = byte.Parse(span); break;
+                    case 6: inherit = byte.Parse(span) == 0; break;
+                    case 7: kiai = byte.Parse(span) != 0; break;
+                    case 8: positive = factor >= 0; break;
+                }
+#else
+                switch (i)
+                {
+                    case 0: offset = double.Parse(span.ToString()); break;
+                    case 1: factor = double.Parse(span.ToString()); break;
+                    case 2: rhythm = int.Parse(span.ToString()); break;
+                    case 3: timingSampleset = (TimingSamplesetType)(byte.Parse(span.ToString()) - 1); break;
+                    case 4: track = ushort.Parse(span.ToString()); break;
+                    case 5: volume = byte.Parse(span.ToString()); break;
+                    case 6: inherit = byte.Parse(span.ToString()) == 0; break;
+                    case 7: kiai = byte.Parse(span.ToString()) != 0; break;
+                    case 8: positive = factor >= 0; break;
+                }
+#endif
+            }
+
             TimingList.Add(new TimingPoint
             {
                 Offset = offset,
