@@ -23,7 +23,7 @@ namespace ParsingPerformanceTest
         static void Main(string[] args)
         {
             var fi = new FileInfo("test.osu");
-            if (!fi.Exists) 
+            if (!fi.Exists)
                 throw new FileNotFoundException("Test file does not exists: " + fi.FullName);
             Environment.SetEnvironmentVariable("test_osu_path", fi.FullName);
             //var osu = LocalCoosuNs.Beatmap.OsuFile.ReadFromFileAsync(@"test.osu").Result;
@@ -45,7 +45,7 @@ namespace ParsingPerformanceTest
             //    .AddDiagnoser(new MemoryDiagnoser(new MemoryDiagnoserConfig()))
             //);
 
-            var summary = BenchmarkRunner.Run<ReadingTask>(/*config*/args: new[] { fi.FullName });
+            var summary = BenchmarkRunner.Run<ReadingTask>(/*config*/);
         }
     }
 
