@@ -12,8 +12,8 @@ namespace Coosu.Beatmap.Sections.HitObject
         private bool _extraAnyUpdated;
         private ObjectSamplesetType _sampleSet;
         private ObjectSamplesetType _additionSet;
-        private int _customIndex;
-        private int _sampleVolume;
+        private ushort _customIndex;
+        private byte _sampleVolume;
         private string _fileName;
 
         public int X { get; set; }
@@ -42,7 +42,7 @@ namespace Coosu.Beatmap.Sections.HitObject
                 int ncBase = 0;
                 if ((RawType & RawObjectType.NewCombo) == RawObjectType.NewCombo)
                     ncBase = 1;
-                var newThing = 0b01110000 & (int)RawType;
+                var newThing = 0b01110000 & (byte)RawType;
                 var ncCount = newThing >> 4;
                 return ncCount + ncBase;
             }
@@ -91,7 +91,7 @@ namespace Coosu.Beatmap.Sections.HitObject
             }
         }
 
-        public int CustomIndex
+        public ushort CustomIndex
         {
             get
             {
@@ -105,7 +105,7 @@ namespace Coosu.Beatmap.Sections.HitObject
             }
         }
 
-        public int SampleVolume
+        public byte SampleVolume
         {
             get
             {
@@ -140,8 +140,8 @@ namespace Coosu.Beatmap.Sections.HitObject
                 var arr = Extras.Split(new[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
                 if (arr.Length > 0) _sampleSet = arr[0].ParseToEnum<ObjectSamplesetType>();
                 if (arr.Length > 1) _additionSet = arr[1].ParseToEnum<ObjectSamplesetType>();
-                if (arr.Length > 2) _customIndex = int.Parse(arr[2]);
-                if (arr.Length > 3) _sampleVolume = int.Parse(arr[3]);
+                if (arr.Length > 2) _customIndex = ushort.Parse(arr[2]);
+                if (arr.Length > 3) _sampleVolume = byte.Parse(arr[3]);
                 if (arr.Length > 4) _fileName = arr[4];
             }
 

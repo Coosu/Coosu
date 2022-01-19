@@ -2,7 +2,7 @@
 
 namespace Coosu.Beatmap.Sections.Timing
 {
-    public class TimingPointComparer : IComparer<TimingPoint>
+    public sealed class TimingPointComparer : IComparer<TimingPoint>
     {
         public int Compare(TimingPoint? x, TimingPoint? y)
         {

@@ -39,8 +39,8 @@ namespace Coosu.Beatmap.Sections
                 TimingSampleset = timingSampleset,
                 Track = track,
                 Volume = volume,
-                Inherit = inherit,
-                Kiai = kiai,
+                IsInherit = inherit,
+                IsKiai = kiai,
                 Positive = positive
             });
         }

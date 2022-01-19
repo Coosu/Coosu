@@ -122,9 +122,9 @@ namespace Coosu.Beatmap.Sections
                                 SampleInfo.Add(new StoryboardSampleData
                                 {
                                     Offset = int.Parse(infos[1]),
-                                    MagicalInt = int.Parse(infos[2]),
+                                    MagicalInt = byte.Parse(infos[2]),
                                     Filename = infos[3].Trim('"'),
-                                    Volume = infos.Length > 4 ? int.Parse(infos[4]) : 0,
+                                    Volume = infos.Length > 4 ? byte.Parse(infos[4]) : default,
                                 });
                             }
                         break;

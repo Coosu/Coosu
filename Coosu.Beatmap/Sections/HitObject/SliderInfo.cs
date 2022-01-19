@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using Coosu.Beatmap.Internal;
@@ -7,7 +8,7 @@ namespace Coosu.Beatmap.Sections.HitObject
 {
     public sealed class SliderInfo
     {
-        public SliderInfo(Vector2 startPoint, int offset, double beatDuration, double sliderMultiplier, double tickRate, double pixelLength)
+        public SliderInfo(Vector2 startPoint, int offset, double beatDuration, double sliderMultiplier, float tickRate, float pixelLength)
         {
             StartPoint = startPoint;
             PixelLength = pixelLength;
@@ -16,14 +17,14 @@ namespace Coosu.Beatmap.Sections.HitObject
             CurrentSliderMultiplier = sliderMultiplier;
             CurrentTickRate = tickRate;
             CurrentSingleDuration = PixelLength / (100 * CurrentSliderMultiplier) * CurrentBeatDuration;
-            CurrentEndTime = StartTime + CurrentSingleDuration * Repeat;
+            CurrentEndTime = (int)(StartTime + CurrentSingleDuration * Repeat);
             CurrentDuration = CurrentEndTime - StartTime;
         }
 
         public SliderType SliderType { get; set; }
         public Vector2[] ControlPoints { get; set; }
         public int Repeat { get; set; }
-        public double PixelLength { get; set; }
+        public float PixelLength { get; set; }
         public HitsoundType[]? EdgeHitsounds { get; set; }
         public ObjectSamplesetType[]? EdgeSamples { get; set; }
         public ObjectSamplesetType[]? EdgeAdditions { get; set; }
@@ -31,7 +32,7 @@ namespace Coosu.Beatmap.Sections.HitObject
         public Vector2 StartPoint { get; set; }
         public Vector2 EndPoint => ControlPoints.Last();
 
-        public double StartTime { get; set; }
+        public int StartTime { get; set; }
 
         /// <summary>
         /// Get the slider's end time.
@@ -39,7 +40,7 @@ namespace Coosu.Beatmap.Sections.HitObject
         /// <b>Please Note this is a computed value that can't be updated after timing changes.</b>
         /// </para>
         /// </summary>
-        public double CurrentEndTime { get; internal set; }
+        public int CurrentEndTime { get; internal set; }
 
         /// <summary>
         /// Get the first duration from slider's head to slider's tail.
@@ -79,7 +80,7 @@ namespace Coosu.Beatmap.Sections.HitObject
         /// <b>Please Note this is a computed value that can't be updated after timing changes.</b>
         /// </para>
         /// </summary>
-        public double CurrentTickRate { get; internal set; }
+        public float CurrentTickRate { get; internal set; }
 
         public override string ToString()
         {

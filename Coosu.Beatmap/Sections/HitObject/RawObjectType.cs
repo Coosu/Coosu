@@ -3,7 +3,7 @@
 namespace Coosu.Beatmap.Sections.HitObject
 {
     [Flags]
-    public enum RawObjectType
+    public enum RawObjectType : byte
     {
         Circle = 1,
         Slider = 2,

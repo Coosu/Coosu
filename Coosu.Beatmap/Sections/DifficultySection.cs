@@ -14,8 +14,8 @@ namespace Coosu.Beatmap.Sections
         [SectionProperty("ApproachRate")]
         public double ApproachRate { get; set; } = 5;
         [SectionProperty("SliderMultiplier")]
-        public double SliderMultiplier { get; set; } = 1.0;
+        public float SliderMultiplier { get; set; } = 1.0f;
         [SectionProperty("SliderTickRate")]
-        public double SliderTickRate { get; set; } = 1.0;
+        public float SliderTickRate { get; set; } = 1.0f;
     }
 }

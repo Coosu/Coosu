@@ -18,7 +18,7 @@ namespace Coosu.Beatmap
         public static Dictionary<double, double> GetInterval(this TimingSection timingSection, double multiple)
         {
             return timingSection.TimingList
-                .Where(t => !t.Inherit)
+                .Where(t => !t.IsInherit)
                 .OrderBy(t => t.Offset)
                 .ToDictionary(k => k.Offset, v => 60000 / v.Bpm * multiple);
         }
@@ -26,7 +26,7 @@ namespace Coosu.Beatmap
         public static double[] GetTimings(this TimingSection timingSection, double multiple)
         {
             var array = timingSection.TimingList
-                .Where(t => !t.Inherit)
+                .Where(t => !t.IsInherit)
                 .OrderBy(t => t.Offset)
                 .ToArray();
             var list = new List<double>();
@@ -53,10 +53,10 @@ namespace Coosu.Beatmap
         public static TimingPoint GetRedLine(this TimingSection timingSection, double offset)
         {
             TimingPoint[] points = timingSection.TimingList
-                .Where(t => !t.Inherit)
+                .Where(t => !t.IsInherit)
                 .Where(t => t.Offset + 0.5 <= offset)
                 .ToArray();
-            return points.Length == 0 ? timingSection.TimingList.First(t => !t.Inherit) : points.Last();
+            return points.Length == 0 ? timingSection.TimingList.First(t => !t.IsInherit) : points.Last();
         }
 
         public static TimingPoint GetLine(this TimingSection timingSection, double offset)
@@ -73,7 +73,7 @@ namespace Coosu.Beatmap
             TimingPoint point;
             if (samePositionPoints.Length > 1)
             {
-                var greens = samePositionPoints.Where(k => k.Inherit);
+                var greens = samePositionPoints.Where(k => k.IsInherit);
                 point = greens.LastOrDefault() ?? samePositionPoints.Last();
                 // there might be possibility that two red lines at same time
             }
@@ -86,7 +86,7 @@ namespace Coosu.Beatmap
         public static double[] GetTimingBars(this TimingSection timingSection)
         {
             var array = timingSection.TimingList
-                .Where(t => !t.Inherit)
+                .Where(t => !t.IsInherit)
                 .OrderBy(t => t.Offset)
                 .ToArray();
             var list = new List<double>();
@@ -117,9 +117,9 @@ namespace Coosu.Beatmap
             double? tmpKiai = null;
             foreach (var t in array)
             {
-                if (t.Kiai && tmpKiai == null)
+                if (t.IsKiai && tmpKiai == null)
                     tmpKiai = t.Offset;
-                else if (!t.Kiai && tmpKiai != null)
+                else if (!t.IsKiai && tmpKiai != null)
                 {
                     list.Add(new RangeValue<double>(tmpKiai.Value, t.Offset));
                     tmpKiai = null;

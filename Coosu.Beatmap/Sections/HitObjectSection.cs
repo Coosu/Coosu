@@ -123,7 +123,7 @@ namespace Coosu.Beatmap.Sections
             int repeat = int.Parse(infos[1]);
 
             // length
-            var pixelLength = double.Parse(infos[2]);
+            var pixelLength = float.Parse(infos[2]);
 
             // edge hitsounds
             HitsoundType[]? edgeHitsounds;
@@ -172,10 +172,10 @@ namespace Coosu.Beatmap.Sections
             }
 
             TimingPoint? lastRedLine = _timingPoints
-                .LastOrDefault(t => !t.Inherit && t.Offset + 0.5 <= hitObject.Offset);
+                .LastOrDefault(t => !t.IsInherit && t.Offset + 0.5 <= hitObject.Offset);
 
             // hitobjects before red lines is allowed
-            lastRedLine ??= _timingPoints.First(t => !t.Inherit);
+            lastRedLine ??= _timingPoints.First(t => !t.IsInherit);
 
             // ReSharper disable once ReplaceWithSingleCallToLastOrDefault
             TimingPoint? lastLine = _timingPoints
