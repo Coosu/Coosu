@@ -29,7 +29,11 @@ namespace Coosu.Beatmap
         public static async Task<LocalOsuFile> ReadFromFileAsync(string path, Action<ReadOptions> readOptionFactory = null)
         {
 #if NETFRAMEWORK
-            var targetPath = path?.StartsWith(@"\\?\") == true ? path : @"\\?\" + path;
+            var targetPath = System.IO.Path.IsPathRooted(path)
+                ? (path?.StartsWith(@"\\?\") == true
+                    ? path
+                    : @"\\?\" + path)
+                : path;
 #else
             var targetPath = path;
 #endif
@@ -58,13 +62,13 @@ namespace Coosu.Beatmap
                     HitObjects?.ToSerializedString()));
         }
 
-        internal override void HandleCustom(string line)
+        public override void HandleCustom(string line)
         {
+            if (Version != 0) return;
             const string verFlag = "osu file format v";
-
             if (line.StartsWith(verFlag))
             {
-                var str = line.Replace(verFlag, "");
+                var str = line.Substring(verFlag.Length);
                 if (!int.TryParse(str, out var verNum))
                     throw new BadOsuFormatException("Unknown osu file format: " + str);
                 if (verNum < 5)
@@ -79,14 +83,65 @@ namespace Coosu.Beatmap
 
         public static async Task<bool> OsbFileHasStoryboard(string osbPath)
         {
-            using (var sr = new StreamReader(osbPath))
+            using var sr = new StreamReader(osbPath);
+            var line = await sr.ReadLineAsync();
+
+            bool inSbSection = false;
+            bool hasInSbSection = false;
+
+            while (!sr.EndOfStream)
             {
-                var line = await sr.ReadLineAsync();
+                if (line.StartsWith("//"))
+                {
+                    if (line.StartsWith("//Storyboard Layer"))
+                    {
+                        inSbSection = true;
+                        hasInSbSection = true;
+                    }
+                    else if (hasInSbSection)
+                    {
+                        break;
+                    }
+                }
+                else if (inSbSection)
+                {
+                    if (!string.IsNullOrWhiteSpace(line))
+                        return true;
+                }
 
-                bool inSbSection = false;
-                bool hasInSbSection = false;
+                line = await sr.ReadLineAsync();
+            }
 
-                while (!sr.EndOfStream)
+            return false;
+        }
+
+        public static async Task<bool> FileHasStoryboard(string mapPath)
+        {
+            using var sr = new StreamReader(mapPath);
+            var line = await sr.ReadLineAsync();
+            bool hasEvent = false;
+            bool inEventsSection = false;
+            bool inSbSection = false;
+            bool hasInSbSection = false;
+
+            while (!sr.EndOfStream)
+            {
+                if (line == null) break;
+
+                if (line.StartsWith("[") && line.EndsWith("]"))
+                {
+                    if (line == "[Events]")
+                    {
+                        inEventsSection = true;
+                        hasEvent = true;
+
+                    }
+                    else if (hasEvent)
+                    {
+                        break;
+                    }
+                }
+                else if (inEventsSection)
                 {
                     if (line.StartsWith("//"))
                     {
@@ -105,64 +160,9 @@ namespace Coosu.Beatmap
                         if (!string.IsNullOrWhiteSpace(line))
                             return true;
                     }
-
-                    line = await sr.ReadLineAsync();
                 }
 
-                return false;
-            }
-        }
-
-        public static async Task<bool> FileHasStoryboard(string mapPath)
-        {
-            using (var sr = new StreamReader(mapPath))
-            {
-                var line = await sr.ReadLineAsync();
-                bool hasEvent = false;
-                bool inEventsSection = false;
-                bool inSbSection = false;
-                bool hasInSbSection = false;
-
-                while (!sr.EndOfStream)
-                {
-                    if (line == null) break;
-
-                    if (line.StartsWith("[") && line.EndsWith("]"))
-                    {
-                        if (line == "[Events]")
-                        {
-                            inEventsSection = true;
-                            hasEvent = true;
-
-                        }
-                        else if (hasEvent)
-                        {
-                            break;
-                        }
-                    }
-                    else if (inEventsSection)
-                    {
-                        if (line.StartsWith("//"))
-                        {
-                            if (line.StartsWith("//Storyboard Layer"))
-                            {
-                                inSbSection = true;
-                                hasInSbSection = true;
-                            }
-                            else if (hasInSbSection)
-                            {
-                                break;
-                            }
-                        }
-                        else if (inSbSection)
-                        {
-                            if (!string.IsNullOrWhiteSpace(line))
-                                return true;
-                        }
-                    }
-
-                    line = await sr.ReadLineAsync();
-                }
+                line = await sr.ReadLineAsync();
             }
 
             return false;

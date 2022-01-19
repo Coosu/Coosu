@@ -51,6 +51,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RoslynTest", "Tests\RoslynT
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SplitBenchmark", "Tests\SplitBenchmark\SplitBenchmark.csproj", "{80DD684E-D051-4F74-B25C-9E9B94FD1ECC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnalyzeTypeBenchmark", "Tests\AnalyzeTypeBenchmark\AnalyzeTypeBenchmark.csproj", "{4EE4E8F1-1048-4C07-B97E-C5ED56E81540}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Build|Any CPU = Build|Any CPU
@@ -178,6 +180,12 @@ Global
 		{80DD684E-D051-4F74-B25C-9E9B94FD1ECC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{80DD684E-D051-4F74-B25C-9E9B94FD1ECC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{80DD684E-D051-4F74-B25C-9E9B94FD1ECC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4EE4E8F1-1048-4C07-B97E-C5ED56E81540}.Build|Any CPU.ActiveCfg = Debug|Any CPU
+		{4EE4E8F1-1048-4C07-B97E-C5ED56E81540}.Build|Any CPU.Build.0 = Debug|Any CPU
+		{4EE4E8F1-1048-4C07-B97E-C5ED56E81540}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4EE4E8F1-1048-4C07-B97E-C5ED56E81540}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4EE4E8F1-1048-4C07-B97E-C5ED56E81540}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4EE4E8F1-1048-4C07-B97E-C5ED56E81540}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -196,6 +204,7 @@ Global
 		{8CAEC15B-C36D-45B2-A7DE-2B8B6E756158} = {020FD699-A91C-4AD7-9AC7-FC69BD65D51E}
 		{FB0F0960-A3BB-4C26-8B15-0B9147C61EDE} = {020FD699-A91C-4AD7-9AC7-FC69BD65D51E}
 		{80DD684E-D051-4F74-B25C-9E9B94FD1ECC} = {020FD699-A91C-4AD7-9AC7-FC69BD65D51E}
+		{4EE4E8F1-1048-4C07-B97E-C5ED56E81540} = {020FD699-A91C-4AD7-9AC7-FC69BD65D51E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1E82D4BA-E134-4C4A-A48B-F02A601C59CF}

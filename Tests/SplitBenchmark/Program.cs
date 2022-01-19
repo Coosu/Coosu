@@ -105,7 +105,7 @@ namespace SplitBenchmark
 
                 int x = 0;
 
-                foreach (var span in t.SpanSplitOptimized(':'))
+                foreach (var span in t.SpanSplitRange(':'))
                 {
                     if (span.index == 0)
                     {

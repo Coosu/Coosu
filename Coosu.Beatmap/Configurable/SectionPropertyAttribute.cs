@@ -2,6 +2,7 @@
 
 namespace Coosu.Beatmap.Configurable
 {
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Class)]
     public class SectionPropertyAttribute : Attribute
     {
         public string? Name { get; }

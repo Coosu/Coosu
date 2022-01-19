@@ -2,24 +2,24 @@
 
 namespace Coosu.Beatmap
 {
-    public class ReadOptions
+    public sealed class ReadOptions
     {
-        internal List<string> Include { get; } = new List<string>();
-        internal List<string> Exclude { get; } = new List<string>();
-        internal bool? IncludeMode { get; private set; } = null;
-        internal bool StoryboardIgnored { get; private set; } = false;
-        internal bool SampleIgnored { get; private set; } = false;
+        public HashSet<string> Include { get; } = new();
+        public HashSet<string> Exclude { get; } = new();
+        public bool? IncludeMode { get; private set; }
+        public bool StoryboardIgnored { get; private set; }
+        public bool SampleIgnored { get; private set; }
 
-        public void IncludeSection(params string[] sections)
+        public void IncludeSection(string section)
         {
             IncludeMode = true;
-            Include.AddRange(sections);
+            Include.Add(section);
         }
 
-        public void ExcludeSection(params string[] sections)
+        public void ExcludeSection(string section)
         {
             IncludeMode = false;
-            Exclude.AddRange(sections);
+            Exclude.Add(section);
         }
 
         public void IgnoreStoryboard()
