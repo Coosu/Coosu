@@ -117,12 +117,12 @@ namespace Coosu.Beatmap.Sections
             var curveInfo = infos[0];
             var sliderType = curveInfo[0];
 
-            var points = new List<Vector2>(); // curvePoints skip 1
+            var points = curveInfo.Length > 100 ? new List<Vector2>(50) : new List<Vector2>();
             int j = -1;
             foreach (var point in curveInfo.SpanSplit('|'))
             {
                 j++;
-                if (j < 1) continue;
+                if (j < 1) continue; // curvePoints skip 1
 
                 int i = 0;
                 int x = 0;

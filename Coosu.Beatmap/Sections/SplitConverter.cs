@@ -19,19 +19,17 @@ namespace Coosu.Beatmap.Sections
 
         public override List<double> ReadSection(ReadOnlySpan<char> value)
         {
-#if NETCOREAPP3_1_OR_GREATER
             var list = new List<double>();
             foreach (var subString in value.SpanSplit(_splitter))
             {
+#if NETCOREAPP3_1_OR_GREATER
                 list.Add(double.Parse(subString));
+#else
+                list.Add(double.Parse(subString.ToString()));
+#endif
             }
 
             return list;
-#else
-            return value.ToString().Split(_splitter)
-                .Select(double.Parse)
-                .ToList();
-#endif
         }
 
         public override string WriteSection(List<double> value)
@@ -60,19 +58,17 @@ namespace Coosu.Beatmap.Sections
 
         public override List<int> ReadSection(ReadOnlySpan<char> value)
         {
-#if NETCOREAPP3_1_OR_GREATER
             var list = new List<int>();
             foreach (var subString in value.SpanSplit(_splitter))
             {
+#if NETCOREAPP3_1_OR_GREATER
                 list.Add(int.Parse(subString));
+#else
+                list.Add(int.Parse(subString.ToString()));
+#endif
             }
 
             return list;
-#else
-            return value.ToString().Split(_splitter)
-                .Select(int.Parse)
-                .ToList();
-#endif
         }
 
         public override string WriteSection(List<int> value)
@@ -101,9 +97,13 @@ namespace Coosu.Beatmap.Sections
 
         public override List<string> ReadSection(ReadOnlySpan<char> value)
         {
-            return value.ToString()
-                .Split(new[] { _splitter }, StringSplitOptions.None)
-                .ToList();
+            var list = new List<string>();
+            foreach (var subString in value.SpanSplit(_splitter))
+            {
+                list.Add(subString.ToString());
+            }
+
+            return list;
         }
 
         public override string WriteSection(List<string> value)

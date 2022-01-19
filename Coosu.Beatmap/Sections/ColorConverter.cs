@@ -10,28 +10,32 @@ namespace Coosu.Beatmap.Sections
     {
         public override Vector3<byte> ReadSection(ReadOnlySpan<char> value)
         {
-#if NETCOREAPP3_1_OR_GREATER
+            byte x = default;
+            byte y = default;
+            byte z = default;
+
             int i = 0;
-            byte x = 0;
-            byte y = 0;
-            byte z = 0;
             foreach (var span in value.SpanSplit(','))
             {
-                if (i == 0) x = byte.Parse(span);
-                else if (i == 1) y = byte.Parse(span);
-                else if (i == 2) z = byte.Parse(span);
+                switch (i)
+                {
+#if NETCOREAPP3_1_OR_GREATER
+
+                    case 0: x = byte.Parse(span); break;
+                    case 1: y = byte.Parse(span); break;
+                    case 2: z = byte.Parse(span); break;
+
+#else
+                    case 0: x = byte.Parse(span.ToString()); break;
+                    case 1: y = byte.Parse(span.ToString()); break;
+                    case 2: z = byte.Parse(span.ToString()); break;
+#endif
+                }
+
                 i++;
             }
 
             return new Vector3<byte>(x, y, z);
-#else
-            var colors = value.ToString()
-                .Split(',')
-                .Select(byte.Parse)
-                .ToArray();
-            return new Vector3<byte>(colors[0], colors[1], colors[2]);
-#endif
-
         }
 
         public override string WriteSection(Vector3<byte> value)
