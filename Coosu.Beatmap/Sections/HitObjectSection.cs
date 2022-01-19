@@ -7,6 +7,7 @@ using Coosu.Beatmap.Configurable;
 using Coosu.Beatmap.Internal;
 using Coosu.Beatmap.Sections.HitObject;
 using Coosu.Beatmap.Sections.Timing;
+using Coosu.Shared;
 
 namespace Coosu.Beatmap.Sections
 {
@@ -100,23 +101,39 @@ namespace Coosu.Beatmap.Sections
 
             // slider curve
             var curveInfo = infos[0];
-            //var controlPointsInfo = curveInfo.AsSpan(2);
-            var controlPoints = curveInfo.Split('|');
             var sliderType = curveInfo[0];
 
-            var points = new Vector2[controlPoints.Length - 1]; // curvePoints skip 1
-            for (var i = 1; i < controlPoints.Length; i++)
+            var points = new List<Vector2>(); // curvePoints skip 1
+            int j = -1;
+            foreach (var point in curveInfo.SpanSplit('|'))
             {
-                var point = controlPoints[i];
+                j++;
+                if (j < 1) continue;
+
+                int i = 0;
+                int x = 0;
+                foreach (var s in point.SpanSplit(':'))
+                {
+                    if (i == 0)
+                    {
 #if NETCOREAPP3_1_OR_GREATER
-                var indexOfColon = point.IndexOf(':');
-                var spanX = point.AsSpan(0, indexOfColon);
-                var spanY = point.AsSpan(indexOfColon + 1, point.Length - indexOfColon - 1);
-                points[i - 1] = new Vector2(int.Parse(spanX), int.Parse(spanY));
+                        x = int.Parse(s);
 #else
-                var xy = point.Split(':');
-                points[i - 1] = new Vector2(int.Parse(xy[0]), int.Parse(xy[1]));
+                        x = int.Parse(s.ToString());
 #endif
+                    }
+                    else
+                    {
+#if NETCOREAPP3_1_OR_GREATER
+                        var y = int.Parse(s);
+#else
+                        var y = int.Parse(s.ToString());
+#endif
+                        points.Add(new Vector2(x, y));
+                    }
+
+                    i++;
+                }
             }
 
             // repeat
@@ -126,48 +143,65 @@ namespace Coosu.Beatmap.Sections
             var pixelLength = float.Parse(infos[2]);
 
             // edge hitsounds
-            HitsoundType[]? edgeHitsounds;
+            List<HitsoundType>? edgeHitsounds;
             ObjectSamplesetType[]? edgeSamples;
             ObjectSamplesetType[]? edgeAdditions;
-            if (infos.Length == 3)
+            if (infos.Length <= 3)
             {
                 edgeHitsounds = null;
                 edgeSamples = null;
                 edgeAdditions = null;
             }
-            else if (infos.Length == 4)
-            {
-                edgeHitsounds = infos[3]
-                    .Split('|')
-                    .Select(t => (HitsoundType)int.Parse(t))
-                    .ToArray();
-                edgeSamples = null;
-                edgeAdditions = null;
-            }
             else
             {
-                edgeHitsounds = infos[3]
-                    .Split('|')
-                    .Select(t => (HitsoundType)int.Parse(t))
-                    .ToArray();
-                string[] edgeAdditionsStrArr = infos[4].Split('|');
-                edgeSamples = new ObjectSamplesetType[repeat + 1];
-                edgeAdditions = new ObjectSamplesetType[repeat + 1];
-
-                for (int i = 0; i < edgeAdditionsStrArr.Length; i++)
+                edgeHitsounds = new List<HitsoundType>();
+                foreach (var span in infos[3].SpanSplit('|'))
                 {
 #if NETCOREAPP3_1_OR_GREATER
-                    var xy = edgeAdditionsStrArr[i];
-                    var indexOfColon = xy.IndexOf(':');
-                    var spanX = xy.AsSpan(0, indexOfColon);
-                    var spanY = xy.AsSpan(indexOfColon + 1, xy.Length - indexOfColon - 1);
-                    edgeSamples[i] = (ObjectSamplesetType)int.Parse(spanX);
-                    edgeAdditions[i] = (ObjectSamplesetType)int.Parse(spanY);
+                    edgeHitsounds.Add((HitsoundType)int.Parse(span));
 #else
-                    var sampAdd = edgeAdditionsStrArr[i].Split(':');
-                    edgeSamples[i] = (ObjectSamplesetType)int.Parse(sampAdd[0]);
-                    edgeAdditions[i] = (ObjectSamplesetType)int.Parse(sampAdd[1]);
+                    edgeHitsounds.Add((HitsoundType)int.Parse(span.ToString()));
 #endif
+                }
+
+                if (infos.Length > 4)
+                {
+                    edgeSamples = new ObjectSamplesetType[edgeHitsounds.Count];
+                    edgeAdditions = new ObjectSamplesetType[edgeHitsounds.Count];
+                    int i = -1;
+                    foreach (var span in infos[4].SpanSplit('|'))
+                    {
+                        i++;
+                        int k = -1;
+                        foreach (var span2 in span.SpanSplit(':'))
+                        {
+                            k++;
+                            switch (k)
+                            {
+                                case 0:
+#if NETCOREAPP3_1_OR_GREATER
+                                    var x = (ObjectSamplesetType)int.Parse(span2);
+#else
+                                    var x = (ObjectSamplesetType)int.Parse(span2.ToString());
+#endif
+                                    edgeSamples[i] = x;
+                                    break;
+                                case 1:
+#if NETCOREAPP3_1_OR_GREATER
+                                    var y = (ObjectSamplesetType)int.Parse(span2);
+#else
+                                    var y = (ObjectSamplesetType)int.Parse(span2.ToString());
+#endif
+                                    edgeAdditions[i] = y;
+                                    break;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    edgeSamples = null;
+                    edgeAdditions = null;
                 }
             }
 

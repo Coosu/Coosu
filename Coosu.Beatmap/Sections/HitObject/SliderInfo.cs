@@ -22,15 +22,15 @@ namespace Coosu.Beatmap.Sections.HitObject
         }
 
         public SliderType SliderType { get; set; }
-        public Vector2[] ControlPoints { get; set; }
+        public IReadOnlyList<Vector2> ControlPoints { get; set; }
         public int Repeat { get; set; }
         public float PixelLength { get; set; }
-        public HitsoundType[]? EdgeHitsounds { get; set; }
+        public IReadOnlyList<HitsoundType>? EdgeHitsounds { get; set; }
         public ObjectSamplesetType[]? EdgeSamples { get; set; }
         public ObjectSamplesetType[]? EdgeAdditions { get; set; }
 
         public Vector2 StartPoint { get; set; }
-        public Vector2 EndPoint => ControlPoints.Last();
+        public Vector2 EndPoint => ControlPoints[ControlPoints.Count - 1];
 
         public int StartTime { get; set; }
 
