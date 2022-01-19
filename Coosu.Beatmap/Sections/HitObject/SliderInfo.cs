@@ -5,7 +5,7 @@ using Coosu.Beatmap.Internal;
 
 namespace Coosu.Beatmap.Sections.HitObject
 {
-    public class SliderInfo
+    public sealed class SliderInfo
     {
         public SliderInfo(Vector2 startPoint, int offset, double beatDuration, double sliderMultiplier, double tickRate, double pixelLength)
         {

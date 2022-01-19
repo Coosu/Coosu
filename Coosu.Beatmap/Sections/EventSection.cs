@@ -10,7 +10,7 @@ using Coosu.Shared.Mathematics;
 namespace Coosu.Beatmap.Sections
 {
     [SectionProperty("Events")]
-    public class EventSection : Section
+    public sealed class EventSection : Section
     {
         private const string SectionBgVideo = "//Background and Video events";
         private const string SectionBreak = "//Break Periods";

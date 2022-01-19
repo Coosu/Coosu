@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using Coosu.Beatmap.Internal;
 
@@ -10,38 +9,30 @@ namespace Coosu.Beatmap.Configurable
     public abstract class KeyValueSection : Section
     {
         [SectionIgnore]
-        public Dictionary<string, string>? UndefinedPairs { get; private set; }
+        public Dictionary<string, string> UndefinedPairs { get; } = new();
 
         public KeyValueSection()
         {
-            var type = GetType();
-            var publicProps = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
-            if (publicProps.Length != 0)
+            var thisType = GetType();
+            var props = thisType.GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
+            for (var i = 0; i < props.Length; i++)
             {
-                _propertyInfos = publicProps
-                    .Where(k => k.GetCustomAttribute<SectionIgnoreAttribute>() == null)
-                    .Select(k =>
-                    {
-                        var attr = k.GetCustomAttribute<SectionPropertyAttribute>();
-                        return (k, attr == null ? k.Name : attr.Name);
-                    })
-                    .ToList();
-            }
-            else
-                _propertyInfos = new List<(PropertyInfo propInfo, string name)>();
-
-            var privateProps = type.GetProperties(BindingFlags.NonPublic | BindingFlags.Instance);
-            if (privateProps.Length != 0)
-            {
-                _propertyInfos.AddRange(privateProps
-                    .Where(k => k.GetCustomAttribute<SectionIgnoreAttribute>() == null &&
-                                k.GetCustomAttribute<SectionPropertyAttribute>() != null)
-                    .Select(k =>
-                    {
-                        var attr = k.GetCustomAttribute<SectionPropertyAttribute>();
-                        return (k, attr.Name);
-                    })
-                );
+                var propertyInfo = props[i];
+                if (propertyInfo.SetMethod == null) continue;
+                var isPublic = propertyInfo.SetMethod.IsPublic;
+                if (!isPublic)
+                {
+                    var sectionPropertyAttr = propertyInfo.GetCustomAttribute<SectionPropertyAttribute>();
+                    if (sectionPropertyAttr == null) continue;
+                    PropertyInfos.Add(sectionPropertyAttr?.Name ?? propertyInfo.Name, propertyInfo);
+                }
+                else
+                {
+                    var sectionIgnoreAttr = propertyInfo.GetCustomAttribute<SectionIgnoreAttribute>();
+                    if (sectionIgnoreAttr != null) continue;
+                    var sectionPropertyAttr = propertyInfo.GetCustomAttribute<SectionPropertyAttribute>();
+                    PropertyInfos.Add(sectionPropertyAttr?.Name ?? propertyInfo.Name, propertyInfo);
+                }
             }
         }
 
@@ -50,12 +41,10 @@ namespace Coosu.Beatmap.Configurable
             MatchKeyValue(line, out var keySpan, out var valueSpan);
             var key = keySpan.ToString();
 #if !NETCOREAPP3_1_OR_GREATER
-            
+
 #endif
-            var prop = _propertyInfos.FirstOrDefault(k => k.name == key).propInfo;
-            if (prop == null)
+            if (!PropertyInfos.TryGetValue(key, out var prop))
             {
-                UndefinedPairs ??= new Dictionary<string, string>();
                 UndefinedPairs.Add(key, valueSpan.ToString());
             }
             else
@@ -115,9 +104,11 @@ namespace Coosu.Beatmap.Configurable
             textWriter.Write(SectionName);
             textWriter.WriteLine("]");
 
-            foreach (var (prop, name) in _propertyInfos)
+            foreach (var kvp in PropertyInfos)
             {
-                string key = name;
+                string key = kvp.Key;
+                var prop = kvp.Value;
+
                 string? value = null;
                 var rawObj = prop.GetValue(this);
                 if (rawObj is null) continue;
@@ -146,10 +137,10 @@ namespace Coosu.Beatmap.Configurable
                     var boolAttr = prop.GetCustomAttribute<SectionBoolAttribute>(false);
                     if (boolAttr != null)
                     {
-                        value = boolAttr.Option switch
+                        value = boolAttr.Type switch
                         {
-                            BoolParseOption.ZeroOne => Convert.ToInt32(rawObj).ToString(),
-                            BoolParseOption.String => rawObj.ToString(),
+                            BoolParseType.ZeroOne => Convert.ToInt32(rawObj).ToString(),
+                            BoolParseType.String => rawObj.ToString(),
                             _ => throw new ArgumentOutOfRangeException()
                         };
                     }
@@ -164,6 +155,6 @@ namespace Coosu.Beatmap.Configurable
 
         protected virtual string KeyValueFlag { get; } = ":";
         protected virtual bool TrimPairs { get; } = false;
-        private readonly List<(PropertyInfo propInfo, string name)> _propertyInfos;
+        protected readonly Dictionary<string, PropertyInfo> PropertyInfos = new();
     }
 }

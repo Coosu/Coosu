@@ -1,11 +1,10 @@
 ﻿using System.IO;
 using Coosu.Beatmap.Configurable;
-using Coosu.Beatmap.Internal;
 using Coosu.Shared;
 
 namespace Coosu.Beatmap.Sections.Event
 {
-    public class VideoData : SerializeWritableObject
+    public sealed class VideoData : SerializeWritableObject
     {
         public double Offset { get; set; }
         public string Filename { get; set; }

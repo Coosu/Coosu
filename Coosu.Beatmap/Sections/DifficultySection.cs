@@ -3,7 +3,7 @@
 namespace Coosu.Beatmap.Sections
 {
     [SectionProperty("Difficulty")]
-    public class DifficultySection : KeyValueSection
+    public sealed class DifficultySection : KeyValueSection
     {
         [SectionProperty("HPDrainRate")]
         public double HpDrainRate { get; set; } = 5;

@@ -2,9 +2,9 @@
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Coosu.Beatmap.Management
+namespace Coosu.Beatmap
 {
-    public class OsuDirectory
+    public sealed class OsuDirectory
     {
         public List<OsuFile> FileList { get; } = new List<OsuFile>();
 

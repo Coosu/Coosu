@@ -7,7 +7,7 @@ namespace Coosu.Beatmap.Internal
 {
     internal static class ValueConvert
     {
-        private static readonly Dictionary<string, MethodInfo> MethodCache = new();
+        private static readonly Dictionary<string, MethodInfo?> MethodCache = new();
         private static readonly Type TypeBoolean = typeof(bool);
         private static readonly Type TypeByte = typeof(byte);
         private static readonly Type TypeSbyte = typeof(sbyte);

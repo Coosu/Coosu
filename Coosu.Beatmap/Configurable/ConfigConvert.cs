@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using Coosu.Shared;
 
 namespace Coosu.Beatmap.Configurable
 {
@@ -12,9 +10,9 @@ namespace Coosu.Beatmap.Configurable
         private static readonly Type SectionType = typeof(Section);
         private static readonly Type ConfigType = typeof(Config);
 
-        public static T DeserializeObject<T>(string value, bool sequential = false) where T : Config
+        public static T DeserializeObject<T>(string value) where T : Config
         {
-            using StringReader sw = new StringReader(value);
+            using var sw = new StringReader(value);
             return DeserializeObject<T>(sw);
         }
 
@@ -131,7 +129,7 @@ namespace Coosu.Beatmap.Configurable
             return false;
         }
 
-        private static void AddSectionsIfPossible(PropertyInfo info, Dictionary<string, ReflectInfo> reflectInfos)
+        private static void AddSectionsIfPossible(PropertyInfo info, IDictionary<string, ReflectInfo> reflectInfos)
         {
             var propType = info.PropertyType;
             if (info.SetMethod == null) return;

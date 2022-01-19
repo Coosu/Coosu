@@ -5,7 +5,7 @@ using Coosu.Beatmap.Sections.Timing;
 namespace Coosu.Beatmap.Sections
 {
     [SectionProperty("General")]
-    public class GeneralSection : KeyValueSection
+    public sealed class GeneralSection : KeyValueSection
     {
         [SectionProperty("AudioFilename")]
         public string AudioFilename { get; set; } = "audio.mp3";
@@ -17,7 +17,7 @@ namespace Coosu.Beatmap.Sections
         public int PreviewTime { get; set; } = 0;
 
         [SectionProperty("Countdown")]
-        [SectionBool(BoolParseOption.ZeroOne)]
+        [SectionBool(BoolParseType.ZeroOne)]
         public bool Countdown { get; set; } = true;
 
         [SectionProperty("SampleSet")]
@@ -31,15 +31,15 @@ namespace Coosu.Beatmap.Sections
         public GameMode Mode { get; set; } = 0;
 
         [SectionProperty("LetterboxInBreaks")]
-        [SectionBool(BoolParseOption.ZeroOne)]
+        [SectionBool(BoolParseType.ZeroOne)]
         public bool LetterboxInBreaks { get; set; } = false;
 
         [SectionProperty("WidescreenStoryboard")]
-        [SectionBool(BoolParseOption.ZeroOne)]
+        [SectionBool(BoolParseType.ZeroOne)]
         public bool WidescreenStoryboard { get; set; } = true;
 
         [SectionProperty("EpilepsyWarning")]
-        [SectionBool(BoolParseOption.ZeroOne)]
+        [SectionBool(BoolParseType.ZeroOne)]
         public bool EpilepsyWarning { get; set; } = false;
 
         [SectionProperty("SkinPreference")]

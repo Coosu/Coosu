@@ -2,9 +2,10 @@
 
 namespace Coosu.Beatmap
 {
-    public class VersionNotSupportedException : Exception
+    public sealed class VersionNotSupportedException : Exception
     {
-        public VersionNotSupportedException(int version) : base($"尚不支持 osu file format v[{version}]。")
+        public VersionNotSupportedException(int version)
+            : base($"The specific osu file format version is not supported: {version}。")
         {
         }
     }

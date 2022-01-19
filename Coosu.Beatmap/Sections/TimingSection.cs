@@ -9,7 +9,7 @@ using Coosu.Shared.Mathematics;
 namespace Coosu.Beatmap.Sections
 {
     [SectionProperty("TimingPoints")]
-    public class TimingSection : Section
+    public sealed class TimingSection : Section
     {
         public List<TimingPoint> TimingList { get; set; } = new();
         public double MinTime => TimingList.Count == 0 ? 0 : TimingList.Min(t => t.Offset);

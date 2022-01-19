@@ -11,7 +11,7 @@ using Coosu.Beatmap.Sections.Timing;
 namespace Coosu.Beatmap.Sections
 {
     [SectionProperty("HitObjects")]
-    public class HitObjectSection : Section
+    public sealed class HitObjectSection : Section
     {
         private readonly List<TimingPoint> _timingPoints;
         private readonly DifficultySection _difficulty;

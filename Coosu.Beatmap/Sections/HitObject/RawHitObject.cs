@@ -5,7 +5,7 @@ using Coosu.Beatmap.Internal;
 
 namespace Coosu.Beatmap.Sections.HitObject
 {
-    public class RawHitObject : SerializeWritableObject
+    public sealed class RawHitObject : SerializeWritableObject
     {
         private string? _extras = "0:0:0:0:";
         private bool _extraInitial;

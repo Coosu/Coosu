@@ -3,7 +3,7 @@ using Coosu.Beatmap.Configurable;
 
 namespace Coosu.Beatmap.Sections.Event
 {
-    public class StoryboardSampleData : SerializeWritableObject
+    public sealed class StoryboardSampleData : SerializeWritableObject
     {
         public int Offset { get; set; }
         public int MagicalInt { get; set; }

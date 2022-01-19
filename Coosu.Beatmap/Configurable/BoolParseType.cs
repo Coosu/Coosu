@@ -1,6 +1,6 @@
 ﻿namespace Coosu.Beatmap.Configurable
 {
-    public enum BoolParseOption
+    public enum BoolParseType
     {
         String, ZeroOne
     }

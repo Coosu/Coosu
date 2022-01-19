@@ -2,7 +2,7 @@
 
 namespace Coosu.Shared
 {
-    public class ConcurrentRandom
+    public sealed class ConcurrentRandom
     {
         private readonly object _lock = new object();
         private Random _random;

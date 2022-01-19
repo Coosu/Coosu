@@ -4,9 +4,9 @@ using Coosu.Beatmap.Configurable;
 using Coosu.Shared;
 using Coosu.Shared.Numerics;
 
-namespace Coosu.Beatmap
+namespace Coosu.Beatmap.Sections
 {
-    public class ColorConverter : ValueConverter<Vector3<byte>>
+    public sealed class ColorConverter : ValueConverter<Vector3<byte>>
     {
         public override Vector3<byte> ReadSection(ReadOnlySpan<char> value)
         {

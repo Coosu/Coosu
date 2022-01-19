@@ -9,11 +9,6 @@ using Coosu.Beatmap.Sections.Timing;
 
 namespace Coosu.Beatmap
 {
-    public class LocalOsuFile : OsuFile
-    {
-        public string OriginPath { get; internal set; }
-    }
-
     public class OsuFile : Config
     {
         public int Version { get; set; }

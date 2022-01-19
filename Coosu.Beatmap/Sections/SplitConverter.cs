@@ -8,7 +8,7 @@ using Coosu.Shared;
 
 namespace Coosu.Beatmap.Sections
 {
-    public class DoubleSplitConverter : ValueConverter<List<double>>
+    public sealed class DoubleSplitConverter : ValueConverter<List<double>>
     {
         private readonly char _splitter;
 
@@ -49,7 +49,7 @@ namespace Coosu.Beatmap.Sections
         }
     }
 
-    public class Int32SplitConverter : ValueConverter<List<int>>
+    public sealed class Int32SplitConverter : ValueConverter<List<int>>
     {
         private readonly char _splitter;
 
@@ -90,7 +90,7 @@ namespace Coosu.Beatmap.Sections
         }
     }
 
-    public class SplitConverter : ValueConverter<List<string>>
+    public sealed class SplitConverter : ValueConverter<List<string>>
     {
         private readonly char _splitter;
 

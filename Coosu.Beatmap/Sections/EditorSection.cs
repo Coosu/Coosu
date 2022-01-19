@@ -4,7 +4,7 @@ using Coosu.Beatmap.Configurable;
 namespace Coosu.Beatmap.Sections
 {
     [SectionProperty("Editor")]
-    public class EditorSection : KeyValueSection
+    public sealed class EditorSection : KeyValueSection
     {
         [SectionProperty("Bookmarks")]
         [SectionConverter(typeof(Int32SplitConverter), ',')]

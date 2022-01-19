@@ -4,7 +4,7 @@ using Coosu.Shared.Numerics;
 namespace Coosu.Beatmap.Sections
 {
     [SectionProperty("Colours")]
-    public class ColorSection : KeyValueSection
+    public sealed class ColorSection : KeyValueSection
     {
         [SectionConverter(typeof(ColorConverter))]
         public Vector3<byte>? Combo1 { get; set; }

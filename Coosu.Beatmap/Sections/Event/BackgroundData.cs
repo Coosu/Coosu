@@ -4,7 +4,7 @@ using Coosu.Beatmap.Configurable;
 
 namespace Coosu.Beatmap.Sections.Event
 {
-    public class BackgroundData : SerializeWritableObject
+    public sealed class BackgroundData : SerializeWritableObject
     {
         public string Filename { get; set; }
         public double X { get; set; }

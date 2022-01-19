@@ -2,7 +2,7 @@
 
 namespace Coosu.Beatmap.Configurable
 {
-    public class SectionConverterAttribute : Attribute
+    public sealed class SectionConverterAttribute : Attribute
     {
         private readonly Type _converterType;
         private readonly object[] _param;

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Coosu.Beatmap.Configurable
 {
-    public class AttributeTypeComparer : IEqualityComparer<Attribute>
+    public sealed class AttributeTypeComparer : IEqualityComparer<Attribute>
     {
         public bool Equals(Attribute? x, Attribute? y)
         {
