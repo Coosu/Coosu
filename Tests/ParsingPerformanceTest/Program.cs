@@ -29,7 +29,7 @@ namespace ParsingPerformanceTest
             if (!fi.Exists)
                 throw new FileNotFoundException("Test file does not exists: " + fi.FullName);
             Environment.SetEnvironmentVariable("test_osu_path", fi.FullName);
-
+            var osu = LocalCoosuNs.Beatmap.OsuFile.ReadFromFileAsync(@"test.osu").Result;
             //Thread.Sleep(1000);
             //var list = new List<object>();
 

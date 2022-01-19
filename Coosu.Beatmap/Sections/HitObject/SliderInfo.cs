@@ -25,7 +25,7 @@ namespace Coosu.Beatmap.Sections.HitObject
         public IReadOnlyList<Vector2> ControlPoints { get; set; }
         public int Repeat { get; set; }
         public double PixelLength { get; set; }
-        public IReadOnlyList<HitsoundType>? EdgeHitsounds { get; set; }
+        public HitsoundType[]? EdgeHitsounds { get; set; }
         public ObjectSamplesetType[]? EdgeSamples { get; set; }
         public ObjectSamplesetType[]? EdgeAdditions { get; set; }
 

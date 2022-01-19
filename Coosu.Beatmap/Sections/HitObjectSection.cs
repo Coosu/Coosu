@@ -157,7 +157,7 @@ namespace Coosu.Beatmap.Sections
             var pixelLength = double.Parse(infos[2]);
 
             // edge hitsounds
-            List<HitsoundType>? edgeHitsounds;
+            HitsoundType[]? edgeHitsounds;
             ObjectSamplesetType[]? edgeSamples;
             ObjectSamplesetType[]? edgeAdditions;
             if (infos.Length <= 3)
@@ -168,20 +168,22 @@ namespace Coosu.Beatmap.Sections
             }
             else
             {
-                edgeHitsounds = new List<HitsoundType>();
+                edgeHitsounds = new HitsoundType[repeat + 1];
+                int g = -1;
                 foreach (var span in infos[3].SpanSplit('|'))
                 {
+                    g++;
 #if NETCOREAPP3_1_OR_GREATER
-                    edgeHitsounds.Add((HitsoundType)int.Parse(span));
+                    edgeHitsounds[g] = (HitsoundType)int.Parse(span);
 #else
-                    edgeHitsounds.Add((HitsoundType)int.Parse(span.ToString()));
+                    edgeHitsounds[g] = (HitsoundType)int.Parse(span.ToString());
 #endif
                 }
 
                 if (infos.Length > 4)
                 {
-                    edgeSamples = new ObjectSamplesetType[edgeHitsounds.Count];
-                    edgeAdditions = new ObjectSamplesetType[edgeHitsounds.Count];
+                    edgeSamples = new ObjectSamplesetType[edgeHitsounds.Length];
+                    edgeAdditions = new ObjectSamplesetType[edgeHitsounds.Length];
                     int i = -1;
                     foreach (var span in infos[4].SpanSplit('|'))
                     {
