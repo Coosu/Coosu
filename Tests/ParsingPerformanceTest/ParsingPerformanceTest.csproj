@@ -15,4 +15,10 @@
     <ProjectReference Include="..\..\Coosu.Beatmap\Coosu.Beatmap.csproj" Aliases="localbuild" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="test.osu">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

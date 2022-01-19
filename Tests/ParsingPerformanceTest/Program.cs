@@ -22,8 +22,12 @@ namespace ParsingPerformanceTest
     {
         static void Main(string[] args)
         {
-            var osu = LocalCoosuNs.Beatmap.OsuFile.ReadFromFileAsync(@"C:\Users\milkitic\Downloads\1376486 Risshuu feat. Choko - Take [no video]\Risshuu feat. Choko - Take (yf_bmp) [Ta~ke take take take take take tatata~].osu").Result;
-            //var osu2 = NugetCoosuNs.Beatmap.OsuFile.ReadFromFileAsync(@"C:\Users\milkitic\Downloads\1376486 Risshuu feat. Choko - Take [no video]\Risshuu feat. Choko - Take (yf_bmp) [Ta~ke take take take take take tatata~].osu").Result;
+            var fi = new FileInfo("test.osu");
+            if (!fi.Exists) 
+                throw new FileNotFoundException("Test file does not exists: " + fi.FullName);
+            Environment.SetEnvironmentVariable("test_osu_path", fi.FullName);
+            //var osu = LocalCoosuNs.Beatmap.OsuFile.ReadFromFileAsync(@"test.osu").Result;
+            //var osu2 = NugetCoosuNs.Beatmap.OsuFile.ReadFromFileAsync(@"test.osu").Result;
             //if (!osu.ReadSuccess) throw osu2.ReadException;
             //var xp = new CsvExporter(CsvSeparator.CurrentCulture);
             //var job = Job.Default
@@ -41,7 +45,7 @@ namespace ParsingPerformanceTest
             //    .AddDiagnoser(new MemoryDiagnoser(new MemoryDiagnoserConfig()))
             //);
 
-            var summary = BenchmarkRunner.Run<ReadingTask>(/*config*/);
+            var summary = BenchmarkRunner.Run<ReadingTask>(/*config*/args: new[] { fi.FullName });
         }
     }
 
@@ -55,7 +59,8 @@ namespace ParsingPerformanceTest
 
         public ReadingTask()
         {
-            _path = @"C:\Users\milkitic\Downloads\1376486 Risshuu feat. Choko - Take [no video]\Risshuu feat. Choko - Take (yf_bmp) [Ta~ke take take take take take tatata~].osu";
+            var path = Environment.GetEnvironmentVariable("test_osu_path");
+            _path = path;
         }
 
         [Benchmark(/*Baseline = true*/)]
