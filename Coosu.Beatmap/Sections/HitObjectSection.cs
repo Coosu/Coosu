@@ -295,8 +295,10 @@ namespace Coosu.Beatmap.Sections
 
             hitObject.SliderInfo.SetVariables(
                 lastRedLine?.Factor ?? 0,
-                _difficulty.SliderMultiplier * (lastLine?.Multiple ?? 0),
-                _difficulty.SliderTickRate);
+                lastLine?.Multiple ?? 0,
+                _difficulty.SliderMultiplier,
+                _difficulty.SliderTickRate
+            );
         }
 
         private void ToSpinner(RawHitObject hitObject, ReadOnlySpan<char> others)

@@ -8,20 +8,14 @@ namespace Coosu.Beatmap.Sections.HitObject
 {
     public sealed class SliderInfo
     {
-        //public SliderInfo(Vector2 startPoint, int offset, double pixelLength)
-        //{
-        //    StartPoint = startPoint;
-        //    PixelLength = pixelLength;
-        //    StartTime = offset;
-        //}
-
-        internal void SetVariables(double beatDuration, double sliderMultiplier, float tickRate)
+        internal void SetVariables(double lastRedFactor, double lastLineMultiple,
+            double diffSliderMultiplier, float diffTickRate)
         {
-            CurrentBeatDuration = beatDuration;
-            CurrentSliderMultiplier = sliderMultiplier;
-            CurrentTickRate = tickRate;
+            CurrentBeatDuration = lastRedFactor;
+            CurrentSliderMultiplier = diffSliderMultiplier * lastLineMultiple;
+            CurrentTickRate = diffTickRate;
 
-            CurrentSingleDuration = PixelLength / (100 * sliderMultiplier) * beatDuration;
+            CurrentSingleDuration = PixelLength / (100 * CurrentSliderMultiplier) * lastRedFactor;
             CurrentEndTime = (int)(StartTime + CurrentSingleDuration * Repeat);
             CurrentDuration = CurrentEndTime - StartTime;
         }
