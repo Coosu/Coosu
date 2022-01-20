@@ -4,6 +4,7 @@ extern alias localbuild;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -30,14 +31,16 @@ namespace ParsingPerformanceTest
                 throw new FileNotFoundException("Test file does not exists: " + fi.FullName);
             Environment.SetEnvironmentVariable("test_osu_path", fi.FullName);
             var osu = LocalCoosuNs.Beatmap.OsuFile.ReadFromFileAsync(@"test.osu").Result;
-            //Thread.Sleep(1000);
-            //var list = new List<object>();
 
-            //for (int i = 0; i < 100; i++)
-            //{
-            //    var osu = LocalCoosuNs.Beatmap.OsuFile.ReadFromFileAsync(@"test.osu").Result;
-            //    list.Add(osu);
-            //}
+            //var arr = new bool[15000]
+            //    .AsParallel()
+            //    .WithDegreeOfParallelism(Environment.ProcessorCount)
+            //    .Select(k =>
+            //    {
+            //        return LocalCoosuNs.Beatmap.OsuFile.ReadFromFileAsync(@"test.osu").Result;
+            //    })
+            //    .ToArray();
+            //return;
 
             //list.Clear();
             //GC.Collect();
@@ -69,7 +72,7 @@ namespace ParsingPerformanceTest
         }
     }
 
-    //[SimpleJob(RuntimeMoniker.Net472)]
+    [SimpleJob(RuntimeMoniker.Net472)]
     [SimpleJob(RuntimeMoniker.Net60)]
     [MemoryDiagnoser]
     [Orderer(SummaryOrderPolicy.FastestToSlowest)]
@@ -87,6 +90,7 @@ namespace ParsingPerformanceTest
         public async Task<object?> LocalCoosu()
         {
             var osu = await LocalCoosuNs.Beatmap.OsuFile.ReadFromFileAsync(_path);
+            osu.HitObjects.ComputeSlidersByCurrentSettings();
             return osu;
         }
 

@@ -11,7 +11,7 @@ namespace Coosu.Beatmap
 {
     public static class SliderExtensions
     {
-        public static SliderEdge[] GetEdges(this SliderInfo sliderInfo)
+        public static SliderEdge[] GetEdges(this ExtendedSliderInfo sliderInfo)
         {
             var edges = new SliderEdge[sliderInfo.Repeat + 1];
 
@@ -30,13 +30,13 @@ namespace Coosu.Beatmap
             return edges;
         }
 
-        public static SliderTick[] GetSliderTicks(this SliderInfo sliderInfo)
+        public static SliderTick[] GetSliderTicks(this ExtendedSliderInfo sliderInfo)
         {
             var tickInterval = sliderInfo.CurrentBeatDuration / sliderInfo.CurrentTickRate;
             return ComputeDiscreteData(sliderInfo, tickInterval);
         }
 
-        public static SliderTick[] GetSliderSlides(this SliderInfo sliderInfo)
+        public static SliderTick[] GetSliderSlides(this ExtendedSliderInfo sliderInfo)
         {
             // 60fps
             var interval = 1000 / 60d;
@@ -44,7 +44,7 @@ namespace Coosu.Beatmap
         }
 
         // todo: not cut by rhythm
-        public static SliderTick[] ComputeDiscreteData(this SliderInfo sliderInfo, double intervalMilliseconds)
+        public static SliderTick[] ComputeDiscreteData(this ExtendedSliderInfo sliderInfo, double intervalMilliseconds)
         {
             SliderTick[] ticks;
             switch (sliderInfo.SliderType)
@@ -95,7 +95,7 @@ namespace Coosu.Beatmap
 
         // todo: not cut by rhythm
         // todo: i forget math
-        private static SliderTick[] ComputePerfectDiscreteData(SliderInfo sliderInfo, double fixedInterval)
+        private static SliderTick[] ComputePerfectDiscreteData(ExtendedSliderInfo sliderInfo, double fixedInterval)
         {
             if (Math.Round(fixedInterval - sliderInfo.CurrentSingleDuration) >= 0)
             {
@@ -181,7 +181,7 @@ namespace Coosu.Beatmap
             return ticks.ToArray();
         }
 
-        private static SliderTick[] ComputeBezierDiscreteData(SliderInfo sliderInfo, double fixedInterval)
+        private static SliderTick[] ComputeBezierDiscreteData(ExtendedSliderInfo sliderInfo, double fixedInterval)
         {
             if (Math.Round(fixedInterval - sliderInfo.CurrentSingleDuration) >= 0)
             {

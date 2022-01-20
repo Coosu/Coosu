@@ -14,7 +14,7 @@ namespace Coosu.Beatmap.Sections
     [SectionProperty("HitObjects")]
     public sealed class HitObjectSection : Section
     {
-        private readonly List<TimingPoint> _timingPoints;
+        private readonly TimingSection _timingSection;
         private readonly DifficultySection _difficulty;
         private readonly SpanSplitArgs _e = new();
         public List<RawHitObject> HitObjectList { get; set; } = new();
@@ -24,12 +24,47 @@ namespace Coosu.Beatmap.Sections
 
         public HitObjectSection(OsuFile osuFile)
         {
-            _timingPoints = osuFile.TimingPoints.TimingList;
-            _timingPoints.Sort(new TimingPointComparer());
+            _timingSection = osuFile.TimingPoints;
             _difficulty = osuFile.Difficulty;
         }
 
         public RawHitObject this[int index] => HitObjectList[index];
+
+        public void ComputeSlidersByCurrentSettings()
+        {
+            _timingSection.TimingList.Sort(new TimingPointComparer());
+            HitObjectList.Sort(new HitObjectOffsetComparer());
+            foreach (var hitObject in HitObjectList)
+            {
+                if (hitObject.SliderInfo == null) continue;
+
+                TimingPoint? lastRedLine = _timingSection.TimingList
+                    .LastOrDefault(t => !t.IsInherit && t.Offset + 0.5 <= hitObject.Offset);
+
+                // hitobjects before red lines is allowed
+                lastRedLine ??= _timingSection.TimingList.First(t => !t.IsInherit);
+
+                // ReSharper disable once ReplaceWithSingleCallToLastOrDefault
+                TimingPoint? lastLine = _timingSection.TimingList
+                    .Where(t => t.Offset - 0.5 >= lastRedLine.Offset && t.Offset + 0.5 <= hitObject.Offset)
+                    //.OrderBy(k => k.Offset)
+                    //.ThenBy(k => k.Inherit) // 1 red + 1 green is allowed, and green has a higher priority.
+                    .LastOrDefault();
+                // hitobjects before red lines is allowed
+                lastLine ??= lastRedLine;
+
+                var extInfo = new ExtendedSliderInfo(hitObject.SliderInfo);
+
+                extInfo.SetVariables(
+                    lastRedLine?.Factor ?? 0,
+                    lastLine?.Multiple ?? 0,
+                    _difficulty.SliderMultiplier,
+                    _difficulty.SliderTickRate
+                );
+
+                hitObject.SliderInfo = extInfo;
+            }
+        }
 
         public override void Match(string line)
         {
@@ -101,7 +136,7 @@ namespace Coosu.Beatmap.Sections
         private void ToCircle(RawHitObject hitObject, ReadOnlySpan<char> others)
         {
             // extra
-            hitObject.Extras = others.ToString();
+            hitObject.SetExtras(others);
         }
 
         private void ToSlider(RawHitObject hitObject, ReadOnlySpan<char> others)
@@ -262,7 +297,7 @@ namespace Coosu.Beatmap.Sections
             // extra
             if (index == 5)
             {
-                hitObject.Extras = extraInfo.ToString();
+                hitObject.SetExtras(extraInfo);
             }
 
             hitObject.SliderInfo = new SliderInfo
@@ -278,27 +313,7 @@ namespace Coosu.Beatmap.Sections
                 SliderType = sliderType.SliderFlagToEnum()
             };
 
-            TimingPoint? lastRedLine = _timingPoints
-                .LastOrDefault(t => !t.IsInherit && t.Offset + 0.5 <= hitObject.Offset);
 
-            // hitobjects before red lines is allowed
-            lastRedLine ??= _timingPoints.First(t => !t.IsInherit);
-
-            // ReSharper disable once ReplaceWithSingleCallToLastOrDefault
-            TimingPoint? lastLine = _timingPoints
-                .Where(t => t.Offset - 0.5 >= lastRedLine.Offset && t.Offset + 0.5 <= hitObject.Offset)
-                //.OrderBy(k => k.Offset)
-                //.ThenBy(k => k.Inherit) // 1 red + 1 green is allowed, and green has a higher priority.
-                .LastOrDefault();
-            // hitobjects before red lines is allowed
-            lastLine ??= lastRedLine;
-
-            hitObject.SliderInfo.SetVariables(
-                lastRedLine?.Factor ?? 0,
-                lastLine?.Multiple ?? 0,
-                _difficulty.SliderMultiplier,
-                _difficulty.SliderTickRate
-            );
         }
 
         private void ToSpinner(RawHitObject hitObject, ReadOnlySpan<char> others)
@@ -310,7 +325,7 @@ namespace Coosu.Beatmap.Sections
             if (infos.Length > 1)
             {
                 var extra = infos[1];
-                hitObject.Extras = extra;
+                hitObject.SetExtras(extra.AsSpan());
             }
         }
 
@@ -322,7 +337,7 @@ namespace Coosu.Beatmap.Sections
             var holdEnd = s.Substring(0, index);
             var extra = s.Substring(index + 1);
             hitObject.HoldEnd = int.Parse(holdEnd);
-            hitObject.Extras = extra;
+            hitObject.SetExtras(extra.AsSpan());
         }
 
         public override void AppendSerializedString(TextWriter textWriter)

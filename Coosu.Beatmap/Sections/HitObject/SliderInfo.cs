@@ -6,20 +6,8 @@ using Coosu.Beatmap.Internal;
 
 namespace Coosu.Beatmap.Sections.HitObject
 {
-    public sealed class SliderInfo
+    public class SliderInfo
     {
-        internal void SetVariables(double lastRedFactor, double lastLineMultiple,
-            double diffSliderMultiplier, float diffTickRate)
-        {
-            CurrentBeatDuration = lastRedFactor;
-            CurrentSliderMultiplier = diffSliderMultiplier * lastLineMultiple;
-            CurrentTickRate = diffTickRate;
-
-            CurrentSingleDuration = PixelLength / (100 * CurrentSliderMultiplier) * lastRedFactor;
-            CurrentEndTime = (int)(StartTime + CurrentSingleDuration * Repeat);
-            CurrentDuration = CurrentEndTime - StartTime;
-        }
-
         public SliderType SliderType { get; set; }
         public IReadOnlyList<Vector2> ControlPoints { get; set; }
         public int Repeat { get; set; }
@@ -32,54 +20,6 @@ namespace Coosu.Beatmap.Sections.HitObject
         public Vector2 EndPoint => ControlPoints[ControlPoints.Count - 1];
 
         public int StartTime { get; set; }
-
-        /// <summary>
-        /// Get the slider's end time.
-        /// <para>
-        /// <b>Please Note this is a computed value that can't be updated after timing changes.</b>
-        /// </para>
-        /// </summary>
-        public int CurrentEndTime { get; internal set; }
-
-        /// <summary>
-        /// Get the first duration from slider's head to slider's tail.
-        /// <para>
-        /// <b>Please Note this is a computed value that can't be updated after timing changes.</b>
-        /// </para>
-        /// </summary>
-        public double CurrentSingleDuration { get; internal set; }
-
-        /// <summary>
-        /// Get the total duration
-        /// <para>
-        /// <b>Please Note this is a computed value that can't be updated after timing changes.</b>
-        /// </para>
-        /// </summary>
-        public double CurrentDuration { get; internal set; }
-
-        /// <summary>
-        /// Get current beat duration for this slider
-        /// <para>
-        /// <b>Please Note this is a computed value that can't be updated after timing changes.</b>
-        /// </para>
-        /// </summary>
-        public double CurrentBeatDuration { get; internal set; }
-
-        /// <summary>
-        /// Get current slider multiplier for this slider
-        /// <para>
-        /// <b>Please Note this is a computed value that can't be updated after timing changes.</b>
-        /// </para>
-        /// </summary>
-        public double CurrentSliderMultiplier { get; internal set; }
-
-        /// <summary>
-        /// Get current tick rate for this slider
-        /// <para>
-        /// <b>Please Note this is a computed value that can't be updated after timing changes.</b>
-        /// </para>
-        /// </summary>
-        public float CurrentTickRate { get; internal set; }
 
         public override string ToString()
         {

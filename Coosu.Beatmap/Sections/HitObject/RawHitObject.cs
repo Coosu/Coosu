@@ -2,20 +2,12 @@
 using System.IO;
 using Coosu.Beatmap.Configurable;
 using Coosu.Beatmap.Internal;
+using Coosu.Shared;
 
 namespace Coosu.Beatmap.Sections.HitObject
 {
     public sealed class RawHitObject : SerializeWritableObject
     {
-        private string? _extras = "0:0:0:0:";
-        private bool _extraInitial;
-        private bool _extraAnyUpdated;
-        private ObjectSamplesetType _sampleSet;
-        private ObjectSamplesetType _additionSet;
-        private ushort _customIndex;
-        private byte _sampleVolume;
-        private string _fileName;
-
         public int X { get; set; }
         public int Y { get; set; }
         public int Offset { get; set; }
@@ -51,123 +43,53 @@ namespace Coosu.Beatmap.Sections.HitObject
         public SliderInfo? SliderInfo { get; set; }
         public int HoldEnd { get; set; }
 
-        public string? Extras
+        public ObjectSamplesetType SampleSet { get; set; }
+
+        public ObjectSamplesetType AdditionSet { get; set; }
+
+        public ushort CustomIndex { get; set; }
+
+        public byte SampleVolume { get; set; }
+
+        public string FileName { get; set; }
+
+        internal void SetExtras(ReadOnlySpan<char> extraInfo)
         {
-            get => _extras;
-            set
+            int i = -1;
+            foreach (var span in extraInfo.SpanSplit(':'))
             {
-                _extras = value;
-                _extraInitial = false;
+                i++;
+                switch (i)
+                {
+#if NETCOREAPP3_1_OR_GREATER
+                    case 0: SampleSet = (ObjectSamplesetType)byte.Parse(span); break;
+                    case 1: AdditionSet = (ObjectSamplesetType)byte.Parse(span); break;
+                    case 2: CustomIndex = ushort.Parse(span); break;
+                    case 3: SampleVolume = byte.Parse(span); break;
+#else
+                    case 0: SampleSet = (ObjectSamplesetType)byte.Parse(span.ToString()); break;
+                    case 1: AdditionSet = (ObjectSamplesetType)byte.Parse(span.ToString()); break;
+                    case 2: CustomIndex = ushort.Parse(span.ToString()); break;
+                    case 3: SampleVolume = byte.Parse(span.ToString()); break;
+#endif
+                    case 4: FileName = span.ToString(); break;
+                }
             }
         }
-
-        #region Extras
-
-        public ObjectSamplesetType SampleSet
-        {
-            get
-            {
-                if (!_extraInitial) InitialExtra();
-                return _sampleSet;
-            }
-            set
-            {
-                _sampleSet = value;
-                _extraAnyUpdated = true;
-            }
-        }
-
-        public ObjectSamplesetType AdditionSet
-        {
-            get
-            {
-                if (!_extraInitial) InitialExtra();
-                return _additionSet;
-            }
-            set
-            {
-                _additionSet = value;
-                _extraAnyUpdated = true;
-            }
-        }
-
-        public ushort CustomIndex
-        {
-            get
-            {
-                if (!_extraInitial) InitialExtra();
-                return _customIndex;
-            }
-            set
-            {
-                _customIndex = value;
-                _extraAnyUpdated = true;
-            }
-        }
-
-        public byte SampleVolume
-        {
-            get
-            {
-                if (!_extraInitial) InitialExtra();
-                return _sampleVolume;
-            }
-            set
-            {
-                _sampleVolume = value;
-                _extraAnyUpdated = true;
-            }
-        }
-
-        public string FileName
-        {
-            get
-            {
-                if (!_extraInitial) InitialExtra();
-                return _fileName;
-            }
-            set
-            {
-                _fileName = value;
-                _extraAnyUpdated = true;
-            }
-        }
-
-        private void InitialExtra()
-        {
-            if (!string.IsNullOrWhiteSpace(Extras))
-            {
-                var arr = Extras.Split(new[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
-                if (arr.Length > 0) _sampleSet = arr[0].ParseToEnum<ObjectSamplesetType>();
-                if (arr.Length > 1) _additionSet = arr[1].ParseToEnum<ObjectSamplesetType>();
-                if (arr.Length > 2) _customIndex = ushort.Parse(arr[2]);
-                if (arr.Length > 3) _sampleVolume = byte.Parse(arr[3]);
-                if (arr.Length > 4) _fileName = arr[4];
-            }
-
-            _extraInitial = true;
-        }
-
-        #endregion
 
         public override string ToString()
         {
-            if (_extraAnyUpdated) Extras = $"{(int)_sampleSet}:{(int)_additionSet}:{_customIndex}:{_sampleVolume}:{_fileName}";
-            switch (ObjectType)
+            var extras = $"{(int)SampleSet}:{(int)AdditionSet}:{CustomIndex}:{SampleVolume}:{FileName}";
+            return ObjectType switch
             {
-                case HitObjectType.Circle:
-                    return $"{X},{Y},{Offset},{(int)RawType},{(int)Hitsound}{(Extras == null ? "" : "," + Extras)}";
-                case HitObjectType.Slider:
-                    return string.Format("{0},{1},{2},{3},{4},{5}{6}",
-                        X, Y, Offset, (int)RawType, (int)Hitsound, SliderInfo,
-                        Extras == null ? "" : "," + Extras);
-                case HitObjectType.Spinner:
-                    return $"{X},{Y},{Offset},{(int)RawType},{(int)Hitsound},{HoldEnd},{Extras ?? ""}";
-                case HitObjectType.Hold:
-                    return $"{X},{Y},{Offset},{(int)RawType},{(int)Hitsound},{HoldEnd}:{Extras ?? ""}";
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+                HitObjectType.Circle =>
+                    $"{X},{Y},{Offset},{(int)RawType},{(int)Hitsound}{(extras == null ? "" : "," + extras)}",
+                HitObjectType.Slider => string.Format("{0},{1},{2},{3},{4},{5}{6}", X, Y, Offset, (int)RawType,
+                    (int)Hitsound, SliderInfo, extras == null ? "" : "," + extras),
+                HitObjectType.Spinner => $"{X},{Y},{Offset},{(int)RawType},{(int)Hitsound},{HoldEnd},{extras ?? ""}",
+                HitObjectType.Hold => $"{X},{Y},{Offset},{(int)RawType},{(int)Hitsound},{HoldEnd}:{extras ?? ""}",
+                _ => throw new ArgumentOutOfRangeException()
+            };
         }
 
         public override void AppendSerializedString(TextWriter textWriter)
