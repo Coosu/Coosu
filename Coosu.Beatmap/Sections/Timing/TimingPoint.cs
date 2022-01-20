@@ -7,7 +7,7 @@ namespace Coosu.Beatmap.Sections.Timing
 {
     public sealed class TimingPoint : SerializeWritableObject
     {
-        private int _rhythm;
+        private byte _rhythm;
 
         public bool Positive { get; set; }
         public double Offset { get; set; }
@@ -35,7 +35,7 @@ namespace Coosu.Beatmap.Sections.Timing
             }
         }
 
-        public int Rhythm
+        public byte Rhythm
         {
             get => _rhythm;
             set
@@ -46,8 +46,8 @@ namespace Coosu.Beatmap.Sections.Timing
         } // 1/4, 2/4, 3/4, 4/4, etc ..
 
         public TimingSamplesetType TimingSampleset { get; set; }
-        public int Track { get; set; }
-        public int Volume { get; set; }
+        public ushort Track { get; set; }
+        public byte Volume { get; set; }
         public bool IsInherit { get; set; }
         public bool IsKiai { get; set; }
 

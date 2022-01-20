@@ -22,7 +22,7 @@ namespace Coosu.Beatmap.Sections
         {
             double offset = default;
             double factor = default;
-            int rhythm = default;
+            byte rhythm = default;
             var timingSampleset = TimingSamplesetType.None;
             ushort track = default;
             byte volume = default;
@@ -39,7 +39,7 @@ namespace Coosu.Beatmap.Sections
                 {
                     case 0: offset = double.Parse(span); break;
                     case 1: factor = double.Parse(span); break;
-                    case 2: rhythm = int.Parse(span); break;
+                    case 2: rhythm = byte.Parse(span); break;
                     case 3: timingSampleset = (TimingSamplesetType)(byte.Parse(span) - 1); break;
                     case 4: track = ushort.Parse(span); break;
                     case 5: volume = byte.Parse(span); break;
@@ -52,7 +52,7 @@ namespace Coosu.Beatmap.Sections
                 {
                     case 0: offset = double.Parse(span.ToString()); break;
                     case 1: factor = double.Parse(span.ToString()); break;
-                    case 2: rhythm = int.Parse(span.ToString()); break;
+                    case 2: rhythm = byte.Parse(span.ToString()); break;
                     case 3: timingSampleset = (TimingSamplesetType)(byte.Parse(span.ToString()) - 1); break;
                     case 4: track = ushort.Parse(span.ToString()); break;
                     case 5: volume = byte.Parse(span.ToString()); break;
