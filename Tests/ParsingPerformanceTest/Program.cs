@@ -25,13 +25,12 @@ namespace ParsingPerformanceTest
     {
         static void Main(string[] args)
         {
-            //var fi = new FileInfo(@"test.osu");
-            var fi = new FileInfo(@"F:\milkitic\Songs\1376486 Risshuu feat. Choko - Take\Risshuu feat. Choko - Take (yf_bmp) [Ta~ke take take take take take tatata~].osu");
+            var fi = new FileInfo(@"test.osu");
+            //var fi = new FileInfo(@"F:\milkitic\Songs\1376486 Risshuu feat. Choko - Take\Risshuu feat. Choko - Take (yf_bmp) [Ta~ke take take take take take tatata~].osu");
             if (!fi.Exists)
                 throw new FileNotFoundException("Test file does not exists: " + fi.FullName);
             Environment.SetEnvironmentVariable("test_osu_path", fi.FullName);
             var osu = LocalCoosuNs.Beatmap.OsuFile.ReadFromFileAsync(@"test.osu").Result;
-            osu.HitObjects.ComputeSlidersByCurrentSettings();
 
             //var arr = new bool[15000]
             //    .AsParallel()
@@ -73,7 +72,7 @@ namespace ParsingPerformanceTest
         }
     }
 
-    [SimpleJob(RuntimeMoniker.Net472)]
+    //[SimpleJob(RuntimeMoniker.Net472)]
     [SimpleJob(RuntimeMoniker.Net60)]
     [MemoryDiagnoser]
     [Orderer(SummaryOrderPolicy.FastestToSlowest)]
@@ -91,7 +90,6 @@ namespace ParsingPerformanceTest
         public async Task<object?> LocalCoosu()
         {
             var osu = await LocalCoosuNs.Beatmap.OsuFile.ReadFromFileAsync(_path);
-            osu.HitObjects.ComputeSlidersByCurrentSettings();
             return osu;
         }
 

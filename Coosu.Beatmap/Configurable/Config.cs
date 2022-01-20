@@ -4,6 +4,10 @@
     {
         public abstract void HandleCustom(string line);
 
+        public virtual void OnDeserialized()
+        {
+        }
+
         public ReadOptions Options { get; set; }
     }
 }

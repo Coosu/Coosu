@@ -21,7 +21,7 @@ namespace Coosu.Beatmap
         public ColorSection Colours { get; set; }
         public HitObjectSection HitObjects { get; set; }
 
-        public static async Task<LocalOsuFile> ReadFromFileAsync(string path, Action<ReadOptions> readOptionFactory = null)
+        public static async Task<LocalOsuFile> ReadFromFileAsync(string path, Action<ReadOptions>? readOptionFactory = null)
         {
 #if NETFRAMEWORK
             var targetPath = System.IO.Path.IsPathRooted(path)
@@ -55,6 +55,11 @@ namespace Coosu.Beatmap
                     TimingPoints?.ToSerializedString(),
                     Colours?.ToSerializedString(),
                     HitObjects?.ToSerializedString()));
+        }
+
+        public override void OnDeserialized()
+        {
+            this.HitObjects.ComputeSlidersByCurrentSettings();
         }
 
         public override void HandleCustom(string line)

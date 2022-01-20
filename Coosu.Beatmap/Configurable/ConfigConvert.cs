@@ -96,6 +96,7 @@ namespace Coosu.Beatmap.Configurable
                 currentLine = reader.ReadLine();
             }
 
+            config.OnDeserialized();
             return config;
         }
 
