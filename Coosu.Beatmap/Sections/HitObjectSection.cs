@@ -106,23 +106,67 @@ namespace Coosu.Beatmap.Sections
 
         private void ToSlider(RawHitObject hitObject, ReadOnlySpan<char> others)
         {
-            var infos = others.ToString().Split(',');
+            ReadOnlySpan<char> curveInfo = default;
+            int repeat = default;
+            double pixelLength = default;
+            ReadOnlySpan<char> edgeHitsoundInfo = default;
+            ReadOnlySpan<char> sampleAdditionInfo = default;
+            ReadOnlySpan<char> extraInfo = default;
 
-            // extra
-            string notSureExtra = infos[infos.Length - 1];
-            bool supportExtra = notSureExtra.IndexOf(":", StringComparison.Ordinal) != -1;
-            hitObject.Extras = supportExtra ? notSureExtra : null;
+            int index = -1;
+            foreach (var infoSpan in others.SpanSplit(','))
+            {
+                index++;
+                switch (index)
+                {
+                    case 0:
+                        curveInfo = infoSpan;
+                        break;
+                    case 1:
+                        // repeat
+#if NETCOREAPP3_1_OR_GREATER
+                        repeat = int.Parse(infoSpan);
+#else
+                        repeat = int.Parse(infoSpan.ToString());
+#endif
+                        break;
+                    case 2:
+                        // length
+#if NETCOREAPP3_1_OR_GREATER
+                        pixelLength = double.Parse(infoSpan);
+#else
+                        pixelLength = double.Parse(infoSpan.ToString());
+#endif
+                        break;
+                    case 3:
+                        edgeHitsoundInfo = infoSpan;
+                        break;
+                    case 4:
+                        sampleAdditionInfo = infoSpan;
+                        break;
+                    case 5:
+                        extraInfo = infoSpan;
+                        break;
+                }
+            }
 
             // slider curve
-            var curveInfo = infos[0];
-            var sliderType = curveInfo[0];
+            char sliderType = default;
+            var points = curveInfo.Length > 100
+                ? curveInfo.Length > 200
+                    ? new List<Vector2>(50)
+                    : new List<Vector2>(30)
+                : new List<Vector2>();
 
-            var points = curveInfo.Length > 100 ? new List<Vector2>(50) : new List<Vector2>();
             int j = -1;
             foreach (var point in curveInfo.SpanSplit('|'))
             {
                 j++;
-                if (j < 1) continue; // curvePoints skip 1
+                if (j < 1)
+                {
+                    sliderType = point[0];
+                    continue; // curvePoints skip 1
+                }
 
                 int i = 0;
                 int x = 0;
@@ -150,17 +194,11 @@ namespace Coosu.Beatmap.Sections
                 }
             }
 
-            // repeat
-            int repeat = int.Parse(infos[1]);
-
-            // length
-            var pixelLength = double.Parse(infos[2]);
-
             // edge hitsounds
             HitsoundType[]? edgeHitsounds;
             ObjectSamplesetType[]? edgeSamples;
             ObjectSamplesetType[]? edgeAdditions;
-            if (infos.Length <= 3)
+            if (index < 3)
             {
                 edgeHitsounds = null;
                 edgeSamples = null;
@@ -170,7 +208,7 @@ namespace Coosu.Beatmap.Sections
             {
                 edgeHitsounds = new HitsoundType[repeat + 1];
                 int g = -1;
-                foreach (var span in infos[3].SpanSplit('|'))
+                foreach (var span in edgeHitsoundInfo.SpanSplit('|'))
                 {
                     g++;
 #if NETCOREAPP3_1_OR_GREATER
@@ -180,12 +218,12 @@ namespace Coosu.Beatmap.Sections
 #endif
                 }
 
-                if (infos.Length > 4)
+                if (index >= 4)
                 {
                     edgeSamples = new ObjectSamplesetType[edgeHitsounds.Length];
                     edgeAdditions = new ObjectSamplesetType[edgeHitsounds.Length];
                     int i = -1;
-                    foreach (var span in infos[4].SpanSplit('|'))
+                    foreach (var span in sampleAdditionInfo.SpanSplit('|'))
                     {
                         i++;
                         int k = -1;
@@ -221,6 +259,25 @@ namespace Coosu.Beatmap.Sections
                 }
             }
 
+            // extra
+            if (index == 5)
+            {
+                hitObject.Extras = extraInfo.ToString();
+            }
+
+            hitObject.SliderInfo = new SliderInfo
+            {
+                StartPoint = new Vector2(hitObject.X, hitObject.Y),
+                StartTime = hitObject.Offset,
+                PixelLength = pixelLength,
+                ControlPoints = points,
+                EdgeAdditions = edgeAdditions,
+                EdgeHitsounds = edgeHitsounds,
+                EdgeSamples = edgeSamples,
+                Repeat = repeat,
+                SliderType = sliderType.SliderFlagToEnum()
+            };
+
             TimingPoint? lastRedLine = _timingPoints
                 .LastOrDefault(t => !t.IsInherit && t.Offset + 0.5 <= hitObject.Offset);
 
@@ -236,19 +293,10 @@ namespace Coosu.Beatmap.Sections
             // hitobjects before red lines is allowed
             lastLine ??= lastRedLine;
 
-            hitObject.SliderInfo = new SliderInfo(new Vector2(hitObject.X, hitObject.Y),
-                hitObject.Offset,
+            hitObject.SliderInfo.SetVariables(
                 lastRedLine?.Factor ?? 0,
                 _difficulty.SliderMultiplier * (lastLine?.Multiple ?? 0),
-                _difficulty.SliderTickRate, pixelLength)
-            {
-                ControlPoints = points,
-                EdgeAdditions = edgeAdditions,
-                EdgeHitsounds = edgeHitsounds,
-                EdgeSamples = edgeSamples,
-                Repeat = repeat,
-                SliderType = sliderType.SliderFlagToEnum()
-            };
+                _difficulty.SliderTickRate);
         }
 
         private void ToSpinner(RawHitObject hitObject, ReadOnlySpan<char> others)
