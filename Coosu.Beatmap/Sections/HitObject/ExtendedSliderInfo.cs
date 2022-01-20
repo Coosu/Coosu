@@ -2,6 +2,11 @@
 {
     public sealed class ExtendedSliderInfo : SliderInfo
     {
+        public ExtendedSliderInfo()
+        {
+
+        }
+
         public ExtendedSliderInfo(SliderInfo sliderInfo)
         {
             SliderType = sliderInfo.SliderType;
@@ -18,7 +23,7 @@
         /// <summary>
         /// Get the slider's end time.
         /// <para>
-        /// <b>Please Note this is a computed value that can't be updated after timing changes.</b>
+        /// <b>Note: </b>This is a computed value that can't be updated after timing changes until calling <see cref="UpdateComputedValues"/>
         /// </para>
         /// </summary>
         public int CurrentEndTime { get; private set; }
@@ -26,7 +31,7 @@
         /// <summary>
         /// Get the first duration from slider's head to slider's tail.
         /// <para>
-        /// <b>Please Note this is a computed value that can't be updated after timing changes.</b>
+        /// <b>Note: </b>This is a computed value that can't be updated after timing changes until calling <see cref="UpdateComputedValues"/>
         /// </para>
         /// </summary>
         public double CurrentSingleDuration { get; private set; }
@@ -34,7 +39,7 @@
         /// <summary>
         /// Get the total duration
         /// <para>
-        /// <b>Please Note this is a computed value that can't be updated after timing changes.</b>
+        /// <b>Note: </b>This is a computed value that can't be updated after timing changes until calling <see cref="UpdateComputedValues"/>
         /// </para>
         /// </summary>
         public double CurrentDuration { get; private set; }
@@ -42,7 +47,7 @@
         /// <summary>
         /// Get current beat duration for this slider
         /// <para>
-        /// <b>Please Note this is a computed value that can't be updated after timing changes.</b>
+        /// <b>Note: </b>This is a computed value that can't be updated after timing changes until calling <see cref="UpdateComputedValues"/>
         /// </para>
         /// </summary>
         public double CurrentBeatDuration { get; private set; }
@@ -50,7 +55,7 @@
         /// <summary>
         /// Get current slider multiplier for this slider
         /// <para>
-        /// <b>Please Note this is a computed value that can't be updated after timing changes.</b>
+        /// <b>Note: </b>This is a computed value that can't be updated after timing changes until calling <see cref="UpdateComputedValues"/>
         /// </para>
         /// </summary>
         public double CurrentSliderMultiplier { get; private set; }
@@ -58,12 +63,12 @@
         /// <summary>
         /// Get current tick rate for this slider
         /// <para>
-        /// <b>Please Note this is a computed value that can't be updated after timing changes.</b>
+        /// <b>Note: </b>This is a computed value that can't be updated after timing changes until calling <see cref="UpdateComputedValues"/>
         /// </para>
         /// </summary>
         public float CurrentTickRate { get; private set; }
 
-        public void SetVariables(double lastRedFactor, double lastLineMultiple,
+        public void UpdateComputedValues(double lastRedFactor, double lastLineMultiple,
             double diffSliderMultiplier, float diffTickRate)
         {
             CurrentBeatDuration = lastRedFactor;

@@ -34,38 +34,50 @@ namespace Coosu.Beatmap.Sections
         {
             _timingSection.TimingList.Sort(new TimingPointComparer());
             HitObjectList.Sort(new HitObjectOffsetComparer());
-            foreach (var hitObject in HitObjectList)
+
+            var currentIndex = 0;
+            double? nextTiming = default;
+            TimingPoint? currentLine = default;
+            TimingPoint? currentRedLine = default;
+            UpdateTiming(ref currentIndex, ref nextTiming, ref currentLine, ref currentRedLine, true);
+
+            for (var i = 0; i < HitObjectList.Count; i++)
             {
+                var hitObject = HitObjectList[i];
                 if (hitObject.SliderInfo == null) continue;
 
-                TimingPoint? lastRedLine = _timingSection.TimingList
-                    .LastOrDefault(t => !t.IsInherit && t.Offset + 0.5 <= hitObject.Offset);
+                while (nextTiming != null && hitObject.Offset + 0.5 >= nextTiming)
+                {
+                    UpdateTiming(ref currentIndex, ref nextTiming, ref currentLine, ref currentRedLine);
+                }
 
-                // hitobjects before red lines is allowed
-                lastRedLine ??= _timingSection.TimingList.First(t => !t.IsInherit);
-
-                // ReSharper disable once ReplaceWithSingleCallToLastOrDefault
-                TimingPoint? lastLine = _timingSection.TimingList
-                    .Where(t => t.Offset - 0.5 >= lastRedLine.Offset && t.Offset + 0.5 <= hitObject.Offset)
-                    //.OrderBy(k => k.Offset)
-                    //.ThenBy(k => k.Inherit) // 1 red + 1 green is allowed, and green has a higher priority.
-                    .LastOrDefault();
-                // hitobjects before red lines is allowed
-                lastLine ??= lastRedLine;
-
-                var extInfo = new ExtendedSliderInfo(hitObject.SliderInfo);
-
-                extInfo.SetVariables(
-                    lastRedLine?.Factor ?? 0,
-                    lastLine?.Multiple ?? 0,
+                hitObject.SliderInfo.UpdateComputedValues(
+                    currentRedLine?.Factor ?? 0,
+                    currentLine?.Multiple ?? 0,
                     _difficulty.SliderMultiplier,
                     _difficulty.SliderTickRate
                 );
+            }
 
-                hitObject.SliderInfo = extInfo;
+            void UpdateTiming(ref int i, ref double? nextT, ref TimingPoint? current, ref TimingPoint? currentRed,
+                bool isInitial = false)
+            {
+                if (_timingSection.TimingList.Count == 0) return;
+
+                current = _timingSection.TimingList[i];
+                if (!current.IsInherit)
+                    currentRed = current;
+                else if (isInitial)
+                    currentRed = _timingSection.TimingList.First(t => !t.IsInherit);
+
+                if (_timingSection.TimingList.Count > i)
+                    nextT = _timingSection.TimingList[i + 1].Offset;
+                else
+                    nextT = null;
+                i++;
             }
         }
-
+        
         public override void Match(string line)
         {
             int x = default;
@@ -300,7 +312,7 @@ namespace Coosu.Beatmap.Sections
                 hitObject.SetExtras(extraInfo);
             }
 
-            hitObject.SliderInfo = new SliderInfo
+            hitObject.SliderInfo = new ExtendedSliderInfo
             {
                 StartPoint = new Vector2(hitObject.X, hitObject.Y),
                 StartTime = hitObject.Offset,
@@ -312,8 +324,6 @@ namespace Coosu.Beatmap.Sections
                 Repeat = repeat,
                 SliderType = sliderType.SliderFlagToEnum()
             };
-
-
         }
 
         private void ToSpinner(RawHitObject hitObject, ReadOnlySpan<char> others)

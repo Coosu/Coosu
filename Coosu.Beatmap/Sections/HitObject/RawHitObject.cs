@@ -40,7 +40,7 @@ namespace Coosu.Beatmap.Sections.HitObject
             }
         }
         public HitsoundType Hitsound { get; set; }
-        public SliderInfo? SliderInfo { get; set; }
+        public ExtendedSliderInfo? SliderInfo { get; set; }
         public int HoldEnd { get; set; }
 
         public ObjectSamplesetType SampleSet { get; set; }
