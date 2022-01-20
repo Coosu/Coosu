@@ -45,7 +45,6 @@ namespace Coosu.Beatmap.Sections
         [SectionProperty("SkinPreference")]
         public string SkinPreference { get; set; }
 
-        protected override string KeyValueFlag => ":";
         protected override bool TrimPairs => true;
     }
 }

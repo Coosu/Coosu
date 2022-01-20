@@ -42,7 +42,8 @@ namespace Coosu.Beatmap.Sections
                 sb.Append(_splitter);
             }
 
-            sb.Remove(sb.Length - 1, 1);
+            if (sb.Length > 0)
+                sb.Remove(sb.Length - 1, 1);
             return sb.ToString();
         }
     }
@@ -81,7 +82,8 @@ namespace Coosu.Beatmap.Sections
                 sb.Append(_splitter);
             }
 
-            sb.Remove(sb.Length - 1, 1);
+            if (sb.Length > 0)
+                sb.Remove(sb.Length - 1, 1);
             return sb.ToString();
         }
     }
@@ -116,7 +118,8 @@ namespace Coosu.Beatmap.Sections
                 sb.Append(_splitter);
             }
 
-            sb.Remove(sb.Length - 1, 1);
+            if (sb.Length > 0)
+                sb.Remove(sb.Length - 1, 1);
             return sb.ToString();
         }
     }

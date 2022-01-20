@@ -49,9 +49,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TextWpfTest", "Tests\TextWp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RoslynTest", "Tests\RoslynTest\RoslynTest.csproj", "{FB0F0960-A3BB-4C26-8B15-0B9147C61EDE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SplitBenchmark", "Tests\SplitBenchmark\SplitBenchmark.csproj", "{80DD684E-D051-4F74-B25C-9E9B94FD1ECC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SplitBenchmark", "Tests\SplitBenchmark\SplitBenchmark.csproj", "{80DD684E-D051-4F74-B25C-9E9B94FD1ECC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnalyzeTypeBenchmark", "Tests\AnalyzeTypeBenchmark\AnalyzeTypeBenchmark.csproj", "{4EE4E8F1-1048-4C07-B97E-C5ED56E81540}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnalyzeTypeBenchmark", "Tests\AnalyzeTypeBenchmark\AnalyzeTypeBenchmark.csproj", "{4EE4E8F1-1048-4C07-B97E-C5ED56E81540}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WritingOsuBenchmark", "Tests\WritingOsuBenchmark\WritingOsuBenchmark.csproj", "{92480BB3-24A2-478B-B386-84816CB5C4ED}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -186,6 +188,12 @@ Global
 		{4EE4E8F1-1048-4C07-B97E-C5ED56E81540}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4EE4E8F1-1048-4C07-B97E-C5ED56E81540}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4EE4E8F1-1048-4C07-B97E-C5ED56E81540}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92480BB3-24A2-478B-B386-84816CB5C4ED}.Build|Any CPU.ActiveCfg = Debug|Any CPU
+		{92480BB3-24A2-478B-B386-84816CB5C4ED}.Build|Any CPU.Build.0 = Debug|Any CPU
+		{92480BB3-24A2-478B-B386-84816CB5C4ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92480BB3-24A2-478B-B386-84816CB5C4ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92480BB3-24A2-478B-B386-84816CB5C4ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92480BB3-24A2-478B-B386-84816CB5C4ED}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -205,6 +213,7 @@ Global
 		{FB0F0960-A3BB-4C26-8B15-0B9147C61EDE} = {020FD699-A91C-4AD7-9AC7-FC69BD65D51E}
 		{80DD684E-D051-4F74-B25C-9E9B94FD1ECC} = {020FD699-A91C-4AD7-9AC7-FC69BD65D51E}
 		{4EE4E8F1-1048-4C07-B97E-C5ED56E81540} = {020FD699-A91C-4AD7-9AC7-FC69BD65D51E}
+		{92480BB3-24A2-478B-B386-84816CB5C4ED} = {020FD699-A91C-4AD7-9AC7-FC69BD65D51E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1E82D4BA-E134-4C4A-A48B-F02A601C59CF}

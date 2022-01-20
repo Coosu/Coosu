@@ -25,6 +25,7 @@ namespace Coosu.Beatmap.Sections.Event
             textWriter.Write($"\"{Filename}\",");
             textWriter.Write($"{X.ToString(CultureInfo.InvariantCulture)},");
             textWriter.Write(Y.ToString(CultureInfo.InvariantCulture));
+            textWriter.WriteLine();
         }
     }
 }

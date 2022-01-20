@@ -32,7 +32,9 @@ namespace ParsingPerformanceTest
                 throw new FileNotFoundException("Test file does not exists: " + fi.FullName);
             Environment.SetEnvironmentVariable("test_osu_path", fi.FullName);
             var osu = LocalCoosuNs.Beatmap.OsuFile.ReadFromFileAsync(@"test.osu").Result;
-
+            osu.WriteOsuFile("new.osu");
+            var osu2 = NugetCoosuNs.Beatmap.OsuFile.ReadFromFileAsync(@"test.osu").Result;
+            osu2.WriteOsuFile("old.osu");
             //var arr = new bool[15000]
             //    .AsParallel()
             //    .WithDegreeOfParallelism(Environment.ProcessorCount)
@@ -72,7 +74,7 @@ namespace ParsingPerformanceTest
             var summary = BenchmarkRunner.Run<ReadingTask>(/*config*/);
         }
     }
-    
+
     [SimpleJob(RuntimeMoniker.Net48)]
     [SimpleJob(RuntimeMoniker.NetCoreApp31)]
     [SimpleJob(RuntimeMoniker.Net60)]
@@ -103,7 +105,7 @@ namespace ParsingPerformanceTest
             var osu = BeatmapDecoder.Decode(_path);
             return osu;
         }
-        
+
         [Benchmark]
         public async Task<object?> CoosuV2_1_0_Beatmap()
         {

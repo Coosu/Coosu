@@ -16,6 +16,7 @@ namespace Coosu.Beatmap.Sections.Event
             textWriter.Write($"Video,");
             textWriter.Write($"{Offset.ToIcString()},");
             textWriter.Write($"\"{Filename}\"");
+            textWriter.WriteLine();
         }
     }
 }

@@ -54,7 +54,7 @@ namespace Coosu.Beatmap.Sections.HitObject
 
         public byte SampleVolume { get; set; }
 
-        public string FileName { get; set; }
+        public string? FileName { get; set; }
 
         internal void SetExtras(ReadOnlySpan<char> extraInfo)
         {
@@ -75,7 +75,7 @@ namespace Coosu.Beatmap.Sections.HitObject
                     case 2: CustomIndex = ushort.Parse(span.ToString()); break;
                     case 3: SampleVolume = byte.Parse(span.ToString()); break;
 #endif
-                    case 4: FileName = span.ToString(); break;
+                    case 4: FileName = span.Trim().ToString(); break;
                 }
             }
         }
@@ -86,11 +86,11 @@ namespace Coosu.Beatmap.Sections.HitObject
             return ObjectType switch
             {
                 HitObjectType.Circle =>
-                    $"{X},{Y},{Offset},{(int)RawType},{(int)Hitsound}{(extras == null ? "" : "," + extras)}",
-                HitObjectType.Slider => string.Format("{0},{1},{2},{3},{4},{5}{6}", X, Y, Offset, (int)RawType,
-                    (int)Hitsound, SliderInfo, extras == null ? "" : "," + extras),
-                HitObjectType.Spinner => $"{X},{Y},{Offset},{(int)RawType},{(int)Hitsound},{HoldEnd},{extras ?? ""}",
-                HitObjectType.Hold => $"{X},{Y},{Offset},{(int)RawType},{(int)Hitsound},{HoldEnd}:{extras ?? ""}",
+                    $"{X},{Y},{Offset},{(int)RawType},{(int)Hitsound},{extras}",
+                HitObjectType.Slider => string.Format("{0},{1},{2},{3},{4},{5},{6}", X, Y, Offset, (int)RawType,
+                    (int)Hitsound, SliderInfo, extras),
+                HitObjectType.Spinner => $"{X},{Y},{Offset},{(int)RawType},{(int)Hitsound},{HoldEnd},{extras}",
+                HitObjectType.Hold => $"{X},{Y},{Offset},{(int)RawType},{(int)Hitsound},{HoldEnd}:{extras}",
                 _ => throw new ArgumentOutOfRangeException()
             };
         }

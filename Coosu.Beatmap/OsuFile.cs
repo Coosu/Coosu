@@ -51,7 +51,7 @@ namespace Coosu.Beatmap
         public void WriteOsuFile(string path, string newDiffName = null)
         {
             File.WriteAllText(path,
-                string.Format("osu file format v{0}\r\n\r\n{1}{2}{3}{4}{5}{6}{7}{8}", Version,
+                string.Format("osu file format v{0}\r\n\r\n{1}\r\n{2}\r\n{3}\r\n{4}\r\n{5}\r\n{6}\r\n\r\n{7}\r\n{8}", Version,
                     General?.ToSerializedString(),
                     Editor?.ToSerializedString(),
                     Metadata?.ToSerializedString(newDiffName),
