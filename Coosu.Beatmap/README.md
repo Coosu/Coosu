@@ -33,19 +33,19 @@ Intel Core i7-4770K CPU 3.50GHz (Haswell), 1 CPU, 8 logical and 4 physical cores
   .NET Framework 4.8   : .NET Framework 4.8 (4.8.4420.0), X64 RyuJIT
 
 ```
-|              Method |                  Job |              Runtime |      Mean |     Error |    StdDev | Ratio | RatioSD |     Gen 0 |    Gen 1 |    Gen 2 | Allocated |
-|-------------------- |--------------------- |--------------------- |----------:|----------:|----------:|------:|--------:|----------:|---------:|---------:|----------:|
-| CoosuLatest_Beatmap |             .NET 6.0 |             .NET 6.0 |  4.551 ms | 0.0893 ms | 0.0955 ms |  1.00 |    0.00 |  148.4375 |  70.3125 |        - |    907 KB |
-|  OsuParsers_Beatmap |             .NET 6.0 |             .NET 6.0 |  8.350 ms | 0.1603 ms | 0.1908 ms |  1.84 |    0.05 |  718.7500 | 281.2500 |  93.7500 |  4,367 KB |
-| CoosuV2_1_0_Beatmap |             .NET 6.0 |             .NET 6.0 | 16.586 ms | 0.1052 ms | 0.0984 ms |  3.63 |    0.08 | 1625.0000 | 187.5000 |  62.5000 |  8,489 KB |
-|                     |                      |                      |           |           |           |       |         |           |          |          |           |
-| CoosuLatest_Beatmap |        .NET Core 3.1 |        .NET Core 3.1 |  3.246 ms | 0.0573 ms | 0.0765 ms |  1.00 |    0.00 |  164.0625 |  82.0313 |        - |    985 KB |
-|  OsuParsers_Beatmap |        .NET Core 3.1 |        .NET Core 3.1 |  7.336 ms | 0.0663 ms | 0.0620 ms |  2.26 |    0.07 |  718.7500 | 281.2500 | 125.0000 |  4,367 KB |
-| CoosuV2_1_0_Beatmap |        .NET Core 3.1 |        .NET Core 3.1 | 16.060 ms | 0.1539 ms | 0.1285 ms |  4.97 |    0.13 | 1718.7500 | 187.5000 |  62.5000 |  8,739 KB |
-|                     |                      |                      |           |           |           |       |         |           |          |          |           |
-| CoosuLatest_Beatmap |   .NET Framework 4.8 |   .NET Framework 4.8 |  8.161 ms | 0.1049 ms | 0.0981 ms |  1.00 |    0.00 |  468.7500 | 203.1250 |  31.2500 |  2,191 KB |
-| CoosuV2_1_0_Beatmap |   .NET Framework 4.8 |   .NET Framework 4.8 | 30.774 ms | 0.3718 ms | 0.3296 ms |  3.77 |    0.05 | 2937.5000 | 187.5000 |  62.5000 | 14,428 KB |
-|  OsuParsers_Beatmap |   .NET Framework 4.8 |   .NET Framework 4.8 | 72.315 ms | 0.7524 ms | 0.6670 ms |  8.85 |    0.12 | 1571.4286 | 285.7143 |        - |  9,562 KB |
+|              Method |              Runtime |      Mean |     Error |    StdDev |     Gen 0 |    Gen 1 |    Gen 2 | Allocated |
+|-------------------- |--------------------- |----------:|----------:|----------:|----------:|---------:|---------:|----------:|
+| CoosuLatest |             .NET 6.0 |  4.551 ms | 0.0893 ms | 0.0955 ms |  148.4375 |  70.3125 |        - |    907 KB |
+|  OsuParsers |             .NET 6.0 |  8.350 ms | 0.1603 ms | 0.1908 ms |  718.7500 | 281.2500 |  93.7500 |  4,367 KB |
+| CoosuV2_1_0 |             .NET 6.0 | 16.586 ms | 0.1052 ms | 0.0984 ms | 1625.0000 | 187.5000 |  62.5000 |  8,489 KB |
+|             |                      |           |           |           |           |          |          |           |
+| CoosuLatest |        .NET Core 3.1 |  3.246 ms | 0.0573 ms | 0.0765 ms |  164.0625 |  82.0313 |        - |    985 KB |
+|  OsuParsers |        .NET Core 3.1 |  7.336 ms | 0.0663 ms | 0.0620 ms |  718.7500 | 281.2500 | 125.0000 |  4,367 KB |
+| CoosuV2_1_0 |        .NET Core 3.1 | 16.060 ms | 0.1539 ms | 0.1285 ms | 1718.7500 | 187.5000 |  62.5000 |  8,739 KB |
+|             |                      |           |           |           |           |          |          |           |
+| CoosuLatest |   .NET Framework 4.8 |  8.161 ms | 0.1049 ms | 0.0981 ms |  468.7500 | 203.1250 |  31.2500 |  2,191 KB |
+| CoosuV2_1_0 |   .NET Framework 4.8 | 30.774 ms | 0.3718 ms | 0.3296 ms | 2937.5000 | 187.5000 |  62.5000 | 14,428 KB |
+|  OsuParsers |   .NET Framework 4.8 | 72.315 ms | 0.7524 ms | 0.6670 ms | 1571.4286 | 285.7143 |        - |  9,562 KB |
 
 
 ## Using Coosu.Beatmap in your project
