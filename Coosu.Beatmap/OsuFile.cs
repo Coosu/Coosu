@@ -21,7 +21,7 @@ namespace Coosu.Beatmap
         public ColorSection Colours { get; set; }
         public HitObjectSection HitObjects { get; set; }
 
-        public static async Task<LocalOsuFile> ReadFromFileAsync(string path, Action<ReadOptions>? readOptionFactory = null)
+        public static async Task<LocalOsuFile> ReadFromFileAsync(string path, Action<OsuReadOptions>? readOptionFactory = null)
         {
 #if NETFRAMEWORK && NET462_OR_GREATER
             var targetPath = System.IO.Path.IsPathRooted(path)
@@ -32,9 +32,14 @@ namespace Coosu.Beatmap
 #else
             var targetPath = path;
 #endif
-            using var sr = new StreamReader(targetPath);
+            var options = new OsuReadOptions();
+            readOptionFactory?.Invoke(options);
             var localOsuFile = await Task
-                .Run(() => ConfigConvert.DeserializeObject<LocalOsuFile>(sr, readOptionFactory))
+                .Run(() =>
+                {
+                    using var sr = new StreamReader(targetPath);
+                    return ConfigConvert.DeserializeObject<LocalOsuFile>(sr, options);
+                })
                 .ConfigureAwait(false);
             localOsuFile.OriginPath = targetPath;
             return localOsuFile;
@@ -59,7 +64,8 @@ namespace Coosu.Beatmap
 
         public override void OnDeserialized()
         {
-            this.HitObjects.ComputeSlidersByCurrentSettings();
+            if (((OsuReadOptions)Options).AutoCompute)
+                this.HitObjects.ComputeSlidersByCurrentSettings();
         }
 
         public override void HandleCustom(string line)

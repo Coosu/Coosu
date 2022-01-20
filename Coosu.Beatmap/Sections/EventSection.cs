@@ -20,11 +20,11 @@ namespace Coosu.Beatmap.Sections
         private readonly StringBuilder _sbInfo = new();
         private readonly Dictionary<string, StringBuilder> _unknownSection = new();
         private string? _currentSection;
-        private readonly ReadOptions _options;
+        private readonly OsuReadOptions _options;
 
         public EventSection(Config osuFile)
         {
-            _options = osuFile.Options;
+            _options = (OsuReadOptions)osuFile.Options;
         }
 
         public BackgroundData? BackgroundInfo { get; set; }

@@ -72,8 +72,7 @@ namespace ParsingPerformanceTest
             var summary = BenchmarkRunner.Run<ReadingTask>(/*config*/);
         }
     }
-
-    [SimpleJob(RuntimeMoniker.Net461)]
+    
     [SimpleJob(RuntimeMoniker.Net48)]
     [SimpleJob(RuntimeMoniker.NetCoreApp31)]
     [SimpleJob(RuntimeMoniker.Net60)]

@@ -10,21 +10,21 @@ namespace Coosu.Beatmap.Configurable
         private static readonly Type SectionType = typeof(Section);
         private static readonly Type ConfigType = typeof(Config);
 
-        public static T DeserializeObject<T>(string value) where T : Config
+        public static T DeserializeObject<T>(string value, ReadOptions options) where T : Config
         {
             using var sw = new StringReader(value);
-            return DeserializeObject<T>(sw);
+            return DeserializeObject<T>(sw, options);
         }
 
-        public static T DeserializeObject<T>(TextReader reader,
-            Action<ReadOptions>? configureReadOptions = null) where T : Config
+        public static T DeserializeObject<T>(TextReader reader, ReadOptions options) where T : Config
         {
+            if (options == null) throw new ArgumentNullException(nameof(options));
             var reflectInfos = GetSectionsOfType<T>();
             var configType = typeof(T);
             var config = (T)Activator.CreateInstance(configType, true)!;
 
-            var options = new ReadOptions();
-            configureReadOptions?.Invoke(options);
+            //var options = new ReadOptions();
+            //configureReadOptions?.Invoke(options);
             config.Options = options;
 
             if (reflectInfos == null)
