@@ -16,6 +16,7 @@ using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Running;
+using OsuParsers.Decoders;
 using LocalCoosuNs = localbuild::Coosu;
 using NugetCoosuNs = Coosu;
 
@@ -72,10 +73,13 @@ namespace ParsingPerformanceTest
         }
     }
 
-    //[SimpleJob(RuntimeMoniker.Net472)]
+    [SimpleJob(RuntimeMoniker.Net461)]
+    [SimpleJob(RuntimeMoniker.Net48)]
+    [SimpleJob(RuntimeMoniker.NetCoreApp31)]
     [SimpleJob(RuntimeMoniker.Net60)]
     [MemoryDiagnoser]
     [Orderer(SummaryOrderPolicy.FastestToSlowest)]
+    [MarkdownExporter]
     public class ReadingTask
     {
         private readonly string _path;
@@ -84,17 +88,25 @@ namespace ParsingPerformanceTest
         {
             var path = Environment.GetEnvironmentVariable("test_osu_path");
             _path = path;
+            Console.WriteLine(_path);
         }
 
-        [Benchmark(/*Baseline = true*/)]
-        public async Task<object?> LocalCoosu()
+        [Benchmark(Baseline = true)]
+        public async Task<object?> CoosuLatest_Beatmap()
         {
             var osu = await LocalCoosuNs.Beatmap.OsuFile.ReadFromFileAsync(_path);
             return osu;
         }
 
         [Benchmark]
-        public async Task<object?> NugetCoosu()
+        public async Task<object?> OsuParsers_Beatmap()
+        {
+            var osu = BeatmapDecoder.Decode(_path);
+            return osu;
+        }
+        
+        [Benchmark]
+        public async Task<object?> CoosuV2_1_0_Beatmap()
         {
             var osu = await NugetCoosuNs.Beatmap.OsuFile.ReadFromFileAsync(_path);
             if (!osu.ReadSuccess) throw osu.ReadException;

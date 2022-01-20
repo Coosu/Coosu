@@ -12,6 +12,7 @@ namespace Coosu.Beatmap.Sections.HitObject
         public int Y { get; set; }
         public int Offset { get; set; }
         public RawObjectType RawType { get; set; }
+
         public HitObjectType ObjectType
         {
             get
@@ -27,6 +28,7 @@ namespace Coosu.Beatmap.Sections.HitObject
                 return HitObjectType.Circle;
             }
         }
+
         public int NewComboCount
         {
             get
@@ -39,6 +41,7 @@ namespace Coosu.Beatmap.Sections.HitObject
                 return ncCount + ncBase;
             }
         }
+
         public HitsoundType Hitsound { get; set; }
         public ExtendedSliderInfo? SliderInfo { get; set; }
         public int HoldEnd { get; set; }

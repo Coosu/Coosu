@@ -23,7 +23,7 @@ namespace Coosu.Beatmap
 
         public static async Task<LocalOsuFile> ReadFromFileAsync(string path, Action<ReadOptions>? readOptionFactory = null)
         {
-#if NETFRAMEWORK
+#if NETFRAMEWORK && NET462_OR_GREATER
             var targetPath = System.IO.Path.IsPathRooted(path)
                 ? (path?.StartsWith(@"\\?\") == true
                     ? path
