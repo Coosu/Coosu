@@ -26,7 +26,6 @@ namespace Coosu.Beatmap.Sections
             byte volume = default;
             bool inherit = default;
             Effects effects = default;
-            bool positive = default;
 
             int i = -1;
             foreach (var span in line.SpanSplit(','))
