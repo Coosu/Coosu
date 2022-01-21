@@ -79,10 +79,14 @@ namespace Coosu.Beatmap.Sections
 
         public override void AppendSerializedString(TextWriter textWriter)
         {
-            textWriter.WriteLine($"[{SectionName}]");
-            foreach (var timingPoint in TimingList)
+            textWriter.Write('[');
+            textWriter.Write(SectionName);
+            textWriter.WriteLine(']');
+            for (var i = 0; i < TimingList.Count; i++)
             {
+                var timingPoint = TimingList[i];
                 timingPoint.AppendSerializedString(textWriter);
+                textWriter.WriteLine();
             }
         }
     }

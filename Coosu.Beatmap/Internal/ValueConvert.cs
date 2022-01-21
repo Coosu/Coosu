@@ -109,7 +109,7 @@ namespace Coosu.Beatmap.Internal
 
             object arg = value.ToString();
             var type = typeof(Convert);
-            var methodName = $"To{propType.Name}";
+            var methodName = "To" + propType.Name;
             if (!MethodCache.TryGetValue(methodName, out var method))
             {
                 method = type.GetMethods()

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using Coosu.Beatmap.Configurable;
 using Coosu.Shared;
@@ -38,9 +39,13 @@ namespace Coosu.Beatmap.Sections
             return new Vector3<byte>(x, y, z);
         }
 
-        public override string WriteSection(Vector3<byte> value)
+        public override void WriteSection(TextWriter textWriter, Vector3<byte> value)
         {
-            return $"{value.X},{value.Y},{value.Z}";
+            textWriter.Write(value.X);
+            textWriter.Write(",");
+            textWriter.Write(value.Y);
+            textWriter.Write(",");
+            textWriter.Write(value.Z);
         }
     }
 }

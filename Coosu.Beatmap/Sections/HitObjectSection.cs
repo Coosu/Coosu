@@ -151,6 +151,30 @@ namespace Coosu.Beatmap.Sections
             hitObject.SetExtras(others);
         }
 
+        private void ToSpinner(RawHitObject hitObject, ReadOnlySpan<char> others)
+        {
+            var s = others.ToString();
+            var infos = s.Split(',');
+            var holdEnd = infos[0];
+            hitObject.HoldEnd = int.Parse(holdEnd);
+            if (infos.Length > 1)
+            {
+                var extra = infos[1];
+                hitObject.SetExtras(extra.AsSpan());
+            }
+        }
+
+        private void ToHold(RawHitObject hitObject, ReadOnlySpan<char> others)
+        {
+            var s = others.ToString();
+            var index = s.IndexOf(':');
+
+            var holdEnd = s.Substring(0, index);
+            var extra = s.Substring(index + 1);
+            hitObject.HoldEnd = int.Parse(holdEnd);
+            hitObject.SetExtras(extra.AsSpan());
+        }
+
         private void ToSlider(RawHitObject hitObject, ReadOnlySpan<char> others)
         {
             ReadOnlySpan<char> curveInfo = default;
@@ -215,10 +239,11 @@ namespace Coosu.Beatmap.Sections
                     continue; // curvePoints skip 1
                 }
 
-                int i = 0;
                 int x = 0;
+                int i = -1;
                 foreach (var s in point.SpanSplit(':'))
                 {
+                    i++;
                     if (i == 0)
                     {
 #if NETCOREAPP3_1_OR_GREATER
@@ -236,8 +261,6 @@ namespace Coosu.Beatmap.Sections
 #endif
                         points.Add(new Vector2(x, y));
                     }
-
-                    i++;
                 }
             }
 
@@ -265,7 +288,12 @@ namespace Coosu.Beatmap.Sections
 #endif
                 }
 
-                if (index >= 4)
+                if (index < 4)
+                {
+                    edgeSamples = null;
+                    edgeAdditions = null;
+                }
+                else
                 {
                     edgeSamples = new ObjectSamplesetType[edgeHitsounds.Length];
                     edgeAdditions = new ObjectSamplesetType[edgeHitsounds.Length];
@@ -299,11 +327,6 @@ namespace Coosu.Beatmap.Sections
                         }
                     }
                 }
-                else
-                {
-                    edgeSamples = null;
-                    edgeAdditions = null;
-                }
             }
 
             // extra
@@ -326,35 +349,14 @@ namespace Coosu.Beatmap.Sections
             };
         }
 
-        private void ToSpinner(RawHitObject hitObject, ReadOnlySpan<char> others)
-        {
-            var s = others.ToString();
-            var infos = s.Split(',');
-            var holdEnd = infos[0];
-            hitObject.HoldEnd = int.Parse(holdEnd);
-            if (infos.Length > 1)
-            {
-                var extra = infos[1];
-                hitObject.SetExtras(extra.AsSpan());
-            }
-        }
-
-        private void ToHold(RawHitObject hitObject, ReadOnlySpan<char> others)
-        {
-            var s = others.ToString();
-            var index = s.IndexOf(':');
-
-            var holdEnd = s.Substring(0, index);
-            var extra = s.Substring(index + 1);
-            hitObject.HoldEnd = int.Parse(holdEnd);
-            hitObject.SetExtras(extra.AsSpan());
-        }
-
         public override void AppendSerializedString(TextWriter textWriter)
         {
-            textWriter.WriteLine($"[{SectionName}]");
-            foreach (var hitObject in HitObjectList)
+            textWriter.Write('[');
+            textWriter.Write(SectionName);
+            textWriter.WriteLine(']');
+            for (var i = 0; i < HitObjectList.Count; i++)
             {
+                var hitObject = HitObjectList[i];
                 hitObject.AppendSerializedString(textWriter);
             }
         }

@@ -79,25 +79,48 @@ namespace Coosu.Beatmap.Sections.HitObject
                 }
             }
         }
-
-        public override string ToString()
-        {
-            var extras = $"{(int)SampleSet}:{(int)AdditionSet}:{CustomIndex}:{SampleVolume}:{FileName}";
-            return ObjectType switch
-            {
-                HitObjectType.Circle =>
-                    $"{X},{Y},{Offset},{(int)RawType},{(int)Hitsound},{extras}",
-                HitObjectType.Slider => string.Format("{0},{1},{2},{3},{4},{5},{6}", X, Y, Offset, (int)RawType,
-                    (int)Hitsound, SliderInfo, extras),
-                HitObjectType.Spinner => $"{X},{Y},{Offset},{(int)RawType},{(int)Hitsound},{HoldEnd},{extras}",
-                HitObjectType.Hold => $"{X},{Y},{Offset},{(int)RawType},{(int)Hitsound},{HoldEnd}:{extras}",
-                _ => throw new ArgumentOutOfRangeException()
-            };
-        }
-
+        
         public override void AppendSerializedString(TextWriter textWriter)
         {
-            textWriter.WriteLine(ToString());
+            textWriter.Write(X);
+            textWriter.Write(',');
+            textWriter.Write(Y);
+            textWriter.Write(',');
+            textWriter.Write(Offset);
+            textWriter.Write(',');
+            textWriter.Write((byte)RawType);
+            textWriter.Write(',');
+            textWriter.Write((byte)Hitsound);
+            textWriter.Write(',');
+            if (ObjectType == HitObjectType.Slider && SliderInfo != null)
+            {
+                SliderInfo.AppendSerializedString(textWriter);
+                textWriter.Write(',');
+            }
+            else if (ObjectType == HitObjectType.Spinner)
+            {
+                textWriter.Write(HoldEnd);
+                textWriter.Write(',');
+            }
+            else if (ObjectType == HitObjectType.Hold)
+            {
+                textWriter.Write(HoldEnd);
+                textWriter.Write(':');
+            }
+            else
+            {
+                textWriter.Write(',');
+            }
+
+            textWriter.Write((byte)SampleSet);
+            textWriter.Write(',');
+            textWriter.Write((byte)AdditionSet);
+            textWriter.Write(',');
+            textWriter.Write(CustomIndex);
+            textWriter.Write(',');
+            textWriter.Write(SampleVolume);
+            textWriter.Write(',');
+            textWriter.Write(FileName);
         }
     }
 }

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
@@ -16,6 +17,7 @@ using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Running;
+using OsuParsers.Beatmaps;
 using OsuParsers.Decoders;
 using LocalCoosuNs = localbuild::Coosu;
 using NugetCoosuNs = Coosu;
@@ -33,6 +35,15 @@ namespace WritingOsuBenchmark
             Environment.SetEnvironmentVariable("test_osu_path", fi.FullName);
             var osu = LocalCoosuNs.Beatmap.OsuFile.ReadFromFileAsync(@"test.osu").Result;
             osu.WriteOsuFile("new.osu");
+            //var sb = new StringBuilder();
+            //for (int i = 0; i < 5000; i++)
+            //{
+            //    osu.WriteOsuFile("new.osu");
+            //    Console.WriteLine(i);
+            //}
+
+            //return;
+
             var osu2 = NugetCoosuNs.Beatmap.OsuFile.ReadFromFileAsync(@"test.osu").Result;
             osu2.WriteOsuFile("old.osu");
 
@@ -50,6 +61,7 @@ namespace WritingOsuBenchmark
             private readonly string _path;
             private readonly LocalCoosuNs.Beatmap.LocalOsuFile _latest;
             private readonly NugetCoosuNs.Beatmap.LocalOsuFile _nuget;
+            private readonly Beatmap _osuParsers;
 
             public WritingTask()
             {
@@ -58,19 +70,27 @@ namespace WritingOsuBenchmark
                 Console.WriteLine(_path);
                 _latest = LocalCoosuNs.Beatmap.OsuFile.ReadFromFileAsync(_path).Result;
                 _nuget = NugetCoosuNs.Beatmap.OsuFile.ReadFromFileAsync(_path).Result;
+                _osuParsers = OsuParsers.Decoders.BeatmapDecoder.Decode(_path);
             }
 
             [Benchmark(Baseline = true)]
-            public async Task<object?> CoosuLatest_Beatmap()
+            public async Task<object?> CoosuLatest_Write()
             {
-                _latest.WriteOsuFile("test.txt");
+                _latest.WriteOsuFile("CoosuLatest_Write.txt");
                 return null;
             }
 
             [Benchmark]
-            public async Task<object?> CoosuV2_1_0_Beatmap()
+            public async Task<object?> OsuParsers_Write()
             {
-                _nuget.WriteOsuFile("test.txt");
+                _osuParsers.Save("OsuParsers_Write.txt");
+                return null;
+            }
+
+            [Benchmark]
+            public async Task<object?> CoosuV2_1_0_Write()
+            {
+                _nuget.WriteOsuFile("CoosuV2_1_0_Write.txt");
                 return null;
             }
         }

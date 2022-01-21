@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using Coosu.Beatmap.Configurable;
 
@@ -43,14 +44,17 @@ namespace Coosu.Beatmap.Sections
         [SectionIgnore]
         public MetaString ArtistMeta => new(Artist, ArtistUnicode);
 
-        public string ToSerializedString(string? newDiffName)
+        public void AppendSerializedString(TextWriter textWriter, string? newDiffName)
         {
             if (newDiffName == null)
-                return ToSerializedString();
+            {
+                base.AppendSerializedString(textWriter);
+                return;
+            }
 
             var clonedSection = (MetadataSection)this.MemberwiseClone();
             clonedSection.Version = newDiffName;
-            return clonedSection.ToSerializedString();
+            clonedSection.AppendSerializedString(textWriter);
         }
     }
 }

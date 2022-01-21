@@ -4,6 +4,9 @@ namespace Coosu.Beatmap.Configurable
 {
     public sealed class SectionConverterAttribute : Attribute
     {
+        public bool SharedCreation { get; set; } = true;
+
+        private ValueConverter? _sharedInstance;
         private readonly Type _converterType;
         private readonly object[] _param;
 
@@ -22,9 +25,13 @@ namespace Coosu.Beatmap.Configurable
 
         public ValueConverter GetConverter()
         {
-            if (_param == null)
-                return (ValueConverter)Activator.CreateInstance(_converterType);
+            if (SharedCreation)
+            {
+                return _sharedInstance ??= (ValueConverter)Activator.CreateInstance(_converterType, _param);
+            }
+
             return (ValueConverter)Activator.CreateInstance(_converterType, _param);
         }
+
     }
 }

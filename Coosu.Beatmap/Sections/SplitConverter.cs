@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using Coosu.Beatmap.Configurable;
@@ -32,19 +33,15 @@ namespace Coosu.Beatmap.Sections
             return list;
         }
 
-        public override string WriteSection(List<double> value)
+        public override void WriteSection(TextWriter textWriter, List<double> value)
         {
-            var sb = new StringBuilder();
             for (var i = 0; i < value.Count; i++)
             {
                 var d = value[i];
-                sb.Append(d.ToIcString());
-                sb.Append(_splitter);
+                textWriter.Write(d.ToIcString());
+                if (i < value.Count - 1)
+                    textWriter.Write(_splitter);
             }
-
-            if (sb.Length > 0)
-                sb.Remove(sb.Length - 1, 1);
-            return sb.ToString();
         }
     }
 
@@ -72,19 +69,15 @@ namespace Coosu.Beatmap.Sections
             return list;
         }
 
-        public override string WriteSection(List<int> value)
+        public override void WriteSection(TextWriter textWriter, List<int> value)
         {
-            var sb = new StringBuilder();
             for (var i = 0; i < value.Count; i++)
             {
                 var d = value[i];
-                sb.Append(d);
-                sb.Append(_splitter);
+                textWriter.Write(d);
+                if (i < value.Count - 1)
+                    textWriter.Write(_splitter);
             }
-
-            if (sb.Length > 0)
-                sb.Remove(sb.Length - 1, 1);
-            return sb.ToString();
         }
     }
 
@@ -108,19 +101,16 @@ namespace Coosu.Beatmap.Sections
             return list;
         }
 
-        public override string WriteSection(List<string> value)
+        public override void WriteSection(TextWriter textWriter, List<string> value)
         {
             var sb = new StringBuilder();
             for (var i = 0; i < value.Count; i++)
             {
                 var d = value[i];
-                sb.Append(d);
-                sb.Append(_splitter);
+                textWriter.Write(d);
+                if (i < value.Count - 1)
+                    textWriter.Write(_splitter);
             }
-
-            if (sb.Length > 0)
-                sb.Remove(sb.Length - 1, 1);
-            return sb.ToString();
         }
     }
 }

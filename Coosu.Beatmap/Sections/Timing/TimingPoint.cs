@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.IO;
 using Coosu.Beatmap.Configurable;
+using Coosu.Shared;
 
 namespace Coosu.Beatmap.Sections.Timing
 {
@@ -64,14 +65,21 @@ namespace Coosu.Beatmap.Sections.Timing
 
         public override void AppendSerializedString(TextWriter textWriter)
         {
-            textWriter.Write($"{Offset},");
-            textWriter.Write($"{Factor.ToString(CultureInfo.InvariantCulture)},");
-            textWriter.Write($"{Rhythm},");
-            textWriter.Write($"{(int)TimingSampleset + 1},");
-            textWriter.Write($"{Track},");
-            textWriter.Write($"{Volume},");
-            textWriter.Write($"{Convert.ToInt32(!IsInherit)},");
-            textWriter.WriteLine(Convert.ToInt32(IsKiai));
+            textWriter.Write(Offset);
+            textWriter.Write(',');
+            textWriter.Write(Factor.ToIcString());
+            textWriter.Write(',');
+            textWriter.Write(Rhythm);
+            textWriter.Write(',');
+            textWriter.Write((byte)TimingSampleset + 1);
+            textWriter.Write(',');
+            textWriter.Write(Track);
+            textWriter.Write(',');
+            textWriter.Write(Volume);
+            textWriter.Write(',');
+            textWriter.Write(IsInherit ? '0' : '1');
+            textWriter.Write(',');
+            textWriter.Write(IsKiai ? '1' : '0');
         }
     }
 }

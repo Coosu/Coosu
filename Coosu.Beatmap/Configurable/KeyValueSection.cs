@@ -117,7 +117,11 @@ namespace Coosu.Beatmap.Configurable
                 if (attr != null)
                 {
                     var converter = attr.GetConverter();
-                    value = converter.WriteSection(rawObj);
+
+                    textWriter.Write(key);
+                    textWriter.Write(KeyValueFlag);
+                    converter.WriteSection(textWriter, rawObj);
+                    continue;
                 }
                 else if (prop.GetMethod.ReturnType.BaseType == typeof(Enum))
                 {

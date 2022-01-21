@@ -11,6 +11,7 @@ namespace Coosu.Beatmap
 {
     public class OsuFile : Config
     {
+        private const string VerFlag = "osu file format v";
         public int Version { get; set; }
         public GeneralSection General { get; set; }
         public EditorSection Editor { get; set; }
@@ -47,19 +48,35 @@ namespace Coosu.Beatmap
 
         public override string ToString() => Path;
 
-        //todo: not optimized
-        public void WriteOsuFile(string path, string newDiffName = null)
+        public void WriteOsuFile(string path, string? newDiffName = null)
         {
-            File.WriteAllText(path,
-                string.Format("osu file format v{0}\r\n\r\n{1}\r\n{2}\r\n{3}\r\n{4}\r\n{5}\r\n{6}\r\n\r\n{7}\r\n{8}", Version,
-                    General?.ToSerializedString(),
-                    Editor?.ToSerializedString(),
-                    Metadata?.ToSerializedString(newDiffName),
-                    Difficulty?.ToSerializedString(),
-                    Events?.ToSerializedString(),
-                    TimingPoints?.ToSerializedString(),
-                    Colours?.ToSerializedString(),
-                    HitObjects?.ToSerializedString()));
+            using var sw = new StreamWriter(path);
+            sw.Write(VerFlag);
+            sw.WriteLine(Version);
+            sw.WriteLine();
+
+            General.AppendSerializedString(sw);
+            sw.WriteLine();
+
+            Editor.AppendSerializedString(sw);
+            sw.WriteLine();
+
+            Metadata.AppendSerializedString(sw, newDiffName);
+            sw.WriteLine();
+
+            Difficulty.AppendSerializedString(sw);
+            sw.WriteLine();
+
+            Events.AppendSerializedString(sw);
+            sw.WriteLine();
+
+            TimingPoints.AppendSerializedString(sw);
+            sw.WriteLine(Environment.NewLine);
+
+            Colours.AppendSerializedString(sw);
+            sw.WriteLine();
+
+            HitObjects.AppendSerializedString(sw);
         }
 
         public override void OnDeserialized()
@@ -71,10 +88,9 @@ namespace Coosu.Beatmap
         public override void HandleCustom(string line)
         {
             if (Version != 0) return;
-            const string verFlag = "osu file format v";
-            if (line.StartsWith(verFlag))
+            if (line.StartsWith(VerFlag))
             {
-                var str = line.Substring(verFlag.Length);
+                var str = line.Substring(VerFlag.Length);
                 if (!int.TryParse(str, out var verNum))
                     throw new BadOsuFormatException("Unknown osu file format: " + str);
                 if (verNum < 5)
