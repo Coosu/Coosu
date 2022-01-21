@@ -16,7 +16,8 @@ namespace Coosu.Beatmap.Sections
     {
         private readonly TimingSection _timingSection;
         private readonly DifficultySection _difficulty;
-        private readonly SpanSplitArgs _e = new();
+        private readonly SpanSplitArgs _sliderArgs = new();
+        private readonly SpanSplitArgs _holdArgs = new();
         public List<RawHitObject> HitObjectList { get; set; } = new();
 
         public double MinTime => HitObjectList.Count == 0 ? 0 : HitObjectList.Min(t => t.Offset);
@@ -77,7 +78,7 @@ namespace Coosu.Beatmap.Sections
                 i++;
             }
         }
-        
+
         public override void Match(string line)
         {
             int x = default;
@@ -88,8 +89,8 @@ namespace Coosu.Beatmap.Sections
             ReadOnlySpan<char> others = default;
 
             int i = -1;
-            _e.Canceled = false;
-            foreach (var span in line.SpanSplit(',', _e))
+            _sliderArgs.Canceled = false;
+            foreach (var span in line.SpanSplit(',', _sliderArgs))
             {
                 i++;
 #if NETCOREAPP3_1_OR_GREATER
@@ -99,7 +100,7 @@ namespace Coosu.Beatmap.Sections
                     case 1: y = int.Parse(span); break;
                     case 2: offset = int.Parse(span); break;
                     case 3: type = (RawObjectType)int.Parse(span); break;
-                    case 4: hitsound = (HitsoundType)int.Parse(span); _e.Canceled = true; break;
+                    case 4: hitsound = (HitsoundType)int.Parse(span); _sliderArgs.Canceled = true; break;
                     default: others = span; break;
                 }
 #else
@@ -109,7 +110,7 @@ namespace Coosu.Beatmap.Sections
                     case 1: y = int.Parse(span.ToString()); break;
                     case 2: offset = int.Parse(span.ToString()); break;
                     case 3: type = (RawObjectType)int.Parse(span.ToString()); break;
-                    case 4: hitsound = (HitsoundType)int.Parse(span.ToString()); _e.Canceled = true; break;
+                    case 4: hitsound = (HitsoundType)int.Parse(span.ToString()); _sliderArgs.Canceled = true; break;
                     default: others = span; break;
                 }
 #endif
@@ -153,26 +154,49 @@ namespace Coosu.Beatmap.Sections
 
         private void ToSpinner(RawHitObject hitObject, ReadOnlySpan<char> others)
         {
-            var s = others.ToString();
-            var infos = s.Split(',');
-            var holdEnd = infos[0];
-            hitObject.HoldEnd = int.Parse(holdEnd);
-            if (infos.Length > 1)
+            int i = -1;
+            int holdEnd = default;
+            ReadOnlySpan<char> extras = default;
+            foreach (var span in others.SpanSplit(','))
             {
-                var extra = infos[1];
-                hitObject.SetExtras(extra.AsSpan());
+                i++;
+                switch (i)
+                {
+#if NETCOREAPP3_1_OR_GREATER
+                    case 0: holdEnd = int.Parse(span); break;
+#else
+                    case 0: holdEnd = int.Parse(span.ToString()); break;
+#endif
+                    case 1: extras = span; break;
+                }
             }
+
+            hitObject.HoldEnd = holdEnd;
+            hitObject.SetExtras(extras);
         }
 
         private void ToHold(RawHitObject hitObject, ReadOnlySpan<char> others)
         {
-            var s = others.ToString();
-            var index = s.IndexOf(':');
+            _holdArgs.Canceled = false;
+            int i = -1;
+            int holdEnd = default;
+            ReadOnlySpan<char> extras = default;
+            foreach (var span in others.SpanSplit(':'))
+            {
+                i++;
+                switch (i)
+                {
+#if NETCOREAPP3_1_OR_GREATER
+                    case 0: holdEnd = int.Parse(span); _holdArgs.Canceled = true; break;
+#else
+                    case 0: holdEnd = int.Parse(span.ToString()); _holdArgs.Canceled = true; break;
+#endif
+                    case 1: extras = span; break;
+                }
+            }
 
-            var holdEnd = s.Substring(0, index);
-            var extra = s.Substring(index + 1);
-            hitObject.HoldEnd = int.Parse(holdEnd);
-            hitObject.SetExtras(extra.AsSpan());
+            hitObject.HoldEnd = holdEnd;
+            hitObject.SetExtras(extras);
         }
 
         private void ToSlider(RawHitObject hitObject, ReadOnlySpan<char> others)
