@@ -107,19 +107,15 @@ namespace Coosu.Beatmap.Sections.HitObject
                 textWriter.Write(HoldEnd);
                 textWriter.Write(':');
             }
-            else
-            {
-                textWriter.Write(',');
-            }
 
             textWriter.Write((byte)SampleSet);
-            textWriter.Write(',');
+            textWriter.Write(':');
             textWriter.Write((byte)AdditionSet);
-            textWriter.Write(',');
+            textWriter.Write(':');
             textWriter.Write(CustomIndex);
-            textWriter.Write(',');
+            textWriter.Write(':');
             textWriter.Write(SampleVolume);
-            textWriter.Write(',');
+            textWriter.Write(':');
             textWriter.Write(FileName);
         }
     }

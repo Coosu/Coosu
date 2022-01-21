@@ -137,6 +137,7 @@ namespace Coosu.Beatmap.Configurable
                     textWriter.Write(name);
                     textWriter.Write(KeyValueFlag);
                     if (rawObj != null) converter.WriteSection(textWriter, rawObj);
+                    textWriter.WriteLine();
                     continue;
                 }
 
@@ -172,7 +173,8 @@ namespace Coosu.Beatmap.Configurable
                         };
                     }
                 }
-                else if (rawObj != null)
+
+                if (value == null && rawObj != null)
                 {
                     value = rawObj.ToString();
                 }

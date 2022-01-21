@@ -58,12 +58,12 @@ namespace WritingOsuBenchmark
     {
         static void Main(string[] args)
         {
-            var fi = new FileInfo(@"test.osu");
-            //var fi = new FileInfo(@"F:\milkitic\Songs\1376486 Risshuu feat. Choko - Take\Risshuu feat. Choko - Take (yf_bmp) [Ta~ke take take take take take tatata~].osu");
+            //var fi = new FileInfo(@"test.osu");
+            var fi = new FileInfo(@"F:\milkitic\Songs\1376486 Risshuu feat. Choko - Take\Risshuu feat. Choko - Take (yf_bmp) [Ta~ke take take take take take tatata~].osu");
             if (!fi.Exists)
                 throw new FileNotFoundException("Test file does not exists: " + fi.FullName);
             Environment.SetEnvironmentVariable("test_osu_path", fi.FullName);
-            var osu = LocalCoosuNs.Beatmap.OsuFile.ReadFromFileAsync(@"test.osu").Result;
+            var osu = LocalCoosuNs.Beatmap.OsuFile.ReadFromFileAsync(fi.FullName).Result;
             osu.WriteOsuFile("new.osu");
             using (var file = File.CreateText(@"new.json"))
             {
@@ -84,7 +84,7 @@ namespace WritingOsuBenchmark
 
             //return;
 
-            var osu2 = NugetCoosuNs.Beatmap.OsuFile.ReadFromFileAsync(@"test.osu").Result;
+            var osu2 = NugetCoosuNs.Beatmap.OsuFile.ReadFromFileAsync(fi.FullName).Result;
             osu2.WriteOsuFile("old.osu");
 
             var summary = BenchmarkRunner.Run<WritingTask>(/*config*/);

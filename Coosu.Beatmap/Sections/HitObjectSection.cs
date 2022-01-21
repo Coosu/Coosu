@@ -382,6 +382,7 @@ namespace Coosu.Beatmap.Sections
             {
                 var hitObject = HitObjectList[i];
                 hitObject.AppendSerializedString(textWriter);
+                textWriter.WriteLine();
             }
         }
     }
