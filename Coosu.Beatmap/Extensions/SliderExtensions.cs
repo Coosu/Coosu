@@ -338,9 +338,10 @@ namespace Coosu.Beatmap
                 }
             }
 
-            if (nextPoint != null)
+            if (currentGroup.Count != 0 && nextPoint != null)
                 currentGroup.Add(nextPoint.Value);
-            groupedPoints.Add(currentGroup);
+            if (currentGroup.Count != 0)
+                groupedPoints.Add(currentGroup);
 
             if (groupedPoints.Count == 0 && rawPoints.Count != 0)
             {
