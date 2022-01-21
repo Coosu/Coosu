@@ -27,7 +27,7 @@ namespace Coosu.Beatmap.Sections
             ushort track = default;
             byte volume = default;
             bool inherit = default;
-            bool kiai = default;
+            Effects effects = default;
             bool positive = default;
 
             int i = -1;
@@ -44,8 +44,7 @@ namespace Coosu.Beatmap.Sections
                     case 4: track = ushort.Parse(span); break;
                     case 5: volume = byte.Parse(span); break;
                     case 6: inherit = byte.Parse(span) == 0; break;
-                    case 7: kiai = byte.Parse(span) != 0; break;
-                    case 8: positive = factor >= 0; break;
+                    case 7: effects = (Effects)byte.Parse(span); break;
                 }
 #else
                 switch (i)
@@ -57,8 +56,7 @@ namespace Coosu.Beatmap.Sections
                     case 4: track = ushort.Parse(span.ToString()); break;
                     case 5: volume = byte.Parse(span.ToString()); break;
                     case 6: inherit = byte.Parse(span.ToString()) == 0; break;
-                    case 7: kiai = byte.Parse(span.ToString()) != 0; break;
-                    case 8: positive = factor >= 0; break;
+                    case 7: effects = (Effects)byte.Parse(span.ToString()); break;
                 }
 #endif
             }
@@ -72,8 +70,7 @@ namespace Coosu.Beatmap.Sections
                 Track = track,
                 Volume = volume,
                 IsInherit = inherit,
-                IsKiai = kiai,
-                Positive = positive
+                Effects = effects,
             });
         }
 

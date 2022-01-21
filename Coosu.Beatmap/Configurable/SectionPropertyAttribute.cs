@@ -5,7 +5,10 @@ namespace Coosu.Beatmap.Configurable
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Class)]
     public sealed class SectionPropertyAttribute : Attribute
     {
+        public const double DefaultValue = double.MaxValue;
         public string? Name { get; }
+
+        public object? Default { get; set; }
 
         public SectionPropertyAttribute() : this(null)
         {

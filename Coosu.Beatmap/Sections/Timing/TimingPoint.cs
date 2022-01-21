@@ -9,14 +9,12 @@ namespace Coosu.Beatmap.Sections.Timing
     public sealed class TimingPoint : SerializeWritableObject
     {
         private byte _rhythm;
-
-        public bool Positive { get; set; }
         public double Offset { get; set; }
         public double Factor { get; set; } // 一拍的ms
 
         public double Bpm //计算属性
         {
-            get => IsInherit ? -1 : Math.Round(60000d / Factor, 3);
+            get => IsInherit ? -1 : Math.Round(60000d / Math.Abs(Factor), 3);
             set
             {
                 if (!IsInherit)
@@ -31,7 +29,7 @@ namespace Coosu.Beatmap.Sections.Timing
             set
             {
                 if (IsInherit)
-                    Factor = Positive ? 100d / value : -100d / value;
+                    Factor = -100d / value;
                 else throw new Exception("The current timing point is not inherited.");
             }
         }
@@ -41,7 +39,7 @@ namespace Coosu.Beatmap.Sections.Timing
             get => _rhythm;
             set
             {
-                if (value is < 1 or > 7) value = 4; //此处待定
+                if (value < 1) value = 1;
                 _rhythm = value;
             }
         } // 1/4, 2/4, 3/4, 4/4, etc ..
@@ -50,7 +48,10 @@ namespace Coosu.Beatmap.Sections.Timing
         public ushort Track { get; set; }
         public byte Volume { get; set; }
         public bool IsInherit { get; set; }
-        public bool IsKiai { get; set; }
+        public Effects Effects { get; set; } = Effects.None;
+
+        public bool IsKiai => (Effects & Effects.Kiai) == Effects.Kiai;
+        public bool IsOmitted => (Effects & Effects.OmitFirstBarLine) == Effects.OmitFirstBarLine;
 
         public override string ToString() =>
             string.Format("{0},{1},{2},{3},{4},{5},{6},{7}",

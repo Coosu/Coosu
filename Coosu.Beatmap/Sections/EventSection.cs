@@ -85,6 +85,7 @@ namespace Coosu.Beatmap.Sections
                 {
                     case SectionBgVideo:
                         // https://osu.ppy.sh/help/wiki/osu!_File_Formats/Osu_(file_format)#videos
+                        // todo: split issue
                         if (line.StartsWith("Video,") || line.StartsWith("1,"))
                         {
                             var infos = line.Split(',');

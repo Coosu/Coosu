@@ -24,14 +24,20 @@ namespace Coosu.Beatmap.Configurable
                 {
                     var sectionPropertyAttr = propertyInfo.GetCustomAttribute<SectionPropertyAttribute>();
                     if (sectionPropertyAttr == null) continue;
-                    PropertyInfos.Add(sectionPropertyAttr?.Name ?? propertyInfo.Name, propertyInfo);
+                    PropertyInfos.Add(sectionPropertyAttr?.Name ?? propertyInfo.Name, new SectionInfo(propertyInfo)
+                    {
+                        Attribute = sectionPropertyAttr
+                    });
                 }
                 else
                 {
                     var sectionIgnoreAttr = propertyInfo.GetCustomAttribute<SectionIgnoreAttribute>();
                     if (sectionIgnoreAttr != null) continue;
                     var sectionPropertyAttr = propertyInfo.GetCustomAttribute<SectionPropertyAttribute>();
-                    PropertyInfos.Add(sectionPropertyAttr?.Name ?? propertyInfo.Name, propertyInfo);
+                    PropertyInfos.Add(sectionPropertyAttr?.Name ?? propertyInfo.Name, new SectionInfo(propertyInfo)
+                    {
+                        Attribute = sectionPropertyAttr,
+                    });
                 }
             }
         }
@@ -43,12 +49,13 @@ namespace Coosu.Beatmap.Configurable
 #if !NETCOREAPP3_1_OR_GREATER
 
 #endif
-            if (!PropertyInfos.TryGetValue(key, out var prop))
+            if (!PropertyInfos.TryGetValue(key, out var sectionInfo))
             {
                 UndefinedPairs.Add(key, valueSpan.ToString());
             }
             else
             {
+                var prop = sectionInfo.PropertyInfo;
                 var propType = prop.GetMethod.ReturnType;
                 var attr = prop.GetCustomAttribute<SectionConverterAttribute>();
 
@@ -106,37 +113,53 @@ namespace Coosu.Beatmap.Configurable
 
             foreach (var kvp in PropertyInfos)
             {
-                string key = kvp.Key;
-                var prop = kvp.Value;
+                var name = kvp.Key;
+                var sectionInfo = kvp.Value;
+                var prop = sectionInfo.PropertyInfo;
 
                 string? value = null;
                 var rawObj = prop.GetValue(this);
-                if (rawObj is null) continue;
+                if (sectionInfo.Attribute?.Default != null)
+                {
+                    if (sectionInfo.Attribute.Default is SectionPropertyAttribute.DefaultValue &&
+                        rawObj == default)
+                        continue;
+
+                    if (sectionInfo.Attribute.Default.GetHashCode() == rawObj?.GetHashCode())
+                        continue;
+                }
 
                 var attr = prop.GetCustomAttribute<SectionConverterAttribute>(false);
                 if (attr != null)
                 {
                     var converter = attr.GetConverter();
 
-                    textWriter.Write(key);
+                    textWriter.Write(name);
                     textWriter.Write(KeyValueFlag);
-                    converter.WriteSection(textWriter, rawObj);
+                    if (rawObj != null) converter.WriteSection(textWriter, rawObj);
                     continue;
                 }
-                else if (prop.GetMethod.ReturnType.BaseType == typeof(Enum))
+
+                if (prop.GetMethod.ReturnType.BaseType == typeof(Enum) && rawObj != null)
                 {
                     var enumAttr = prop.GetCustomAttribute<SectionEnumAttribute>(false);
                     if (enumAttr != null)
                     {
-                        value = enumAttr.Option switch
+                        switch (enumAttr.Option)
                         {
-                            EnumParseOption.Index => ((int)rawObj).ToString(),
-                            EnumParseOption.String => rawObj.ToString(),
-                            _ => throw new ArgumentOutOfRangeException()
-                        };
+                            case EnumParseOption.Index:
+                                var type = Enum.GetUnderlyingType(rawObj.GetType());
+                                value = Convert.ChangeType(rawObj, type).ToString();
+                                break;
+                            case EnumParseOption.String:
+                                value = rawObj.ToString();
+                                break;
+                            default:
+                                throw new ArgumentOutOfRangeException();
+                        }
                     }
                 }
-                else if (prop.GetMethod.ReturnType == typeof(bool))
+                else if (prop.GetMethod.ReturnType == typeof(bool) && rawObj != null)
                 {
                     var boolAttr = prop.GetCustomAttribute<SectionBoolAttribute>(false);
                     if (boolAttr != null)
@@ -149,9 +172,12 @@ namespace Coosu.Beatmap.Configurable
                         };
                     }
                 }
+                else if (rawObj != null)
+                {
+                    value = rawObj.ToString();
+                }
 
-                value ??= rawObj.ToString();
-                textWriter.Write(key);
+                textWriter.Write(name);
                 textWriter.Write(KeyValueFlag);
                 textWriter.WriteLine(value);
             }
@@ -159,6 +185,18 @@ namespace Coosu.Beatmap.Configurable
 
         protected virtual string KeyValueFlag { get; } = ":";
         protected virtual bool TrimPairs { get; } = false;
-        protected readonly Dictionary<string, PropertyInfo> PropertyInfos = new();
+        protected readonly Dictionary<string, SectionInfo> PropertyInfos = new();
+    }
+
+    public class SectionInfo
+    {
+
+        public SectionInfo(PropertyInfo propertyInfo)
+        {
+            PropertyInfo = propertyInfo;
+        }
+
+        public PropertyInfo PropertyInfo { get; }
+        public SectionPropertyAttribute? Attribute { get; set; }
     }
 }

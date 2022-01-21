@@ -30,6 +30,20 @@ namespace Coosu.Beatmap.Sections
         [SectionConverter(typeof(ColorConverter))]
         public Vector3<byte>? Combo8 { get; set; }
 
+        /// <summary>
+        /// Additive slider track color
+        /// </summary>
+        [SectionProperty(Default = SectionPropertyAttribute.DefaultValue)]
+        [SectionConverter(typeof(ColorConverter))]
+        public Vector3<byte>? SliderTrackOverride { get; set; }
+
+        /// <summary>
+        /// Slider border color
+        /// </summary>
+        [SectionProperty(Default = SectionPropertyAttribute.DefaultValue)]
+        [SectionConverter(typeof(ColorConverter))]
+        public Vector3<byte>? SliderBorder { get; set; }
+
         protected override string KeyValueFlag => " : ";
     }
 }
