@@ -1,4 +1,6 @@
-﻿namespace Coosu.Beatmap.Sections.HitObject
+﻿using Coosu.Beatmap.Configurable;
+
+namespace Coosu.Beatmap.Sections.HitObject
 {
     public sealed class ExtendedSliderInfo : SliderInfo
     {
@@ -26,6 +28,7 @@
         /// <b>Note: </b>This is a computed value that can't be updated after timing changes until calling <see cref="UpdateComputedValues"/>
         /// </para>
         /// </summary>
+        [SectionIgnore]
         public int CurrentEndTime { get; private set; }
 
         /// <summary>
@@ -34,6 +37,7 @@
         /// <b>Note: </b>This is a computed value that can't be updated after timing changes until calling <see cref="UpdateComputedValues"/>
         /// </para>
         /// </summary>
+        [SectionIgnore]
         public double CurrentSingleDuration { get; private set; }
 
         /// <summary>
@@ -42,6 +46,7 @@
         /// <b>Note: </b>This is a computed value that can't be updated after timing changes until calling <see cref="UpdateComputedValues"/>
         /// </para>
         /// </summary>
+        [SectionIgnore]
         public double CurrentDuration { get; private set; }
 
         /// <summary>
@@ -50,6 +55,7 @@
         /// <b>Note: </b>This is a computed value that can't be updated after timing changes until calling <see cref="UpdateComputedValues"/>
         /// </para>
         /// </summary>
+        [SectionIgnore]
         public double CurrentBeatDuration { get; private set; }
 
         /// <summary>
@@ -58,6 +64,7 @@
         /// <b>Note: </b>This is a computed value that can't be updated after timing changes until calling <see cref="UpdateComputedValues"/>
         /// </para>
         /// </summary>
+        [SectionIgnore]
         public double CurrentSliderMultiplier { get; private set; }
 
         /// <summary>
@@ -66,6 +73,7 @@
         /// <b>Note: </b>This is a computed value that can't be updated after timing changes until calling <see cref="UpdateComputedValues"/>
         /// </para>
         /// </summary>
+        [SectionIgnore]
         public float CurrentTickRate { get; private set; }
 
         public void UpdateComputedValues(double lastRedFactor, double lastLineMultiple,

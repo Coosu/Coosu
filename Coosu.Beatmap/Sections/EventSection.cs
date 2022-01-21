@@ -29,7 +29,7 @@ namespace Coosu.Beatmap.Sections
 
         public BackgroundData? BackgroundInfo { get; set; }
         public VideoData? VideoInfo { get; set; }
-        public List<StoryboardSampleData> SampleInfo { get; set; } = new();
+        public List<StoryboardSampleData> Samples { get; set; } = new();
         public List<RangeValue<int>> Breaks { get; set; } = new();
 
         /// <summary>
@@ -39,9 +39,6 @@ namespace Coosu.Beatmap.Sections
         /// </para>
         /// </summary>
         public string? StoryboardText { get; set; }
-
-        [Obsolete("After version 2.1.1, layer parsing has been removed.")]
-        public object? Layer { get; } = null;
 
         public override void Match(string line)
         {
@@ -120,7 +117,7 @@ namespace Coosu.Beatmap.Sections
                             if (line.StartsWith("Sample,") || line.StartsWith("5,"))
                             {
                                 var infos = line.Split(',');
-                                SampleInfo.Add(new StoryboardSampleData
+                                Samples.Add(new StoryboardSampleData
                                 {
                                     Offset = int.Parse(infos[1]),
                                     MagicalInt = byte.Parse(infos[2]),
@@ -153,7 +150,7 @@ namespace Coosu.Beatmap.Sections
 
             textWriter.WriteLine(StoryboardText?.TrimEnd('\r', '\n'));
             textWriter.WriteLine(SectionSbSamples);
-            var validSampleList = SampleInfo.Where(k => k.Volume > 0);
+            var validSampleList = Samples.Where(k => k.Volume > 0);
             foreach (var sampleData in validSampleList)
             {
                 sampleData.AppendSerializedString(textWriter);

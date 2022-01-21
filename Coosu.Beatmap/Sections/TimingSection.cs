@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Coosu.Beatmap.Configurable;
 using Coosu.Beatmap.Sections.Timing;
 using Coosu.Shared;
-using Coosu.Shared.Mathematics;
 
 namespace Coosu.Beatmap.Sections
 {
@@ -13,10 +11,10 @@ namespace Coosu.Beatmap.Sections
     public sealed class TimingSection : Section
     {
         public List<TimingPoint> TimingList { get; set; } = new();
+        [SectionIgnore]
         public double MinTime => TimingList.Count == 0 ? 0 : TimingList.Min(t => t.Offset);
+        [SectionIgnore]
         public double MaxTime => TimingList.Count == 0 ? 0 : TimingList.Max(t => t.Offset);
-
-        public TimingPoint this[int index] => TimingList[index];
 
         public override void Match(string line)
         {

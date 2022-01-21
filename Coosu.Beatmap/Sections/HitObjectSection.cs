@@ -20,7 +20,9 @@ namespace Coosu.Beatmap.Sections
         private readonly SpanSplitArgs _holdArgs = new();
         public List<RawHitObject> HitObjectList { get; set; } = new();
 
+        [SectionIgnore]
         public double MinTime => HitObjectList.Count == 0 ? 0 : HitObjectList.Min(t => t.Offset);
+        [SectionIgnore]
         public double MaxTime => HitObjectList.Count == 0 ? 0 : HitObjectList.Max(t => t.Offset);
 
         public HitObjectSection(OsuFile osuFile)
@@ -28,9 +30,7 @@ namespace Coosu.Beatmap.Sections
             _timingSection = osuFile.TimingPoints;
             _difficulty = osuFile.Difficulty;
         }
-
-        public RawHitObject this[int index] => HitObjectList[index];
-
+        
         public void ComputeSlidersByCurrentSettings()
         {
             _timingSection.TimingList.Sort(new TimingPointComparer());

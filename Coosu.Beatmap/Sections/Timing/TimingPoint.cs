@@ -50,7 +50,9 @@ namespace Coosu.Beatmap.Sections.Timing
         public bool IsInherit { get; set; }
         public Effects Effects { get; set; } = Effects.None;
 
+        [SectionIgnore]
         public bool IsKiai => (Effects & Effects.Kiai) == Effects.Kiai;
+        [SectionIgnore]
         public bool IsOmitted => (Effects & Effects.OmitFirstBarLine) == Effects.OmitFirstBarLine;
 
         public override string ToString() =>

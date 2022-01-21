@@ -11,7 +11,7 @@ namespace Coosu.Beatmap.Sections
         /// </summary>
         [SectionProperty("Bookmarks")]
         [SectionConverter(typeof(Int32SplitConverter), ',')]
-        public List<int> Bookmarks { get; set; }
+        public List<int> Bookmarks { get; set; } = new();
 
         /// <summary>
         /// Distance snap multiplier

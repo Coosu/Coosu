@@ -205,7 +205,7 @@ namespace Coosu.Beatmap
             emptyFile.Events = new EventSection(emptyFile);
             emptyFile.HitObjects = new HitObjectSection(emptyFile);
             emptyFile.TimingPoints.TimingList = new List<TimingPoint>();
-            emptyFile.Events.SampleInfo = new List<StoryboardSampleData>();
+            emptyFile.Events.Samples = new List<StoryboardSampleData>();
             return emptyFile;
         }
 

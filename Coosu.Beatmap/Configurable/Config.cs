@@ -8,6 +8,7 @@
         {
         }
 
+        [SectionIgnore]
         public ReadOptions Options { get; set; }
     }
 }
