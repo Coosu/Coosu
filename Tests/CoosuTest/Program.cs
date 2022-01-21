@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Coosu.Beatmap;
+using Coosu.Beatmap.Sections.HitObject;
 using Coosu.Storyboard;
 using Coosu.Storyboard.Easing;
 using Coosu.Storyboard.Extensions;
@@ -16,6 +19,20 @@ namespace CoosuTest
     {
         static async Task Main(string[] args)
         {
+            var dir = new OsuDirectory(@"C:\Users\milkitic\Downloads\1376486 Risshuu feat. Choko - Take [no video]");
+            await dir.InitializeAsync();
+            var osuFile = dir.OsuFiles.FirstOrDefault(k => k.Metadata.Version?.Contains("~") == true);
+            var slider = osuFile.HitObjects.HitObjectList.First(k => k.Offset == 48819);
+            var gg = slider.SliderInfo.GetSliderSlides();
+
+
+            var allHs = dir.OsuFiles.AsParallel().Select(k =>
+            {
+                return dir.GetHitsoundNodesAsync(k).Result;
+            }).SelectMany(k => k).ToArray();
+
+            var hitsounds = await dir.GetHitsoundNodesAsync(osuFile);
+
             var text1 = File.ReadAllText(
                 "D:\\GitHub\\ReOsuStoryboardPlayer\\ReOsuStoryboardPlayer.Core.UnitTest\\TestData\\" +
                 "test.osb");

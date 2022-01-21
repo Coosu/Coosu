@@ -22,6 +22,24 @@ namespace Coosu.Beatmap
         public ColorSection Colours { get; set; }
         public HitObjectSection HitObjects { get; set; }
 
+        public static LocalOsuFile ReadFromFile(string path, Action<OsuReadOptions>? readOptionFactory = null)
+        {
+#if NETFRAMEWORK && NET462_OR_GREATER
+            var targetPath = System.IO.Path.IsPathRooted(path)
+                ? (path?.StartsWith(@"\\?\") == true
+                    ? path
+                    : @"\\?\" + path)
+                : path;
+#else
+            var targetPath = path;
+#endif
+            var options = new OsuReadOptions();
+            readOptionFactory?.Invoke(options);
+            using var sr = new StreamReader(targetPath);
+            var localOsuFile = ConfigConvert.DeserializeObject<LocalOsuFile>(sr, options);
+            localOsuFile.OriginPath = targetPath;
+            return localOsuFile;
+        }
         public static async Task<LocalOsuFile> ReadFromFileAsync(string path, Action<OsuReadOptions>? readOptionFactory = null)
         {
 #if NETFRAMEWORK && NET462_OR_GREATER

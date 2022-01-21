@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net472;net5.0</TargetFrameworks>
+    <TargetFrameworks>net472;net6.0</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup Condition="$(TargetFramework) == net472">
@@ -10,6 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Coosu.Beatmap\Coosu.Beatmap.csproj" />
     <ProjectReference Include="..\..\Coosu.Storyboard.Extensions\Coosu.Storyboard.Extensions.csproj" />
     <ProjectReference Include="..\..\Coosu.Storyboard\Coosu.Storyboard.csproj" />
   </ItemGroup>
