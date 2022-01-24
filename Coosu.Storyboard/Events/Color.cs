@@ -9,53 +9,53 @@ namespace Coosu.Storyboard.Events
 
         public double StartR
         {
-            get => Start[0];
-            set => Start[0] = value;
+            get => GetValue(0);
+            set => SetValue(0, value);
         }
 
         public double StartG
         {
-            get => Start[1];
-            set => Start[1] = value;
+            get => GetValue(1);
+            set => SetValue(1, value);
         }
 
         public double StartB
         {
-            get => Start[2];
-            set => Start[2] = value;
+            get => GetValue(2);
+            set => SetValue(2, value);
         }
 
         public double EndR
         {
-            get => End[0];
-            set => End[0] = value;
+            get => GetValue(3);
+            set => SetValue(3, value);
         }
 
         public double EndG
         {
-            get => End[1];
-            set => End[1] = value;
+            get => GetValue(4);
+            set => SetValue(4, value);
         }
 
         public double EndB
         {
-            get => End[2];
-            set => End[2] = value;
+            get => GetValue(5);
+            set => SetValue(5, value);
         }
 
-        public Color(EasingFunctionBase easing, double startTime, double endTime,
-            double r1, double g1, double b1, double r2, double g2, double b2)
-            : base(easing, startTime, endTime, new[] { r1, g1, b1 }, new[] { r2, g2, b2 })
-        {
-        }
+        //public Color(EasingFunctionBase easing, double startTime, double endTime,
+        //    double r1, double g1, double b1, double r2, double g2, double b2)
+        //    : base(easing, startTime, endTime, new[] { r1, g1, b1 }, new[] { r2, g2, b2 })
+        //{
+        //}
 
         public Color(EasingFunctionBase easing, double startTime, double endTime, Span<double> start, Span<double> end)
             : base(easing, startTime, endTime, start, end)
         {
         }
 
-        public Color()
-        {
-        }
+        //public Color()
+        //{
+        //}
     }
 }

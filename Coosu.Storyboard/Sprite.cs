@@ -95,12 +95,13 @@ namespace Coosu.Storyboard
             DefaultY = defaultY;
         }
 
-        public Sprite(string layer, string origin, string imagePath, double defaultX, double defaultY)
+        public Sprite(ReadOnlySpan<char> layer, ReadOnlySpan<char> origin, ReadOnlySpan<char> imagePath,
+            double defaultX, double defaultY)
         {
             //ObjectType = OsbObjectType.Parse(type);
-            LayerType = (LayerType)Enum.Parse(typeof(LayerType), layer);
-            OriginType = (OriginType)Enum.Parse(typeof(OriginType), origin);
-            ImagePath = imagePath;
+            LayerType = layer.ToLayerType();
+            OriginType = origin.ToOriginType();
+            ImagePath = imagePath.ToString();
             DefaultX = defaultX;
             DefaultY = defaultY;
         }

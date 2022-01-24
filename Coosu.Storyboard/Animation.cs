@@ -45,13 +45,16 @@ namespace Coosu.Storyboard
         /// <param name="frameCount">Set frame count.</param>
         /// <param name="frameDelay">Set frame rate (frame delay).</param>
         /// <param name="loopType">Set loop type.</param>
-        public Animation(string layer, string origin, string imagePath, double defaultX,
-            double defaultY, int frameCount, double frameDelay, string loopType)
+        public Animation(ReadOnlySpan<char> layer, 
+            ReadOnlySpan<char> origin,
+            ReadOnlySpan<char> imagePath,
+            double defaultX, double defaultY, 
+            int frameCount, double frameDelay, ReadOnlySpan<char> loopType)
             : base(layer, origin, imagePath, defaultX, defaultY)
         {
             FrameCount = frameCount;
             FrameDelay = frameDelay;
-            LoopType = (LoopType)Enum.Parse(typeof(LoopType), loopType);
+            LoopType = loopType.ToLoopType();
         }
 
         public override async Task WriteHeaderAsync(TextWriter writer)

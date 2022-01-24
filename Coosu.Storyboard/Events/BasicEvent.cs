@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -14,24 +15,77 @@ namespace Coosu.Storyboard.Events
     [DebuggerDisplay("Expression = {DebuggerDisplay}")]
     public abstract class BasicEvent : IKeyEvent
     {
+        public virtual double DefaultValue { get; } = 0;
+
         private double[]? _end;
+        internal List<double> ListValue;
         private string DebuggerDisplay => this.GetHeaderString();
 
         public abstract EventType EventType { get; }
         public EasingFunctionBase Easing { get; set; } = LinearEase.Instance;
         public double StartTime { get; set; }
         public double EndTime { get; set; }
-        public double[] Start { get; set; }
 
-        public double[] End
+        public IReadOnlyList<double> Value
         {
-            get => EventType.Size == 0 ? Start : _end!;
-            set
-            {
-                if (EventType.Size == 0) Start = value;
-                else _end = value;
-            }
+            get => ListValue;
+            internal set => ListValue = (List<double>)value;
         }
+
+        protected void Fill(int count)
+        {
+            var index = count - 1;
+            if (index > ListValue.Count - 1)
+            {
+                while (index > ListValue.Count - 1)
+                {
+                    ListValue.Add(DefaultValue);
+                }
+            }
+
+        }
+
+        // todo: 大于size时自动匹配为start
+        protected double GetValue(int index)
+        {
+            if (index > ListValue.Count - 1)
+            {
+                while (index > ListValue.Count - 1)
+                {
+                    ListValue.Add(DefaultValue);
+                }
+
+                return DefaultValue;
+            }
+
+            return ListValue[index];
+        }
+
+        protected void SetValue(int index, double value)
+        {
+            if (index > ListValue.Count - 1)
+                while (index > ListValue.Count - 1)
+                {
+                    if (index == ListValue.Count)
+                        ListValue.Add(value);
+                    else
+                        ListValue.Add(DefaultValue);
+                }
+            else
+                ListValue[index] = value;
+        }
+
+        //public double[] Start { get; set; }
+
+        //public double[] End
+        //{
+        //    get => EventType.Size == 0 ? Start : _end!;
+        //    set
+        //    {
+        //        if (EventType.Size == 0) Start = value;
+        //        else _end = value;
+        //    }
+        //}
 
         public virtual bool IsStatic => Start.SequenceEqual(End);
 
@@ -59,13 +113,12 @@ namespace Coosu.Storyboard.Events
         public virtual async Task WriteScriptAsync(TextWriter writer) =>
             await WriteHeaderAsync(writer);
 
-        protected BasicEvent()
-        {
-            Start = EmptyArray<double>.Value;
-            End = EmptyArray<double>.Value;
-        }
+        //protected BasicEvent()
+        //{
+        //    Value = EmptyArray<double>.Value;
+        //}
 
-        protected BasicEvent(EasingFunctionBase easing, double startTime, double endTime, Span<double> start, Span<double> end)
+        protected BasicEvent(EasingFunctionBase easing, double startTime, double endTime, List<double> value)
         {
             Easing = easing;
             StartTime = startTime;
@@ -110,11 +163,13 @@ namespace Coosu.Storyboard.Events
 
         public static IKeyEvent Create(EventType e, EasingFunctionBase easing,
             double startTime, double endTime,
-            Span<double> value)
+            List<double> value)
         {
             var size = e.Size;
-            if (size != 0 && value.Length != size && value.Length != size * 2) throw new ArgumentException();
-            if (size == 0) return Create(e, easing, startTime, endTime, value.Slice(0, 1), default);
+            if (size != 0 && value.Count != size && value.Count != size * 2)
+                throw new ArgumentException();
+            if (size == 0)
+                return Create(e, easing, startTime, endTime, value.Slice(0, 1), default);
             return Create(e, easing, startTime, endTime,
                 value.Slice(0, size),
                 value.Length == size ? default : value.Slice(size, size));

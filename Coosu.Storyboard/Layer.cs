@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Coosu.Shared;
 using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Events;
 using Coosu.Storyboard.Utils;
@@ -140,6 +141,8 @@ namespace Coosu.Storyboard
             //0 = isLooping, 1 = isTriggering, 2 = isBlank
             bool[] options = { false, false, false };
 
+            var spanSplitArgs = new SpanSplitArgs();
+            var valueCache = new List<double>();
             int rowIndex = 0;
             string? line = textReader.ReadLine();
             while (line != null)
@@ -154,7 +157,8 @@ namespace Coosu.Storyboard
                 {
                     try
                     {
-                        currentObj = ParseObject(line, rowIndex, currentObj, group, options);
+                        currentObj = ParseObject(line, rowIndex, currentObj, group, options, spanSplitArgs, valueCache);
+                        valueCache.Clear();
                     }
                     catch (Exception e)
                     {
@@ -188,47 +192,87 @@ namespace Coosu.Storyboard
             int rowIndex,
             IDefinedObject? currentObj,
             Layer layer,
-            bool[] options)
+            bool[] options,
+            in SpanSplitArgs e,
+            in List<double> valueCache)
         {
             var sprite = currentObj as Sprite;
             ref bool isLooping = ref options[0];
             ref bool isTriggering = ref options[1];
             ref bool isBlank = ref options[2];
 
-            //int count = line.Count(k => k == ',') + 1;
-            var @params = line.Split(SplitChar);
-            string identifier = @params[0];
+            int i = -1;
+            ReadOnlySpan<char> param0 = default;
+            ReadOnlySpan<char> others = default;
+            foreach (var span in line.SpanSplit(SplitChar, e))
+            {
+                i++;
+                switch (i)
+                {
+                    case 0: param0 = span; e.Canceled = true; break;
+                    case 1: others = span; break;
+                }
+            }
+
+            e.Canceled = false;
+            var identifier = param0.ToString();
 
             if (ObjectType.Contains(identifier))
             {
+                ReadOnlySpan<char> param1 = default;
+                ReadOnlySpan<char> param2 = default;
+                ReadOnlySpan<char> param3 = default;
+                ReadOnlySpan<char> param4 = default;
+                ReadOnlySpan<char> param5 = default;
+                ReadOnlySpan<char> param6 = default;
+                ReadOnlySpan<char> param7 = default;
+                ReadOnlySpan<char> param8 = default;
+
+                i = 0;
+                foreach (var span in others.SpanSplit(SplitChar))
+                {
+                    i++;
+                    switch (i)
+                    {
+                        case 1: param1 = span; break;
+                        case 2: param2 = span; break;
+                        case 3: param3 = span; break;
+                        case 4: param4 = span; break;
+                        case 5: param5 = span; break;
+                        case 6: param6 = span; break;
+                        case 7: param7 = span; break;
+                        case 8: param8 = span; break;
+                    }
+                }
+
                 sprite?.TryEndLoop();
 
-                if (@params.Length == 6)
+                if (i == 5)
                 {
                     currentObj = layer.CreateSprite(
                         //@params[0],
-                        @params[1],
-                        @params[2],
-                        @params[3].Trim(QuoteChar),
-                        double.Parse(@params[4]),
-                        double.Parse(@params[5])
+                        param1,
+                      param2,
+                        param3.Trim(QuoteChar),
+                        double.Parse(param4),
+                        double.Parse(param5)
                     );
                     currentObj.RowInSource = rowIndex;
                     isLooping = false;
                     isTriggering = false;
                     isBlank = false;
                 }
-                else if (@params.Length == 8)
+                else if (i == 7)
                 {
                     currentObj = layer.CreateAnimation(
                         //@params[0],
-                        @params[1],
-                        @params[2],
-                        @params[3].Trim(QuoteChar),
-                        double.Parse(@params[4]),
-                        double.Parse(@params[5]),
-                        int.Parse(@params[6]),
-                        double.Parse(@params[7]),
+                        @param1,
+                        @param2,
+                        @param3.Trim(QuoteChar),
+                        double.Parse(@param4),
+                        double.Parse(@param5),
+                        int.Parse(@param6),
+                        double.Parse(@param7),
                         "LoopForever"
                     );
                     currentObj.RowInSource = rowIndex;
@@ -236,18 +280,18 @@ namespace Coosu.Storyboard
                     isTriggering = false;
                     isBlank = false;
                 }
-                else if (@params.Length == 9)
+                else if (i == 8)
                 {
                     currentObj = layer.CreateAnimation(
                         //@params[0],
-                        @params[1],
-                        @params[2],
-                        @params[3].Trim(QuoteChar),
-                        double.Parse(@params[4]),
-                        double.Parse(@params[5]),
-                        int.Parse(@params[6]),
-                        double.Parse(@params[7]),
-                        @params[8]
+                        @param1,
+                        @param2,
+                        @param3.Trim(QuoteChar),
+                        double.Parse(@param4),
+                        double.Parse(@param5),
+                        int.Parse(@param6),
+                        double.Parse(@param7),
+                        @param8
                     );
                     currentObj.RowInSource = rowIndex;
                     isLooping = false;
@@ -257,7 +301,7 @@ namespace Coosu.Storyboard
                 else
                     throw new Exception("Sprite declared wrongly");
             }
-            else if (string.IsNullOrEmpty(line.Trim()))
+            else if (string.IsNullOrWhiteSpace(line))
             {
                 isBlank = true;
             }
@@ -297,57 +341,80 @@ namespace Coosu.Storyboard
 
                 int easing = int.MinValue, startTime = int.MinValue, endTime = int.MinValue;
 
+                e.Canceled = false;
                 if (EventTypes.IsBasicEvent(identifier))
                 {
-                    easing = int.Parse(@params[1]);
+                    ReadOnlySpan<char> param1 = default;
+                    ReadOnlySpan<char> param2 = default;
+                    ReadOnlySpan<char> param3 = default;
+
+                    i = 0;
+                    foreach (var span in others.SpanSplit(SplitChar, e))
+                    {
+                        i++;
+                        switch (i)
+                        {
+                            case 1: param1 = span; break;
+                            case 2: param2 = span; break;
+                            case 3: param3 = span; e.Canceled = true; break;
+                            case 4: break;
+                        }
+                    }
+
+                    easing = int.Parse(param1);
                     if (easing is > 34 or < 0)
                         throw new FormatException("Unknown easing");
-                    startTime = int.Parse(@params[2]);
-                    endTime = @params[3] == ""
+                    startTime = int.Parse(param2);
+                    endTime = param3.Length == 0
                         ? startTime
-                        : int.Parse(@params[3]);
+                        : int.Parse(param3);
                 }
 
                 if (sprite != null)
-                    ParseEvent(sprite, options, @params, identifier, easing, startTime, endTime);
+                    ParseEvent(sprite, options, others, identifier, easing, startTime, endTime, e, valueCache);
             }
 
             return currentObj!;
         }
 
-        private static void ParseEvent(Sprite currentObj, bool[] options, string?[] rawParams,
-            string identifier, int easing, int startTime, int endTime)
+        private static void ParseEvent(Sprite currentObj, bool[] options,
+            ReadOnlySpan<char> rawParams,
+            string identifier, int easing, int startTime, int endTime,
+            in SpanSplitArgs e)
         {
-            int rawLength = rawParams.Length;
+            //int rawLength = rawParams.Length;
             var eventType = EventTypes.GetValue(identifier);
             if (eventType != default)
             {
                 var size = eventType.Size;
                 if (size >= 1)
                 {
-                    const int baseLength = 4;
+                    var t = 0;
+                    var valueStore = new List<double>();
+                    foreach (var span in rawParams.SpanSplit(SplitChar, e))
+                    {
+                        t++;
+                        if (t >= 4)
+                        {
+                            valueStore.Add(double.Parse(span));
+                        }
+                    }
+
+                    var basicEvent = BasicEvent.Create(eventType, (EasingType)easing, startTime, endTime, valueStore);
+
+                    //const int baseLength = 3;
+
+
                     // 验证是否存在缺省
-                    if (rawLength == size + baseLength)
+                    if (doubleList.Count == size)
                     {
-                        int length = size * 2;
-                        Span<double> array = stackalloc double[length];
-                        for (int i = 0; i < size; i++)
-                            array[i] = double.Parse(rawParams[baseLength + i]!);
-                        for (int i = 0; i < size; i++)
-                            array[i + size] = double.Parse(rawParams[baseLength + i]!);
-
+                        InjectEvent(others);
+                    }
+                    else if (doubleList.Count == size * 2)
+                    {
                         InjectEvent(array);
                     }
-                    else if (rawLength == size * 2 + baseLength)
-                    {
-                        int length = size * 2;
-                        Span<double> array = stackalloc double[length];
-                        for (int i = 0; i < length; i++)
-                            array[i] = double.Parse(rawParams[baseLength + i]!);
-
-                        InjectEvent(array);
-                    }
-                    else if (rawLength > size * 2 + baseLength && (rawLength - baseLength) % size == 0)
+                    else if (doubleList.Count > size * 2 && (doubleList.Count) % size == 0)
                     {
                         var duration = endTime - startTime;
                         for (int i = baseLength, j = 0; i < rawParams.Length - size; i += size, j++)
@@ -380,7 +447,7 @@ namespace Coosu.Storyboard
                             currentObj.Parameter(
                                 startTime,
                                 endTime,
-                                rawParams[4]!.ToParameterEnum());
+                                rawParams[4].ToParameterEnum());
                             return;
                         }
                     }
@@ -429,15 +496,21 @@ namespace Coosu.Storyboard
             }
         }
 
-        private Sprite CreateSprite(string layer, string origin, string imagePath, double defaultX, double defaultY)
+        private Sprite CreateSprite(ReadOnlySpan<char> layer,
+            ReadOnlySpan<char> origin,
+            ReadOnlySpan<char> imagePath,
+            double defaultX, double defaultY)
         {
             var obj = new Sprite(layer, origin, imagePath, defaultX, defaultY);
             AddObject(obj);
             return obj;
         }
 
-        private Sprite CreateAnimation(string layer, string origin, string imagePath, double defaultX,
-            double defaultY, int frameCount, double frameDelay, string loopType)
+        private Sprite CreateAnimation(ReadOnlySpan<char> layer,
+            ReadOnlySpan<char> origin,
+            ReadOnlySpan<char> imagePath,
+            double defaultX, double defaultY,
+            int frameCount, double frameDelay, ReadOnlySpan<char> loopType)
         {
             var obj = new Animation(layer, origin, imagePath, defaultX, defaultY, frameCount, frameDelay, loopType);
             AddObject(obj);
