@@ -13,9 +13,9 @@ namespace Coosu.Storyboard
     {
         public static SpriteGroup CreateText(this ISpriteHost spriteHost,
             string text,
-            double startTime,
-            double initialX,
-            double initialY,
+            float startTime,
+            float initialX,
+            float initialY,
             Action<CoosuTextOptionsBuilder> configure)
         {
             var builder = new CoosuTextOptionsBuilder();
@@ -25,9 +25,9 @@ namespace Coosu.Storyboard
 
         public static SpriteGroup CreateText(this ISpriteHost spriteHost,
             string text,
-            double startTime,
-            double initialX,
-            double initialY,
+            float startTime,
+            float initialX,
+            float initialY,
             OriginType origin,
             Action<CoosuTextOptionsBuilder> configure)
         {
@@ -38,9 +38,9 @@ namespace Coosu.Storyboard
 
         public static SpriteGroup CreateText(this ISpriteHost spriteHost,
             string text,
-            double startTime,
-            double initialX,
-            double initialY,
+            float startTime,
+            float initialX,
+            float initialY,
             LayerType layer = LayerType.Foreground,
             OriginType origin = OriginType.Centre,
             CoosuTextOptions? textOptions = null)
@@ -95,7 +95,7 @@ namespace Coosu.Storyboard
                     var deg = textOptions.ShadowDirection;
                     var x = r * Math.Cos(deg / 180d * Math.PI);
                     var y = r * Math.Sin(deg / 180d * Math.PI);
-                    var sprite = spriteGroup.CreateSprite(filePath, layer, textOptions.Origin, x, y);
+                    var sprite = spriteGroup.CreateSprite(filePath, layer, textOptions.Origin, (float)x, (float)y);
                     if (scale) AdjustScale(sprite, startTime, textOptions);
                     sprite.Tag = i;
                 }
@@ -135,22 +135,22 @@ namespace Coosu.Storyboard
             return spriteGroup;
         }
 
-        private static void AdjustScale(IEventHost sprite, double startTime, CoosuTextOptions textOptions)
+        private static void AdjustScale(IEventHost sprite, float startTime, CoosuTextOptions textOptions)
         {
             var isVertical = textOptions.Orientation == Orientation.Vertical;
             var useYAdd = isVertical && textOptions.RotateBy90 == false;
             if (!isVertical)
             {
-                sprite.Vector(startTime, textOptions.XScale, textOptions.YScale);
+                sprite.Vector(startTime, (float)textOptions.XScale, (float)textOptions.YScale);
             }
             else if (!useYAdd)
             {
-                sprite.Vector(startTime, textOptions.YScale, textOptions.XScale);
-                sprite.Rotate(startTime, Math.PI / 2);
+                sprite.Vector(startTime, (float)textOptions.YScale, (float)textOptions.XScale);
+                sprite.Rotate(startTime, (float)(Math.PI / 2));
             }
             else
             {
-                sprite.Vector(startTime, textOptions.XScale, textOptions.YScale);
+                sprite.Vector(startTime, (float)textOptions.XScale, (float)textOptions.YScale);
             }
         }
     }

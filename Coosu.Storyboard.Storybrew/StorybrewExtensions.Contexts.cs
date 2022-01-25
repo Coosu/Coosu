@@ -93,13 +93,13 @@ namespace Coosu.Storyboard
 
                 if (isVertical)
                 {
-                    sprite.DefaultY += calOffset.X + addition / 2;
-                    sprite.DefaultX += calOffset.Y + addition / 2;
+                    sprite.DefaultY += (float)(calOffset.X + addition / 2);
+                    sprite.DefaultX += (float)(calOffset.Y + addition / 2);
                 }
                 else
                 {
-                    sprite.DefaultX += calOffset.X + addition / 2;
-                    sprite.DefaultY = calOffset.Y;
+                    sprite.DefaultX += (float)(calOffset.X + addition / 2);
+                    sprite.DefaultY = (float)calOffset.Y;
                     //sprite.DefaultY += calOffset.Y + addition / 2;
                 }
 

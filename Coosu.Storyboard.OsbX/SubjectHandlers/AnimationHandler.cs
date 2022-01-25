@@ -33,15 +33,15 @@ namespace Coosu.Storyboard.OsbX.SubjectHandlers
             var layerType = (LayerType)Enum.Parse(typeof(LayerType), split[1]);
             var origin = (OriginType)Enum.Parse(typeof(OriginType), split[2]);
             var path = split[3].Trim('\"');
-            var defX = double.Parse(split[4]);
-            var defY = double.Parse(split[5]);
+            var defX = float.Parse(split[4]);
+            var defY = float.Parse(split[5]);
             var frameCount = int.Parse(split[6]);
-            var frameDelay = double.Parse(split[7]);
+            var frameDelay = float.Parse(split[7]);
             var loopType = split.Length == 9
                 ? (LoopType)Enum.Parse(typeof(LoopType), split[8])
                 : LoopType.LoopForever;
 
-            double defaultZ = 1;
+            float defaultZ = 1;
             string cameraIdentifier = Guid.Empty.ToString();
             if (split.Length == 11)
             {

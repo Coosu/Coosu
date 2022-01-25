@@ -6,16 +6,16 @@ namespace Coosu.Storyboard.OsbX.Actions
     {
         public override EventType EventType => EventTypes.Scale;
 
-        public double StartOrigin
+        public float StartOrigin
         {
-            get => Start[0];
-            set => Start[0] = value;
+            get => GetValue(0);
+            set => SetValue(0, value);
         }
 
-        public double EndOrigin
+        public float EndOrigin
         {
-            get => End[0];
-            set => End[0] = value;
+            get => GetValue(1);
+            set => SetValue(1, value);
         }
     }
 }

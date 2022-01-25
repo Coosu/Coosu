@@ -18,21 +18,21 @@ namespace Coosu.Storyboard.Extensions
 
         public EasingFunctionBase Easing { get; set; } = LinearEase.Instance;
 
-        public double StartTime { get; set; }
-        public double EndTime { get; set; }
+        public float StartTime { get; set; }
+        public float EndTime { get; set; }
 
         /// <summary>
         /// For relative event this is a tag.
         /// </summary>
-        public double[] Start { get; set; }
+        public float[] Start { get; set; }
 
         /// <summary>
         /// This is actual relative value.
         /// </summary>
-        public double[] End { get; set; }
+        public float[] End { get; set; }
         public virtual bool IsStartsEqualsEnds => End.All(k => k == 0);
 
-        public void AdjustTiming(double offset)
+        public void AdjustTiming(float offset)
         {
             StartTime += offset;
             EndTime += offset;
@@ -60,18 +60,18 @@ namespace Coosu.Storyboard.Extensions
         public RelativeEvent(EventType eventType)
         {
             EventType = eventType;
-            Start = EmptyArray<double>.Value;
-            End = EmptyArray<double>.Value;
+            Start = EmptyArray<float>.Value;
+            End = EmptyArray<float>.Value;
         }
 
-        public RelativeEvent(EventType eventType, EasingFunctionBase easing, double startTime, double endTime, double[] byValue)
+        public RelativeEvent(EventType eventType, EasingFunctionBase easing, float startTime, float endTime, float[] byValue)
         {
             EventType = eventType;
             Easing = easing;
             StartTime = startTime;
             EndTime = endTime;
             End = byValue;
-            Start = new double[eventType.Size];
+            Start = new float[eventType.Size];
         }
 
         protected virtual async Task WriteExtraScriptAsync(TextWriter textWriter)
