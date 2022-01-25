@@ -28,50 +28,91 @@ namespace Coosu.Storyboard
         public OriginType OriginType { get; }
         public string ImagePath { get; }
         /// <inheritdoc />
-        public double DefaultX { get; set; }
+        public float DefaultX { get; set; }
         /// <inheritdoc />
-        public double DefaultY { get; set; }
+        public float DefaultY { get; set; }
 
         /// <inheritdoc />
-        public double DefaultZ { get; set; }
+        public float DefaultZ { get; set; }
         /// <inheritdoc />
         public string CameraIdentifier { get; set; } = "00000000-0000-0000-0000-000000000000";
 
         // EventHosts
-        public ICollection<IKeyEvent> Events { get; set; } =
-            new SortedSet<IKeyEvent>(new EventSequenceComparer());
+        public ICollection<IKeyEvent> Events { get; set; } = new List<IKeyEvent>();
+        //new SortedSet<IKeyEvent>(new EventSequenceComparer());
 
         // ISceneObject
-        public List<Loop> LoopList { get; } = new();
-        public List<Trigger> TriggerList { get; } = new();
+        public List<Loop> LoopList { get; private set; } = new();
+        public List<Trigger> TriggerList { get; private set; } = new();
 
-        public double MaxTime =>
-             NumericHelper.GetMaxValue(
-                 Events.Select(k => k.EndTime),
-                 LoopList.Select(k => k.OuterMaxTime),
-                 TriggerList.Select(k => k.MaxTime)
-             );
+        public float MaxTime
+        {
+            get
+            {
+                if (Events.Count == 0 && LoopList.Count == 0 && TriggerList.Count == 0)
+                    return float.NaN;
 
-        public double MinTime =>
-            NumericHelper.GetMinValue(
-                Events.Select(k => k.StartTime),
-                LoopList.Select(k => k.OuterMinTime),
-                TriggerList.Select(k => k.MinTime)
-            );
+                var max = Events.Count == 0 ? float.MinValue : Events.Max(k => k.EndTime);
+                var loopMax = LoopList.Count == 0 ? float.MinValue : LoopList.Max(k => k.OuterMaxTime);
+                max = max >= loopMax ? max : loopMax;
 
-        public double MaxStartTime =>
-            NumericHelper.GetMaxValue(
-                Events.Select(k => k.StartTime),
-                LoopList.Select(k => k.OuterMinTime),
-                TriggerList.Select(k => k.MinTime)
-            );
+                var triggerMax = TriggerList.Count == 0 ? float.MinValue : TriggerList.Max(k => k.MaxTime);
+                max = max >= triggerMax ? max : triggerMax;
+                return max;
+            }
+        }
 
-        public double MinEndTime =>
-            NumericHelper.GetMinValue(
-                Events.Select(k => k.EndTime),
-                LoopList.Select(k => k.OuterMaxTime),
-                TriggerList.Select(k => k.MaxTime)
-            );
+        public float MinTime
+        {
+            get
+            {
+                if (Events.Count == 0 && LoopList.Count == 0 && TriggerList.Count == 0)
+                    return float.NaN;
+
+                var min = Events.Count == 0 ? float.MaxValue : Events.Min(k => k.StartTime);
+                var loopMin = LoopList.Count == 0 ? float.MaxValue : LoopList.Min(k => k.OuterMinTime);
+                min = min <= loopMin ? min : loopMin;
+
+                var triggerMin = TriggerList.Count == 0 ? float.MaxValue : TriggerList.Min(k => k.MinTime);
+                min = min <= triggerMin ? min : triggerMin;
+                return min;
+            }
+        }
+
+        public float MaxStartTime
+        {
+            get
+            {
+                if (Events.Count == 0 && LoopList.Count == 0 && TriggerList.Count == 0)
+                    return float.NaN;
+
+                var max = Events.Count == 0 ? float.MinValue : Events.Max(k => k.StartTime);
+                var loopMax = LoopList.Count == 0 ? float.MinValue : LoopList.Max(k => k.OuterMinTime);
+                max = max >= loopMax ? max : loopMax;
+
+                var triggerMax = TriggerList.Count == 0 ? float.MinValue : TriggerList.Max(k => k.MinTime);
+                max = max >= triggerMax ? max : triggerMax;
+                return max;
+            }
+        }
+
+        public float MinEndTime
+        {
+            get
+            {
+                if (Events.Count == 0 && LoopList.Count == 0 && TriggerList.Count == 0)
+                    return float.NaN;
+
+                var min = Events.Count == 0 ? float.MaxValue : Events.Min(k => k.EndTime);
+                var loopMin = LoopList.Count == 0 ? float.MaxValue : LoopList.Min(k => k.OuterMaxTime);
+                min = min <= loopMin ? min : loopMin;
+
+                var triggerMin = TriggerList.Count == 0 ? float.MaxValue : TriggerList.Min(k => k.MaxTime);
+                min = min <= triggerMin ? min : triggerMin;
+                return min;
+            }
+        }
+
         public bool EnableGroupedSerialization { get; set; }/* = true;*/
 
         // Loop control
@@ -86,7 +127,7 @@ namespace Coosu.Storyboard
         /// <param name="imagePath">Set image path.</param>
         /// <param name="defaultX">Set default x-coordinate of location.</param>
         /// <param name="defaultY">Set default x-coordinate of location.</param>
-        public Sprite(LayerType layerType, OriginType originType, string imagePath, double defaultX, double defaultY)
+        public Sprite(LayerType layerType, OriginType originType, string imagePath, float defaultX, float defaultY)
         {
             LayerType = layerType;
             OriginType = originType;
@@ -96,7 +137,7 @@ namespace Coosu.Storyboard
         }
 
         public Sprite(ReadOnlySpan<char> layer, ReadOnlySpan<char> origin, ReadOnlySpan<char> imagePath,
-            double defaultX, double defaultY)
+            float defaultX, float defaultY)
         {
             //ObjectType = OsbObjectType.Parse(type);
             LayerType = layer.ToLayerType();
@@ -196,9 +237,9 @@ namespace Coosu.Storyboard
         public void AddEvent(IKeyEvent @event)
         {
             if (_isLooping)
-                LoopList[LoopList.Count - 1].AddEvent(@event);
+                LoopList![LoopList.Count - 1].AddEvent(@event);
             else if (_isTriggering)
-                TriggerList[TriggerList.Count - 1].AddEvent(@event);
+                TriggerList![TriggerList.Count - 1].AddEvent(@event);
             else
                 Events.Add(@event);
         }
@@ -213,8 +254,12 @@ namespace Coosu.Storyboard
                 Events = Events.Select(k => k.Clone()).Cast<IKeyEvent>().ToList(),
             };
 
-            sprite.LoopList.AddRange(LoopList.Select(k => k.Clone()).Cast<Loop>());
-            sprite.TriggerList.AddRange(LoopList.Select(k => k.Clone()).Cast<Trigger>());
+            if (LoopList != null)
+                sprite.LoopList = new List<Loop>(LoopList.Select(k => k.Clone()).Cast<Loop>());
+
+            if (TriggerList != null)
+                sprite.TriggerList = new List<Trigger>(TriggerList.Select(k => k.Clone()).Cast<Trigger>());
+
             return sprite;
         }
     }

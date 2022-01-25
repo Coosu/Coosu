@@ -13,13 +13,13 @@ namespace Coosu.Storyboard
         public string CameraIdentifier { get; set; } = Guid.NewGuid().ToString();
 
         /// <inheritdoc />
-        public double DefaultX { get; set; } = 320;
+        public float DefaultX { get; set; } = 320;
 
         /// <inheritdoc />
-        public double DefaultY { get; set; } = 240;
+        public float DefaultY { get; set; } = 240;
 
         /// <inheritdoc />
-        public double DefaultZ { get; set; } = 1;
+        public float DefaultZ { get; set; } = 1;
 
         public OriginType OriginType { get; set; } = OriginType.Centre;
         public ICollection<IKeyEvent> Events { get; set; } = new List<IKeyEvent>();

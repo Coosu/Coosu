@@ -21,8 +21,8 @@
             };
         }
 
-        public static CubicEase InstanceIn => new() { EasingMode = EasingMode.EaseIn };
-        public static CubicEase InstanceOut => new() { EasingMode = EasingMode.EaseOut };
-        public static CubicEase InstanceInOut => new() { EasingMode = EasingMode.EaseInOut };
+        public static CubicEase InstanceIn { get; } = new() { EasingMode = EasingMode.EaseIn, ThrowIfChangeProperty = true };
+        public static CubicEase InstanceOut { get; } = new() { EasingMode = EasingMode.EaseOut, ThrowIfChangeProperty = true };
+        public static CubicEase InstanceInOut { get; } = new() { EasingMode = EasingMode.EaseInOut, ThrowIfChangeProperty = true };
     }
 }

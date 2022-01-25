@@ -18,30 +18,30 @@ namespace Coosu.Storyboard.Events
         public EventType EventType { get; } = EventTypes.Trigger;
 
         public bool EnableGroupedSerialization { get; set; } /*= true;*/
-        public ICollection<IKeyEvent> Events { get; set; } =
-            new SortedSet<IKeyEvent>(new EventSequenceComparer());
+        public ICollection<IKeyEvent> Events { get; set; } = new List<IKeyEvent>();
+            //new SortedSet<IKeyEvent>(new EventSequenceComparer());
 
-        public double StartTime { get; set; }
-        public double EndTime { get; set; }
+        public float StartTime { get; set; }
+        public float EndTime { get; set; }
         public string TriggerName { get; set; }
 
-        public double MaxTime =>
+        public float MaxTime =>
             EndTime +
             (Events.Count > 0
                 ? Events.Max(k => k.EndTime)
                 : 0);
 
-        public double MinTime => StartTime;
+        public float MinTime => StartTime;
 
-        public double MaxStartTime =>
+        public float MaxStartTime =>
             EndTime +
             (Events.Count > 0
                 ? Events.Max(k => k.StartTime)
                 : 0); //if hitsound played at end time
 
-        public double MinEndTime => StartTime; // if no hitsound here
+        public float MinEndTime => StartTime; // if no hitsound here
 
-        public Trigger(double startTime, double endTime, TriggerType triggerType, bool listenSample = false, uint? customSampleSet = null)
+        public Trigger(float startTime, float endTime, TriggerType triggerType, bool listenSample = false, uint? customSampleSet = null)
         {
             StartTime = startTime;
             EndTime = endTime;
@@ -49,7 +49,7 @@ namespace Coosu.Storyboard.Events
             TriggerName = GetTriggerString(triggerType, listenSample, customSampleSet);
         }
 
-        public Trigger(double startTime, double endTime, string triggerName)
+        public Trigger(float startTime, float endTime, string triggerName)
         {
             StartTime = startTime;
             EndTime = endTime;
@@ -112,7 +112,7 @@ namespace Coosu.Storyboard.Events
             return sb.ToString();
         }
 
-        public void AdjustTiming(double offset)
+        public void AdjustTiming(float offset)
         {
             StartTime += offset;
         }

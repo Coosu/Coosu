@@ -6,15 +6,15 @@ namespace Coosu.Storyboard.Events
     public sealed class Fade : BasicEvent
     {
         public override EventType EventType => EventTypes.Fade;
-        public override double DefaultValue { get; } = 1d;
+        public override float DefaultValue { get; } = 1f;
 
-        public double StartOpacity
+        public float StartOpacity
         {
             get => GetValue(0);
             set => SetValue(0, value);
         }
 
-        public double EndOpacity
+        public float EndOpacity
         {
             get => GetValue(1);
             set => SetValue(1, value);
@@ -25,7 +25,7 @@ namespace Coosu.Storyboard.Events
         //{
         //}
 
-        public Fade(EasingFunctionBase easing, double startTime, double endTime, List<double> values)
+        public Fade(EasingFunctionBase easing, float startTime, float endTime, List<float> values)
             : base(easing, startTime, endTime, values)
         {
         }

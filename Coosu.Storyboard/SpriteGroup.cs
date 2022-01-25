@@ -19,7 +19,7 @@ namespace Coosu.Storyboard
         {
         }
 
-        public SpriteGroup(double defaultX, double defaultY, double defaultZ, OriginType origin)
+        public SpriteGroup(float defaultX, float defaultY, float defaultZ, OriginType origin)
         {
             Camera2.DefaultX = defaultX;
             Camera2.DefaultY = defaultY;
@@ -51,19 +51,19 @@ namespace Coosu.Storyboard
 
         }
 
-        public double MaxTime =>
+        public float MaxTime =>
             NumericHelper.GetMaxValue(
                 Events.Select(k => k.EndTime)
             );
-        public double MinTime =>
+        public float MinTime =>
             NumericHelper.GetMinValue(
                 Events.Select(k => k.StartTime)
             );
-        public double MaxStartTime =>
+        public float MaxStartTime =>
             NumericHelper.GetMaxValue(
                 Events.Select(k => k.StartTime)
             );
-        public double MinEndTime =>
+        public float MinEndTime =>
             NumericHelper.GetMinValue(
                 Events.Select(k => k.EndTime)
             );
@@ -82,21 +82,21 @@ namespace Coosu.Storyboard
         }
 
         /// <inheritdoc />
-        public double DefaultX
+        public float DefaultX
         {
             get => Camera2.DefaultX;
             set => Camera2.DefaultX = value;
         }
 
         /// <inheritdoc />
-        public double DefaultY
+        public float DefaultY
         {
             get => Camera2.DefaultY;
             set => Camera2.DefaultY = value;
         }
 
         /// <inheritdoc />
-        public double DefaultZ
+        public float DefaultZ
         {
             get => Camera2.DefaultZ;
             set => Camera2.DefaultZ = value;

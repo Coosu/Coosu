@@ -6,15 +6,15 @@ namespace Coosu.Storyboard.Events
     public sealed class Scale : BasicEvent
     {
         public override EventType EventType => EventTypes.Scale;
-        public override double DefaultValue { get; } = 1d;
+        public override float DefaultValue { get; } = 1f;
 
-        public double StartScale
+        public float StartScale
         {
             get => GetValue(0);
             set => SetValue(0, value);
         }
 
-        public double EndScale
+        public float EndScale
         {
             get => GetValue(1);
             set => SetValue(1, value);
@@ -25,7 +25,7 @@ namespace Coosu.Storyboard.Events
         //{
         //}
 
-        public Scale(EasingFunctionBase easing, double startTime, double endTime, List<double> values)
+        public Scale(EasingFunctionBase easing, float startTime, float endTime, List<float> values)
             : base(easing, startTime, endTime, values)
         {
         }

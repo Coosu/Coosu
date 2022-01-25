@@ -16,23 +16,23 @@ namespace Coosu.Storyboard.Events
     [DebuggerDisplay("Expression = {DebuggerDisplay}")]
     public abstract class BasicEvent : IKeyEvent
     {
-        private List<double> _values;
+        private List<float> _values;
         private string DebuggerDisplay => this.GetHeaderString();
 
         public abstract EventType EventType { get; }
         public EasingFunctionBase Easing { get; set; } = LinearEase.Instance;
-        public double StartTime { get; set; }
-        public double EndTime { get; set; }
+        public float StartTime { get; set; }
+        public float EndTime { get; set; }
 
-        public virtual double DefaultValue => 0;
-        public IReadOnlyList<double> Values
+        public virtual float DefaultValue => 0;
+        public IReadOnlyList<float> Values
         {
             get => _values;
-            internal set => _values = (List<double>)value;
+            internal set => _values = (List<float>)value;
         }
 
 #if NET5_0_OR_GREATER
-        public virtual Span<double> GetStartsSpan()
+        public virtual Span<float> GetStartsSpan()
         {
             Fill();
             var size = EventType.Size;
@@ -42,7 +42,7 @@ namespace Coosu.Storyboard.Events
             return span;
         }
 
-        public Span<double> GetEndsSpan()
+        public Span<float> GetEndsSpan()
         {
             Fill();
             var size = EventType.Size;
@@ -56,9 +56,9 @@ namespace Coosu.Storyboard.Events
         public virtual bool IsHalfFilled => Values.Count == EventType.Size;
         public virtual bool IsFilled => Values.Count == EventType.Size * 2;
 
-        public virtual double GetValue(int index)
+        public virtual float GetValue(int index)
         {
-            if (index >= EventType.Size)
+            if (index >= EventType.Size * 2)
                 throw new ArgumentOutOfRangeException(nameof(index), index,
                     $"Incorrect parameter index for {EventType.Flag}");
             if (index < 0)
@@ -68,9 +68,9 @@ namespace Coosu.Storyboard.Events
             return GetValueImpl(index);
         }
 
-        public virtual void SetValue(int index, double value)
+        public virtual void SetValue(int index, float value)
         {
-            if (index >= EventType.Size)
+            if (index >= EventType.Size * 2)
                 throw new ArgumentOutOfRangeException(nameof(index), index,
                     $"Incorrect parameter index for {EventType.Flag}");
             if (index < 0)
@@ -102,7 +102,7 @@ namespace Coosu.Storyboard.Events
             return true;
         }
 
-        public void AdjustTiming(double offset)
+        public void AdjustTiming(float offset)
         {
             StartTime += offset;
             EndTime += offset;
@@ -128,10 +128,10 @@ namespace Coosu.Storyboard.Events
 
         protected BasicEvent()
         {
-            _values = new List<double>();
+            _values = new List<float>();
         }
 
-        protected BasicEvent(EasingFunctionBase easing, double startTime, double endTime, List<double> values)
+        protected BasicEvent(EasingFunctionBase easing, float startTime, float endTime, List<float> values)
         {
             Easing = easing;
             StartTime = startTime;
@@ -150,8 +150,8 @@ namespace Coosu.Storyboard.Events
 
         protected void Fill(int count)
         {
+            if (count <= _values.Count) return;
             var index = count - 1;
-            if (index <= _values.Count - 1) return;
             var size = EventType.Size;
             if (IsHalfFilled && !IsFilled)
             {
@@ -178,13 +178,13 @@ namespace Coosu.Storyboard.Events
             }
         }
 
-        protected double GetValueImpl(int index)
+        protected float GetValueImpl(int index)
         {
             Fill(index + 1);
             return _values[index];
         }
 
-        protected void SetValueImpl(int index, double value)
+        protected void SetValueImpl(int index, float value)
         {
             Fill(index + 1);
             _values[index] = value;
@@ -204,7 +204,7 @@ namespace Coosu.Storyboard.Events
             for (int i = 0; i < Values.Count; i++)
             {
                 await textWriter.WriteAsync(Values[i].ToIcString());
-                if (i != EventType.Size - 1) await textWriter.WriteAsync(',');
+                if (i != Values.Count - 1) await textWriter.WriteAsync(',');
             }
         }
 
@@ -223,7 +223,7 @@ namespace Coosu.Storyboard.Events
         //}
 
         public static IKeyEvent Create(EventType e, EasingFunctionBase easing,
-            double startTime, double endTime, List<double> values)
+            float startTime, float endTime, List<float> values)
         {
             var size = e.Size;
             if (size != 0 && values.Count != size && values.Count != size * 2)
@@ -254,7 +254,7 @@ namespace Coosu.Storyboard.Events
                 keyEvent = result ?? throw new ArgumentOutOfRangeException(nameof(e), e, null);
             }
 
-            keyEvent.Fill();
+            //keyEvent.Fill();
             return keyEvent;
         }
 

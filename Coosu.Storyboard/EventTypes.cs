@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace Coosu.Storyboard
 {
@@ -7,9 +8,9 @@ namespace Coosu.Storyboard
     {
         #region static members
 
-        private static readonly Dictionary<string, EventType> DictionaryStore = new(StringComparer.OrdinalIgnoreCase);
+        private static readonly Dictionary<string, EventType> DictionaryStore = new(/*StringComparer.OrdinalIgnoreCase*/);
         private static readonly Dictionary<int, EventType> DictionaryStoreIndex = new();
-        private static readonly Dictionary<string, EventType> NonBasicDictionaryStore = new(StringComparer.OrdinalIgnoreCase);
+        private static readonly Dictionary<string, EventType> NonBasicDictionaryStore = new(/*StringComparer.OrdinalIgnoreCase*/);
 
         static EventTypes()
         {

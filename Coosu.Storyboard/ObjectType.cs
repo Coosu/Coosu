@@ -11,7 +11,7 @@ namespace Coosu.Storyboard
 
         #region static members
 
-        private static readonly Dictionary<string, ObjectType> DictionaryStore = new(StringComparer.OrdinalIgnoreCase);
+        private static readonly Dictionary<string, ObjectType> DictionaryStore = new(/*StringComparer.OrdinalIgnoreCase*/);
         private static readonly Dictionary<ObjectType, string> BackDictionaryStore = new();
 
         static ObjectType()

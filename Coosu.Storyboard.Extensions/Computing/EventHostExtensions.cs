@@ -14,13 +14,13 @@ namespace Coosu.Storyboard.Extensions.Computing
         {
             if (host is Sprite sprite)
             {
-                if (sprite.TriggerList.Any())
+                if (sprite.TriggerList.Count > 0)
                 {
                     foreach (var t in sprite.TriggerList)
                         t.Expand();
                 }
 
-                if (sprite.LoopList.Any())
+                if (sprite.LoopList.Count > 0)
                 {
                     foreach (var loop in sprite.LoopList)
                     {
@@ -137,9 +137,10 @@ namespace Coosu.Storyboard.Extensions.Computing
             var maxTime = eventHost.MaxTime;
             if (eventHost is Sprite sprite)
             {
-                return sprite.Events.Count(k => k.EndTime.Equals(maxTime)) +
-                       sprite.LoopList.Count(k => k.OuterMaxTime.Equals(maxTime)) +
-                       sprite.TriggerList.Count(k => k.MaxTime.Equals(maxTime));
+                var sum = sprite.Events.Count(k => k.EndTime.Equals(maxTime));
+                sum += sprite.LoopList.Count(k => k.OuterMaxTime.Equals(maxTime));
+                sum += sprite.TriggerList.Count(k => k.MaxTime.Equals(maxTime));
+                return sum;
             }
 
             return eventHost.Events.Count(k => k.EndTime.Equals(maxTime));
@@ -150,9 +151,10 @@ namespace Coosu.Storyboard.Extensions.Computing
             var minTime = eventHost.MinTime;
             if (eventHost is Sprite sprite)
             {
-                return sprite.Events.Count(k => k.StartTime.Equals(minTime)) +
-                       sprite.LoopList.Count(k => k.OuterMinTime.Equals(minTime)) +
-                       sprite.TriggerList.Count(k => k.MinTime.Equals(minTime));
+                var sum = sprite.Events.Count(k => k.StartTime.Equals(minTime));
+                sum += sprite.LoopList.Count(k => k.OuterMinTime.Equals(minTime));
+                sum += sprite.TriggerList.Count(k => k.MinTime.Equals(minTime));
+                return sum;
             }
 
             return eventHost.Events.Count(k => k.StartTime.Equals(minTime));

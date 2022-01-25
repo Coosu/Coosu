@@ -21,8 +21,8 @@
             };
         }
 
-        public static QuadraticEase InstanceIn => new() { EasingMode = EasingMode.EaseIn };
-        public static QuadraticEase InstanceOut => new() { EasingMode = EasingMode.EaseOut };
-        public static QuadraticEase InstanceInOut => new() { EasingMode = EasingMode.EaseInOut };
+        public static QuadraticEase InstanceIn { get; } = new() { EasingMode = EasingMode.EaseIn, ThrowIfChangeProperty = true };
+        public static QuadraticEase InstanceOut { get; } = new() { EasingMode = EasingMode.EaseOut, ThrowIfChangeProperty = true };
+        public static QuadraticEase InstanceInOut { get; } = new() { EasingMode = EasingMode.EaseInOut, ThrowIfChangeProperty = true };
     }
 }

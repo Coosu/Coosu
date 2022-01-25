@@ -5,7 +5,7 @@ namespace Coosu.Storyboard.Common
     public interface IEvent : ITimingAdjustable, ICloneable
     {
         EventType EventType { get; }
-        double StartTime { get; }
-        double EndTime { set; get; }
+        float StartTime { get; }
+        float EndTime { set; get; }
     }
 }

@@ -50,9 +50,7 @@ namespace Coosu.Storyboard.Easing
         public static implicit operator EasingFunctionBase(EasingType easing)
         {
             var easingFunction = easing.ToEasingFunction();
-            return easingFunction as EasingFunctionBase
-                   ?? throw new Exception("The target class " + easingFunction.GetType() +
-                                          " should be inherited by \"" + nameof(EasingFunctionBase) + "\"");
+            return easingFunction;
         }
 
         public static implicit operator EasingFunctionBase(int easingIndex)
@@ -61,9 +59,7 @@ namespace Coosu.Storyboard.Easing
                 throw new ArgumentOutOfRangeException(nameof(easingIndex), easingIndex, null);
             var easing = (EasingType)easingIndex;
             var easingFunction = easing.ToEasingFunction();
-            return easingFunction as EasingFunctionBase
-                   ?? throw new Exception("The target class " + easingFunction.GetType() +
-                                          " should be inherited by \"" + nameof(EasingFunctionBase) + "\"");
+            return easingFunction;
         }
 
         private static readonly Type EasingTypeT = typeof(EasingType);
