@@ -39,7 +39,7 @@ namespace Coosu.Storyboard
 
         // EventHosts
         public ICollection<IKeyEvent> Events { get; set; } =
-            new SortedSet<IKeyEvent>(new EventTimingComparer());
+            new SortedSet<IKeyEvent>(new EventSequenceComparer());
 
         // ISceneObject
         public List<Loop> LoopList { get; } = new();

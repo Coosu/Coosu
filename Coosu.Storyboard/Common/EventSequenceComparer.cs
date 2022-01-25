@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Coosu.Storyboard.Common
 {
-    public class EventTimingComparer : IComparer<IKeyEvent>
+    public class EventSequenceComparer : IComparer<IKeyEvent>
     {
         public int Compare(IKeyEvent? x, IKeyEvent? y)
         {
@@ -25,8 +25,7 @@ namespace Coosu.Storyboard.Common
                 return 1;
             if (x.EventType < y.EventType)
                 return -1;
-            if (x.Start.SequenceEqual(y.Start) &&
-                x.End.SequenceEqual(y.End))
+            if (x.Values.SequenceEqual(y.Values))
                 return 0;
             return 1; // ensure object can be insert in order.
             //return 0;

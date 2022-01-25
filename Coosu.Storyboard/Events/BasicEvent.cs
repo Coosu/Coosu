@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Coosu.Shared;
+using Coosu.Shared.Mathematics;
 using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Easing;
 using Coosu.Storyboard.Extensibility;
@@ -15,10 +16,7 @@ namespace Coosu.Storyboard.Events
     [DebuggerDisplay("Expression = {DebuggerDisplay}")]
     public abstract class BasicEvent : IKeyEvent
     {
-        public virtual double DefaultValue { get; } = 0;
-
-        private double[]? _end;
-        internal List<double> ListValue;
+        private List<double> _values;
         private string DebuggerDisplay => this.GetHeaderString();
 
         public abstract EventType EventType { get; }
@@ -26,68 +24,83 @@ namespace Coosu.Storyboard.Events
         public double StartTime { get; set; }
         public double EndTime { get; set; }
 
-        public IReadOnlyList<double> Value
+        public virtual double DefaultValue => 0;
+        public IReadOnlyList<double> Values
         {
-            get => ListValue;
-            internal set => ListValue = (List<double>)value;
+            get => _values;
+            internal set => _values = (List<double>)value;
         }
 
-        protected void Fill(int count)
+#if NET5_0_OR_GREATER
+        public virtual Span<double> GetStartsSpan()
         {
-            var index = count - 1;
-            if (index > ListValue.Count - 1)
+            Fill();
+            var size = EventType.Size;
+            var span = System.Runtime.InteropServices.CollectionsMarshal
+                .AsSpan(_values)
+                .Slice(0, size);
+            return span;
+        }
+
+        public Span<double> GetEndsSpan()
+        {
+            Fill();
+            var size = EventType.Size;
+            var span = System.Runtime.InteropServices.CollectionsMarshal
+                .AsSpan(_values)
+                .Slice(size, size);
+            return span;
+        }
+#endif
+
+        public virtual bool IsHalfFilled => Values.Count == EventType.Size;
+        public virtual bool IsFilled => Values.Count == EventType.Size * 2;
+
+        public virtual double GetValue(int index)
+        {
+            if (index >= EventType.Size)
+                throw new ArgumentOutOfRangeException(nameof(index), index,
+                    $"Incorrect parameter index for {EventType.Flag}");
+            if (index < 0)
+                throw new ArgumentOutOfRangeException(nameof(index), index,
+                    $"Incorrect parameter index for {EventType.Flag}");
+
+            return GetValueImpl(index);
+        }
+
+        public virtual void SetValue(int index, double value)
+        {
+            if (index >= EventType.Size)
+                throw new ArgumentOutOfRangeException(nameof(index), index,
+                    $"Incorrect parameter index for {EventType.Flag}");
+            if (index < 0)
+                throw new ArgumentOutOfRangeException(nameof(index), index,
+                    $"Incorrect parameter index for {EventType.Flag}");
+
+            SetValueImpl(index, value);
+        }
+
+        public virtual void Fill()
+        {
+            Fill(EventType.Size * 2);
+        }
+
+        public virtual bool IsStartsEqualsEnds()
+        {
+            if (IsHalfFilled) return true;
+            if (!IsFilled) return false;
+
+            var size = EventType.Size;
+            for (var i = 0; i < Values.Count / 2; i++)
             {
-                while (index > ListValue.Count - 1)
-                {
-                    ListValue.Add(DefaultValue);
-                }
+                var d0 = Values[i];
+                var d1 = Values[i + size];
+                if (!Precision.AlmostEquals(d0, d1))
+                    return false;
             }
 
+            return true;
         }
-
-        // todo: 大于size时自动匹配为start
-        protected double GetValue(int index)
-        {
-            if (index > ListValue.Count - 1)
-            {
-                while (index > ListValue.Count - 1)
-                {
-                    ListValue.Add(DefaultValue);
-                }
-
-                return DefaultValue;
-            }
-
-            return ListValue[index];
-        }
-
-        protected void SetValue(int index, double value)
-        {
-            if (index > ListValue.Count - 1)
-                while (index > ListValue.Count - 1)
-                {
-                    if (index == ListValue.Count)
-                        ListValue.Add(value);
-                    else
-                        ListValue.Add(DefaultValue);
-                }
-            else
-                ListValue[index] = value;
-        }
-
-        //public double[] Start { get; set; }
-
-        //public double[] End
-        //{
-        //    get => EventType.Size == 0 ? Start : _end!;
-        //    set
-        //    {
-        //        if (EventType.Size == 0) Start = value;
-        //        else _end = value;
-        //    }
-        //}
-
-        public virtual bool IsStatic => Start.SequenceEqual(End);
 
         public void AdjustTiming(double offset)
         {
@@ -113,107 +126,141 @@ namespace Coosu.Storyboard.Events
         public virtual async Task WriteScriptAsync(TextWriter writer) =>
             await WriteHeaderAsync(writer);
 
-        //protected BasicEvent()
-        //{
-        //    Value = EmptyArray<double>.Value;
-        //}
+        protected BasicEvent()
+        {
+            _values = new List<double>();
+        }
 
-        protected BasicEvent(EasingFunctionBase easing, double startTime, double endTime, List<double> value)
+        protected BasicEvent(EasingFunctionBase easing, double startTime, double endTime, List<double> values)
         {
             Easing = easing;
             StartTime = startTime;
             EndTime = endTime;
-            Start = start.ToArray();
-            End = end == default ? Start : end.ToArray();
+            _values = values;
         }
 
         protected virtual async Task WriteExtraScriptAsync(TextWriter textWriter)
         {
-            bool sequenceEqual = Start.SequenceEqual(End);
-
+            var sequenceEqual = IsStartsEqualsEnds();
             if (sequenceEqual)
                 await WriteStartAsync(textWriter);
             else
                 await WriteFullAsync(textWriter);
         }
 
+        protected void Fill(int count)
+        {
+            var index = count - 1;
+            if (index <= _values.Count - 1) return;
+            var size = EventType.Size;
+            if (IsHalfFilled && !IsFilled)
+            {
+                _values.Capacity = size * 2;
+                for (int i = 0; i < size; i++)
+                {
+                    _values.Add(_values[i]);
+                }
+            }
+            else if (index < size)
+            {
+                _values.Capacity = size;
+                while (_values.Count < size)
+                {
+                    _values.Add(DefaultValue);
+                }
+            }
+            else
+            {
+                while (index > _values.Count - 1)
+                {
+                    _values.Add(DefaultValue);
+                }
+            }
+        }
+
+        protected double GetValueImpl(int index)
+        {
+            Fill(index + 1);
+            return _values[index];
+        }
+
+        protected void SetValueImpl(int index, double value)
+        {
+            Fill(index + 1);
+            _values[index] = value;
+        }
+
         private async Task WriteStartAsync(TextWriter textWriter)
         {
             for (int i = 0; i < EventType.Size; i++)
             {
-                await textWriter.WriteAsync(Start[i].ToIcString());
+                await textWriter.WriteAsync(Values[i].ToIcString());
                 if (i != EventType.Size - 1) await textWriter.WriteAsync(',');
             }
         }
 
         private async Task WriteFullAsync(TextWriter textWriter)
         {
-            for (int i = 0; i < EventType.Size; i++)
+            for (int i = 0; i < Values.Count; i++)
             {
-                await textWriter.WriteAsync(Start[i].ToIcString());
-                await textWriter.WriteAsync(',');
-            }
-
-            for (int i = 0; i < EventType.Size; i++)
-            {
-                await textWriter.WriteAsync(End[i].ToIcString());
+                await textWriter.WriteAsync(Values[i].ToIcString());
                 if (i != EventType.Size - 1) await textWriter.WriteAsync(',');
             }
         }
 
+        //public static IKeyEvent Create(EventType e, EasingFunctionBase easing,
+        //    double startTime, double endTime,
+        //    List<double> value)
+        //{
+        //    var size = e.Size;
+        //    if (size != 0 && value.Count != size && value.Count != size * 2)
+        //        throw new ArgumentException();
+        //    if (size == 0)
+        //        return Create(e, easing, startTime, endTime, value.Slice(0, 1), default);
+        //    return Create(e, easing, startTime, endTime,
+        //        value.Slice(0, size),
+        //        value.Length == size ? default : value.Slice(size, size));
+        //}
+
         public static IKeyEvent Create(EventType e, EasingFunctionBase easing,
-            double startTime, double endTime,
-            List<double> value)
+            double startTime, double endTime, List<double> values)
         {
             var size = e.Size;
-            if (size != 0 && value.Count != size && value.Count != size * 2)
-                throw new ArgumentException();
-            if (size == 0)
-                return Create(e, easing, startTime, endTime, value.Slice(0, 1), default);
-            return Create(e, easing, startTime, endTime,
-                value.Slice(0, size),
-                value.Length == size ? default : value.Slice(size, size));
-        }
+            if (size != 0 && values.Count != size && values.Count != size * 2)
+                throw new ArgumentException($"Incorrect parameter length for {e.Flag}: {values.Count}");
 
-        public static IKeyEvent Create(EventType e, EasingFunctionBase easing,
-            double startTime, double endTime, Span<double> start, Span<double> end)
-        {
             IKeyEvent keyEvent;
-            if (e.Size != 0 && end.Length == 0)
-                end = start.ToArray();
-
-            if (e.Size != 0 && start.Length != e.Size) throw new ArgumentException();
-
             if (e == EventTypes.Fade)
-                keyEvent = new Fade(easing, startTime, endTime, start, end);
+                keyEvent = new Fade(easing, startTime, endTime, values);
             else if (e == EventTypes.Move)
-                keyEvent = new Move(easing, startTime, endTime, start, end);
+                keyEvent = new Move(easing, startTime, endTime, values);
             else if (e == EventTypes.MoveX)
-                keyEvent = new MoveX(easing, startTime, endTime, start, end);
+                keyEvent = new MoveX(easing, startTime, endTime, values);
             else if (e == EventTypes.MoveY)
-                keyEvent = new MoveY(easing, startTime, endTime, start, end);
+                keyEvent = new MoveY(easing, startTime, endTime, values);
             else if (e == EventTypes.Scale)
-                keyEvent = new Scale(easing, startTime, endTime, start, end);
+                keyEvent = new Scale(easing, startTime, endTime, values);
             else if (e == EventTypes.Vector)
-                keyEvent = new Vector(easing, startTime, endTime, start, end);
+                keyEvent = new Vector(easing, startTime, endTime, values);
             else if (e == EventTypes.Rotate)
-                keyEvent = new Rotate(easing, startTime, endTime, start, end);
+                keyEvent = new Rotate(easing, startTime, endTime, values);
             else if (e == EventTypes.Color)
-                keyEvent = new Color(easing, startTime, endTime, start, end);
+                keyEvent = new Color(easing, startTime, endTime, values);
             else if (e == EventTypes.Parameter)
-                keyEvent = new Parameter(startTime, endTime, start.Slice(0, 1));
+                keyEvent = new Parameter(startTime, endTime, values);
             else
             {
-                var result = HandlerRegister.GetEventTransformation(e)?.Invoke(e, easing, startTime, endTime, start, end);
+                var result = HandlerRegister.GetEventTransformation(e)?.Invoke(e, easing, startTime, endTime, values);
                 keyEvent = result ?? throw new ArgumentOutOfRangeException(nameof(e), e, null);
             }
 
+            keyEvent.Fill();
             return keyEvent;
         }
 
         public object Clone()
         {
-            return BasicEvent.Create(EventType, Easing, StartTime, EndTime, Start.ToArray(), End.ToArray());
+            return BasicEvent.Create(EventType, Easing, StartTime, EndTime, Values.ToList());
         }
     }
 }

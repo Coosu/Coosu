@@ -257,7 +257,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             PreOptimize(sprite, obsoleteList, keyEvents);
             NormalOptimize(sprite);
             sprite.Events =
-                new SortedSet<IKeyEvent>(sprite.Events, new EventTimingComparer());
+                new SortedSet<IKeyEvent>(sprite.Events, new EventSequenceComparer());
             if (sprite.ObjectType == ObjectTypes.Sprite &&
                 Path.GetFileName(sprite.ImagePath) == sprite.ImagePath &&
                 sprite.LayerType == LayerType.Background)
@@ -292,7 +292,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
 
             foreach (var hostEvent in host.Events)
             {
-                if (hostEvent.StartTime.Equals(hostEvent.EndTime) && !hostEvent.IsStatic)
+                if (hostEvent.StartTime.Equals(hostEvent.EndTime) && !hostEvent.IsStartsEqualsEnds)
                     hostEvent.Start = hostEvent.End.ToArray();
             }
         }

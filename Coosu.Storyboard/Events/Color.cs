@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using Coosu.Storyboard.Easing;
 
 namespace Coosu.Storyboard.Events
@@ -49,13 +49,13 @@ namespace Coosu.Storyboard.Events
         //{
         //}
 
-        public Color(EasingFunctionBase easing, double startTime, double endTime, Span<double> start, Span<double> end)
-            : base(easing, startTime, endTime, start, end)
+        public Color(EasingFunctionBase easing, double startTime, double endTime, List<double> values)
+            : base(easing, startTime, endTime, values)
         {
         }
 
-        //public Color()
-        //{
-        //}
+        public Color()
+        {
+        }
     }
 }

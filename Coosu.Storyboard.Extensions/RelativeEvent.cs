@@ -30,7 +30,7 @@ namespace Coosu.Storyboard.Extensions
         /// This is actual relative value.
         /// </summary>
         public double[] End { get; set; }
-        public virtual bool IsStatic => End.All(k => k == 0);
+        public virtual bool IsStartsEqualsEnds => End.All(k => k == 0);
 
         public void AdjustTiming(double offset)
         {

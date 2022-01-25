@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Easing;
 
@@ -10,36 +10,36 @@ namespace Coosu.Storyboard.Events
 
         public double StartX
         {
-            get => Start[0];
-            set => Start[0] = value;
+            get => GetValue(0);
+            set => SetValue(0, value);
         }
 
         public double StartY
         {
-            get => Start[1];
-            set => Start[1] = value;
+            get => GetValue(1);
+            set => SetValue(1, value);
         }
 
         public double EndX
         {
-            get => End[0];
-            set => End[0] = value;
+            get => GetValue(2);
+            set => SetValue(2, value);
         }
 
         public double EndY
         {
-            get => End[1];
-            set => End[1] = value;
+            get => GetValue(3);
+            set => SetValue(3, value);
         }
 
-        public Move(EasingFunctionBase easing, double startTime, double endTime, double x1, double y1, double x2, double y2) :
-            base(easing, startTime, endTime, new[] { x1, y1 }, new[] { x2, y2 })
-        {
+        //public Move(EasingFunctionBase easing, double startTime, double endTime, double x1, double y1, double x2, double y2) :
+        //    base(easing, startTime, endTime, new[] { x1, y1 }, new[] { x2, y2 })
+        //{
 
-        }
+        //}
 
-        public Move(EasingFunctionBase easing, double startTime, double endTime, Span<double> start, Span<double> end)
-            : base(easing, startTime, endTime, start, end)
+        public Move(EasingFunctionBase easing, double startTime, double endTime, List<double> values)
+            : base(easing, startTime, endTime, values)
         {
         }
 
@@ -49,10 +49,10 @@ namespace Coosu.Storyboard.Events
 
         public void AdjustPosition(double x, double y)
         {
-            Start[0] += x;
-            Start[1] += y;
-            End[0] += x;
-            End[1] += y;
+            StartX += x;
+            StartY += y;
+            EndX += x;
+            EndY += y;
         }
     }
 }

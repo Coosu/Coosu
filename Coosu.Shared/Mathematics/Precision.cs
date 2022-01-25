@@ -2,12 +2,12 @@
 using System.Drawing;
 using System.Numerics;
 
-namespace Coosu.Beatmap.Utils
+namespace Coosu.Shared.Mathematics
 {
     /// <summary>
     /// Utility class to compare <see cref="float"/> or <see cref="double"/> values for equality.
     /// </summary>
-    internal static class Precision
+    public static class Precision
     {
         /// <summary>
         /// The default epsilon for all <see cref="float"/> values.

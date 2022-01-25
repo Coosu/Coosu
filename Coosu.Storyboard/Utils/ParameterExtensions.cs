@@ -16,6 +16,17 @@ namespace Coosu.Storyboard.Utils
             };
         }
 
+        public static ParameterType ToParameterEnum(this char str)
+        {
+            return str switch
+            {
+                'H' => ParameterType.Horizontal,
+                'V' => ParameterType.Vertical,
+                'A' => ParameterType.Additive,
+                _ => throw new ArgumentOutOfRangeException(nameof(str), str, null)
+            };
+        }
+
         public static ParameterType ToParameterEnum(this string str)
         {
             return str switch

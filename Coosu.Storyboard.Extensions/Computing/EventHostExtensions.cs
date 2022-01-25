@@ -592,12 +592,12 @@ namespace Coosu.Storyboard.Extensions.Computing
 
         private static void AddMiniUnitEvent(IKeyEvent e, ICollection<IKeyEvent> list)
         {
-            if (e.IsStatic && e.StartTime.Equals(e.EndTime))
+            if (e.IsStartsEqualsEnds && e.StartTime.Equals(e.EndTime))
             {
 
             }
 
-            else if (e.IsStatic && e.StartTime.Equals(e.EndTime) &&
+            else if (e.IsStartsEqualsEnds && e.StartTime.Equals(e.EndTime) &&
                  (list.Any(k => k.StartTime.Equals(e.StartTime)
                                 && e.Start.SequenceEqual(k.Start)) ||
                   list.Any(k => k.EndTime.Equals(e.StartTime)

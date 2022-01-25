@@ -142,7 +142,6 @@ namespace Coosu.Storyboard
             bool[] options = { false, false, false };
 
             var spanSplitArgs = new SpanSplitArgs();
-            var valueCache = new List<double>();
             int rowIndex = 0;
             string? line = textReader.ReadLine();
             while (line != null)
@@ -157,8 +156,7 @@ namespace Coosu.Storyboard
                 {
                     try
                     {
-                        currentObj = ParseObject(line, rowIndex, currentObj, group, options, spanSplitArgs, valueCache);
-                        valueCache.Clear();
+                        currentObj = ParseObject(line, rowIndex, currentObj, group, options, spanSplitArgs);
                     }
                     catch (Exception e)
                     {
@@ -193,8 +191,7 @@ namespace Coosu.Storyboard
             IDefinedObject? currentObj,
             Layer layer,
             bool[] options,
-            in SpanSplitArgs e,
-            in List<double> valueCache)
+            in SpanSplitArgs e)
         {
             var sprite = currentObj as Sprite;
             ref bool isLooping = ref options[0];
@@ -254,8 +251,13 @@ namespace Coosu.Storyboard
                         param1,
                       param2,
                         param3.Trim(QuoteChar),
+#if NETCOREAPP3_1_OR_GREATER
                         double.Parse(param4),
                         double.Parse(param5)
+#else
+                        double.Parse(param4.ToString()),
+                        double.Parse(param5.ToString())
+#endif
                     );
                     currentObj.RowInSource = rowIndex;
                     isLooping = false;
@@ -269,11 +271,18 @@ namespace Coosu.Storyboard
                         @param1,
                         @param2,
                         @param3.Trim(QuoteChar),
+#if NETCOREAPP3_1_OR_GREATER
                         double.Parse(@param4),
                         double.Parse(@param5),
                         int.Parse(@param6),
                         double.Parse(@param7),
-                        "LoopForever"
+#else
+                        double.Parse(@param4.ToString()),
+                        double.Parse(@param5.ToString()),
+                        int.Parse(@param6.ToString()),
+                        double.Parse(@param7.ToString()),
+#endif
+                        "LoopForever".AsSpan()
                     );
                     currentObj.RowInSource = rowIndex;
                     isLooping = false;
@@ -287,10 +296,17 @@ namespace Coosu.Storyboard
                         @param1,
                         @param2,
                         @param3.Trim(QuoteChar),
+#if NETCOREAPP3_1_OR_GREATER
                         double.Parse(@param4),
                         double.Parse(@param5),
                         int.Parse(@param6),
                         double.Parse(@param7),
+#else
+                        double.Parse(@param4.ToString()),
+                        double.Parse(@param5.ToString()),
+                        int.Parse(@param6.ToString()),
+                        double.Parse(@param7.ToString()),
+#endif
                         @param8
                     );
                     currentObj.RowInSource = rowIndex;
@@ -361,17 +377,25 @@ namespace Coosu.Storyboard
                         }
                     }
 
+#if NETCOREAPP3_1_OR_GREATER
                     easing = int.Parse(param1);
-                    if (easing is > 34 or < 0)
-                        throw new FormatException("Unknown easing");
                     startTime = int.Parse(param2);
                     endTime = param3.Length == 0
                         ? startTime
                         : int.Parse(param3);
+#else
+                    easing = int.Parse(param1.ToString());
+                    startTime = int.Parse(param2.ToString());
+                    endTime = param3.Length == 0
+                        ? startTime
+                        : int.Parse(param3.ToString());
+#endif
+                    if (easing is > 34 or < 0)
+                        throw new FormatException("Unknown easing");
                 }
 
                 if (sprite != null)
-                    ParseEvent(sprite, options, others, identifier, easing, startTime, endTime, e, valueCache);
+                    ParseEvent(sprite, options, others, identifier, easing, startTime, endTime);
             }
 
             return currentObj!;
@@ -379,10 +403,8 @@ namespace Coosu.Storyboard
 
         private static void ParseEvent(Sprite currentObj, bool[] options,
             ReadOnlySpan<char> rawParams,
-            string identifier, int easing, int startTime, int endTime,
-            in SpanSplitArgs e)
+            string identifier, int easing, int startTime, int endTime)
         {
-            //int rawLength = rawParams.Length;
             var eventType = EventTypes.GetValue(identifier);
             if (eventType != default)
             {
@@ -390,109 +412,135 @@ namespace Coosu.Storyboard
                 if (size >= 1)
                 {
                     var t = 0;
-                    var valueStore = new List<double>();
-                    foreach (var span in rawParams.SpanSplit(SplitChar, e))
+                    var valueStore = new List<double>(size * 2);
+                    foreach (var span in rawParams.SpanSplit(SplitChar))
                     {
                         t++;
                         if (t >= 4)
                         {
+#if NETCOREAPP3_1_OR_GREATER
                             valueStore.Add(double.Parse(span));
+#else
+                            valueStore.Add(double.Parse(span.ToString()));
+#endif
                         }
                     }
 
-                    var basicEvent = BasicEvent.Create(eventType, (EasingType)easing, startTime, endTime, valueStore);
-
-                    //const int baseLength = 3;
-
-
-                    // 验证是否存在缺省
-                    if (doubleList.Count == size)
+                    if (valueStore.Count <= size * 2 || (valueStore.Count) % size != 0)
                     {
-                        InjectEvent(others);
-                    }
-                    else if (doubleList.Count == size * 2)
-                    {
-                        InjectEvent(array);
-                    }
-                    else if (doubleList.Count > size * 2 && (doubleList.Count) % size == 0)
-                    {
-                        var duration = endTime - startTime;
-                        for (int i = baseLength, j = 0; i < rawParams.Length - size; i += size, j++)
-                        {
-                            ParseEvent(currentObj, options,
-                                new[] { rawParams[0], null, null, null }
-                                    .Concat(
-                                        rawParams
-                                            .Skip(i)
-                                            .Take(size * 2)
-                                    )
-                                    .ToArray(),
-                                identifier,
-                                easing,
-                                startTime + duration * j,
-                                endTime + duration * j);
-                        }
+                        var basicEvent = BasicEvent.Create(eventType, (EasingType)easing, startTime, endTime,
+                            valueStore);
+                        currentObj.AddEvent(basicEvent);
                     }
                     else
                     {
-                        throw new Exception($"Wrong parameter for event: \"{identifier}\"");
+                        var duration = endTime - startTime;
+                        for (int i = 0, j = 0; i < rawParams.Length - size; i += size, j++)
+                        {
+                            var copy = new List<double>(size * 2);
+
+                            for (int k = 0; k < size * 2; k++)
+                            {
+                                copy.Add(rawParams[i + k]);
+                            }
+
+                            var newStartTime = startTime + duration * j;
+                            var newEndTime = endTime + duration * j;
+                            var basicEvent = BasicEvent.Create(eventType, (EasingType)easing,
+                                newStartTime, newEndTime, copy);
+                            currentObj.AddEvent(basicEvent);
+                        }
                     }
                 }
                 else
                 {
                     if (identifier == EventTypes.Parameter.Flag)
                     {
-                        if (rawLength == 5)
+                        var t = 0;
+                        ParameterType p = default;
+                        foreach (var span in rawParams.SpanSplit(SplitChar))
                         {
-                            currentObj.Parameter(
-                                startTime,
-                                endTime,
-                                rawParams[4].ToParameterEnum());
-                            return;
+                            t++;
+                            if (t == 4) p = span[0].ToParameterEnum();
+                        }
+
+                        if (t == 4)
+                        {
+                            currentObj.Parameter(startTime, endTime, p);
+                        }
+                        else
+                        {
+                            throw new ArgumentException($"Incorrect parameter length for {identifier}: {t - 3}");
                         }
                     }
                     else if (identifier == EventTypes.Loop.Flag)
                     {
-                        if (rawLength == 3)
+                        var t = 0;
+                        int loopCount = default;
+                        foreach (var span in rawParams.SpanSplit(SplitChar))
                         {
-                            startTime = int.Parse(rawParams[1]!);
-                            int loopCount = int.Parse(rawParams[2]!);
-                            currentObj.StartLoop(startTime, loopCount);
+                            t++;
+                            switch (t)
+                            {
+#if NETCOREAPP3_1_OR_GREATER
+                                case 1: startTime = int.Parse(span); break;
+                                case 2: loopCount = int.Parse(span); break;
+#else
+                                case 1: startTime = int.Parse(span.ToString()); break;
+                                case 2: loopCount = int.Parse(span.ToString()); break;
+#endif
+                            }
+                        }
 
+                        if (t == 2)
+                        {
+                            currentObj.StartLoop(startTime, loopCount);
                             options[0] = true; // isLooping
-                            return;
+                        }
+                        else
+                        {
+                            throw new ArgumentException($"Incorrect declaration length for {identifier}: {t + 1}");
                         }
                     }
                     else if (identifier == EventTypes.Trigger.Flag)
                     {
-                        if (rawLength == 4)
+                        var t = 0;
+                        ReadOnlySpan<char> triggerType = default;
+                        foreach (var span in rawParams.SpanSplit(SplitChar))
                         {
-                            startTime = int.Parse(rawParams[2]!);
-                            endTime = int.Parse(rawParams[3]!);
+                            t++;
+                            switch (t)
+                            {
+                                case 1: triggerType = span; break;
+#if NETCOREAPP3_1_OR_GREATER
+                                case 2: startTime = int.Parse(span); break;
+                                case 3: endTime = int.Parse(span); break;
+#else
+                                case 2: startTime = int.Parse(span.ToString()); break;
+                                case 3: endTime = int.Parse(span.ToString()); break;
+#endif
+                            }
+                        }
 
-                            currentObj.StartTrigger(startTime, endTime, rawParams[1]!); // rawParams[1]: triggerType
+                        if (t == 3)
+                        {
+                            currentObj.StartTrigger(startTime, endTime, triggerType.ToString());
                             options[1] = true; // isTriggering
-                            return;
+                        }
+                        else
+                        {
+                            throw new ArgumentException($"Incorrect declaration length for {identifier}: {t + 1}");
                         }
                     }
                     else
                     {
                         throw new ArgumentOutOfRangeException(nameof(identifier));
                     }
-
-                    throw new Exception($"Wrong parameter for event: \"{identifier}\"");
                 }
             }
             else
             {
                 throw new Exception($"Unknown event: \"{identifier}\"");
-            }
-
-
-            void InjectEvent(Span<double> span)
-            {
-                var basicEvent = BasicEvent.Create(eventType, (EasingType)easing, startTime, endTime, span);
-                currentObj.AddEvent(basicEvent);
             }
         }
 
@@ -517,7 +565,7 @@ namespace Coosu.Storyboard
             return obj;
         }
 
-        #region ISpriteHost
+#region ISpriteHost
 
         public object Clone()
         {
@@ -567,6 +615,6 @@ namespace Coosu.Storyboard
         public ISpriteHost? BaseHost => null;
         public Dictionary<string, object> Tags { get; } = new();
 
-        #endregion
+#endregion
     }
 }

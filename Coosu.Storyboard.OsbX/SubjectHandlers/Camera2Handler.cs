@@ -74,7 +74,7 @@ namespace Coosu.Storyboard.OsbX.SubjectHandlers
 
         // EventHosts
         public ICollection<IKeyEvent> Events { get; set; } =
-            new SortedSet<IKeyEvent>(new EventTimingComparer());
+            new SortedSet<IKeyEvent>(new EventSequenceComparer());
 
         public void AddEvent(IKeyEvent @event)
         {

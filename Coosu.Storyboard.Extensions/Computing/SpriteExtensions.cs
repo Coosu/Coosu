@@ -43,7 +43,7 @@ namespace Coosu.Storyboard.Extensions.Computing
                     e.Start.SequenceEqual(e.GetIneffectiveValue()) &&
                     e.StartTime > sprite.MinTime)
                 {
-                    if (e.IsStatic)
+                    if (e.IsStartsEqualsEnds)
                         e.AdjustTiming(sprite.MinTime - e.StartTime); // todo: stop changing here
                     dic[e.EventType].StartTime = sprite.MinTime;
                     dic[e.EventType].IsFadingOut = true;
