@@ -208,19 +208,11 @@ namespace Coosu.Storyboard.Events
             }
         }
 
-        //public static IKeyEvent Create(EventType e, EasingFunctionBase easing,
-        //    double startTime, double endTime,
-        //    List<double> value)
-        //{
-        //    var size = e.Size;
-        //    if (size != 0 && value.Count != size && value.Count != size * 2)
-        //        throw new ArgumentException();
-        //    if (size == 0)
-        //        return Create(e, easing, startTime, endTime, value.Slice(0, 1), default);
-        //    return Create(e, easing, startTime, endTime,
-        //        value.Slice(0, size),
-        //        value.Length == size ? default : value.Slice(size, size));
-        //}
+        public static IKeyEvent Create(EventType e, EasingFunctionBase easing,
+            float startTime, float endTime, IEnumerable<float> startValues, IEnumerable<float> endValues)
+        {
+            return Create(e, easing, startTime, endTime, startValues.Concat(endValues).ToList());
+        }
 
         public static IKeyEvent Create(EventType e, EasingFunctionBase easing,
             float startTime, float endTime, List<float> values)

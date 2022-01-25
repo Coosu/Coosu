@@ -8,40 +8,40 @@ namespace Coosu.Storyboard.Extensions.Computing
 {
     public static class EventExtensions
     {
-        internal static readonly ReadOnlyDictionary<EventType, double[]> IneffectiveDictionary = new(
-            new Dictionary<EventType, double[]>
+        internal static readonly ReadOnlyDictionary<EventType, float[]> IneffectiveDictionary = new(
+            new Dictionary<EventType, float[]>
             {
-                [EventTypes.Fade] = new[] { 0d },
-                [EventTypes.Scale] = new[] { 0d },
-                [EventTypes.Vector] = new[] { 0d, 0d },
-                [EventTypes.Color] = new[] { 0d, 0d, 0d },
+                [EventTypes.Fade] = new[] { 0f },
+                [EventTypes.Scale] = new[] { 0f },
+                [EventTypes.Vector] = new[] { 0f, 0f },
+                [EventTypes.Color] = new[] { 0f, 0f, 0f },
             });
 
-        internal static readonly ReadOnlyDictionary<EventType, double[]> DefaultDictionary = new(
-            new Dictionary<EventType, double[]>
+        internal static readonly ReadOnlyDictionary<EventType, float[]> DefaultDictionary = new(
+            new Dictionary<EventType, float[]>
             {
-                [EventTypes.Fade] = new[] { 1d },
-                [EventTypes.Scale] = new[] { 1d },
-                [EventTypes.Vector] = new[] { 1d, 1d },
-                [EventTypes.Rotate] = new[] { 0d },
-                [EventTypes.Color] = new[] { 255d, 255d, 255d },
+                [EventTypes.Fade] = new[] { 1f },
+                [EventTypes.Scale] = new[] { 1f },
+                [EventTypes.Vector] = new[] { 1f, 1f },
+                [EventTypes.Rotate] = new[] { 0f },
+                [EventTypes.Color] = new[] { 255f, 255f, 255f },
             });
 
-        public static double[] GetIneffectiveValue(this IKeyEvent e)
+        public static float[] GetIneffectiveValue(this IKeyEvent e)
         {
             return IneffectiveDictionary.ContainsKey(e.EventType)
                 ? IneffectiveDictionary[e.EventType]
-                : EmptyArray<double>.Value;
+                : EmptyArray<float>.Value;
         }
 
-        public static double[]? GetDefaultValue(this EventType eventType)
+        public static float[]? GetDefaultValue(this EventType eventType)
         {
             return DefaultDictionary.ContainsKey(eventType)
                 ? DefaultDictionary[eventType]
                 : null;
         }
 
-        public static double[]? GetDefaultValue(this EventType eventType, ICameraUsable? sprite)
+        public static float[]? GetDefaultValue(this EventType eventType, ICameraUsable? sprite)
         {
             if (sprite == null) return GetDefaultValue(eventType);
 
@@ -51,12 +51,12 @@ namespace Coosu.Storyboard.Extensions.Computing
             return GetDefaultValue(eventType);
         }
 
-        public static double[] ComputeRelative(this EventType eventType, double[] source, double[] relativeVal,
+        public static float[] ComputeRelative(this EventType eventType, float[] source, float[] relativeVal,
             int? accuracy = null)
         {
             if (eventType.Size < 1)
                 throw new ArgumentOutOfRangeException(nameof(eventType), eventType, "Only support sized event type.");
-            var value = new double[eventType.Size];
+            var value = new float[eventType.Size];
             for (int i = 0; i < eventType.Size; i++)
             {
                 //if (eventType == EventTypes.Fade ||eventType==EventTypes.Scale||eventType==)
@@ -66,7 +66,7 @@ namespace Coosu.Storyboard.Extensions.Computing
                 if (accuracy == null)
                     value[i] = source[i] + relativeVal[i];
                 else
-                    value[i] = Math.Round(source[i] + relativeVal[i], accuracy.Value);
+                    value[i] = (float)Math.Round(source[i] + relativeVal[i], accuracy.Value);
             }
 
             return value;

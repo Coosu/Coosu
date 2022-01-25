@@ -292,7 +292,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
 
             foreach (var hostEvent in host.Events)
             {
-                if (hostEvent.StartTime.Equals(hostEvent.EndTime) && !hostEvent.IsStartsEqualsEnds)
+                if (hostEvent.StartTime.Equals(hostEvent.EndTime) && !hostEvent.IsStartsEqualsEnds())
                     hostEvent.Start = hostEvent.End.ToArray();
             }
         }

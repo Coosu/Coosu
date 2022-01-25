@@ -57,7 +57,7 @@ namespace CoosuTest
             //Console.WriteLine(percent);
 
             var layer = new Layer();
-            layer.Camera2.RotateBy(new BackEase() { Amplitude = 2 }, startTime: 0, endTime: 500, Math.PI / 2);
+            layer.Camera2.RotateBy(new BackEase() { Amplitude = 2 }, startTime: 0, endTime: 500, (float)(Math.PI / 2));
             layer.Camera2.MoveBy(startTime: 0, endTime: 500, x: 300, y: 30);
             layer.Camera2.StandardizeEvents();
             //            layer = Layer.ParseFromText(@"

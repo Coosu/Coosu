@@ -169,7 +169,7 @@ namespace Coosu.Storyboard.Extensions.Computing
             return true;
         }
 
-        public static double[] ComputeFrame(this IEventHost eventHost, EventType eventType, double time, int? accuracy)
+        public static float[] ComputeFrame(this IEventHost eventHost, EventType eventType, float time, int? accuracy)
         {
             if (eventType.Size < 1) throw new ArgumentOutOfRangeException(nameof(eventType), eventType, "Only support sized event type.");
             var basicEvents = eventHost.Events
