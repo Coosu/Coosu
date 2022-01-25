@@ -16,8 +16,7 @@ namespace Coosu.Storyboard.Events
         internal ISceneObject? _baseObject;
         public bool EnableGroupedSerialization { get; set; }/* = true;*/
 
-        public ICollection<IKeyEvent> Events { get; set; } = new List<IKeyEvent>();
-            //new SortedSet<IKeyEvent>(new EventSequenceComparer());
+        public ICollection<IKeyEvent> Events { get; set; } = new SortedSet<IKeyEvent>(EventSequenceComparer.Instance);
 
         public float StartTime { get; set; }
         public float EndTime

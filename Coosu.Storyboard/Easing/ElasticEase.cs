@@ -5,7 +5,7 @@ namespace Coosu.Storyboard.Easing
     /// <summary>
     /// This class implements an easing function that gives an elastic/springy curve
     /// </summary>
-    public class ElasticEase : EasingFunctionBase
+    public sealed class ElasticEase : EasingFunctionBase
     {
         private int _oscillations = 3;
         private double _springiness = 3;

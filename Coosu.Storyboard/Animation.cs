@@ -9,7 +9,6 @@ namespace Coosu.Storyboard
     {
         public override ObjectType ObjectType { get; } = ObjectTypes.Animation;
 
-
         public int FrameCount { get; set; }
         public float FrameDelay { get; set; }
         public LoopType LoopType { get; set; }

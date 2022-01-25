@@ -5,7 +5,7 @@ namespace Coosu.Storyboard.Easing
     /// <summary>
     /// This class implements an easing function that gives an exponential curve
     /// </summary>
-    public class ExponentialEase : EasingFunctionBase
+    public sealed class ExponentialEase : EasingFunctionBase
     {
         private double _exponent = 2;
 

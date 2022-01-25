@@ -8,7 +8,7 @@ using Coosu.Storyboard.Common;
 
 namespace Coosu.Storyboard
 {
-    public class SpriteGroup : ISceneObject, ISpriteHost
+    public sealed class SpriteGroup : ISceneObject, ISpriteHost
     {
         static SpriteGroup()
         {

@@ -5,7 +5,7 @@ namespace Coosu.Storyboard.Easing
     /// <summary>
     /// This class implements an easing function that backs up before going to the destination.
     /// </summary>
-    public class BackEase : EasingFunctionBase
+    public sealed class BackEase : EasingFunctionBase
     {
         private double _amplitude = 1;
 

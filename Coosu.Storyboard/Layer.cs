@@ -15,7 +15,7 @@ namespace Coosu.Storyboard
     /// Coosu layer.
     /// <para>This is more of a group for controlling a set of sprites instead of osu!storyboard layer.</para>
     /// </summary>
-    public class Layer : ISpriteHost, IAdjustable
+    public sealed class Layer : ISpriteHost, IAdjustable
     {
         /// <summary>
         /// Layer name.

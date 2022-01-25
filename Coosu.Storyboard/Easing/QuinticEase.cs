@@ -3,7 +3,7 @@
     /// <summary>
     /// This class implements an easing function that gives a quintic curve toward the destination
     /// </summary>
-    public class QuinticEase : EasingFunctionBase
+    public sealed class QuinticEase : EasingFunctionBase
     {
         protected override double EaseInCore(double normalizedTime)
         {

@@ -15,7 +15,7 @@ namespace Coosu.Storyboard
     /// Represents a storyboard sprite. This class cannot be inherited.
     /// </summary>
     [DebuggerDisplay("Header = {DebuggerDisplay}")]
-    public partial class Sprite : ISceneObject
+    public class Sprite : ISceneObject
     {
         private string DebuggerDisplay => this.GetHeaderString();
 
@@ -38,8 +38,7 @@ namespace Coosu.Storyboard
         public string CameraIdentifier { get; set; } = "00000000-0000-0000-0000-000000000000";
 
         // EventHosts
-        public ICollection<IKeyEvent> Events { get; set; } = new List<IKeyEvent>();
-        //new SortedSet<IKeyEvent>(new EventSequenceComparer());
+        public ICollection<IKeyEvent> Events { get; set; } = new SortedSet<IKeyEvent>(EventSequenceComparer.Instance);
 
         // ISceneObject
         public List<Loop> LoopList { get; private set; } = new();

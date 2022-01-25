@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Coosu.Storyboard.Common
 {
-    public class EventSequenceComparer : IComparer<IKeyEvent>
+    public sealed class EventSequenceComparer : IComparer<IKeyEvent>
     {
         public int Compare(IKeyEvent? x, IKeyEvent? y)
         {
@@ -30,5 +30,7 @@ namespace Coosu.Storyboard.Common
             return 1; // ensure object can be insert in order.
             //return 0;
         }
+
+        public static EventSequenceComparer Instance { get; } = new();
     }
 }

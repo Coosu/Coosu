@@ -3,7 +3,7 @@ using Coosu.Storyboard.Easing;
 
 namespace Coosu.Storyboard.Events
 {
-    public class Rotate : BasicEvent
+    public sealed class Rotate : BasicEvent
     {
         public override EventType EventType => EventTypes.Rotate;
 
