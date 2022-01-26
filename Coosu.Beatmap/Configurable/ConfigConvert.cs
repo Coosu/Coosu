@@ -120,7 +120,7 @@ namespace Coosu.Beatmap.Configurable
 
         private static bool MatchedSection(string line, out string sectionName)
         {
-            if (line.StartsWith("[") && line.EndsWith("]"))
+            if (line[0] == '[' && line[line.Length - 1] == ']')
             {
                 sectionName = line.Substring(1, line.Length - 2);
                 return true;

@@ -42,7 +42,7 @@ namespace Coosu.Beatmap.Sections
 
         public override void Match(string line)
         {
-            if (line.StartsWith("//"))
+            if (line.StartsWith("//", StringComparison.Ordinal))
             {
                 var section = line.Trim();
                 switch (section)
