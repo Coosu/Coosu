@@ -222,23 +222,23 @@ namespace Coosu.Storyboard.Events
                 throw new ArgumentException($"Incorrect parameter length for {e.Flag}: {values.Count}");
 
             IKeyEvent keyEvent;
-            if (e == EventTypes.Fade)
+            if (e.Flag == EventTypes.Fade.Flag)
                 keyEvent = new Fade(easing, startTime, endTime, values);
-            else if (e == EventTypes.Move)
+            else if (e.Flag == EventTypes.Move.Flag)
                 keyEvent = new Move(easing, startTime, endTime, values);
-            else if (e == EventTypes.MoveX)
+            else if (e.Flag == EventTypes.MoveX.Flag)
                 keyEvent = new MoveX(easing, startTime, endTime, values);
-            else if (e == EventTypes.MoveY)
+            else if (e.Flag == EventTypes.MoveY.Flag)
                 keyEvent = new MoveY(easing, startTime, endTime, values);
-            else if (e == EventTypes.Scale)
+            else if (e.Flag == EventTypes.Scale.Flag)
                 keyEvent = new Scale(easing, startTime, endTime, values);
-            else if (e == EventTypes.Vector)
+            else if (e.Flag == EventTypes.Vector.Flag)
                 keyEvent = new Vector(easing, startTime, endTime, values);
-            else if (e == EventTypes.Rotate)
+            else if (e.Flag == EventTypes.Rotate.Flag)
                 keyEvent = new Rotate(easing, startTime, endTime, values);
-            else if (e == EventTypes.Color)
+            else if (e.Flag == EventTypes.Color.Flag)
                 keyEvent = new Color(easing, startTime, endTime, values);
-            else if (e == EventTypes.Parameter)
+            else if (e.Flag == EventTypes.Parameter.Flag)
                 keyEvent = new Parameter(startTime, endTime, values);
             else
             {

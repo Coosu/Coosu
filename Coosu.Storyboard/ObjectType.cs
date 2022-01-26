@@ -50,7 +50,7 @@ namespace Coosu.Storyboard
 
         #endregion
 
-        public int Flag { get; }
+        public readonly int Flag;
 
         public ObjectType(int flag)
         {

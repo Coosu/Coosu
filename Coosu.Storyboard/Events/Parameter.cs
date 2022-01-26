@@ -13,8 +13,8 @@ namespace Coosu.Storyboard.Events
 
         public ParameterType Type
         {
-            get => (ParameterType)(int)GetValue(0);
-            set => SetValue(0, (int)value);
+            get => (ParameterType)(byte)GetValue(0);
+            set => SetValue(0, (byte)value);
         }
 
         public override bool IsFilled => Values.Count == 1;

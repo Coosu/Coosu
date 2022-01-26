@@ -9,16 +9,18 @@ namespace Coosu.Storyboard
 
         public static LoopType ToLoopType(this ReadOnlySpan<char> loopType)
         {
-//#if NET6_0_OR_GREATER
-//            return Enum.Parse<LoopType>(loopType);
-//#else
+#if NET6_0_OR_GREATER
+            return Enum.Parse<LoopType>(loopType);
+#else
+            if (loopType.Length == 1 && loopType[0] <= '9' && loopType[0] >= '0')
+                return (LoopType)byte.Parse(loopType.ToString());
             var t = loopType/*.ToString()*/;
             if (t.SequenceEqual(S_LoopForever.AsSpan()))
                 return LoopType.LoopForever;
             if (t.SequenceEqual(S_LoopOnce.AsSpan()))
                 return LoopType.LoopOnce;
             throw new ArgumentOutOfRangeException(nameof(loopType), loopType.ToString(), null);
-//#endif
+#endif
         }
 
         private const string S_Background = "Background";
@@ -29,9 +31,11 @@ namespace Coosu.Storyboard
 
         public static LayerType ToLayerType(this ReadOnlySpan<char> layerType)
         {
-//#if NET6_0_OR_GREATER
-//            return Enum.Parse<LayerType>(layerType);
-//#else
+#if NET6_0_OR_GREATER
+            return Enum.Parse<LayerType>(layerType);
+#else
+            if (layerType.Length == 1 && layerType[0] <= '9' && layerType[0] >= '0')
+                return (LayerType)byte.Parse(layerType.ToString());
             var t = layerType/*.ToString()*/;
             if (t.SequenceEqual(S_Background.AsSpan()))
                 return LayerType.Background;
@@ -44,7 +48,7 @@ namespace Coosu.Storyboard
             if (t.SequenceEqual(S_Overlay.AsSpan()))
                 return LayerType.Overlay;
             throw new ArgumentOutOfRangeException(nameof(layerType), layerType.ToString(), null);
-//#endif
+#endif
         }
 
         private const string S_TopLeft = "TopLeft";
@@ -60,9 +64,11 @@ namespace Coosu.Storyboard
 
         public static OriginType ToOriginType(this ReadOnlySpan<char> originType)
         {
-//#if NET6_0_OR_GREATER
-//            return Enum.Parse<OriginType>(originType);
-//#else
+#if NET6_0_OR_GREATER
+            return Enum.Parse<OriginType>(originType);
+#else
+            if (originType.Length == 1 && originType[0] <= '9' && originType[0] >= '0')
+                return (OriginType)byte.Parse(originType.ToString());
             var t = originType/*.ToString()*/;
             if (t.SequenceEqual(S_TopLeft.AsSpan()))
                 return OriginType.TopLeft;
@@ -85,7 +91,7 @@ namespace Coosu.Storyboard
             if (t.SequenceEqual(S_Custom.AsSpan()))
                 return OriginType.Custom;
             throw new ArgumentOutOfRangeException(nameof(originType), originType.ToString(), null);
-//#endif
+#endif
         }
     }
 }

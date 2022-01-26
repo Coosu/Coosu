@@ -236,9 +236,9 @@ namespace Coosu.Storyboard
         public void AddEvent(IKeyEvent @event)
         {
             if (_isLooping)
-                LoopList![LoopList.Count - 1].AddEvent(@event);
+                LoopList[LoopList.Count - 1].AddEvent(@event);
             else if (_isTriggering)
-                TriggerList![TriggerList.Count - 1].AddEvent(@event);
+                TriggerList[TriggerList.Count - 1].AddEvent(@event);
             else
                 Events.Add(@event);
         }
