@@ -20,10 +20,10 @@ namespace OsbParsingBenchmark
     {
         static void Main(string[] args)
         {
-            //var fi = new FileInfo(@"UltraLight.osb");
+            var fi = new FileInfo(@"UltraLight.osb");
             //var fi = new FileInfo(@"light.osb");
             //var fi = new FileInfo(@"test.osb");
-            var fi = new FileInfo(@"rrt.osb");
+            //var fi = new FileInfo(@"rrt.osb");
             if (!fi.Exists)
                 throw new FileNotFoundException("Test file does not exists: " + fi.FullName);
             Environment.SetEnvironmentVariable("test_osb_path", fi.FullName);
@@ -79,12 +79,12 @@ namespace OsbParsingBenchmark
                 return osu;
             }
 
-            //[Benchmark]
-            //public async Task<object?> CoosuOld_Storyboard()
-            //{
-            //    var osu = await NugetCoosuNs.Storyboard.Layer.ParseFromFileAsync(_path);
-            //    return osu;
-            //}
+            [Benchmark]
+            public async Task<object?> CoosuOld_Storyboard()
+            {
+                var osu = await NugetCoosuNs.Storyboard.Layer.ParseFromFileAsync(_path);
+                return osu;
+            }
         }
 
         private static void Generate()
