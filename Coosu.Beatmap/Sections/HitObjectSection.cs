@@ -8,6 +8,7 @@ using Coosu.Beatmap.Internal;
 using Coosu.Beatmap.Sections.HitObject;
 using Coosu.Beatmap.Sections.Timing;
 using Coosu.Shared;
+using Coosu.Shared.Numerics;
 
 namespace Coosu.Beatmap.Sections
 {
@@ -93,27 +94,15 @@ namespace Coosu.Beatmap.Sections
             foreach (var span in line.SpanSplit(',', _sliderArgs))
             {
                 i++;
-#if NETCOREAPP3_1_OR_GREATER
                 switch (i)
                 {
-                    case 0: x = int.Parse(span); break;
-                    case 1: y = int.Parse(span); break;
-                    case 2: offset = int.Parse(span); break;
-                    case 3: type = (RawObjectType)int.Parse(span); break;
-                    case 4: hitsound = (HitsoundType)int.Parse(span); _sliderArgs.Canceled = true; break;
+                    case 0: x = ParseHelper.ParseInt32(span); break;
+                    case 1: y = ParseHelper.ParseInt32(span); break;
+                    case 2: offset = ParseHelper.ParseInt32(span); break;
+                    case 3: type = (RawObjectType)ParseHelper.ParseByte(span); break;
+                    case 4: hitsound = (HitsoundType)ParseHelper.ParseByte(span); _sliderArgs.Canceled = true; break;
                     default: others = span; break;
                 }
-#else
-                switch (i)
-                {
-                    case 0: x = int.Parse(span.ToString()); break;
-                    case 1: y = int.Parse(span.ToString()); break;
-                    case 2: offset = int.Parse(span.ToString()); break;
-                    case 3: type = (RawObjectType)int.Parse(span.ToString()); break;
-                    case 4: hitsound = (HitsoundType)int.Parse(span.ToString()); _sliderArgs.Canceled = true; break;
-                    default: others = span; break;
-                }
-#endif
             }
 
             var hitObject = new RawHitObject
@@ -162,11 +151,7 @@ namespace Coosu.Beatmap.Sections
                 i++;
                 switch (i)
                 {
-#if NETCOREAPP3_1_OR_GREATER
-                    case 0: holdEnd = int.Parse(span); break;
-#else
-                    case 0: holdEnd = int.Parse(span.ToString()); break;
-#endif
+                    case 0: holdEnd = ParseHelper.ParseInt32(span); break;
                     case 1: extras = span; break;
                 }
             }
@@ -186,11 +171,7 @@ namespace Coosu.Beatmap.Sections
                 i++;
                 switch (i)
                 {
-#if NETCOREAPP3_1_OR_GREATER
-                    case 0: holdEnd = int.Parse(span); _holdArgs.Canceled = true; break;
-#else
-                    case 0: holdEnd = int.Parse(span.ToString()); _holdArgs.Canceled = true; break;
-#endif
+                    case 0: holdEnd = ParseHelper.ParseInt32(span); _holdArgs.Canceled = true; break;
                     case 1: extras = span; break;
                 }
             }
@@ -219,19 +200,11 @@ namespace Coosu.Beatmap.Sections
                         break;
                     case 1:
                         // repeat
-#if NETCOREAPP3_1_OR_GREATER
-                        repeat = int.Parse(infoSpan);
-#else
-                        repeat = int.Parse(infoSpan.ToString());
-#endif
+                        repeat = ParseHelper.ParseInt32(infoSpan);
                         break;
                     case 2:
                         // length
-#if NETCOREAPP3_1_OR_GREATER
-                        pixelLength = double.Parse(infoSpan);
-#else
-                        pixelLength = double.Parse(infoSpan.ToString());
-#endif
+                        pixelLength = ParseHelper.ParseDouble(infoSpan);
                         break;
                     case 3:
                         edgeHitsoundInfo = infoSpan;
@@ -270,19 +243,11 @@ namespace Coosu.Beatmap.Sections
                     i++;
                     if (i == 0)
                     {
-#if NETCOREAPP3_1_OR_GREATER
-                        x = int.Parse(s);
-#else
-                        x = int.Parse(s.ToString());
-#endif
+                        x = ParseHelper.ParseInt32(s);
                     }
                     else
                     {
-#if NETCOREAPP3_1_OR_GREATER
-                        var y = int.Parse(s);
-#else
-                        var y = int.Parse(s.ToString());
-#endif
+                        var y = ParseHelper.ParseInt32(s);
                         points.Add(new Vector2(x, y));
                     }
                 }
@@ -305,11 +270,7 @@ namespace Coosu.Beatmap.Sections
                 foreach (var span in edgeHitsoundInfo.SpanSplit('|'))
                 {
                     g++;
-#if NETCOREAPP3_1_OR_GREATER
-                    edgeHitsounds[g] = (HitsoundType)int.Parse(span);
-#else
-                    edgeHitsounds[g] = (HitsoundType)int.Parse(span.ToString());
-#endif
+                    edgeHitsounds[g] = (HitsoundType)ParseHelper.ParseByte(span);
                 }
 
                 if (index < 4)
@@ -332,19 +293,11 @@ namespace Coosu.Beatmap.Sections
                             switch (k)
                             {
                                 case 0:
-#if NETCOREAPP3_1_OR_GREATER
-                                    var x = (ObjectSamplesetType)int.Parse(span2);
-#else
-                                    var x = (ObjectSamplesetType)int.Parse(span2.ToString());
-#endif
+                                    var x = (ObjectSamplesetType)ParseHelper.ParseByte(span2);
                                     edgeSamples[i] = x;
                                     break;
                                 case 1:
-#if NETCOREAPP3_1_OR_GREATER
-                                    var y = (ObjectSamplesetType)int.Parse(span2);
-#else
-                                    var y = (ObjectSamplesetType)int.Parse(span2.ToString());
-#endif
+                                    var y = (ObjectSamplesetType)ParseHelper.ParseByte(span2);
                                     edgeAdditions[i] = y;
                                     break;
                             }

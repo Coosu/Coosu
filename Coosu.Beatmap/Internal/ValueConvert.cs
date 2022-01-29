@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Coosu.Shared.Numerics;
 
 namespace Coosu.Beatmap.Internal
 {
@@ -22,88 +23,79 @@ namespace Coosu.Beatmap.Internal
 
         public static bool ConvertValue(ReadOnlySpan<char> value, Type propType, out object? converted)
         {
-#if NETCOREAPP3_1_OR_GREATER
             if (propType == TypeBoolean)
             {
-                var b = int.TryParse(value, out var result);
+                var b = ParseHelper.TryParseByte(value, out var result);
                 converted = result == 1;
                 return b;
             }
 
             if (propType == TypeByte)
             {
-                var b = byte.TryParse(value, out var result);
+                var b = ParseHelper.TryParseByte(value, out var result);
                 converted = result;
                 return b;
             }
             if (propType == TypeSbyte)
             {
-                var b = sbyte.TryParse(value, out var result);
+                var b = ParseHelper.TryParseSByte(value, out var result);
                 converted = result;
                 return b;
             }
 
             if (propType == TypeInt16)
             {
-                var b = short.TryParse(value, out var result);
+                var b = ParseHelper.TryParseInt16(value, out var result);
                 converted = result;
                 return b;
             }
 
             if (propType == TypeUInt16)
             {
-                var b = ushort.TryParse(value, out var result);
+                var b = ParseHelper.TryParseUInt16(value, out var result);
                 converted = result;
                 return b;
             }
 
             if (propType == TypeInt32)
             {
-                var b = int.TryParse(value, out var result);
+                var b = ParseHelper.TryParseInt32(value, out var result);
                 converted = result;
                 return b;
             }
 
             if (propType == TypeUInt32)
             {
-                var b = uint.TryParse(value, out var result);
+                var b = ParseHelper.TryParseUInt32(value, out var result);
                 converted = result;
                 return b;
             }
 
             if (propType == TypeInt64)
             {
-                var b = long.TryParse(value, out var result);
+                var b = ParseHelper.TryParseInt64(value, out var result);
                 converted = result;
                 return b;
             }
 
             if (propType == TypeUInt64)
             {
-                var b = ulong.TryParse(value, out var result);
+                var b = ParseHelper.TryParseUInt64(value, out var result);
                 converted = result;
                 return b;
             }
 
             if (propType == TypeDouble)
             {
-                var b = double.TryParse(value, out var result);
+                var b = ParseHelper.TryParseDouble(value, out var result);
                 converted = result;
                 return b;
             }
 
             if (propType == TypeSingle)
             {
-                var b = float.TryParse(value, out var result);
+                var b = ParseHelper.TryParseSingle(value, out var result);
                 converted = result;
-                return b;
-            }
-#endif
-
-            if (propType == TypeBoolean)
-            {
-                var b = int.TryParse(value.ToString(), out var result);
-                converted = result == 1;
                 return b;
             }
 
