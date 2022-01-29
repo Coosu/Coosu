@@ -30,7 +30,7 @@ namespace Coosu.Beatmap.Sections
             _timingSection = osuFile.TimingPoints;
             _difficulty = osuFile.Difficulty;
         }
-        
+
         public void ComputeSlidersByCurrentSettings()
         {
             _timingSection.TimingList.Sort(new TimingPointComparer());

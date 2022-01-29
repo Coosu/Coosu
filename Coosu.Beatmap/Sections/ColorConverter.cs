@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using Coosu.Beatmap.Configurable;
 using Coosu.Shared;
 using Coosu.Shared.Numerics;

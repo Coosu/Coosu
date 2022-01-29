@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using Coosu.Beatmap.Configurable;
-using Coosu.Beatmap.Internal;
 using Coosu.Shared;
 
 namespace Coosu.Beatmap.Sections

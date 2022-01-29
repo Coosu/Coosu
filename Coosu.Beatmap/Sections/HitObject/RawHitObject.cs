@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using Coosu.Beatmap.Configurable;
-using Coosu.Beatmap.Internal;
 using Coosu.Shared;
 
 namespace Coosu.Beatmap.Sections.HitObject
@@ -79,7 +78,7 @@ namespace Coosu.Beatmap.Sections.HitObject
                 }
             }
         }
-        
+
         public override void AppendSerializedString(TextWriter textWriter)
         {
             textWriter.Write(X);
