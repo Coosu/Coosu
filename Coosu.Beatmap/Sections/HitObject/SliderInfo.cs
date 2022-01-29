@@ -107,6 +107,8 @@ namespace Coosu.Beatmap.Sections.HitObject
                 if (i < EdgeSamples.Length - 1)
                     textWriter.Write('|');
             }
+
+            return groupedPoints;
         }
     }
 
