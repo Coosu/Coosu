@@ -42,7 +42,7 @@ namespace Coosu.Beatmap.Sections
 
         public override void Match(string line)
         {
-            if (line.StartsWith("//"))
+            if (line.StartsWith("//", StringComparison.Ordinal))
             {
                 var section = line.Trim();
                 switch (section)
@@ -63,7 +63,7 @@ namespace Coosu.Beatmap.Sections
                         _currentSection = SectionSbSamples;
                         break;
                     default:
-                        if (section.StartsWith(SectionStoryboard))
+                        if (section.StartsWith(SectionStoryboard, StringComparison.Ordinal))
                         {
                             _currentSection = SectionStoryboard;
                             if (!_options.StoryboardIgnored) _sbInfo.AppendLine(line);

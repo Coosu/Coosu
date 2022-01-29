@@ -101,7 +101,7 @@ namespace Coosu.Beatmap.Configurable
 
         protected int MatchFlag(string line)
         {
-            var index = line.IndexOf(KeyValueFlag, StringComparison.InvariantCulture);
+            var index = line.IndexOf(KeyValueFlag, StringComparison.Ordinal);
             return index;
         }
 

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using Coosu.Beatmap.Configurable;
 using Coosu.Shared;
 using Coosu.Shared.Numerics;
@@ -20,17 +19,9 @@ namespace Coosu.Beatmap.Sections
             {
                 switch (i)
                 {
-#if NETCOREAPP3_1_OR_GREATER
-
-                    case 0: x = byte.Parse(span); break;
-                    case 1: y = byte.Parse(span); break;
-                    case 2: z = byte.Parse(span); break;
-
-#else
-                    case 0: x = byte.Parse(span.ToString()); break;
-                    case 1: y = byte.Parse(span.ToString()); break;
-                    case 2: z = byte.Parse(span.ToString()); break;
-#endif
+                    case 0: x = ParseHelper.ParseByte(span); break;
+                    case 1: y = ParseHelper.ParseByte(span); break;
+                    case 2: z = ParseHelper.ParseByte(span); break;
                 }
 
                 i++;

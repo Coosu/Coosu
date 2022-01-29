@@ -106,7 +106,7 @@ namespace Coosu.Beatmap
         public override void HandleCustom(string line)
         {
             if (Version != 0) return;
-            if (line.StartsWith(VerFlag))
+            if (line.StartsWith(VerFlag, StringComparison.Ordinal))
             {
                 var str = line.Substring(VerFlag.Length);
                 if (!int.TryParse(str, out var verNum))

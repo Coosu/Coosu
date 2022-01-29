@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using Coosu.Beatmap.Configurable;
-using Coosu.Beatmap.Internal;
 using Coosu.Shared;
+using Coosu.Shared.Numerics;
 
 namespace Coosu.Beatmap.Sections
 {
@@ -23,11 +22,7 @@ namespace Coosu.Beatmap.Sections
             var list = new List<double>();
             foreach (var subString in value.SpanSplit(_splitter))
             {
-#if NETCOREAPP3_1_OR_GREATER
-                list.Add(double.Parse(subString));
-#else
-                list.Add(double.Parse(subString.ToString()));
-#endif
+                list.Add(ParseHelper.ParseDouble(subString));
             }
 
             return list;
@@ -59,11 +54,7 @@ namespace Coosu.Beatmap.Sections
             var list = new List<int>();
             foreach (var subString in value.SpanSplit(_splitter))
             {
-#if NETCOREAPP3_1_OR_GREATER
-                list.Add(int.Parse(subString));
-#else
-                list.Add(int.Parse(subString.ToString()));
-#endif
+                list.Add(ParseHelper.ParseInt32(subString));
             }
 
             return list;

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
 using Coosu.Beatmap.Configurable;
-using Coosu.Beatmap.Internal;
 using Coosu.Shared;
+using Coosu.Shared.Numerics;
 
 namespace Coosu.Beatmap.Sections.HitObject
 {
@@ -64,22 +64,15 @@ namespace Coosu.Beatmap.Sections.HitObject
                 i++;
                 switch (i)
                 {
-#if NETCOREAPP3_1_OR_GREATER
-                    case 0: SampleSet = (ObjectSamplesetType)byte.Parse(span); break;
-                    case 1: AdditionSet = (ObjectSamplesetType)byte.Parse(span); break;
-                    case 2: CustomIndex = ushort.Parse(span); break;
-                    case 3: SampleVolume = byte.Parse(span); break;
-#else
-                    case 0: SampleSet = (ObjectSamplesetType)byte.Parse(span.ToString()); break;
-                    case 1: AdditionSet = (ObjectSamplesetType)byte.Parse(span.ToString()); break;
-                    case 2: CustomIndex = ushort.Parse(span.ToString()); break;
-                    case 3: SampleVolume = byte.Parse(span.ToString()); break;
-#endif
+                    case 0: SampleSet = (ObjectSamplesetType)ParseHelper.ParseByte(span); break;
+                    case 1: AdditionSet = (ObjectSamplesetType)ParseHelper.ParseByte(span); break;
+                    case 2: CustomIndex = ParseHelper.ParseUInt16(span); break;
+                    case 3: SampleVolume = ParseHelper.ParseByte(span); break;
                     case 4: FileName = span.Trim().ToString(); break;
                 }
             }
         }
-        
+
         public override void AppendSerializedString(TextWriter textWriter)
         {
             textWriter.Write(X);
