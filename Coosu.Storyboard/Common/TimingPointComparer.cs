@@ -4,6 +4,12 @@ namespace Coosu.Storyboard.Common
 {
     public class TimingPointComparer : IComparer<TimingPoint>
     {
+        private TimingPointComparer()
+        {
+        }
+
+        public static IComparer<TimingPoint> Instance { get; } = new TimingPointComparer();
+
         public int Compare(TimingPoint x, TimingPoint y)
         {
             var val = x.Timing.CompareTo(y.Timing);

@@ -251,13 +251,20 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                 }
             }
 
+            // temporary to object equals
             sprite.Events = new HashSet<IKeyEvent>(sprite.Events);
+
+            // relative to absolute
+            // todo: performance issue
             sprite.StandardizeEvents(Options.DiscretizingInterval, Options.DiscretizingAccuracy);
+
             var obsoleteList = sprite.ComputeInvisibleRange(out var keyEvents);
             PreOptimize(sprite, obsoleteList, keyEvents);
             NormalOptimize(sprite);
-            sprite.Events =
-                new SortedSet<IKeyEvent>(sprite.Events, new EventSequenceComparer());
+
+            // to compute equals
+            sprite.Events = new SortedSet<IKeyEvent>(sprite.Events, new EventSequenceComparer());
+
             if (sprite.ObjectType == ObjectTypes.Sprite &&
                 Path.GetFileName(sprite.ImagePath) == sprite.ImagePath &&
                 sprite.LayerType == LayerType.Background)
@@ -294,8 +301,15 @@ namespace Coosu.Storyboard.Extensions.Optimizing
 
             foreach (var hostEvent in host.Events)
             {
+                if (hostEvent.EventType.Size < 1) continue;
                 if (hostEvent.StartTime.Equals(hostEvent.EndTime) && !hostEvent.IsStartsEqualsEnds())
-                    hostEvent.SetStarts(hostEvent.GetEnds());
+                {
+                    hostEvent.Fill();
+                    for (int i = 0; i < hostEvent.EventType.Size; i++)
+                    {
+                        hostEvent.SetValue(i, hostEvent.GetValue(i + hostEvent.EventType.Size));
+                    }
+                }
             }
         }
 
