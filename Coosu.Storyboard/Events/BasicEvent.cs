@@ -16,7 +16,7 @@ namespace Coosu.Storyboard.Events
     [DebuggerDisplay("Expression = {DebuggerDisplay}")]
     public abstract class BasicEvent : IKeyEvent
     {
-        private List<float> _values;
+        internal List<float> _values;
         private string DebuggerDisplay => this.GetHeaderString();
 
         public abstract EventType EventType { get; }
@@ -32,7 +32,7 @@ namespace Coosu.Storyboard.Events
         }
 
 #if NET5_0_OR_GREATER
-        public virtual Span<float> GetStartsSpan()
+        public Span<float> GetStartsSpan()
         {
             Fill();
             var size = EventType.Size;
@@ -52,6 +52,21 @@ namespace Coosu.Storyboard.Events
             return span;
         }
 #endif
+        public IEnumerable<float> GetStarts()
+        {
+            Fill();
+            var size = EventType.Size;
+            var span = _values.Take(size);
+            return span;
+        }
+
+        public IEnumerable<float> GetEnds()
+        {
+            Fill();
+            var size = EventType.Size;
+            var span = _values.Skip(size).Take(size);
+            return span;
+        }
 
         public virtual bool IsHalfFilled => Values.Count == EventType.Size;
         public virtual bool IsFilled => Values.Count == EventType.Size * 2;
@@ -80,6 +95,60 @@ namespace Coosu.Storyboard.Events
             SetValueImpl(index, value);
         }
 
+        public void SetStartsValues(IEnumerable<float> startValues)
+        {
+            if (startValues is IReadOnlyList<float> l)
+            {
+                for (var i = 0; i < EventType.Size; i++)
+                {
+                    var f = l[i];
+                    _values[i] = f;
+                }
+            }
+            else
+            {
+                int i = 0;
+                foreach (var startValue in startValues)
+                {
+                    _values[i] = startValue;
+                    i++;
+                    if (i >= EventType.Size) break;
+                }
+            }
+        }
+
+        public void SetEndsValues(IEnumerable<float> endValues)
+        {
+            if (endValues is IReadOnlyList<float> l)
+            {
+                for (var i = 0; i < EventType.Size; i++)
+                {
+                    var f = l[i];
+                    _values[i + EventType.Size] = f;
+                }
+            }
+            else
+            {
+                int i = EventType.Size;
+                foreach (var startValue in endValues)
+                {
+                    _values[i] = startValue;
+                    i++;
+                    if (i >= EventType.Size * 2) break;
+                }
+            }
+        }
+
+        public void SetRawValues(IEnumerable<float> startValues, IEnumerable<float> endValues)
+        {
+            var list = new List<float>();
+            list.AddRange(startValues);
+            list.AddRange(endValues);
+
+            if (list.Count != EventType.Size * 2) throw new ArgumentException();
+            Values = list;
+        }
+
         public virtual void Fill()
         {
             Fill(EventType.Size * 2);
@@ -88,7 +157,7 @@ namespace Coosu.Storyboard.Events
         public virtual bool IsStartsEqualsEnds()
         {
             if (IsHalfFilled) return true;
-            if (!IsFilled) return false;
+            Fill();
 
             var size = EventType.Size;
             for (var i = 0; i < Values.Count / 2; i++)
@@ -209,9 +278,23 @@ namespace Coosu.Storyboard.Events
         }
 
         public static IKeyEvent Create(EventType e, EasingFunctionBase easing,
+            float startTime, float endTime, Span<float> startValues, Span<float> endValues)
+        {
+            var list = new List<float>();
+            foreach (var startValue in startValues) list.Add(startValue);
+            foreach (var endValue in endValues) list.Add(endValue);
+
+            return Create(e, easing, startTime, endTime, list);
+        }
+
+        public static IKeyEvent Create(EventType e, EasingFunctionBase easing,
             float startTime, float endTime, IEnumerable<float> startValues, IEnumerable<float> endValues)
         {
-            return Create(e, easing, startTime, endTime, startValues.Concat(endValues).ToList());
+            var list = new List<float>();
+            list.AddRange(startValues);
+            list.AddRange(endValues);
+
+            return Create(e, easing, startTime, endTime, list);
         }
 
         public static IKeyEvent Create(EventType e, EasingFunctionBase easing,
@@ -252,7 +335,7 @@ namespace Coosu.Storyboard.Events
 
         public object Clone()
         {
-            return BasicEvent.Create(EventType, Easing, StartTime, EndTime, Values.ToList());
+            return BasicEvent.Create(EventType, Easing, StartTime, EndTime, Values.CloneAsList());
         }
     }
 }
