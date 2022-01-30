@@ -293,7 +293,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             foreach (var hostEvent in host.Events)
             {
                 if (hostEvent.StartTime.Equals(hostEvent.EndTime) && !hostEvent.IsStartsEqualsEnds())
-                    hostEvent.Start = hostEvent.End.ToArray();
+                    hostEvent.SetStarts(hostEvent.GetEnds());
             }
         }
 
@@ -368,12 +368,12 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                             // R should be kept, but can be optimized
                             if (list.Count == 1)
                             {
-                                for (var j = 0; j < nowE.End.Length; j++)
+                                for (var j = 0; j < nowE.EventType.Size; j++)
                                 {
-                                    if (nowE.End[j].ToIcString().Length > nowE.Start[j].ToIcString().Length)
+                                    if (nowE.GetEndsValue(j).ToIcString().Length > nowE.GetStartsValue(j).ToIcString().Length)
                                     {
                                         RaiseSituationEvent(host, SituationType.ThisLastSingleInLastInvisibleToFixTail,
-                                            () => { nowE.End[j] = nowE.Start[j]; },
+                                            () => { nowE.SetEndsValue(j, nowE.GetStartsValue(j)); },
                                             nowE);
                                     }
                                 }
@@ -467,7 +467,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                                 nowE);
                         }
                         // 不唯一时
-                        else if (nowE.IsTimeInRange(host) && nowE.IsStatic() &&
+                        else if (nowE.IsTimeInRange(host) && nowE.IsStartsEqualsEnds() &&
                             list.Count > 1)
                         {
                             var nextE = list[1];
@@ -482,12 +482,12 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                         else if (type == EventTypes.Move
                                  && host is Sprite sprite)
                         {
-                            if (list.Count == 1 && nowE.IsStatic()
+                            if (list.Count == 1 && nowE.IsStartsEqualsEnds()
                                                 && nowE.IsTimeInRange(host)
                                                 && eventList.Count > 1)
                             {
                                 var move = (Move)nowE;
-                                if (nowE.Start.All(k => k.Equals((int)k))) //若为小数，不归并
+                                if (nowE.GetStarts().All(k => k.Equals((int)k))) //若为小数，不归并
                                 {
                                     RaiseSituationEvent(host,
                                         SituationType.MoveSingleIsStaticToRemoveAndChangeInitial,
@@ -551,8 +551,8 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                         /*
                          * 当 此event与前event一致，且前后param皆固定
                         */
-                        if (nowE.IsStatic()
-                            && preE.IsStatic()
+                        if (nowE.IsStartsEqualsEnds()
+                            && preE.IsStartsEqualsEnds()
                             && preE.SuccessiveTo(nowE))
                         {
                             RaiseSituationEvent(host, SituationType.ThisPrevIsStaticAndSequentToCombine,
@@ -572,7 +572,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                         */
                         else if (nowE.IsSmallerThenMaxTime(host) /*||
                                  type == EventTypes.Fade && nowStartP.SequenceEqual(EventExtension.IneffectiveDictionary[EventTypes.Fade]) */
-                                 && nowE.IsStatic()
+                                 && nowE.IsStartsEqualsEnds()
                                  && preE.SuccessiveTo(nowE))
                         {
                             RaiseSituationEvent(host, SituationType.ThisIsStaticAndSequentWithPrevToCombine,
@@ -598,7 +598,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                         {
                             if (index > 1 ||
                                 preE.EqualsMultiMinTime(host) ||
-                                preE.IsStatic() && preE.SuccessiveTo(nowE))
+                                preE.IsStartsEqualsEnds() && preE.SuccessiveTo(nowE))
                             {
                                 RaiseSituationEvent(host, SituationType.PrevIsStaticAndTimeOverlapWithThisStartTimeToRemove,
                                     () =>
