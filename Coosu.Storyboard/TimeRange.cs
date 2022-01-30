@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Coosu.Shared.Mathematics;
 using Coosu.Storyboard.Common;
@@ -78,34 +79,37 @@ namespace Coosu.Storyboard
 
         public bool OnTimingRangeBound(out RangeValue<double> patterned, double timingPoint)
         {
-            //int i = 0;
-            foreach (var range in TimingList)
+            for (var i = 0; i < TimingList.Count; i++)
             {
-                if (timingPoint.Equals(range.StartTime) || timingPoint.Equals(range.EndTime))
+                var range = TimingList[i];
+                if (Precision.AlmostEquals(timingPoint, range.StartTime) ||
+                    Precision.AlmostEquals(timingPoint, range.EndTime))
                 {
                     patterned = range;
                     return true;
                 }
-
-                //i++;
             }
 
             patterned = default;
             return false;
         }
 
-        public bool ContainsTimingPoint(out RangeValue<double> patterned, params double[] time)
+        public bool ContainsTimingPoint(out RangeValue<double> patterned, params double[] timeList)
         {
-            //int i = 0;
-            foreach (var range in TimingList)
+            Array.Sort(timeList);
+            if (timeList.Length == 0)
+                throw new ArgumentOutOfRangeException("length", timeList.Length, null);
+
+            var first = timeList[0];
+            var last = timeList[timeList.Length - 1];
+            for (var i = 0; i < TimingList.Count; i++)
             {
-                if (time.All(t => t >= range.StartTime && t <= range.EndTime))
+                var range = TimingList[i];
+                if (first >= range.StartTime && last <= range.EndTime)
                 {
                     patterned = range;
                     return true;
                 }
-
-                //i++;
             }
 
             patterned = default;

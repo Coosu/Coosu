@@ -17,8 +17,8 @@ namespace Coosu.Storyboard.Extensions.Computing
 
         public static bool IsDefault(this IKeyEvent e)
         {
-            return EventExtensions.DefaultDictionary.ContainsKey(e.EventType) &&
-                   e.GetStarts().SequenceEqual(EventExtensions.DefaultDictionary[e.EventType]);
+            return EventExtensions.DefaultDictionary.ContainsKey(e.EventType.Flag) &&
+                   e.GetStarts().SequenceEqual(EventExtensions.DefaultDictionary[e.EventType.Flag]);
         }
 
         public static bool EqualsMaxTime(this IKeyEvent e, IDetailedEventHost host)
@@ -69,8 +69,8 @@ namespace Coosu.Storyboard.Extensions.Computing
 
         public static bool EndsWithIneffective(this IKeyEvent e)
         {
-            return EventExtensions.IneffectiveDictionary.ContainsKey(e.EventType) &&
-                   EventExtensions.IneffectiveDictionary[e.EventType].SequenceEqual(e.GetEnds());
+            return EventExtensions.IneffectiveDictionary.ContainsKey(e.EventType.Flag) &&
+                   EventExtensions.IneffectiveDictionary[e.EventType.Flag].SequenceEqual(e.GetEnds());
         }
 
         public static bool IsStaticAndDefault(this IKeyEvent e)

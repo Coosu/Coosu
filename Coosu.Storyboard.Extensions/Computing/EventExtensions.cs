@@ -8,36 +8,36 @@ namespace Coosu.Storyboard.Extensions.Computing
 {
     public static class EventExtensions
     {
-        internal static readonly ReadOnlyDictionary<EventType, float[]> IneffectiveDictionary = new(
-            new Dictionary<EventType, float[]>
+        internal static readonly ReadOnlyDictionary<string, float[]> IneffectiveDictionary = new(
+            new Dictionary<string, float[]>
             {
-                [EventTypes.Fade] = new[] { 0f },
-                [EventTypes.Scale] = new[] { 0f },
-                [EventTypes.Vector] = new[] { 0f, 0f },
-                [EventTypes.Color] = new[] { 0f, 0f, 0f },
+                [EventTypes.Fade.Flag] = new[] { 0f },
+                [EventTypes.Scale.Flag] = new[] { 0f },
+                [EventTypes.Vector.Flag] = new[] { 0f, 0f },
+                [EventTypes.Color.Flag] = new[] { 0f, 0f, 0f },
             });
 
-        internal static readonly ReadOnlyDictionary<EventType, float[]> DefaultDictionary = new(
-            new Dictionary<EventType, float[]>
+        internal static readonly ReadOnlyDictionary<string, float[]> DefaultDictionary = new(
+            new Dictionary<string, float[]>
             {
-                [EventTypes.Fade] = new[] { 1f },
-                [EventTypes.Scale] = new[] { 1f },
-                [EventTypes.Vector] = new[] { 1f, 1f },
-                [EventTypes.Rotate] = new[] { 0f },
-                [EventTypes.Color] = new[] { 255f, 255f, 255f },
+                [EventTypes.Fade.Flag] = new[] { 1f },
+                [EventTypes.Scale.Flag] = new[] { 1f },
+                [EventTypes.Vector.Flag] = new[] { 1f, 1f },
+                [EventTypes.Rotate.Flag] = new[] { 0f },
+                [EventTypes.Color.Flag] = new[] { 255f, 255f, 255f },
             });
 
         public static float[] GetIneffectiveValue(this IKeyEvent e)
         {
-            return IneffectiveDictionary.ContainsKey(e.EventType)
-                ? IneffectiveDictionary[e.EventType]
+            return IneffectiveDictionary.ContainsKey(e.EventType.Flag)
+                ? IneffectiveDictionary[e.EventType.Flag]
                 : EmptyArray<float>.Value;
         }
 
         public static float[]? GetDefaultValue(this EventType eventType)
         {
-            return DefaultDictionary.ContainsKey(eventType)
-                ? DefaultDictionary[eventType]
+            return DefaultDictionary.ContainsKey(eventType.Flag)
+                ? DefaultDictionary[eventType.Flag]
                 : null;
         }
 

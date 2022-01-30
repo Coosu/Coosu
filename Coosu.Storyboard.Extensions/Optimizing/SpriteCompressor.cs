@@ -276,18 +276,20 @@ namespace Coosu.Storyboard.Extensions.Optimizing
         {
             if (host is Sprite ele)
             {
-                foreach (var item in ele.LoopList)
+                for (var i = 0; i < ele.LoopList.Count; i++)
                 {
+                    var item = ele.LoopList[i];
                     PreOptimize(item, obsoleteList, keyEvents);
                 }
 
-                foreach (var item in ele.TriggerList)
+                for (var i = 0; i < ele.TriggerList.Count; i++)
                 {
+                    var item = ele.TriggerList[i];
                     PreOptimize(item, obsoleteList, keyEvents);
                 }
             }
 
-            if (host.Events.Any())
+            if (host.Events.Count > 0)
                 RemoveByInvisibleList(host, obsoleteList, keyEvents);
 
             foreach (var hostEvent in host.Events)
@@ -347,7 +349,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
 
                     // 判断是否此Event为控制Invisible Range的Event。
                     if (!(nowE.OnInvisibleTimingRangeBound(obsoleteList) &&
-                          EventExtensions.IneffectiveDictionary.ContainsKey(nowE.EventType)))
+                          EventExtensions.IneffectiveDictionary.ContainsKey(nowE.EventType.Flag)))
                     {
                         bool canRemove;
 
