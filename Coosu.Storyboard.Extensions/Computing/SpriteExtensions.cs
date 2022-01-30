@@ -40,7 +40,7 @@ namespace Coosu.Storyboard.Extensions.Computing
                 dic[e.EventType].Count++;
                 // 最早的event晚于最小开始时间，默认加这一段
                 if (dic[e.EventType].Count == 1 &&
-                    e.Start.SequenceEqual(e.GetIneffectiveValue()) &&
+                    e.GetStarts().SequenceEqual(e.GetIneffectiveValue()) &&
                     e.StartTime > sprite.MinTime)
                 {
                     if (e.IsStartsEqualsEnds())
@@ -51,8 +51,8 @@ namespace Coosu.Storyboard.Extensions.Computing
                 }
 
                 // event.Start和End都为无用值时，开始计时
-                if (e.Start.SequenceEqual(e.GetIneffectiveValue()) &&
-                    e.End.SequenceEqual(e.GetIneffectiveValue()) &&
+                if (e.GetStarts().SequenceEqual(e.GetIneffectiveValue()) &&
+                    e.GetEnds().SequenceEqual(e.GetIneffectiveValue()) &&
                     dic[e.EventType].IsFadingOut == false)
                 {
                     dic[e.EventType].StartTime = e.StartTime;
@@ -60,7 +60,7 @@ namespace Coosu.Storyboard.Extensions.Computing
                     keyEvents.Add(e);
                 }
                 // event.End为无用值时，开始计时
-                else if (e.End.SequenceEqual(e.GetIneffectiveValue()) &&
+                else if (e.GetEnds().SequenceEqual(e.GetIneffectiveValue()) &&
                          dic[e.EventType].IsFadingOut == false)
                 {
                     dic[e.EventType].StartTime = e.EndTime;
@@ -69,8 +69,8 @@ namespace Coosu.Storyboard.Extensions.Computing
                 }
                 else if (dic[e.EventType].IsFadingOut)
                 {
-                    if (e.Start.SequenceEqual(e.GetIneffectiveValue()) &&
-                        e.End.SequenceEqual(e.GetIneffectiveValue()))
+                    if (e.GetStarts().SequenceEqual(e.GetIneffectiveValue()) &&
+                        e.GetEnds().SequenceEqual(e.GetIneffectiveValue()))
                         continue;
                     AddTimeRage(dic[e.EventType].StartTime, e.StartTime);
                     dic[e.EventType].IsFadingOut = false;

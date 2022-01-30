@@ -51,12 +51,14 @@ namespace Coosu.Storyboard.Extensions.Computing
             return GetDefaultValue(eventType);
         }
 
-        public static float[] ComputeRelative(this EventType eventType, float[] source, float[] relativeVal,
+        public static List<float> ComputeRelative(this EventType eventType,
+            IReadOnlyList<float> source,
+            IReadOnlyList<float> relativeVal,
             int? accuracy = null)
         {
             if (eventType.Size < 1)
                 throw new ArgumentOutOfRangeException(nameof(eventType), eventType, "Only support sized event type.");
-            var value = new float[eventType.Size];
+            var list = new List<float>(eventType.Size);
             for (int i = 0; i < eventType.Size; i++)
             {
                 //if (eventType == EventTypes.Fade ||eventType==EventTypes.Scale||eventType==)
@@ -64,12 +66,12 @@ namespace Coosu.Storyboard.Extensions.Computing
                 //    value[i] = source[i] * relativeVal[i];
                 //}
                 if (accuracy == null)
-                    value[i] = source[i] + relativeVal[i];
+                    list.Add(source[i] + relativeVal[i]);
                 else
-                    value[i] = (float)Math.Round(source[i] + relativeVal[i], accuracy.Value);
+                    list.Add((float)Math.Round(source[i] + relativeVal[i], accuracy.Value));
             }
 
-            return value;
+            return list;
         }
     }
 }
