@@ -14,7 +14,10 @@ namespace Coosu.Storyboard.Common
         Span<float> GetStartsSpan();
         Span<float> GetEndsSpan();
 #endif
-
+        IEnumerable<float> GetStarts();
+        IEnumerable<float> GetEnds();
+        void SetStarts(IEnumerable<float> startValues);
+        void SetEnds(IEnumerable<float> endValues);
         bool IsHalfFilled { get; }
         bool IsFilled { get; }
         float GetValue(int index);

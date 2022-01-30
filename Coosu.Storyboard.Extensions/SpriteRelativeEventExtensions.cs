@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Collections.Generic;
+using System.Numerics;
 using Coosu.Shared.Numerics;
 using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Easing;
@@ -389,21 +390,21 @@ namespace Coosu.Storyboard
             float startTime, float endTime,
             float x)
         {
-            host.AddEvent(new RelativeEvent(e, easing, startTime, endTime, new[] { x }));
+            host.AddEvent(new RelativeEvent(e, easing, startTime, endTime, new List<float>(1) { x }));
         }
 
         private static void AddEventRelative(this IEventHost host, EventType e, EasingFunctionBase easing,
             float startTime, float endTime,
             float x, float y)
         {
-            host.AddEvent(new RelativeEvent(e, easing, startTime, endTime, new[] { x, y }));
+            host.AddEvent(new RelativeEvent(e, easing, startTime, endTime, new List<float>(2) { x, y }));
         }
 
         private static void AddEventRelative(this IEventHost host, EventType e, EasingFunctionBase easing,
             float startTime, float endTime,
             float x, float y, float z)
         {
-            host.AddEvent(new RelativeEvent(e, easing, startTime, endTime, new[] { x, y, z }));
+            host.AddEvent(new RelativeEvent(e, easing, startTime, endTime, new List<float>(3) { x, y, z }));
         }
     }
 }

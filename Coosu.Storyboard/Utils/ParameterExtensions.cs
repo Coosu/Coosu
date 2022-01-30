@@ -1,7 +1,8 @@
 ﻿using System;
 using Coosu.Storyboard.Events;
 
-namespace Coosu.Storyboard.Utils
+// ReSharper disable once CheckNamespace
+namespace Coosu.Storyboard
 {
     public static class ParameterExtensions
     {

@@ -3,8 +3,15 @@ using System.Collections.Generic;
 
 namespace Coosu.Shared
 {
-    internal static class ListExtensions
+    public static class ListExtensions
     {
+        public static List<T> CloneAsList<T>(this IReadOnlyCollection<T> list)
+        {
+            var retList = new List<T>();
+            retList.AddRange(list);
+            return retList;
+        }
+
         public static void AddSorted<T>(this List<T> list, T item) where T : IComparable<T>
         {
             if (list.Count == 0)
