@@ -95,7 +95,7 @@ namespace Coosu.Storyboard.Events
             SetValueImpl(index, value);
         }
 
-        public void SetStartsValues(IEnumerable<float> startValues)
+        public void SetStarts(IEnumerable<float> startValues)
         {
             if (startValues is IReadOnlyList<float> l)
             {
@@ -117,7 +117,7 @@ namespace Coosu.Storyboard.Events
             }
         }
 
-        public void SetEndsValues(IEnumerable<float> endValues)
+        public void SetEnds(IEnumerable<float> endValues)
         {
             if (endValues is IReadOnlyList<float> l)
             {

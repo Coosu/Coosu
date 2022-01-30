@@ -33,8 +33,8 @@ namespace Coosu.Storyboard
 
         public static void SetRawValues(this IKeyEvent e, IEnumerable<float> startValues, IEnumerable<float> endValues)
         {
-            e.SetStartsValues(startValues);
-            e.SetEndsValues(endValues);
+            e.SetStarts(startValues);
+            e.SetEnds(endValues);
         }
     }
 }
