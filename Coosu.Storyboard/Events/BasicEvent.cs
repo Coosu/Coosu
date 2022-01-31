@@ -139,16 +139,6 @@ namespace Coosu.Storyboard.Events
             }
         }
 
-        public void SetRawValues(IEnumerable<float> startValues, IEnumerable<float> endValues)
-        {
-            var list = new List<float>();
-            list.AddRange(startValues);
-            list.AddRange(endValues);
-
-            if (list.Count != EventType.Size * 2) throw new ArgumentException();
-            Values = list;
-        }
-
         public virtual void Fill()
         {
             Fill(EventType.Size * 2);

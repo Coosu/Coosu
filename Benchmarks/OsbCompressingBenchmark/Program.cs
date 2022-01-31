@@ -20,8 +20,8 @@ namespace OsbCompressingBenchmark
     {
         static void Main(string[] args)
         {
-            var fi = new FileInfo(@"Rin - Prism Magical (DJ SHARPNEL hardrave remix) (regenz).osb");
-            //var fi = new FileInfo(@"Denkishiki Karen Ongaku Shuudan - Gareki no Yume (Dored).osb");
+            //var fi = new FileInfo(@"Rin - Prism Magical (DJ SHARPNEL hardrave remix) (regenz).osb");
+            var fi = new FileInfo(@"Denkishiki Karen Ongaku Shuudan - Gareki no Yume (Dored).osb");
             //var fi = new FileInfo(@"minmin - O.M.E.N. (Mafiamaster).osb");
             if (!fi.Exists)
                 throw new FileNotFoundException("Test file does not exists: " + fi.FullName);
@@ -66,7 +66,7 @@ namespace OsbCompressingBenchmark
             [Benchmark(Baseline = true)]
             public async Task<object?> CoosuLatest_Storyboard()
             {
-                var compressor = new LocalCoosuNs.Storyboard.Extensions.Optimizing.SpriteCompressor(_osuLocal, new CompressOptions()
+                var compressor = new SpriteCompressor(_osuLocal, new CompressOptions()
                 {
                     ThreadCount = 1
                 });
