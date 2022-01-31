@@ -43,7 +43,7 @@ namespace Coosu.Storyboard.Extensions.Computing
                         }
                     }
 
-                    sprite.LoopList.Clear();
+                    sprite.ClearLoops();
                 }
             }
 
@@ -317,10 +317,10 @@ namespace Coosu.Storyboard.Extensions.Computing
                 var eventList = @event.ComputeDiscretizedEvents(false,
                     discretizingInterval,
                     discretizingAccuracy);
-                sprite.Events.Remove(@event);
+                sprite.RemoveEvent(@event);
                 foreach (var keyEvent in eventList)
                 {
-                    sprite.Events.Add(keyEvent);
+                    sprite.AddEvent(keyEvent);
                 }
             }
         }
@@ -367,7 +367,7 @@ namespace Coosu.Storyboard.Extensions.Computing
                                 defaultValue,
                                 @event.EventType.ComputeRelative(defaultValue, @event.Values));
                             AddEventDirectly(sprite, newEvent, discretizingInterval, discretizingAccuracy);
-                            sprite.Events.Remove(@event);
+                            sprite.RemoveEvent(@event);
                         }
                         else if (targetStandardEvents.Count == 0)
                         {
@@ -376,7 +376,7 @@ namespace Coosu.Storyboard.Extensions.Computing
                                 lastValue,
                                 @event.EventType.ComputeRelative(lastValue, @event.Values));
                             AddEventDirectly(sprite, newEvent, discretizingInterval, discretizingAccuracy);
-                            sprite.Events.Remove(@event);
+                            sprite.RemoveEvent(@event);
 
                             var nextEvents = allThisTypeStandardEvents
                                 .Where(k => k.StartTime >= endTime)
@@ -623,7 +623,7 @@ namespace Coosu.Storyboard.Extensions.Computing
 
                             foreach (var keyEvent in list)
                             {
-                                sprite.Events.Add(keyEvent);
+                                sprite.AddEvent(keyEvent);
                             }
 
                             foreach (var value in discretizingTargetStandardEvents.Values)
@@ -637,14 +637,14 @@ namespace Coosu.Storyboard.Extensions.Computing
                                     }
                                 }
 
-                                sprite.Events.Add(value);
+                                sprite.AddEvent(value);
                             }
 
-                            sprite.Events.Remove(@event);
+                            sprite.RemoveEvent(@event);
                             list.Clear();
                             foreach (var targetStandardEvent in targetStandardEvents)
                             {
-                                sprite.Events.Remove(targetStandardEvent);
+                                sprite.RemoveEvent(targetStandardEvent);
                             }
 
                             var nextEvents = allThisTypeStandardEvents
@@ -679,12 +679,12 @@ namespace Coosu.Storyboard.Extensions.Computing
                     discretizingAccuracy);
                 foreach (var keyEvent in de)
                 {
-                    sprite.Events.Add(keyEvent);
+                    sprite.AddEvent(keyEvent);
                 }
             }
             else
             {
-                sprite.Events.Add(newEvent);
+                sprite.AddEvent(newEvent);
             }
         }
 

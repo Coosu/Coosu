@@ -5,11 +5,9 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Coosu.Shared;
 using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Events;
 using Coosu.Storyboard.Extensions.Computing;
-using Coosu.Storyboard.Utils;
 
 namespace Coosu.Storyboard.Extensions.Optimizing
 {
@@ -252,7 +250,9 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             }
 
             // temporary to object equals
-            sprite.Events = new HashSet<IKeyEvent>(sprite.Events);
+            IReadOnlyCollection<IKeyEvent> collection = new HashSet<IKeyEvent>(sprite.Events);
+            sprite.ClearEvents();
+            foreach (var keyEvent in collection) sprite.AddEvent(keyEvent);
 
             // relative to absolute
             // todo: performance issue
@@ -263,7 +263,9 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             NormalOptimize(sprite);
 
             // to compute equals
-            sprite.Events = new SortedSet<IKeyEvent>(sprite.Events, new EventSequenceComparer());
+            collection = new SortedSet<IKeyEvent>(sprite.Events, EventSequenceComparer.Instance);
+            sprite.ClearEvents(EventSequenceComparer.Instance);
+            foreach (var keyEvent in collection) sprite.AddEvent(keyEvent);
 
             if (sprite.ObjectType == ObjectTypes.Sprite &&
                 Path.GetFileName(sprite.ImagePath) == sprite.ImagePath &&
@@ -456,7 +458,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                 {
                     BasicEvent nowE = list[index];
                     if (host is Sprite ele &&
-                        ele.TriggerList.Count > 0 && 
+                        ele.TriggerList.Count > 0 &&
                         ele.TriggerList.Any(k => nowE.EndTime >= k.StartTime && nowE.StartTime <= k.EndTime) &&
                         ele.LoopList.Count > 0 &&
                         ele.LoopList.Any(k => nowE.EndTime >= k.StartTime && nowE.StartTime <= k.EndTime))
@@ -641,7 +643,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
 
         private static void RemoveEvent(IDetailedEventHost sourceHost, ICollection<BasicEvent> eventList, BasicEvent e)
         {
-            var success = sourceHost.Events.Remove(e);
+            var success = sourceHost.RemoveEvent(e);
             if (!success)
             {
                 //var count = sourceHost.Events.RemoveWhere(k =>

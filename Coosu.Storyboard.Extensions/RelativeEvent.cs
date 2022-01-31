@@ -8,21 +8,43 @@ using Coosu.Shared;
 using Coosu.Shared.Mathematics;
 using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Easing;
-using Coosu.Storyboard.Utils;
 
 namespace Coosu.Storyboard.Extensions
 {
     [DebuggerDisplay("Expression = {DebuggerDisplay}")]
     public class RelativeEvent : IKeyEvent
     {
+        public event Action? TimingChanged;
+
         private List<float> _values;
+        private float _startTime;
+        private float _endTime;
         private string DebuggerDisplay => this.GetHeaderString();
         public EventType EventType { get; }
 
         public EasingFunctionBase Easing { get; set; } = LinearEase.Instance;
 
-        public float StartTime { get; set; }
-        public float EndTime { get; set; }
+        public float StartTime
+        {
+            get => _startTime;
+            set
+            {
+                if (Precision.AlmostEquals(_startTime, value)) return;
+                _startTime = value;
+                TimingChanged?.Invoke();
+            }
+        }
+
+        public float EndTime
+        {
+            get => _endTime;
+            set
+            {
+                if (Precision.AlmostEquals(_startTime, value)) return;
+                _endTime = value;
+                TimingChanged?.Invoke();
+            }
+        }
 
         public virtual float DefaultValue => 0;
 

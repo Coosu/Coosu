@@ -1,12 +1,15 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Coosu.Storyboard.Common
 {
     public interface IEventHost : IScriptable
     {
-        ICollection<IKeyEvent> Events { get; set; }
+        IReadOnlyCollection<IKeyEvent> Events { get; }
         void AddEvent(IKeyEvent @event);
+        bool RemoveEvent(IKeyEvent @event);
+        void ClearEvents(IComparer<IKeyEvent>? comparer);
     }
 
     public interface IDetailedEventHost : IScriptable, ICloneable, IEventHost

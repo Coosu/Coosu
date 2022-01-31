@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -15,6 +16,7 @@ namespace Coosu.Storyboard
             ObjectType.SignType(10, "SpriteGroup");
         }
 
+        private ICollection<IKeyEvent> _events = new SortedSet<IKeyEvent>(EventSequenceComparer.Instance);
         public SpriteGroup()
         {
         }
@@ -70,16 +72,30 @@ namespace Coosu.Storyboard
 
         public bool EnableGroupedSerialization { get; set; }
 
-        public ICollection<IKeyEvent> Events
+        public IReadOnlyCollection<IKeyEvent> Events
         {
-            get => Camera2.Events;
-            set => Camera2.Events = value;
+            get => (IReadOnlyCollection<IKeyEvent>)_events;
+            internal set => _events = value as ICollection<IKeyEvent> ?? throw new Exception(
+                $"The collection should be {nameof(ICollection<IKeyEvent>)}");
         }
 
+        IReadOnlyCollection<IKeyEvent> IEventHost.Events => Events;
+        
         public void AddEvent(IKeyEvent @event)
         {
             Camera2.AddEvent(@event);
         }
+
+        public bool RemoveEvent(IKeyEvent @event)
+        {
+            return Camera2.RemoveEvent(@event);
+        }
+
+        public void ClearEvents(IComparer<IKeyEvent>? comparer = null)
+        {
+            Camera2.ClearEvents(comparer);
+        }
+
 
         /// <inheritdoc />
         public float DefaultX

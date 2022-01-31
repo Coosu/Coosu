@@ -5,6 +5,8 @@ namespace Coosu.Storyboard.Common
 {
     public sealed class EventSequenceComparer : IComparer<IKeyEvent>
     {
+        private EventSequenceComparer() { }
+
         public int Compare(IKeyEvent? x, IKeyEvent? y)
         {
             if (y == null && x == null)

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Coosu.Shared;
+using Coosu.Shared.Mathematics;
 using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Utils;
 
@@ -11,14 +12,38 @@ namespace Coosu.Storyboard.Events
 {
     public sealed class Loop : ISubEventHost, IEvent
     {
+        public event Action? TimingChanged;
         public EventType EventType { get; } = EventTypes.Loop;
 
         internal ISceneObject? _baseObject;
+        private float _startTime;
+        private ICollection<IKeyEvent> _events = new SortedSet<IKeyEvent>(EventSequenceComparer.Instance);
+
+        private float? _cachedMaxTime;
+        private float? _cachedMinTime;
+        private float? _cachedMaxStartTime;
+        private float? _cachedMinEndTime;
+
+        public IReadOnlyCollection<IKeyEvent> Events
+        {
+            get => (IReadOnlyCollection<IKeyEvent>)_events;
+            internal set => _events = value as ICollection<IKeyEvent> ?? throw new Exception(
+                $"The collection should be {nameof(ICollection<IKeyEvent>)}");
+        }
+
         public bool EnableGroupedSerialization { get; set; }/* = true;*/
 
-        public ICollection<IKeyEvent> Events { get; set; } = new SortedSet<IKeyEvent>(EventSequenceComparer.Instance);
+        public float StartTime
+        {
+            get => _startTime;
+            set
+            {
+                if (Precision.AlmostEquals(_startTime, value)) return;
+                _startTime = value;
+                ResetCacheAndRaiseTimingChanged();
+            }
+        }
 
-        public float StartTime { get; set; }
         public float EndTime
         {
             get => OuterMaxTime();
@@ -28,10 +53,29 @@ namespace Coosu.Storyboard.Events
         public int LoopCount { get; set; }
         public float OuterMaxTime() => StartTime + MaxTime() * LoopCount;
         public float OuterMinTime() => StartTime + MinTime();
-        public float MaxTime() => Events.Count > 0 ? Events.Max(k => k.EndTime) : 0;
-        public float MinTime() => Events.Count > 0 ? Events.Min(k => k.StartTime) : 0;
-        public float MaxStartTime() => Events.Count > 0 ? Events.Max(k => k.StartTime) : 0;
-        public float MinEndTime() => Events.Count > 0 ? Events.Min(k => k.EndTime) : 0;
+        public float MaxTime()
+        {
+            if (_cachedMaxTime != null) return _cachedMaxTime.Value;
+            return (float)(_cachedMaxTime = Events.Count > 0 ? Events.Max(k => k.EndTime) : 0);
+        }
+
+        public float MinTime()
+        {
+            if (_cachedMinTime != null) return _cachedMinTime.Value;
+            return (float)(_cachedMinTime = Events.Count > 0 ? Events.Min(k => k.StartTime) : 0);
+        }
+
+        public float MaxStartTime()
+        {
+            if (_cachedMaxStartTime != null) return _cachedMaxStartTime.Value;
+            return (float)(_cachedMaxStartTime = Events.Count > 0 ? Events.Max(k => k.StartTime) : 0);
+        }
+
+        public float MinEndTime()
+        {
+            if (_cachedMinEndTime != null) return _cachedMinEndTime.Value;
+            return (float)(_cachedMinEndTime = Events.Count > 0 ? Events.Min(k => k.EndTime) : 0);
+        }
 
         public Loop(float startTime, int loopCount)
         {
@@ -58,9 +102,29 @@ namespace Coosu.Storyboard.Events
             StartTime += offset;
         }
 
+        IReadOnlyCollection<IKeyEvent> IEventHost.Events => Events;
+
         public void AddEvent(IKeyEvent @event)
         {
-            Events.Add(@event);
+            _events.Add(@event);
+            @event.TimingChanged += ResetCacheAndRaiseTimingChanged;
+        }
+
+        public bool RemoveEvent(IKeyEvent @event)
+        {
+            @event.TimingChanged -= ResetCacheAndRaiseTimingChanged;
+            return _events.Remove(@event);
+        }
+
+        public void ClearEvents(IComparer<IKeyEvent>? comparer = null)
+        {
+            foreach (var @event in _events)
+                @event.TimingChanged -= ResetCacheAndRaiseTimingChanged;
+            _events.Clear();
+            if (comparer == null)
+                _events = new HashSet<IKeyEvent>();
+            else
+                _events = new SortedSet<IKeyEvent>(comparer);
         }
 
         ISceneObject? ISubEventHost.BaseObject
@@ -73,10 +137,22 @@ namespace Coosu.Storyboard.Events
         {
             var loop = new Loop(StartTime, LoopCount)
             {
-                Events = Events.Select(k => k.Clone()).Cast<IKeyEvent>().ToList(),
                 EnableGroupedSerialization = EnableGroupedSerialization
             };
+
+            foreach (var keyEvent in _events) 
+                loop.AddEvent((IKeyEvent)keyEvent.Clone());
+
             return loop;
+        }
+
+        private void ResetCacheAndRaiseTimingChanged()
+        {
+            _cachedMaxTime = null;
+            _cachedMinTime = null;
+            _cachedMaxStartTime = null;
+            _cachedMinEndTime = null;
+            TimingChanged?.Invoke();
         }
     }
 }

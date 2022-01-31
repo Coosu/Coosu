@@ -16,13 +16,36 @@ namespace Coosu.Storyboard.Events
     [DebuggerDisplay("Expression = {DebuggerDisplay}")]
     public abstract class BasicEvent : IKeyEvent
     {
+        public event Action? TimingChanged;
         internal List<float> _values;
+        private float _startTime;
+        private float _endTime;
         private string DebuggerDisplay => this.GetHeaderString();
 
         public abstract EventType EventType { get; }
         public EasingFunctionBase Easing { get; set; } = LinearEase.Instance;
-        public float StartTime { get; set; }
-        public float EndTime { get; set; }
+
+        public float StartTime
+        {
+            get => _startTime;
+            set
+            {
+                if (Precision.AlmostEquals(_startTime, value)) return;
+                _startTime = value;
+                TimingChanged?.Invoke();
+            }
+        }
+
+        public float EndTime
+        {
+            get => _endTime;
+            set
+            {
+                if (Precision.AlmostEquals(_startTime, value)) return;
+                _endTime = value;
+                TimingChanged?.Invoke();
+            }
+        }
 
         public virtual float DefaultValue => 0;
         public IReadOnlyList<float> Values
@@ -196,8 +219,8 @@ namespace Coosu.Storyboard.Events
         protected BasicEvent(EasingFunctionBase easing, float startTime, float endTime, List<float> values)
         {
             Easing = easing;
-            StartTime = startTime;
-            EndTime = endTime;
+            _startTime = startTime;
+            _endTime = endTime;
             _values = values;
         }
 
