@@ -28,7 +28,10 @@ namespace OsbCompressingBenchmark
             Environment.SetEnvironmentVariable("test_osb_path", fi.FullName);
 
             var osu = Layer.ParseFromFileAsync(fi.FullName).Result;
-            var compressor = new LocalCoosuNs.Storyboard.Extensions.Optimizing.SpriteCompressor(osu);
+            var compressor = new SpriteCompressor(osu, new CompressOptions()
+            {
+                ThreadCount = 1
+            });
             compressor.CompressAsync().Wait();
             osu.SaveScriptAsync("new.osb").Wait();
 

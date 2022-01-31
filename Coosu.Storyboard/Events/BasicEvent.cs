@@ -158,7 +158,9 @@ namespace Coosu.Storyboard.Events
         {
             if (IsHalfFilled) return true;
             Fill();
-
+#if NET5_0_OR_GREATER
+            return GetEndsSpan().SequenceEqual(GetStartsSpan());
+#else
             var size = EventType.Size;
             for (var i = 0; i < Values.Count / 2; i++)
             {
@@ -169,6 +171,7 @@ namespace Coosu.Storyboard.Events
             }
 
             return true;
+#endif
         }
 
         public void AdjustTiming(float offset)

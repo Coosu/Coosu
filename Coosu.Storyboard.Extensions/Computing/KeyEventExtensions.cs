@@ -15,12 +15,6 @@ namespace Coosu.Storyboard.Extensions.Computing
             return e.EventType.GetDefaultValue();
         }
 
-        public static bool IsDefault(this IKeyEvent e)
-        {
-            return EventExtensions.DefaultDictionary.ContainsKey(e.EventType.Flag) &&
-                   e.GetStarts().SequenceEqual(EventExtensions.DefaultDictionary[e.EventType.Flag]);
-        }
-
         public static bool EqualsMaxTime(this IKeyEvent e, IDetailedEventHost host)
         {
             return e.EndTime.Equals(host.MaxTime);
@@ -33,10 +27,10 @@ namespace Coosu.Storyboard.Extensions.Computing
 
         public static bool IsTimeInRange(this IKeyEvent e, IDetailedEventHost host)
         {
-            return e.IsSmallerThenMaxTime(host) && e.IsLargerThanMinTime(host);
+            return e.IsSmallerThanMaxTime(host) && e.IsLargerThanMinTime(host);
         }
 
-        public static bool IsSmallerThenMaxTime(this IKeyEvent e, IDetailedEventHost host)
+        public static bool IsSmallerThanMaxTime(this IKeyEvent e, IDetailedEventHost host)
         {
             return e.EndTime < host.MaxTime ||
                    e.EqualsMultiMaxTime(host);
@@ -64,7 +58,11 @@ namespace Coosu.Storyboard.Extensions.Computing
         }
         public static bool SuccessiveTo(this IKeyEvent previous, IKeyEvent next)
         {
+#if NET5_0_OR_GREATER
+            return previous.GetEndsSpan().SequenceEqual(next.GetStartsSpan());
+#else
             return previous.GetEnds().SequenceEqual(next.GetStarts());
+#endif
         }
 
         public static bool EndsWithIneffective(this IKeyEvent e)
@@ -75,10 +73,16 @@ namespace Coosu.Storyboard.Extensions.Computing
 
         public static bool IsStaticAndDefault(this IKeyEvent e)
         {
-            return e.IsDefault() &&
-                   e.IsStartsEqualsEnds();
+            if (!e.IsStartsEqualsEnds()) return false;
+            return EventExtensions.DefaultDictionary.TryGetValue(e.EventType.Flag, out var defValue) &&
+#if NET5_0_OR_GREATER
+                   e.GetStartsSpan().SequenceEqual(defValue.AsSpan())
+#else
+                   e.GetStarts().SequenceEqual(defValue)
+#endif
+                ;
         }
-        
+
         public static bool OnInvisibleTimingRangeBound(this IKeyEvent e, TimeRange obsoleteList)
         {
             return obsoleteList.OnTimingRangeBound(out _, e.StartTime) ||

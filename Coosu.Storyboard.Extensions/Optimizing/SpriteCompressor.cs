@@ -320,18 +320,20 @@ namespace Coosu.Storyboard.Extensions.Optimizing
         {
             if (host is Sprite ele)
             {
-                foreach (var item in ele.LoopList)
+                for (var i = 0; i < ele.LoopList.Count; i++)
                 {
+                    var item = ele.LoopList[i];
                     NormalOptimize(item);
                 }
 
-                foreach (var item in ele.TriggerList)
+                for (var i = 0; i < ele.TriggerList.Count; i++)
                 {
+                    var item = ele.TriggerList[i];
                     NormalOptimize(item);
                 }
             }
 
-            if (host.Events.Any())
+            if (host.Events.Count > 0)
             {
                 RemoveByLogic(host, host.Events.Cast<BasicEvent>().ToList());
             }
@@ -386,7 +388,8 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                             {
                                 for (var j = 0; j < nowE.EventType.Size; j++)
                                 {
-                                    if (nowE.GetEndsValue(j).ToIcString().Length > nowE.GetStartsValue(j).ToIcString().Length)
+                                    // 好像不需要这个判断，因为两个控制参数和一个比肯定一个短
+                                    //if (nowE.GetEndsValue(j).ToIcString().Length > nowE.GetStartsValue(j).ToIcString().Length)
                                     {
                                         RaiseSituationEvent(host, SituationType.ThisLastSingleInLastInvisibleToFixTail,
                                             () => { nowE.SetEndsValue(j, nowE.GetStartsValue(j)); },
@@ -394,7 +397,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                                     }
                                 }
 
-                                if (nowE.IsSmallerThenMaxTime(host))
+                                if (nowE.IsSmallerThanMaxTime(host))
                                 {
                                     RaiseSituationEvent(host, SituationType.ThisLastSingleInLastInvisibleToFixEndTime,
                                         () => { nowE.EndTime = nowE.StartTime; },
@@ -418,7 +421,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                             // 判断是否此Event在某Invisible Range内，且下一Event的StartTime也在此Invisible Range内。
                             canRemove = obsoleteList.ContainsTimingPoint(out _,
                                 nowE.StartTime, nowE.EndTime, nextE.StartTime) /*&& !keyEvents.Contains(nowE)*/;
-                            //目前限制：多个fadoutlist的控制节点不能删的只剩一个
+                            // todo: 目前限制：多个fadoutlist的控制节点不能删的只剩一个
                             if (canRemove)
                             {
                                 RaiseSituationEvent(host, SituationType.NextHeadAndThisInInvisibleToRemove,
@@ -453,12 +456,15 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                 {
                     BasicEvent nowE = list[index];
                     if (host is Sprite ele &&
+                        ele.TriggerList.Count > 0 && 
                         ele.TriggerList.Any(k => nowE.EndTime >= k.StartTime && nowE.StartTime <= k.EndTime) &&
+                        ele.LoopList.Count > 0 &&
                         ele.LoopList.Any(k => nowE.EndTime >= k.StartTime && nowE.StartTime <= k.EndTime))
                     {
                         index--;
                         continue;
                     }
+
                     // 若是首个event
                     if (index == 0)
                     {
@@ -586,7 +592,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                          * 且 此event的param固定
                          * 且 此event当前动作 = 此event上个动作
                         */
-                        else if (nowE.IsSmallerThenMaxTime(host) /*||
+                        else if (nowE.IsSmallerThanMaxTime(host) /*||
                                  type == EventTypes.Fade && nowStartP.SequenceEqual(EventExtension.IneffectiveDictionary[EventTypes.Fade]) */
                                  && nowE.IsStartsEqualsEnds()
                                  && preE.SuccessiveTo(nowE))
