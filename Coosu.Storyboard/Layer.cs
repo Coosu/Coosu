@@ -127,10 +127,10 @@ namespace Coosu.Storyboard
             return GetEnumerator();
         }
 
-        public float MaxTime => SceneObjects.Count == 0 ? 0 : SceneObjects.Max(k => k.MaxTime);
-        public float MinTime => SceneObjects.Count == 0 ? 0 : SceneObjects.Min(k => k.MinTime);
-        public float MaxStartTime => SceneObjects.Count == 0 ? 0 : SceneObjects.Max(k => k.MaxStartTime);
-        public float MinEndTime => SceneObjects.Count == 0 ? 0 : SceneObjects.Min(k => k.MinEndTime);
+        public float MaxTime() => SceneObjects.Count == 0 ? 0 : SceneObjects.Max(k => k.MaxTime());
+        public float MinTime() => SceneObjects.Count == 0 ? 0 : SceneObjects.Min(k => k.MinTime());
+        public float MaxStartTime() => SceneObjects.Count == 0 ? 0 : SceneObjects.Max(k => k.MaxStartTime());
+        public float MinEndTime() => SceneObjects.Count == 0 ? 0 : SceneObjects.Min(k => k.MinEndTime());
 
         public IList<Sprite> Sprites => SceneObjects
             .Where(k => k is Sprite)

@@ -17,12 +17,12 @@ namespace Coosu.Storyboard.Extensions.Computing
 
         public static bool EqualsMaxTime(this IKeyEvent e, IDetailedEventHost host)
         {
-            return e.EndTime.Equals(host.MaxTime);
+            return e.EndTime.Equals(host.MaxTime());
         }
 
         public static bool EqualsMinTime(this IKeyEvent e, IDetailedEventHost host)
         {
-            return e.StartTime.Equals(host.MinTime);
+            return e.StartTime.Equals(host.MinTime());
         }
 
         public static bool IsTimeInRange(this IKeyEvent e, IDetailedEventHost host)
@@ -32,13 +32,13 @@ namespace Coosu.Storyboard.Extensions.Computing
 
         public static bool IsSmallerThanMaxTime(this IKeyEvent e, IDetailedEventHost host)
         {
-            return e.EndTime < host.MaxTime ||
+            return e.EndTime < host.MaxTime() ||
                    e.EqualsMultiMaxTime(host);
         }
 
         public static bool IsLargerThanMinTime(this IKeyEvent e, IDetailedEventHost host)
         {
-            return e.StartTime > host.MinTime ||
+            return e.StartTime > host.MinTime() ||
                    e.EqualsMultiMinTime(host);
         }
 

@@ -64,12 +64,12 @@ namespace Coosu.Storyboard.Extensions.Computing
 
                 if (dic[flag].Count == 1 &&
                     isStartsIneffective &&
-                    e.StartTime > sprite.MinTime)
+                    e.StartTime > sprite.MinTime())
                 {
                     if (e.IsStartsEqualsEnds())
-                        e.AdjustTiming(sprite.MinTime - e.StartTime); // todo: stop changing here
+                        e.AdjustTiming(sprite.MinTime() - e.StartTime); // todo: stop changing here
 
-                    dic[flag].StartTime = sprite.MinTime;
+                    dic[flag].StartTime = sprite.MinTime();
                     dic[flag].IsFadingOut = true;
                     keyEvents.Add(e);
                 }
@@ -108,9 +108,9 @@ namespace Coosu.Storyboard.Extensions.Computing
                 .Where(k => k.Value.IsFadingOut)
                 .OrderBy(k => k.Value.StartTime))
             {
-                if (Precision.AlmostEquals(pair.Value.StartTime, sprite.MaxTime))
+                if (Precision.AlmostEquals(pair.Value.StartTime, sprite.MaxTime()))
                     break;
-                AddTimeRage(pair.Value.StartTime, sprite.MaxTime);
+                AddTimeRage(pair.Value.StartTime, sprite.MaxTime());
                 break;
             }
 

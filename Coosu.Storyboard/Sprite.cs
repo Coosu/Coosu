@@ -44,72 +44,60 @@ namespace Coosu.Storyboard
         public List<Loop> LoopList { get; private set; } = new();
         public List<Trigger> TriggerList { get; private set; } = new();
 
-        public float MaxTime
+        public float MaxTime()
         {
-            get
-            {
-                if (Events.Count == 0 && LoopList.Count == 0 && TriggerList.Count == 0)
-                    return float.NaN;
+            if (Events.Count == 0 && LoopList.Count == 0 && TriggerList.Count == 0)
+                return float.NaN;
 
-                var max = Events.Count == 0 ? float.MinValue : Events.Max(k => k.EndTime);
-                var loopMax = LoopList.Count == 0 ? float.MinValue : LoopList.Max(k => k.OuterMaxTime);
-                max = max >= loopMax ? max : loopMax;
+            var max = Events.Count == 0 ? float.MinValue : Events.Max(k => k.EndTime);
+            var loopMax = LoopList.Count == 0 ? float.MinValue : LoopList.Max(k => k.OuterMaxTime());
+            max = max >= loopMax ? max : loopMax;
 
-                var triggerMax = TriggerList.Count == 0 ? float.MinValue : TriggerList.Max(k => k.MaxTime);
-                max = max >= triggerMax ? max : triggerMax;
-                return max;
-            }
+            var triggerMax = TriggerList.Count == 0 ? float.MinValue : TriggerList.Max(k => k.MaxTime());
+            max = max >= triggerMax ? max : triggerMax;
+            return max;
         }
 
-        public float MinTime
+        public float MinTime()
         {
-            get
-            {
-                if (Events.Count == 0 && LoopList.Count == 0 && TriggerList.Count == 0)
-                    return float.NaN;
+            if (Events.Count == 0 && LoopList.Count == 0 && TriggerList.Count == 0)
+                return float.NaN;
 
-                var min = Events.Count == 0 ? float.MaxValue : Events.Min(k => k.StartTime);
-                var loopMin = LoopList.Count == 0 ? float.MaxValue : LoopList.Min(k => k.OuterMinTime);
-                min = min <= loopMin ? min : loopMin;
+            var min = Events.Count == 0 ? float.MaxValue : Events.Min(k => k.StartTime);
+            var loopMin = LoopList.Count == 0 ? float.MaxValue : LoopList.Min(k => k.OuterMinTime());
+            min = min <= loopMin ? min : loopMin;
 
-                var triggerMin = TriggerList.Count == 0 ? float.MaxValue : TriggerList.Min(k => k.MinTime);
-                min = min <= triggerMin ? min : triggerMin;
-                return min;
-            }
+            var triggerMin = TriggerList.Count == 0 ? float.MaxValue : TriggerList.Min(k => k.MinTime());
+            min = min <= triggerMin ? min : triggerMin;
+            return min;
         }
 
-        public float MaxStartTime
+        public float MaxStartTime()
         {
-            get
-            {
-                if (Events.Count == 0 && LoopList.Count == 0 && TriggerList.Count == 0)
-                    return float.NaN;
+            if (Events.Count == 0 && LoopList.Count == 0 && TriggerList.Count == 0)
+                return float.NaN;
 
-                var max = Events.Count == 0 ? float.MinValue : Events.Max(k => k.StartTime);
-                var loopMax = LoopList.Count == 0 ? float.MinValue : LoopList.Max(k => k.OuterMinTime);
-                max = max >= loopMax ? max : loopMax;
+            var max = Events.Count == 0 ? float.MinValue : Events.Max(k => k.StartTime);
+            var loopMax = LoopList.Count == 0 ? float.MinValue : LoopList.Max(k => k.OuterMinTime());
+            max = max >= loopMax ? max : loopMax;
 
-                var triggerMax = TriggerList.Count == 0 ? float.MinValue : TriggerList.Max(k => k.MinTime);
-                max = max >= triggerMax ? max : triggerMax;
-                return max;
-            }
+            var triggerMax = TriggerList.Count == 0 ? float.MinValue : TriggerList.Max(k => k.MinTime());
+            max = max >= triggerMax ? max : triggerMax;
+            return max;
         }
 
-        public float MinEndTime
+        public float MinEndTime()
         {
-            get
-            {
-                if (Events.Count == 0 && LoopList.Count == 0 && TriggerList.Count == 0)
-                    return float.NaN;
+            if (Events.Count == 0 && LoopList.Count == 0 && TriggerList.Count == 0)
+                return float.NaN;
 
-                var min = Events.Count == 0 ? float.MaxValue : Events.Min(k => k.EndTime);
-                var loopMin = LoopList.Count == 0 ? float.MaxValue : LoopList.Min(k => k.OuterMaxTime);
-                min = min <= loopMin ? min : loopMin;
+            var min = Events.Count == 0 ? float.MaxValue : Events.Min(k => k.EndTime);
+            var loopMin = LoopList.Count == 0 ? float.MaxValue : LoopList.Min(k => k.OuterMaxTime());
+            min = min <= loopMin ? min : loopMin;
 
-                var triggerMin = TriggerList.Count == 0 ? float.MaxValue : TriggerList.Min(k => k.MaxTime);
-                min = min <= triggerMin ? min : triggerMin;
-                return min;
-            }
+            var triggerMin = TriggerList.Count == 0 ? float.MaxValue : TriggerList.Min(k => k.MaxTime());
+            min = min <= triggerMin ? min : triggerMin;
+            return min;
         }
 
         public bool EnableGroupedSerialization { get; set; }/* = true;*/

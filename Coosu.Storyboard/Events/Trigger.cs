@@ -24,21 +24,21 @@ namespace Coosu.Storyboard.Events
         public float EndTime { get; set; }
         public string TriggerName { get; set; }
 
-        public float MaxTime =>
+        public float MaxTime() =>
             EndTime +
             (Events.Count > 0
                 ? Events.Max(k => k.EndTime)
                 : 0);
 
-        public float MinTime => StartTime;
+        public float MinTime() => StartTime;
 
-        public float MaxStartTime =>
+        public float MaxStartTime() =>
             EndTime +
             (Events.Count > 0
                 ? Events.Max(k => k.StartTime)
                 : 0); //if hitsound played at end time
 
-        public float MinEndTime => StartTime; // if no hitsound here
+        public float MinEndTime() => StartTime; // if no hitsound here
 
         public Trigger(float startTime, float endTime, TriggerType triggerType, bool listenSample = false, uint? customSampleSet = null)
         {

@@ -66,10 +66,10 @@ namespace Coosu.Storyboard.OsbX.SubjectHandlers
         public string CameraIdentifier { get; set; }
         public List<Loop> LoopList { get; } = new();
         public List<Trigger> TriggerList { get; } = new();
-        public float MaxTime => Events.Count > 0 ? Events.Max(k => k.EndTime) : 0;
-        public float MinTime => Events.Count > 0 ? Events.Min(k => k.StartTime) : 0;
-        public float MaxStartTime => Events.Count > 0 ? Events.Max(k => k.StartTime) : 0;
-        public float MinEndTime => Events.Count > 0 ? Events.Min(k => k.EndTime) : 0;
+        public float MaxTime() => Events.Count > 0 ? Events.Max(k => k.EndTime) : 0;
+        public float MinTime() => Events.Count > 0 ? Events.Min(k => k.StartTime) : 0;
+        public float MaxStartTime() => Events.Count > 0 ? Events.Max(k => k.StartTime) : 0;
+        public float MinEndTime() => Events.Count > 0 ? Events.Min(k => k.EndTime) : 0;
         public bool EnableGroupedSerialization { get; set; }
 
         // EventHosts

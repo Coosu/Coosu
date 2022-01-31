@@ -374,7 +374,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                         {
                             // 判断是否此Event在某Invisible Range内，且此Invisible Range持续到EventHost结束。
                             canRemove = nowE.InInvisibleTimingRange(obsoleteList, out var range) &&
-                                        range.EndTime.Equals(host.MaxTime);
+                                        range.EndTime.Equals(host.MaxTime());
                             if (!canRemove) continue;
 
                             // M,1,86792,87127,350.1588,489.5946,350.1588,339.5946

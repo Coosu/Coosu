@@ -21,17 +21,17 @@ namespace Coosu.Storyboard.Events
         public float StartTime { get; set; }
         public float EndTime
         {
-            get => OuterMaxTime;
-            set => throw new System.NotSupportedException();
+            get => OuterMaxTime();
+            set => throw new NotSupportedException();
         }
 
         public int LoopCount { get; set; }
-        public float OuterMaxTime => StartTime + MaxTime * LoopCount;
-        public float OuterMinTime => StartTime + MinTime;
-        public float MaxTime => Events.Count > 0 ? Events.Max(k => k.EndTime) : 0;
-        public float MinTime => Events.Count > 0 ? Events.Min(k => k.StartTime) : 0;
-        public float MaxStartTime => Events.Count > 0 ? Events.Max(k => k.StartTime) : 0;
-        public float MinEndTime => Events.Count > 0 ? Events.Min(k => k.EndTime) : 0;
+        public float OuterMaxTime() => StartTime + MaxTime() * LoopCount;
+        public float OuterMinTime() => StartTime + MinTime();
+        public float MaxTime() => Events.Count > 0 ? Events.Max(k => k.EndTime) : 0;
+        public float MinTime() => Events.Count > 0 ? Events.Min(k => k.StartTime) : 0;
+        public float MaxStartTime() => Events.Count > 0 ? Events.Max(k => k.StartTime) : 0;
+        public float MinEndTime() => Events.Count > 0 ? Events.Min(k => k.EndTime) : 0;
 
         public Loop(float startTime, int loopCount)
         {

@@ -51,19 +51,19 @@ namespace Coosu.Storyboard
 
         }
 
-        public float MaxTime =>
+        public float MaxTime() =>
             NumericHelper.GetMaxValue(
                 Events.Select(k => k.EndTime)
             );
-        public float MinTime =>
+        public float MinTime() =>
             NumericHelper.GetMinValue(
                 Events.Select(k => k.StartTime)
             );
-        public float MaxStartTime =>
+        public float MaxStartTime() =>
             NumericHelper.GetMaxValue(
                 Events.Select(k => k.StartTime)
             );
-        public float MinEndTime =>
+        public float MinEndTime() =>
             NumericHelper.GetMinValue(
                 Events.Select(k => k.EndTime)
             );

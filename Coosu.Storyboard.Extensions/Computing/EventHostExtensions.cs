@@ -30,7 +30,7 @@ namespace Coosu.Storyboard.Extensions.Computing
                         var startTime = loop.StartTime;
                         for (int count = 0; count < loopCount; count++)
                         {
-                            var fixedStartTime = startTime + (count * loop.MaxTime);
+                            var fixedStartTime = startTime + (count * loop.MaxTime());
                             foreach (var e in loop.Events)
                             {
                                 sprite.AddEvent(
@@ -141,7 +141,7 @@ namespace Coosu.Storyboard.Extensions.Computing
         private const int AlgorithmSwitchThreshold = 30;
         public static int GetMaxTimeCount(this IDetailedEventHost eventHost)
         {
-            var maxTime = eventHost.MaxTime;
+            var maxTime = eventHost.MaxTime();
             int sum = 0;
             if (eventHost is Sprite sprite)
             {
@@ -149,14 +149,14 @@ namespace Coosu.Storyboard.Extensions.Computing
                 {
                     if (sprite.LoopList.Count < AlgorithmSwitchThreshold)
                     {
-                        sum += sprite.LoopList.Count(k => k.OuterMaxTime.Equals(maxTime));
+                        sum += sprite.LoopList.Count(k => k.OuterMaxTime().Equals(maxTime));
                     }
                     else
                     {
-                        var orderBy2 = sprite.LoopList.OrderByDescending(k => k.OuterMaxTime);
+                        var orderBy2 = sprite.LoopList.OrderByDescending(k => k.OuterMaxTime());
                         foreach (var keyEvent in orderBy2)
                         {
-                            if (keyEvent.OuterMaxTime >= maxTime) sum++;
+                            if (keyEvent.OuterMaxTime() >= maxTime) sum++;
                             else break;
                         }
                     }
@@ -166,14 +166,14 @@ namespace Coosu.Storyboard.Extensions.Computing
                 {
                     if (sprite.TriggerList.Count < AlgorithmSwitchThreshold)
                     {
-                        sum += sprite.TriggerList.Count(k => k.MaxTime.Equals(maxTime));
+                        sum += sprite.TriggerList.Count(k => k.MaxTime().Equals(maxTime));
                     }
                     else
                     {
-                        var orderBy3 = sprite.TriggerList.OrderByDescending(k => k.MaxTime);
+                        var orderBy3 = sprite.TriggerList.OrderByDescending(k => k.MaxTime());
                         foreach (var keyEvent in orderBy3)
                         {
-                            if (keyEvent.MaxTime >= maxTime) sum++;
+                            if (keyEvent.MaxTime() >= maxTime) sum++;
                             else break;
                         }
                     }
@@ -199,7 +199,7 @@ namespace Coosu.Storyboard.Extensions.Computing
 
         public static int GetMinTimeCount(this IDetailedEventHost eventHost)
         {
-            var minTime = eventHost.MinTime;
+            var minTime = eventHost.MinTime();
             int sum = 0;
             if (eventHost is Sprite sprite)
             {
@@ -207,14 +207,14 @@ namespace Coosu.Storyboard.Extensions.Computing
                 {
                     if (sprite.LoopList.Count < AlgorithmSwitchThreshold)
                     {
-                        sum += sprite.LoopList.Count(k => k.OuterMinTime.Equals(minTime));
+                        sum += sprite.LoopList.Count(k => k.OuterMinTime().Equals(minTime));
                     }
                     else
                     {
-                        var orderBy2 = sprite.LoopList.OrderBy(k => k.OuterMinTime);
+                        var orderBy2 = sprite.LoopList.OrderBy(k => k.OuterMinTime());
                         foreach (var keyEvent in orderBy2)
                         {
-                            if (keyEvent.OuterMinTime <= minTime) sum++;
+                            if (keyEvent.OuterMinTime() <= minTime) sum++;
                             else break;
                         }
                     }
@@ -224,14 +224,14 @@ namespace Coosu.Storyboard.Extensions.Computing
                 {
                     if (sprite.TriggerList.Count < AlgorithmSwitchThreshold)
                     {
-                        sum += sprite.TriggerList.Count(k => k.MinTime.Equals(minTime));
+                        sum += sprite.TriggerList.Count(k => k.MinTime().Equals(minTime));
                     }
                     else
                     {
-                        var orderBy3 = sprite.TriggerList.OrderBy(k => k.MinTime);
+                        var orderBy3 = sprite.TriggerList.OrderBy(k => k.MinTime());
                         foreach (var keyEvent in orderBy3)
                         {
-                            if (keyEvent.MinTime <= minTime) sum++;
+                            if (keyEvent.MinTime() <= minTime) sum++;
                             else break;
                         }
                     }
@@ -257,9 +257,9 @@ namespace Coosu.Storyboard.Extensions.Computing
 
         public static bool HasEffectiveTiming(this IDetailedEventHost eventHost)
         {
-            if (eventHost.MaxTime < eventHost.MinTime)
+            if (eventHost.MaxTime() < eventHost.MinTime())
                 return false;
-            if (eventHost.MaxTime.Equals(eventHost.MinTime))
+            if (eventHost.MaxTime().Equals(eventHost.MinTime()))
                 return false;
             return true;
         }

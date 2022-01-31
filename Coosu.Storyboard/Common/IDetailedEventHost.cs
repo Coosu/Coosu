@@ -11,10 +11,10 @@ namespace Coosu.Storyboard.Common
 
     public interface IDetailedEventHost : IScriptable, ICloneable, IEventHost
     {
-        float MaxTime { get; }
-        float MinTime { get; }
-        float MaxStartTime { get; }
-        float MinEndTime { get; }
+        float MaxTime();
+        float MinTime();
+        float MaxStartTime();
+        float MinEndTime();
 
         bool EnableGroupedSerialization { get; set; }
     }

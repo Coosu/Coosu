@@ -5,10 +5,10 @@ namespace Coosu.Storyboard.Common
 {
     public interface ISpriteHost : IScriptable, ICloneable, IEnumerable<Sprite>
     {
-        float MaxTime { get; }
-        float MinTime { get; }
-        float MaxStartTime { get; }
-        float MinEndTime { get; }
+        float MaxTime();
+        float MinTime();
+        float MaxStartTime();
+        float MinEndTime();
         IList<Sprite> Sprites { get; }
         IList<ISpriteHost> SubHosts { get; }
         Camera2 Camera2 { get; }
