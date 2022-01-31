@@ -20,8 +20,8 @@ namespace OsbCompressingBenchmark
     {
         static void Main(string[] args)
         {
-            //var fi = new FileInfo(@"Rin - Prism Magical (DJ SHARPNEL hardrave remix) (regenz).osb");
-            var fi = new FileInfo(@"Denkishiki Karen Ongaku Shuudan - Gareki no Yume (Dored).osb");
+            var fi = new FileInfo(@"Rin - Prism Magical (DJ SHARPNEL hardrave remix) (regenz).osb");
+            //var fi = new FileInfo(@"Denkishiki Karen Ongaku Shuudan - Gareki no Yume (Dored).osb");
             //var fi = new FileInfo(@"minmin - O.M.E.N. (Mafiamaster).osb");
             if (!fi.Exists)
                 throw new FileNotFoundException("Test file does not exists: " + fi.FullName);
@@ -45,7 +45,7 @@ namespace OsbCompressingBenchmark
         //[SimpleJob(RuntimeMoniker.Net48)]
         //[SimpleJob(RuntimeMoniker.NetCoreApp31)]
         [SimpleJob(RuntimeMoniker.Net60)]
-        [MemoryDiagnoser]
+        [MemoryDiagnoser(false)]
         [Orderer(SummaryOrderPolicy.FastestToSlowest)]
         [MarkdownExporter]
         public class CompressingTask

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
@@ -107,12 +108,23 @@ namespace Coosu.Storyboard.Extensions.Optimizing
 
             foreach (var grouping in possibleBgs.GroupBy(k => k.ImagePath))
             {
-                var imgList = grouping.ToList();
-                if (imgList.Count == 1) continue;
+                using (var enumerator = grouping.GetEnumerator())
+                {
+                    bool result = false;
+                    for (int i = 0; i < 2; i++)
+                    {
+                        result = enumerator.MoveNext();
+                    }
 
-                var uselessList = imgList.Where(sprite => !sprite.HasEffectiveTiming()).ToList();
-                List<Sprite> removeList = uselessList.Count == imgList.Count
-                    ? uselessList.OrderBy(k => k.ToScriptString().Length).Skip(1).ToList()
+                    if (!result)
+                        continue;
+                }
+
+                var count = grouping.Count();
+
+                var uselessList = grouping.Where(sprite => !sprite.HasEffectiveTiming());
+                IEnumerable<Sprite> removeList = uselessList.Count() == count
+                    ? uselessList.OrderBy(k => k.ToScriptString().Length).Skip(1)
                     : uselessList;
 
                 foreach (var sprite in removeList)
@@ -146,19 +158,21 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                         .WithDegreeOfParallelism(Options.ThreadCount)
                         .ForAll(sprite =>
                         {
-                            mrs.Wait();
+                            if (ErrorOccured != null)
+                                mrs.Wait();
 
                             var preserve = InnerCompress(mrs, sprite, possibleBgs);
                             if (!preserve) uselessSprites.Add(sprite);
-                            lock (indexLock)
-                            {
-                                index++;
-                                ProgressChanged?.Invoke(this, new ProgressEventArgs(Guid)
+                            if (ProgressChanged != null)
+                                lock (indexLock)
                                 {
-                                    Progress = index,
-                                    TotalCount = total
-                                });
-                            }
+                                    index++;
+                                    ProgressChanged?.Invoke(this, new ProgressEventArgs(Guid)
+                                    {
+                                        Progress = index,
+                                        TotalCount = total
+                                    });
+                                }
                         });
                     return false;
                 }
@@ -222,30 +236,33 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                 errorList.Add(e.Message);
             });
 
-            if (errorList.Count > 0)
+            if (ErrorOccured != null)
             {
-                var arg = new ProcessErrorEventArgs(sprite)
+                if (errorList.Count > 0)
                 {
-                    Message = $"{sprite.RowInSource} - Examine failed. Found {errorList.Count} error(s):\r\n" +
-                              string.Join("\r\n", errorList)
-                };
-
-                lock (_pauseThreadLock)
-                {
-                    if (_cancelToken?.IsCancellationRequested != false)
+                    var arg = new ProcessErrorEventArgs(sprite)
                     {
-                        return true;
+                        Message = $"{sprite.RowInSource} - Examine failed. Found {errorList.Count} error(s):\r\n" +
+                                  string.Join("\r\n", errorList)
+                    };
+
+                    lock (_pauseThreadLock)
+                    {
+                        if (_cancelToken?.IsCancellationRequested != false)
+                        {
+                            return true;
+                        }
+
+                        mrs.Reset();
+                        ErrorOccured?.Invoke(sprite, arg);
+                        mrs.Set();
                     }
 
-                    mrs.Reset();
-                    ErrorOccured?.Invoke(sprite, arg);
-                    mrs.Set();
-                }
-
-                if (!arg.Continue)
-                {
-                    if (!sprite.HasEffectiveTiming()) return false;
-                    return true;
+                    if (!arg.Continue)
+                    {
+                        if (!sprite.HasEffectiveTiming()) return false;
+                        return true;
+                    }
                 }
             }
 
@@ -337,7 +354,17 @@ namespace Coosu.Storyboard.Extensions.Optimizing
 
             if (host.Events.Count > 0)
             {
-                RemoveByLogic(host, host.Events.Cast<BasicEvent>().ToList());
+                var count = host.Events.Count;
+                var keyEvents = ArrayPool<BasicEvent>.Shared.Rent(count);
+                ((ICollection<IKeyEvent>)host.Events).CopyTo(keyEvents, 0);
+                try
+                {
+                    RemoveByLogic(host, keyEvents, host.Events.Count);
+                }
+                finally
+                {
+                    ArrayPool<BasicEvent>.Shared.Return(keyEvents);
+                }
             }
         }
 
@@ -445,9 +472,9 @@ namespace Coosu.Storyboard.Extensions.Optimizing
         /// </summary>
         /// <param name="host"></param>
         /// <param name="eventList"></param>
-        private void RemoveByLogic(IDetailedEventHost host, List<BasicEvent> eventList)
+        private void RemoveByLogic(IDetailedEventHost host, IEnumerable<BasicEvent> eventList, int count)
         {
-            var groups = eventList.GroupBy(k => k.EventType);
+            var groups = eventList.Take(count).GroupBy(k => k.EventType);
             foreach (var group in groups)
             {
                 EventType type = group.Key;
@@ -471,7 +498,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                     if (index == 0)
                     {
                         //如果总计只剩一条命令了，不处理
-                        if (eventList.Count <= 1) return;
+                        if (count <= 1) return;
 
                         //S,0,300,,1
                         //S,0,400,500,0.5
@@ -508,7 +535,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                         {
                             if (list.Count == 1 && nowE.IsStartsEqualsEnds()
                                                 && nowE.IsTimeInRange(host)
-                                                && eventList.Count > 1)
+                                                && count > 1)
                             {
                                 var move = (Move)nowE;
                                 if (nowE.GetStarts().All(k => k.Equals((int)k))) //若为小数，不归并
