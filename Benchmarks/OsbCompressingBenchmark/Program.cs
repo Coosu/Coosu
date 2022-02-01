@@ -43,10 +43,10 @@ namespace OsbCompressingBenchmark
             var summary = BenchmarkRunner.Run<CompressingTask>(/*config*/);
         }
 
-        //[SimpleJob(RuntimeMoniker.Net48)]
-        //[SimpleJob(RuntimeMoniker.NetCoreApp31)]
+        [SimpleJob(RuntimeMoniker.Net48)]
+        [SimpleJob(RuntimeMoniker.NetCoreApp31)]
         [SimpleJob(RuntimeMoniker.Net60)]
-        [MemoryDiagnoser(false)]
+        [MemoryDiagnoser]
         [Orderer(SummaryOrderPolicy.FastestToSlowest)]
         [MarkdownExporter]
         public class CompressingTask
@@ -65,7 +65,7 @@ namespace OsbCompressingBenchmark
             }
 
             [Benchmark(Baseline = true)]
-            public async Task<object?> CoosuLatest_Storyboard()
+            public async Task<object?> CoosuLatest_Compress()
             {
                 var compressor = new SpriteCompressor(_osuLocal, new CompressOptions()
                 {
@@ -76,13 +76,37 @@ namespace OsbCompressingBenchmark
             }
 
             [Benchmark]
-            public async Task<object?> CoosuOld_Storyboard()
+            public async Task<object?> CoosuOld_Compress()
             {
                 var compressor2 = new NugetCoosuNs.Storyboard.Extensions.Optimizing.SpriteCompressor(_osuNuget, new NugetCoosuNs.Storyboard.Extensions.Optimizing.CompressOptions()
                 {
                     ThreadCount = 1
                 });
                 compressor2.CompressAsync().Wait();
+                return null;
+            }
+
+            [Benchmark]
+            public async Task<object?> CoosuLatest_ParseAndCompress()
+            {
+                var osuLocal = await Layer.ParseFromFileAsync(_path);
+                var compressor = new SpriteCompressor(osuLocal, new CompressOptions()
+                {
+                    ThreadCount = 1
+                });
+                await compressor.CompressAsync();
+                return null;
+            }
+
+            [Benchmark]
+            public async Task<object?> CoosuOld_ParseAndCompress()
+            {
+                var osuNuget = await NugetCoosuNs.Storyboard.Layer.ParseFromFileAsync(_path);
+                var compressor2 = new NugetCoosuNs.Storyboard.Extensions.Optimizing.SpriteCompressor(osuNuget, new NugetCoosuNs.Storyboard.Extensions.Optimizing.CompressOptions()
+                {
+                    ThreadCount = 1
+                });
+                await compressor2.CompressAsync();
                 return null;
             }
         }
