@@ -172,14 +172,24 @@ namespace Coosu.Storyboard.Events
             if (IsHalfFilled) return true;
             Fill();
 #if NET5_0_OR_GREATER
-            return GetEndsSpan().SequenceEqual(GetStartsSpan());
+            var endsSpan = GetEndsSpan();
+            var startsSpan = GetStartsSpan();
+            for (var i = 0; i < endsSpan.Length; i++)
+            {
+                var e = endsSpan[i];
+                var s = startsSpan[i];
+                if (!Precision.AlmostEquals((double)s, e))
+                    return false;
+            }
+
+            return true;
 #else
             var size = EventType.Size;
             for (var i = 0; i < Values.Count / 2; i++)
             {
                 var d0 = Values[i];
                 var d1 = Values[i + size];
-                if (!Precision.AlmostEquals(d0, d1))
+                if (!Precision.AlmostEquals((double)d0, d1))
                     return false;
             }
 

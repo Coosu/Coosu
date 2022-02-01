@@ -108,16 +108,21 @@ namespace Coosu.Storyboard.Events
         {
             _events.Add(@event);
             @event.TimingChanged += ResetCacheAndRaiseTimingChanged;
+            ResetCacheAndRaiseTimingChanged();
         }
 
         public bool RemoveEvent(IKeyEvent @event)
         {
             @event.TimingChanged -= ResetCacheAndRaiseTimingChanged;
-            return _events.Remove(@event);
+            var removeEvent = _events.Remove(@event);
+            if (removeEvent)
+                ResetCacheAndRaiseTimingChanged();
+            return removeEvent;
         }
 
         public void ClearEvents(IComparer<IKeyEvent>? comparer = null)
         {
+            var valid = _events.Count > 0;
             foreach (var @event in _events)
                 @event.TimingChanged -= ResetCacheAndRaiseTimingChanged;
             _events.Clear();
@@ -125,6 +130,7 @@ namespace Coosu.Storyboard.Events
                 _events = new HashSet<IKeyEvent>();
             else
                 _events = new SortedSet<IKeyEvent>(comparer);
+            if (valid) ResetCacheAndRaiseTimingChanged();
         }
 
         ISceneObject? ISubEventHost.BaseObject
@@ -140,7 +146,7 @@ namespace Coosu.Storyboard.Events
                 EnableGroupedSerialization = EnableGroupedSerialization
             };
 
-            foreach (var keyEvent in _events) 
+            foreach (var keyEvent in _events)
                 loop.AddEvent((IKeyEvent)keyEvent.Clone());
 
             return loop;

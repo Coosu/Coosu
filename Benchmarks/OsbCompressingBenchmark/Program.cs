@@ -20,8 +20,9 @@ namespace OsbCompressingBenchmark
     {
         static void Main(string[] args)
         {
-            var fi = new FileInfo(@"Rin - Prism Magical (DJ SHARPNEL hardrave remix) (regenz).osb");
-            //var fi = new FileInfo(@"Denkishiki Karen Ongaku Shuudan - Gareki no Yume (Dored).osb");
+            //var fi = new FileInfo(@"Rin - Prism Magical (DJ SHARPNEL hardrave remix) (regenz).osb");
+            var fi = new FileInfo(@"Denkishiki Karen Ongaku Shuudan - Gareki no Yume (Dored).osb");
+            //var fi = new FileInfo(@"test.osb");
             //var fi = new FileInfo(@"minmin - O.M.E.N. (Mafiamaster).osb");
             if (!fi.Exists)
                 throw new FileNotFoundException("Test file does not exists: " + fi.FullName);

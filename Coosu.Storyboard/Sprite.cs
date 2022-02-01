@@ -250,7 +250,7 @@ namespace Coosu.Storyboard
         }
 
         IReadOnlyCollection<IKeyEvent> IEventHost.Events => Events;
-        
+
         public void AddEvent(IKeyEvent @event)
         {
             if (_isLooping)
@@ -261,13 +261,17 @@ namespace Coosu.Storyboard
             {
                 _events.Add(@event);
                 @event.TimingChanged += ResetCacheAndRaiseTimingChanged;
+                ResetCacheAndRaiseTimingChanged();
             }
         }
 
         public bool RemoveEvent(IKeyEvent @event)
         {
             @event.TimingChanged -= ResetCacheAndRaiseTimingChanged;
-            return _events.Remove(@event);
+            var removeEvent = _events.Remove(@event);
+            if (removeEvent)
+                ResetCacheAndRaiseTimingChanged();
+            return removeEvent;
         }
 
         public void AddLoop(Loop loop)
@@ -275,13 +279,17 @@ namespace Coosu.Storyboard
             TryEndLoop();
             _loopList.Add(loop);
             loop.TimingChanged += ResetCacheAndRaiseTimingChanged;
+            ResetCacheAndRaiseTimingChanged();
         }
 
         public bool RemoveLoop(Loop loop)
         {
             TryEndLoop();
             loop.TimingChanged -= ResetCacheAndRaiseTimingChanged;
-            return _loopList.Remove(loop);
+            var removeLoop = _loopList.Remove(loop);
+            if (removeLoop)
+                ResetCacheAndRaiseTimingChanged();
+            return removeLoop;
         }
 
         public void AddTrigger(Trigger trigger)
@@ -295,11 +303,15 @@ namespace Coosu.Storyboard
         {
             TryEndLoop();
             trigger.TimingChanged -= ResetCacheAndRaiseTimingChanged;
-            return _triggerList.Remove(trigger);
+            var removeTrigger = _triggerList.Remove(trigger);
+            if (removeTrigger)
+                ResetCacheAndRaiseTimingChanged();
+            return removeTrigger;
         }
 
         public void ClearEvents(IComparer<IKeyEvent>? comparer = null)
         {
+            var valid = _events.Count > 0;
             foreach (var @event in _events)
                 @event.TimingChanged -= ResetCacheAndRaiseTimingChanged;
             _events.Clear();
@@ -307,22 +319,38 @@ namespace Coosu.Storyboard
                 _events = new HashSet<IKeyEvent>();
             else
                 _events = new SortedSet<IKeyEvent>(comparer);
+            if (valid)
+                ResetCacheAndRaiseTimingChanged();
         }
 
         public void ClearLoops()
         {
-            EndLoop();
-            foreach (var loop in _loopList)
+            TryEndLoop();
+            var valid = _loopList.Count > 0;
+            for (var i = 0; i < _loopList.Count; i++)
+            {
+                var loop = _loopList[i];
                 loop.TimingChanged -= ResetCacheAndRaiseTimingChanged;
+            }
+
             _loopList.Clear();
+            if (valid)
+                ResetCacheAndRaiseTimingChanged();
         }
 
         public void ClearTriggers()
         {
-            EndLoop();
-            foreach (var trigger in _triggerList)
+            TryEndLoop();
+            var valid = _triggerList.Count > 0;
+            for (var i = 0; i < _triggerList.Count; i++)
+            {
+                var trigger = _triggerList[i];
                 trigger.TimingChanged -= ResetCacheAndRaiseTimingChanged;
+            }
+
             _triggerList.Clear();
+            if (valid)
+                ResetCacheAndRaiseTimingChanged();
         }
 
         public object Clone()
@@ -334,7 +362,7 @@ namespace Coosu.Storyboard
                 EnableGroupedSerialization = EnableGroupedSerialization,
             };
 
-            foreach (var keyEvent in _events) 
+            foreach (var keyEvent in _events)
                 sprite.AddEvent((IKeyEvent)keyEvent.Clone());
 
             if (LoopList.Count > 0)

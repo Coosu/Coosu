@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Coosu.Shared;
 using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Events;
 using Coosu.Storyboard.Extensions.Computing;
@@ -300,6 +301,18 @@ namespace Coosu.Storyboard.Extensions.Optimizing
         /// </summary>
         private void PreOptimize(IDetailedEventHost host, TimeRange obsoleteList, HashSet<BasicEvent> keyEvents)
         {
+            if (obsoleteList.ContainsTimingPoint(out _, host.MinTime(), host.MaxTime()))
+            {
+                host.ClearEvents(null);
+                if (host is Sprite sprite)
+                {
+                    sprite.ClearLoops();
+                    sprite.ClearTriggers();
+                }
+
+                return;
+            }
+
             if (host is Sprite ele)
             {
                 for (var i = 0; i < ele.LoopList.Count; i++)
@@ -373,6 +386,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
         /// </summary>
         private void RemoveByInvisibleList(IDetailedEventHost host, TimeRange obsoleteList, HashSet<BasicEvent> keyEvents)
         {
+            int count = 0; //todo
             if (obsoleteList.TimingList.Count == 0) return;
             var groups = host.Events.GroupBy(k => k.EventType);
             foreach (var group in groups)
@@ -438,7 +452,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                                 RaiseSituationEvent(host, SituationType.ThisLastInLastInvisibleToRemove,
                                     () =>
                                     {
-                                        RemoveEvent(host, list, nowE);
+                                        RemoveEvent(host, list, nowE, ref count);
                                         i--;
                                     },
                                     nowE);
@@ -456,7 +470,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                                 RaiseSituationEvent(host, SituationType.NextHeadAndThisInInvisibleToRemove,
                                     () =>
                                     {
-                                        RemoveEvent(host, list, nowE);
+                                        RemoveEvent(host, list, nowE, ref count);
                                         i--;
                                     },
                                     nowE, nextE);
@@ -514,7 +528,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                             list.Count == 1)
                         {
                             RaiseSituationEvent(host, SituationType.ThisFirstSingleIsStaticAndDefaultToRemove,
-                                () => { RemoveEvent(host, list, nowE); },
+                                () => { RemoveEvent(host, list, nowE, ref count); },
                                 nowE);
                         }
                         // 不唯一时
@@ -525,7 +539,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                             if (nowE.SuccessiveTo(nextE))
                             {
                                 RaiseSituationEvent(host, SituationType.ThisFirstIsStaticAndSequentWithNextHeadToRemove,
-                                    () => { RemoveEvent(host, list, nowE); },
+                                    () => { RemoveEvent(host, list, nowE, ref count); },
                                     nowE);
                             }
                         }
@@ -547,14 +561,14 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                                             sprite.DefaultX = move.StartX;
                                             sprite.DefaultY = move.StartY;
 
-                                            RemoveEvent(host, list, nowE);
+                                            RemoveEvent(host, list, nowE, ref count);
                                         },
                                         nowE);
                                 }
                                 else if (move.EqualsInitialPosition(sprite))
                                 {
                                     RaiseSituationEvent(host, SituationType.MoveSingleEqualsInitialToRemove,
-                                        () => { RemoveEvent(host, list, nowE); },
+                                        () => { RemoveEvent(host, list, nowE, ref count); },
                                         nowE);
                                 }
                                 else
@@ -611,7 +625,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                                 {
                                     preE.EndTime = nowE.EndTime; // 整合至前面: 前一个命令的结束时间延伸
 
-                                    RemoveEvent(host, list, nowE);
+                                    RemoveEvent(host, list, nowE, ref count);
                                     index--;
                                 },
                                 preE, nowE);
@@ -629,7 +643,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                             RaiseSituationEvent(host, SituationType.ThisIsStaticAndSequentWithPrevToCombine,
                                 () =>
                                 {
-                                    RemoveEvent(host, list, nowE);
+                                    RemoveEvent(host, list, nowE, ref count);
                                     index--;
                                 },
                                 preE, nowE);
@@ -654,7 +668,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                                 RaiseSituationEvent(host, SituationType.PrevIsStaticAndTimeOverlapWithThisStartTimeToRemove,
                                     () =>
                                     {
-                                        RemoveEvent(host, list, preE);
+                                        RemoveEvent(host, list, preE, ref count);
                                         index--;
                                     },
                                     preE, nowE);
@@ -668,7 +682,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             } // group的循环
         }
 
-        private static void RemoveEvent(IDetailedEventHost sourceHost, ICollection<BasicEvent> eventList, BasicEvent e)
+        private static void RemoveEvent(IDetailedEventHost sourceHost, ICollection<BasicEvent> eventList, BasicEvent e, ref int count)
         {
             var success = sourceHost.RemoveEvent(e);
             if (!success)
@@ -683,6 +697,11 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                 //    throw new Exception("Failed to delete event");
                 //}
             }
+            else
+            {
+                count--;
+            }
+
             eventList.Remove(e);
         }
 

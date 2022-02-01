@@ -266,6 +266,8 @@ namespace Coosu.Storyboard.Extensions.Computing
 
         public static bool HasEffectiveTiming(this IDetailedEventHost eventHost)
         {
+            if (float.IsNaN(eventHost.MaxTime()) || float.IsNaN(eventHost.MinTime()))
+                return false;
             if (eventHost.MaxTime() < eventHost.MinTime())
                 return false;
             if (eventHost.MaxTime().Equals(eventHost.MinTime()))
