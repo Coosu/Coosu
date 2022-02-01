@@ -5,7 +5,7 @@ namespace Coosu.Storyboard.Easing
     /// <summary>
     /// This class implements an easing function that backs up before going to the destination.
     /// </summary>
-    public class BackEase : EasingFunctionBase
+    public sealed class BackEase : EasingFunctionBase
     {
         private double _amplitude = 1;
 
@@ -42,8 +42,8 @@ namespace Coosu.Storyboard.Easing
             };
         }
 
-        public static BackEase InstanceIn => new() { EasingMode = EasingMode.EaseIn, ThrowIfChangeProperty = true };
-        public static BackEase InstanceOut => new() { EasingMode = EasingMode.EaseOut, ThrowIfChangeProperty = true };
-        public static BackEase InstanceInOut => new() { EasingMode = EasingMode.EaseInOut, ThrowIfChangeProperty = true };
+        public static BackEase InstanceIn { get; } = new() { EasingMode = EasingMode.EaseIn, ThrowIfChangeProperty = true };
+        public static BackEase InstanceOut { get; } = new() { EasingMode = EasingMode.EaseOut, ThrowIfChangeProperty = true };
+        public static BackEase InstanceInOut { get; } = new() { EasingMode = EasingMode.EaseInOut, ThrowIfChangeProperty = true };
     }
 }

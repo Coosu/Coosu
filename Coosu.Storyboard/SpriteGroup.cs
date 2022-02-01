@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,18 +9,19 @@ using Coosu.Storyboard.Common;
 
 namespace Coosu.Storyboard
 {
-    public class SpriteGroup : ISceneObject, ISpriteHost
+    public sealed class SpriteGroup : ISceneObject, ISpriteHost
     {
         static SpriteGroup()
         {
             ObjectType.SignType(10, "SpriteGroup");
         }
 
+        private ICollection<IKeyEvent> _events = new SortedSet<IKeyEvent>(EventSequenceComparer.Instance);
         public SpriteGroup()
         {
         }
 
-        public SpriteGroup(double defaultX, double defaultY, double defaultZ, OriginType origin)
+        public SpriteGroup(float defaultX, float defaultY, float defaultZ, OriginType origin)
         {
             Camera2.DefaultX = defaultX;
             Camera2.DefaultY = defaultY;
@@ -51,52 +53,66 @@ namespace Coosu.Storyboard
 
         }
 
-        public double MaxTime =>
+        public float MaxTime() =>
             NumericHelper.GetMaxValue(
                 Events.Select(k => k.EndTime)
             );
-        public double MinTime =>
+        public float MinTime() =>
             NumericHelper.GetMinValue(
                 Events.Select(k => k.StartTime)
             );
-        public double MaxStartTime =>
+        public float MaxStartTime() =>
             NumericHelper.GetMaxValue(
                 Events.Select(k => k.StartTime)
             );
-        public double MinEndTime =>
+        public float MinEndTime() =>
             NumericHelper.GetMinValue(
                 Events.Select(k => k.EndTime)
             );
 
         public bool EnableGroupedSerialization { get; set; }
 
-        public ICollection<IKeyEvent> Events
+        public IReadOnlyCollection<IKeyEvent> Events
         {
-            get => Camera2.Events;
-            set => Camera2.Events = value;
+            get => (IReadOnlyCollection<IKeyEvent>)_events;
+            internal set => _events = value as ICollection<IKeyEvent> ?? throw new Exception(
+                $"The collection should be {nameof(ICollection<IKeyEvent>)}");
         }
 
+        IReadOnlyCollection<IKeyEvent> IEventHost.Events => Events;
+        
         public void AddEvent(IKeyEvent @event)
         {
             Camera2.AddEvent(@event);
         }
 
+        public bool RemoveEvent(IKeyEvent @event)
+        {
+            return Camera2.RemoveEvent(@event);
+        }
+
+        public void ClearEvents(IComparer<IKeyEvent>? comparer = null)
+        {
+            Camera2.ClearEvents(comparer);
+        }
+
+
         /// <inheritdoc />
-        public double DefaultX
+        public float DefaultX
         {
             get => Camera2.DefaultX;
             set => Camera2.DefaultX = value;
         }
 
         /// <inheritdoc />
-        public double DefaultY
+        public float DefaultY
         {
             get => Camera2.DefaultY;
             set => Camera2.DefaultY = value;
         }
 
         /// <inheritdoc />
-        public double DefaultZ
+        public float DefaultZ
         {
             get => Camera2.DefaultZ;
             set => Camera2.DefaultZ = value;

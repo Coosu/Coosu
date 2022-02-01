@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Easing;
 
@@ -8,25 +8,25 @@ namespace Coosu.Storyboard.Events
     {
         public override EventType EventType => EventTypes.MoveY;
 
-        public double StartY
+        public float StartY
         {
-            get => Start[0];
-            set => Start[0] = value;
+            get => GetValue(0);
+            set => SetValue(0, value);
         }
 
-        public double EndY
+        public float EndY
         {
-            get => End[0];
-            set => End[0] = value;
+            get => GetValue(1);
+            set => SetValue(1, value);
         }
 
-        public MoveY(EasingFunctionBase easing, double startTime, double endTime, double y1, double y2) :
-            base(easing, startTime, endTime, new[] { y1 }, new[] { y2 })
-        {
-        }
+        //public MoveY(EasingFunctionBase easing, double startTime, double endTime, double y1, double y2) :
+        //    base(easing, startTime, endTime, new[] { y1 }, new[] { y2 })
+        //{
+        //}
 
-        public MoveY(EasingFunctionBase easing, double startTime, double endTime, Span<double> start, Span<double> end)
-            : base(easing, startTime, endTime, start, end)
+        public MoveY(EasingFunctionBase easing, float startTime, float endTime, List<float> values)
+            : base(easing, startTime, endTime, values)
         {
         }
 
@@ -34,10 +34,10 @@ namespace Coosu.Storyboard.Events
         {
         }
 
-        public void AdjustPosition(double x, double y)
+        public void AdjustPosition(float x, float y)
         {
-            Start[0] += y;
-            End[0] += y;
+            StartY += y;
+            EndY += y;
         }
     }
 }

@@ -1,31 +1,31 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using Coosu.Storyboard.Easing;
 
 namespace Coosu.Storyboard.Events
 {
-    public class Rotate : BasicEvent
+    public sealed class Rotate : BasicEvent
     {
         public override EventType EventType => EventTypes.Rotate;
 
-        public double StartRotate
+        public float StartRotate
         {
-            get => Start[0];
-            set => Start[0] = value;
+            get => GetValue(0);
+            set => SetValue(0, value);
         }
 
-        public double EndRotate
+        public float EndRotate
         {
-            get => End[0];
-            set => End[0] = value;
+            get => GetValue(1);
+            set => SetValue(1, value);
         }
 
-        public Rotate(EasingFunctionBase easing, double startTime, double endTime, double r1, double r2) :
-            base(easing, startTime, endTime, new[] { r1 }, new[] { r2 })
-        {
-        }
+        //public Rotate(EasingFunctionBase easing, double startTime, double endTime, double r1, double r2) :
+        //    base(easing, startTime, endTime, new[] { r1 }, new[] { r2 })
+        //{
+        //}
 
-        public Rotate(EasingFunctionBase easing, double startTime, double endTime, Span<double> start, Span<double> end)
-            : base(easing, startTime, endTime, start, end)
+        public Rotate(EasingFunctionBase easing, float startTime, float endTime, List<float> values)
+            : base(easing, startTime, endTime, values)
         {
         }
 

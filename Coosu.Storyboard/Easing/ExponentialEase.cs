@@ -5,7 +5,7 @@ namespace Coosu.Storyboard.Easing
     /// <summary>
     /// This class implements an easing function that gives an exponential curve
     /// </summary>
-    public class ExponentialEase : EasingFunctionBase
+    public sealed class ExponentialEase : EasingFunctionBase
     {
         private double _exponent = 2;
 
@@ -48,8 +48,8 @@ namespace Coosu.Storyboard.Easing
             };
         }
 
-        public static ExponentialEase InstanceIn => new() { EasingMode = EasingMode.EaseIn, ThrowIfChangeProperty = true };
-        public static ExponentialEase InstanceOut => new() { EasingMode = EasingMode.EaseOut, ThrowIfChangeProperty = true };
-        public static ExponentialEase InstanceInOut => new() { EasingMode = EasingMode.EaseInOut, ThrowIfChangeProperty = true };
+        public static ExponentialEase InstanceIn { get; } = new() { EasingMode = EasingMode.EaseIn, ThrowIfChangeProperty = true };
+        public static ExponentialEase InstanceOut { get; } = new() { EasingMode = EasingMode.EaseOut, ThrowIfChangeProperty = true };
+        public static ExponentialEase InstanceInOut { get; } = new() { EasingMode = EasingMode.EaseInOut, ThrowIfChangeProperty = true };
     }
 }

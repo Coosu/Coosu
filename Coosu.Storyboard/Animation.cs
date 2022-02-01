@@ -9,9 +9,8 @@ namespace Coosu.Storyboard
     {
         public override ObjectType ObjectType { get; } = ObjectTypes.Animation;
 
-
         public int FrameCount { get; set; }
-        public double FrameDelay { get; set; }
+        public float FrameDelay { get; set; }
         public LoopType LoopType { get; set; }
 
         /// <summary>
@@ -25,8 +24,8 @@ namespace Coosu.Storyboard
         /// <param name="frameCount">Set frame count.</param>
         /// <param name="frameDelay">Set frame rate (frame delay).</param>
         /// <param name="loopType">Set loop type.</param>
-        public Animation(LayerType layerType, OriginType originType, string imagePath, double defaultX,
-            double defaultY, int frameCount, double frameDelay, LoopType loopType)
+        public Animation(LayerType layerType, OriginType originType, string imagePath, float defaultX,
+            float defaultY, int frameCount, float frameDelay, LoopType loopType)
             : base(layerType, originType, imagePath, defaultX, defaultY)
         {
             FrameCount = frameCount;
@@ -45,13 +44,16 @@ namespace Coosu.Storyboard
         /// <param name="frameCount">Set frame count.</param>
         /// <param name="frameDelay">Set frame rate (frame delay).</param>
         /// <param name="loopType">Set loop type.</param>
-        public Animation(string layer, string origin, string imagePath, double defaultX,
-            double defaultY, int frameCount, double frameDelay, string loopType)
+        public Animation(ReadOnlySpan<char> layer, 
+            ReadOnlySpan<char> origin,
+            ReadOnlySpan<char> imagePath,
+            float defaultX, float defaultY, 
+            int frameCount, float frameDelay, ReadOnlySpan<char> loopType)
             : base(layer, origin, imagePath, defaultX, defaultY)
         {
             FrameCount = frameCount;
             FrameDelay = frameDelay;
-            LoopType = (LoopType)Enum.Parse(typeof(LoopType), loopType);
+            LoopType = loopType.ToLoopType();
         }
 
         public override async Task WriteHeaderAsync(TextWriter writer)

@@ -5,7 +5,7 @@ namespace Coosu.Storyboard.Easing
     /// <summary>
     /// This class implements an easing function that gives a circular curve toward the destination.
     /// </summary>
-    public class CircleEase : EasingFunctionBase
+    public sealed class CircleEase : EasingFunctionBase
     {
         protected override double EaseInCore(double normalizedTime)
         {
@@ -24,8 +24,8 @@ namespace Coosu.Storyboard.Easing
             };
         }
 
-        public static CircleEase InstanceIn => new() { EasingMode = EasingMode.EaseIn };
-        public static CircleEase InstanceOut => new() { EasingMode = EasingMode.EaseOut };
-        public static CircleEase InstanceInOut => new() { EasingMode = EasingMode.EaseInOut };
+        public static CircleEase InstanceIn { get; } = new() { EasingMode = EasingMode.EaseIn, ThrowIfChangeProperty = true };
+        public static CircleEase InstanceOut { get; } = new() { EasingMode = EasingMode.EaseOut, ThrowIfChangeProperty = true };
+        public static CircleEase InstanceInOut { get; } = new() { EasingMode = EasingMode.EaseInOut, ThrowIfChangeProperty = true };
     }
 }

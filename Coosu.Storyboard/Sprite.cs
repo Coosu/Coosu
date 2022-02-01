@@ -15,9 +15,15 @@ namespace Coosu.Storyboard
     /// Represents a storyboard sprite. This class cannot be inherited.
     /// </summary>
     [DebuggerDisplay("Header = {DebuggerDisplay}")]
-    public partial class Sprite : ISceneObject
+    public class Sprite : ISceneObject
     {
         private string DebuggerDisplay => this.GetHeaderString();
+        private ICollection<IKeyEvent> _events = new SortedSet<IKeyEvent>(EventSequenceComparer.Instance);
+
+        private float? _cachedMaxTime;
+        private float? _cachedMinTime;
+        private float? _cachedMaxStartTime;
+        private float? _cachedMinEndTime;
 
         public virtual ObjectType ObjectType { get; } = ObjectTypes.Sprite;
 
@@ -28,55 +34,105 @@ namespace Coosu.Storyboard
         public OriginType OriginType { get; }
         public string ImagePath { get; }
         /// <inheritdoc />
-        public double DefaultX { get; set; }
+        public float DefaultX { get; set; }
         /// <inheritdoc />
-        public double DefaultY { get; set; }
+        public float DefaultY { get; set; }
 
         /// <inheritdoc />
-        public double DefaultZ { get; set; }
+        public float DefaultZ { get; set; }
         /// <inheritdoc />
         public string CameraIdentifier { get; set; } = "00000000-0000-0000-0000-000000000000";
 
         // EventHosts
-        public ICollection<IKeyEvent> Events { get; set; } =
-            new SortedSet<IKeyEvent>(new EventTimingComparer());
+
+        public IReadOnlyCollection<IKeyEvent> Events
+        {
+            get => (IReadOnlyCollection<IKeyEvent>)_events;
+            internal set => _events = value as ICollection<IKeyEvent> ?? throw new Exception(
+                $"The collection should be {nameof(ICollection<IKeyEvent>)}");
+        }
 
         // ISceneObject
-        public List<Loop> LoopList { get; } = new();
-        public List<Trigger> TriggerList { get; } = new();
 
-        public double MaxTime =>
-             NumericHelper.GetMaxValue(
-                 Events.Select(k => k.EndTime),
-                 LoopList.Select(k => k.OuterMaxTime),
-                 TriggerList.Select(k => k.MaxTime)
-             );
+        public IReadOnlyList<Loop> LoopList
+        {
+            get => _loopList;
+            private set => _loopList = (List<Loop>)value;
+        }
 
-        public double MinTime =>
-            NumericHelper.GetMinValue(
-                Events.Select(k => k.StartTime),
-                LoopList.Select(k => k.OuterMinTime),
-                TriggerList.Select(k => k.MinTime)
-            );
+        public IReadOnlyList<Trigger> TriggerList
+        {
+            get => _triggerList;
+            private set => _triggerList = (List<Trigger>)value;
+        }
 
-        public double MaxStartTime =>
-            NumericHelper.GetMaxValue(
-                Events.Select(k => k.StartTime),
-                LoopList.Select(k => k.OuterMinTime),
-                TriggerList.Select(k => k.MinTime)
-            );
+        public float MaxTime()
+        {
+            if (_cachedMaxTime != null) return _cachedMaxTime.Value;
+            if (Events.Count == 0 && LoopList.Count == 0 && TriggerList.Count == 0)
+                return float.NaN;
 
-        public double MinEndTime =>
-            NumericHelper.GetMinValue(
-                Events.Select(k => k.EndTime),
-                LoopList.Select(k => k.OuterMaxTime),
-                TriggerList.Select(k => k.MaxTime)
-            );
+            var max = Events.Count == 0 ? float.MinValue : Events.Max(k => k.EndTime);
+            var loopMax = LoopList.Count == 0 ? float.MinValue : LoopList.Max(k => k.OuterMaxTime());
+            max = max >= loopMax ? max : loopMax;
+
+            var triggerMax = TriggerList.Count == 0 ? float.MinValue : TriggerList.Max(k => k.MaxTime());
+            max = max >= triggerMax ? max : triggerMax;
+            return (float)(_cachedMaxTime = max);
+        }
+
+        public float MinTime()
+        {
+            if (_cachedMinTime != null) return _cachedMinTime.Value;
+            if (Events.Count == 0 && LoopList.Count == 0 && TriggerList.Count == 0)
+                return float.NaN;
+
+            var min = Events.Count == 0 ? float.MaxValue : Events.Min(k => k.StartTime);
+            var loopMin = LoopList.Count == 0 ? float.MaxValue : LoopList.Min(k => k.OuterMinTime());
+            min = min <= loopMin ? min : loopMin;
+
+            var triggerMin = TriggerList.Count == 0 ? float.MaxValue : TriggerList.Min(k => k.MinTime());
+            min = min <= triggerMin ? min : triggerMin;
+            return (float)(_cachedMinTime = min);
+        }
+
+        public float MaxStartTime()
+        {
+            if (_cachedMaxStartTime != null) return _cachedMaxStartTime.Value;
+            if (Events.Count == 0 && LoopList.Count == 0 && TriggerList.Count == 0)
+                return float.NaN;
+
+            var max = Events.Count == 0 ? float.MinValue : Events.Max(k => k.StartTime);
+            var loopMax = LoopList.Count == 0 ? float.MinValue : LoopList.Max(k => k.OuterMinTime());
+            max = max >= loopMax ? max : loopMax;
+
+            var triggerMax = TriggerList.Count == 0 ? float.MinValue : TriggerList.Max(k => k.MinTime());
+            max = max >= triggerMax ? max : triggerMax;
+            return (float)(_cachedMaxStartTime = max);
+        }
+
+        public float MinEndTime()
+        {
+            if (_cachedMinEndTime != null) return _cachedMinEndTime.Value;
+            if (Events.Count == 0 && LoopList.Count == 0 && TriggerList.Count == 0)
+                return float.NaN;
+
+            var min = Events.Count == 0 ? float.MaxValue : Events.Min(k => k.EndTime);
+            var loopMin = LoopList.Count == 0 ? float.MaxValue : LoopList.Min(k => k.OuterMaxTime());
+            min = min <= loopMin ? min : loopMin;
+
+            var triggerMin = TriggerList.Count == 0 ? float.MaxValue : TriggerList.Min(k => k.MaxTime());
+            min = min <= triggerMin ? min : triggerMin;
+            return (float)(_cachedMinEndTime = min);
+        }
+
         public bool EnableGroupedSerialization { get; set; }/* = true;*/
 
         // Loop control
         private bool _isTriggering;
         private bool _isLooping;
+        private List<Loop> _loopList = new();
+        private List<Trigger> _triggerList = new();
 
         /// <summary>
         /// Create a storyboard sprite by a static image.
@@ -86,7 +142,7 @@ namespace Coosu.Storyboard
         /// <param name="imagePath">Set image path.</param>
         /// <param name="defaultX">Set default x-coordinate of location.</param>
         /// <param name="defaultY">Set default x-coordinate of location.</param>
-        public Sprite(LayerType layerType, OriginType originType, string imagePath, double defaultX, double defaultY)
+        public Sprite(LayerType layerType, OriginType originType, string imagePath, float defaultX, float defaultY)
         {
             LayerType = layerType;
             OriginType = originType;
@@ -95,12 +151,13 @@ namespace Coosu.Storyboard
             DefaultY = defaultY;
         }
 
-        public Sprite(string layer, string origin, string imagePath, double defaultX, double defaultY)
+        public Sprite(ReadOnlySpan<char> layer, ReadOnlySpan<char> origin, ReadOnlySpan<char> imagePath,
+            float defaultX, float defaultY)
         {
             //ObjectType = OsbObjectType.Parse(type);
-            LayerType = (LayerType)Enum.Parse(typeof(LayerType), layer);
-            OriginType = (OriginType)Enum.Parse(typeof(OriginType), origin);
-            ImagePath = imagePath;
+            LayerType = layer.ToLayerType();
+            OriginType = origin.ToOriginType();
+            ImagePath = imagePath.ToString();
             DefaultX = defaultX;
             DefaultY = defaultY;
         }
@@ -110,9 +167,9 @@ namespace Coosu.Storyboard
             if (_isLooping || _isTriggering)
                 throw new Exception("You can not start another loop when the previous one isn't end.");
 
-            _isLooping = true;
             var loop = new Loop(startTime, loopCount);
-            LoopList.Add(loop);
+            AddLoop(loop);
+            _isLooping = true;
             return loop;
         }
 
@@ -130,9 +187,9 @@ namespace Coosu.Storyboard
             if (_isLooping || _isTriggering)
                 throw new Exception("You can not start another loop when the previous one isn't end.");
 
-            _isTriggering = true;
             var trig = new Trigger(startTime, endTime, triggerType, listenSample, customSampleSet);
-            TriggerList.Add(trig);
+            AddTrigger(trig);
+            _isTriggering = true;
             return trig;
         }
 
@@ -148,9 +205,9 @@ namespace Coosu.Storyboard
             if (_isLooping || _isTriggering)
                 throw new Exception("You can not start another loop when the previous one isn't end.");
 
-            _isTriggering = true;
             var trig = new Trigger(startTime, endTime, triggerName);
-            TriggerList.Add(trig);
+            AddTrigger(trig);
+            _isTriggering = true;
             return trig;
         }
 
@@ -192,6 +249,8 @@ namespace Coosu.Storyboard
             await ScriptHelper.WriteElementEventsAsync(writer, this, EnableGroupedSerialization);
         }
 
+        IReadOnlyCollection<IKeyEvent> IEventHost.Events => Events;
+
         public void AddEvent(IKeyEvent @event)
         {
             if (_isLooping)
@@ -199,7 +258,99 @@ namespace Coosu.Storyboard
             else if (_isTriggering)
                 TriggerList[TriggerList.Count - 1].AddEvent(@event);
             else
-                Events.Add(@event);
+            {
+                _events.Add(@event);
+                @event.TimingChanged += ResetCacheAndRaiseTimingChanged;
+                ResetCacheAndRaiseTimingChanged();
+            }
+        }
+
+        public bool RemoveEvent(IKeyEvent @event)
+        {
+            @event.TimingChanged -= ResetCacheAndRaiseTimingChanged;
+            var removeEvent = _events.Remove(@event);
+            if (removeEvent)
+                ResetCacheAndRaiseTimingChanged();
+            return removeEvent;
+        }
+
+        public void AddLoop(Loop loop)
+        {
+            TryEndLoop();
+            _loopList.Add(loop);
+            loop.TimingChanged += ResetCacheAndRaiseTimingChanged;
+            ResetCacheAndRaiseTimingChanged();
+        }
+
+        public bool RemoveLoop(Loop loop)
+        {
+            TryEndLoop();
+            loop.TimingChanged -= ResetCacheAndRaiseTimingChanged;
+            var removeLoop = _loopList.Remove(loop);
+            if (removeLoop)
+                ResetCacheAndRaiseTimingChanged();
+            return removeLoop;
+        }
+
+        public void AddTrigger(Trigger trigger)
+        {
+            TryEndLoop();
+            _triggerList.Add(trigger);
+            trigger.TimingChanged += ResetCacheAndRaiseTimingChanged;
+        }
+
+        public bool RemoveTrigger(Trigger trigger)
+        {
+            TryEndLoop();
+            trigger.TimingChanged -= ResetCacheAndRaiseTimingChanged;
+            var removeTrigger = _triggerList.Remove(trigger);
+            if (removeTrigger)
+                ResetCacheAndRaiseTimingChanged();
+            return removeTrigger;
+        }
+
+        public void ClearEvents(IComparer<IKeyEvent>? comparer = null)
+        {
+            var valid = _events.Count > 0;
+            foreach (var @event in _events)
+                @event.TimingChanged -= ResetCacheAndRaiseTimingChanged;
+            _events.Clear();
+            if (comparer == null)
+                _events = new HashSet<IKeyEvent>();
+            else
+                _events = new SortedSet<IKeyEvent>(comparer);
+            if (valid)
+                ResetCacheAndRaiseTimingChanged();
+        }
+
+        public void ClearLoops()
+        {
+            TryEndLoop();
+            var valid = _loopList.Count > 0;
+            for (var i = 0; i < _loopList.Count; i++)
+            {
+                var loop = _loopList[i];
+                loop.TimingChanged -= ResetCacheAndRaiseTimingChanged;
+            }
+
+            _loopList.Clear();
+            if (valid)
+                ResetCacheAndRaiseTimingChanged();
+        }
+
+        public void ClearTriggers()
+        {
+            TryEndLoop();
+            var valid = _triggerList.Count > 0;
+            for (var i = 0; i < _triggerList.Count; i++)
+            {
+                var trigger = _triggerList[i];
+                trigger.TimingChanged -= ResetCacheAndRaiseTimingChanged;
+            }
+
+            _triggerList.Clear();
+            if (valid)
+                ResetCacheAndRaiseTimingChanged();
         }
 
         public object Clone()
@@ -209,12 +360,28 @@ namespace Coosu.Storyboard
                 DefaultZ = DefaultZ,
                 CameraIdentifier = CameraIdentifier,
                 EnableGroupedSerialization = EnableGroupedSerialization,
-                Events = Events.Select(k => k.Clone()).Cast<IKeyEvent>().ToList(),
             };
 
-            sprite.LoopList.AddRange(LoopList.Select(k => k.Clone()).Cast<Loop>());
-            sprite.TriggerList.AddRange(LoopList.Select(k => k.Clone()).Cast<Trigger>());
+            foreach (var keyEvent in _events)
+                sprite.AddEvent((IKeyEvent)keyEvent.Clone());
+
+            if (LoopList.Count > 0)
+                foreach (var loop in LoopList)
+                    sprite.AddLoop((Loop)loop.Clone());
+
+            if (TriggerList.Count > 0)
+                foreach (var trigger in TriggerList)
+                    sprite.AddTrigger((Trigger)trigger.Clone());
+
             return sprite;
+        }
+
+        private void ResetCacheAndRaiseTimingChanged()
+        {
+            _cachedMaxTime = null;
+            _cachedMinTime = null;
+            _cachedMaxStartTime = null;
+            _cachedMinEndTime = null;
         }
     }
 }

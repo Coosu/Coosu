@@ -5,7 +5,7 @@ namespace Coosu.Storyboard.Easing
     /// <summary>
     /// This class implements an easing function that gives a Sine curve toward the destination.
     /// </summary>
-    public class SineEase : EasingFunctionBase
+    public sealed class SineEase : EasingFunctionBase
     {
         protected override double EaseInCore(double normalizedTime)
         {
@@ -23,8 +23,8 @@ namespace Coosu.Storyboard.Easing
             };
         }
 
-        public static SineEase InstanceIn => new() { EasingMode = EasingMode.EaseIn };
-        public static SineEase InstanceOut => new() { EasingMode = EasingMode.EaseOut };
-        public static SineEase InstanceInOut => new() { EasingMode = EasingMode.EaseInOut };
+        public static SineEase InstanceIn { get; } = new() { EasingMode = EasingMode.EaseIn, ThrowIfChangeProperty = true };
+        public static SineEase InstanceOut { get; } = new() { EasingMode = EasingMode.EaseOut, ThrowIfChangeProperty = true };
+        public static SineEase InstanceInOut { get; } = new() { EasingMode = EasingMode.EaseInOut, ThrowIfChangeProperty = true };
     }
 }

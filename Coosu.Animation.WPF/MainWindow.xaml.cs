@@ -94,7 +94,7 @@ namespace Coosu.Animation.WPF
             //var folder = @"D:\Games\osu!\Songs\ok";
             var eg = Layer.ParseFromFile(file);
 
-            var min = eg.SceneObjects.Min(k => k.MinTime);
+            var min = eg.SceneObjects.Min(k => k.MinTime());
             if (min > 0)
             {
                 min = 0;
