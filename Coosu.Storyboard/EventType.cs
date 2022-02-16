@@ -4,7 +4,7 @@ using System.Diagnostics;
 namespace Coosu.Storyboard
 {
     [DebuggerDisplay("Flag = {Flag}")]
-    public struct EventType : IEquatable<EventType>, IComparable<EventType>, IComparable
+    public sealed class EventType : IEquatable<EventType>, IComparable<EventType>, IComparable
     {
         public readonly string Flag;
         public readonly int Size;

@@ -22,6 +22,7 @@ namespace CoosuTest
             var dir = new OsuDirectory(@"C:\Users\milkitic\Downloads\1376486 Risshuu feat. Choko - Take [no video]");
             await dir.InitializeAsync();
             var osuFile = dir.OsuFiles.FirstOrDefault(k => k.Metadata.Version?.Contains("~") == true);
+            var slider1 = osuFile.HitObjects.HitObjectList.FirstOrDefault(k => k.ObjectType == HitObjectType.Slider);
             var slider = osuFile.HitObjects.HitObjectList.First(k => k.Offset == 48819);
             var gg = slider.SliderInfo.GetSliderSlides();
 

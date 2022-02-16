@@ -45,12 +45,12 @@ namespace Coosu.Storyboard
             DictionaryStore.Add(flag, type);
         }
 
-        public static EventType GetValue(string flag)
+        public static EventType? GetValue(string flag)
         {
             return DictionaryStore.TryGetValue(flag, out var val) ? val : default;
         }
 
-        public static EventType GetValue(int index)
+        public static EventType? GetValue(int index)
         {
             return DictionaryStoreIndex.TryGetValue(index, out var val) ? val : default;
         }

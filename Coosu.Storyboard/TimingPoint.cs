@@ -2,9 +2,9 @@
 
 namespace Coosu.Storyboard
 {
-    public struct TimingPoint : IComparable<TimingPoint>
+    public sealed class TimingPoint : IComparable<TimingPoint>
     {
-        public TimingPoint(double timing, bool isStart) : this()
+        public TimingPoint(double timing, bool isStart)
         {
             Timing = timing;
             IsStart = isStart;

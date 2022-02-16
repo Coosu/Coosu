@@ -1,8 +1,8 @@
 ﻿namespace Coosu.Shared.Numerics
 {
-    public struct Vector3<T>
+    public readonly struct ReadyOnlyVector3<T>
     {
-        public Vector3(T x, T y, T z) : this()
+        public ReadyOnlyVector3(T x, T y, T z) : this()
         {
             X = x;
             Y = y;

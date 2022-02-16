@@ -2,7 +2,7 @@
 
 namespace Coosu.Shared.Mathematics
 {
-    public struct RangeValue<T> where T : IComparable
+    public readonly struct RangeValue<T> where T : IComparable
     {
         public T StartTime { get; }
         public T EndTime { get; }

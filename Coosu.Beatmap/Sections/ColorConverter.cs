@@ -6,9 +6,9 @@ using Coosu.Shared.Numerics;
 
 namespace Coosu.Beatmap.Sections
 {
-    public sealed class ColorConverter : ValueConverter<Vector3<byte>>
+    public sealed class ColorConverter : ValueConverter<ReadyOnlyVector3<byte>>
     {
-        public override Vector3<byte> ReadSection(ReadOnlySpan<char> value)
+        public override ReadyOnlyVector3<byte> ReadSection(ReadOnlySpan<char> value)
         {
             byte x = default;
             byte y = default;
@@ -27,10 +27,10 @@ namespace Coosu.Beatmap.Sections
                 i++;
             }
 
-            return new Vector3<byte>(x, y, z);
+            return new ReadyOnlyVector3<byte>(x, y, z);
         }
 
-        public override void WriteSection(TextWriter textWriter, Vector3<byte> value)
+        public override void WriteSection(TextWriter textWriter, ReadyOnlyVector3<byte> value)
         {
             textWriter.Write(value.X);
             textWriter.Write(",");

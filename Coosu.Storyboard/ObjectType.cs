@@ -5,7 +5,7 @@ using System.Diagnostics;
 namespace Coosu.Storyboard
 {
     [DebuggerDisplay("Name = {DebuggerDisplay}")]
-    public struct ObjectType : IEquatable<ObjectType>, IComparable<ObjectType>, IComparable
+    public sealed class ObjectType : IEquatable<ObjectType>, IComparable<ObjectType>, IComparable
     {
         private string? DebuggerDisplay => ObjectType.GetString(this);
 

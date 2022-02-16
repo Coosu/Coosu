@@ -3,8 +3,10 @@
 namespace Coosu.Beatmap.MetaData
 {
     [DebuggerDisplay("{DebuggerDisplay()}")]
-    public struct MapIdentity : IMapIdentifiable
+    public readonly struct MapIdentity : IMapIdentifiable
     {
+        private static readonly MapIdentity _default = new();
+
         public MapIdentity(string folderName, string version, bool inOwnDb) : this()
         {
             FolderName = folderName;
@@ -17,7 +19,7 @@ namespace Coosu.Beatmap.MetaData
         public bool InOwnDb { get; }
         public MapIdentity GetIdentity() => this;
 
-        public static MapIdentity Default { get; } = new MapIdentity();
+        public static ref readonly MapIdentity Default => ref _default;
 
         public override bool Equals(object obj)
         {
