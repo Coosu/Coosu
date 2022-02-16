@@ -17,9 +17,9 @@ namespace Coosu.Storyboard
             Index = index;
         }
 
-        public bool Equals(EventType other)
+        public bool Equals(EventType? other)
         {
-            return Flag == other.Flag;
+            return Flag == other?.Flag;
         }
 
         public override bool Equals(object obj)

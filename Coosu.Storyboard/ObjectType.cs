@@ -57,9 +57,9 @@ namespace Coosu.Storyboard
             Flag = flag;
         }
 
-        public bool Equals(ObjectType other)
+        public bool Equals(ObjectType? other)
         {
-            return Flag == other.Flag;
+            return Flag == other?.Flag;
         }
 
         public override bool Equals(object obj)
