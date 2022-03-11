@@ -1,343 +1,254 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Net.Security;
-using System.Security.Cryptography.X509Certificates;
+using System.Text;
+using System.Text.Json;
 using System.Threading;
-using MihaZupan;
+using System.Threading.Tasks;
+using System.Web;
 
-namespace Coosu.Api.HttpClient
+namespace Coosu.Api.HttpClient;
+
+internal class HttpClientUtility
 {
-    /// <summary>
-    /// Helper class of HttpClient.
-    /// To increase the efficiency, please consider to initialize this class infrequently.
-    /// </summary>
-    internal class HttpClientUtility : IDisposable
+    private enum RequestMethod
     {
-        public static readonly string CacheImagePath =
-            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "imageCache");
+        Get, Post, Put, Delete
+    }
 
-        public TimeSpan Timeout { get; set; }
-
-        public int RetryCount { get; set; }
-
-        private readonly System.Net.Http.HttpClient _httpClient;
-
-        public HttpClientUtility(Socks5ProxyOptions? socks5ProxyOptions = null) : this(TimeSpan.FromSeconds(8), 3, socks5ProxyOptions)
+    static HttpClientUtility()
+    {
+        ServicePointManager.ServerCertificateValidationCallback = (_, _, _, _) => true;
+        AppDomain.CurrentDomain.ProcessExit += (_, _) =>
         {
-        }
+            _httpClient?.Dispose();
+        };
+        _httpClient = null!;
+    }
 
-        public HttpClientUtility(TimeSpan timeout, Socks5ProxyOptions? socks5ProxyOptions = null) : this(timeout, 3, socks5ProxyOptions)
+    private static System.Net.Http.HttpClient _httpClient;
+    private readonly ClientOptions _clientOptions;
+    private AuthenticationHeaderValue? _authorization;
+
+    public HttpClientUtility(ClientOptions? clientCreationOptions = null)
+    {
+        _clientOptions = clientCreationOptions ??= new ClientOptions();
+        if (_httpClient != null!) return;
+        HttpMessageHandler handler;
+        if (clientCreationOptions.ProxyUrl == null)
         {
-        }
-
-        public HttpClientUtility(TimeSpan timeout, int retryCount, Socks5ProxyOptions? socks5ProxyOptions = null)
-        {
-            socks5ProxyOptions ??= new Socks5ProxyOptions();
-
-            Timeout = timeout;
-            RetryCount = retryCount;
-            var handler = new HttpClientHandler
+            handler = new HttpClientHandler
             {
                 AutomaticDecompression = DecompressionMethods.GZip
             };
-
-            if (socks5ProxyOptions.UseSocks5Proxy)
+        }
+        else
+        {
+#if NET6_0_OR_GREATER
+            handler = new SocketsHttpHandler
             {
-                handler.Proxy = new HttpToSocks5Proxy(socks5ProxyOptions.HostName, socks5ProxyOptions.Port);
-            }
-
-            ServicePointManager.ServerCertificateValidationCallback = CheckValidationResult;
-            _httpClient = new System.Net.Http.HttpClient(handler)
-            {
-                Timeout = Timeout
+                Proxy = new WebProxy(clientCreationOptions.ProxyUrl),
+                AutomaticDecompression = DecompressionMethods.GZip
             };
-        }
-
-        public void SetDefaultAuthorization(string scheme, string parameter)
-        {
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(scheme, parameter);
-        }
-
-        public void SetDefaultHeader(IDictionary<string, string> argsHeader)
-        {
-            foreach (var kvp in argsHeader)
+#else
+            var httpClientHandler = new HttpClientHandler
             {
-                _httpClient.DefaultRequestHeaders.Add(kvp.Key, kvp.Value);
+                AutomaticDecompression = DecompressionMethods.GZip,
+            };
+            var uri = new Uri(clientCreationOptions.ProxyUrl);
+            httpClientHandler.Proxy = new MihaZupan.HttpToSocks5Proxy(uri.Host, uri.Port);
+            handler = httpClientHandler;
+#endif
+        }
+
+        _httpClient = new System.Net.Http.HttpClient(handler) { Timeout = clientCreationOptions.Timeout };
+    }
+
+    public void SetDefaultAuthorization(string scheme, string parameter)
+    {
+        _authorization = new AuthenticationHeaderValue(scheme, parameter);
+    }
+
+    public async Task<T> HttpGet<T>(
+        string uri,
+        IReadOnlyDictionary<string, string>? queries = null,
+        IReadOnlyDictionary<string, string>? headers = null)
+    {
+        return await SendAsync<T>(uri, queries, null, headers, RequestMethod.Get);
+    }
+
+    /// <summary>
+    /// DELETE with value-pairs.
+    /// </summary>
+    /// <param name="url">Http uri.</param>
+    /// <param name="queries">Parameter dictionary.</param>
+    /// <param name="headers">Header dictionary.</param>
+    /// <returns></returns>
+    public async Task<T> HttpDelete<T>(
+        string url,
+        IReadOnlyDictionary<string, string>? queries = null,
+        IReadOnlyDictionary<string, string>? headers = null)
+    {
+        return await SendAsync<T>(url, queries, null, headers, RequestMethod.Delete);
+    }
+
+    /// <summary>
+    /// POST with Json.
+    /// </summary>
+    /// <param name="url">Http uri.</param>
+    /// <param name="obj">object</param>
+    /// <param name="headers">Header dictionary.</param>
+    /// <returns></returns>
+    public async Task<T> HttpPost<T>(string url, object obj,
+        IReadOnlyDictionary<string, string>? headers = null)
+    {
+        HttpContent content = new StringContent(JsonSerializer.Serialize(obj));
+        content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+        return await SendAsync<T>(url, null, content, headers, RequestMethod.Post);
+    }
+
+    /// <summary>
+    /// POST with Json.
+    /// </summary>
+    /// <param name="url">Http uri.</param>
+    /// <param name="obj">object</param>
+    /// <param name="headers">Header dictionary.</param>
+    /// <returns></returns>
+    public async Task<T> HttpPut<T>(string url, object obj,
+        IReadOnlyDictionary<string, string>? headers = null)
+    {
+        HttpContent content = new StringContent(JsonSerializer.Serialize(obj));
+        content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+        return await SendAsync<T>(url, null, content, headers, RequestMethod.Put);
+    }
+
+    private async Task<T> SendAsync<T>(
+        string url,
+        IReadOnlyDictionary<string, string>? args,
+        HttpContent? content,
+        IReadOnlyDictionary<string, string>? argsHeader,
+        RequestMethod requestMethod)
+    {
+        var context = new RequestContext(url + BuildQueries(args));
+        return await RunWithRetry(context, async () =>
+        {
+            var uri = context.RequestUri;
+            var request = requestMethod switch
+            {
+                RequestMethod.Get => new HttpRequestMessage(HttpMethod.Get, uri),
+                RequestMethod.Delete => new HttpRequestMessage(HttpMethod.Delete, uri),
+                RequestMethod.Post => new HttpRequestMessage(HttpMethod.Post, uri),
+                RequestMethod.Put => new HttpRequestMessage(HttpMethod.Put, uri),
+                _ => throw new ArgumentOutOfRangeException(nameof(requestMethod), requestMethod, null)
+            };
+
+            if (content != null)
+            {
+                request.Content = content;
             }
-        }
 
-        /// <summary>
-        /// GET with value-pairs.
-        /// </summary>
-        /// <param name="url">Http uri.</param>
-        /// <param name="args">Parameter dictionary.</param>
-        /// <param name="argsHeader">Header dictionary.</param>
-        /// <returns></returns>
-        public string HttpGet(
-            string url,
-            IDictionary<string, string> args = null,
-            IDictionary<string, string> argsHeader = null)
-        {
-            return GetResult(url, args, argsHeader, RequestMethod.Get);
-        }
-
-        /// <summary>
-        /// DELETE with value-pairs.
-        /// </summary>
-        /// <param name="url">Http uri.</param>
-        /// <param name="args">Parameter dictionary.</param>
-        /// <param name="argsHeader">Header dictionary.</param>
-        /// <returns></returns>
-        public string HttpDelete(
-            string url,
-            IDictionary<string, string> args = null,
-            IDictionary<string, string> argsHeader = null)
-        {
-            return GetResult(url, args, argsHeader, RequestMethod.Delete);
-        }
-
-        /// <summary>
-        /// POST with nothing.
-        /// </summary>
-        /// <param name="url">Http uri.</param>
-        /// <returns></returns>
-        public string HttpPost(string url)
-        {
-            HttpContent content = new StringContent("");
-            content.Headers.ContentType = new MediaTypeHeaderValue(HttpContentType.Form.GetContentType());
-            return HttpRequest(url, content, RequestMethod.Post);
-        }
-
-        /// <summary>
-        /// POST with Json.
-        /// </summary>
-        /// <param name="url">Http uri.</param>
-        /// <param name="postJson">json string.</param>
-        /// <returns></returns>
-        public string HttpPostJson(string url, string postJson)
-        {
-            HttpContent content = new StringContent(postJson);
-            content.Headers.ContentType = new MediaTypeHeaderValue(HttpContentType.Json.GetContentType());
-            return HttpRequest(url, content, RequestMethod.Post);
-        }
-
-        /// <summary>
-        /// POST with Json.
-        /// </summary>
-        /// <param name="url">Http uri.</param>
-        /// <param name="args">Parameter dictionary.</param>
-        /// <param name="argsHeader">Header dictionary.</param>
-        /// <returns></returns>
-        public string HttpPostJson(string url,
-            IDictionary<string, string> args = null,
-            IDictionary<string, string> argsHeader = null)
-        {
-            HttpContent content = GetHttpContent(HttpContentType.Json, args, argsHeader, true);
-            return HttpRequest(url, content, RequestMethod.Post);
-        }
-
-        /// <summary>
-        /// PUT with Json.
-        /// </summary>
-        /// <param name="url">Http uri.</param>
-        /// <param name="args">Parameter dictionary.</param>
-        /// <param name="argsHeader">Header dictionary.</param>
-        /// <returns></returns>
-        public string HttpPutJson(string url,
-            IDictionary<string, string> args = null,
-            IDictionary<string, string> argsHeader = null)
-        {
-            HttpContent content = GetHttpContent(HttpContentType.Json, args, argsHeader, true);
-            return HttpRequest(url, content, RequestMethod.Put);
-        }
-
-        private static HttpContent GetHttpContent(
-            HttpContentType contentType,
-            IDictionary<string, string> args,
-            IDictionary<string, string> argsHeader,
-            bool json)
-        {
-            HttpContent content;
-            if (args != null)
+            if (_authorization != null)
             {
-                if (json)
-                {
-                    var jsonStr = Newtonsoft.Json.JsonConvert.SerializeObject(args);
-                    content = new StringContent(jsonStr);
-                    content.Headers.ContentType = new MediaTypeHeaderValue(contentType.GetContentType());
-                }
-                else
-                {
-                    content = new StringContent(string.Join("&", args.Select(k => $"{k.Key}={k.Value}")));
-                    content.Headers.ContentType = new MediaTypeHeaderValue(contentType.GetContentType());
-                }
-            }
-            else
-            {
-                content = new StringContent("");
-                content.Headers.ContentType = new MediaTypeHeaderValue(HttpContentType.Form.GetContentType());
+                request.Headers.Authorization = _authorization;
             }
 
             if (argsHeader != null)
             {
-                foreach (var item in argsHeader)
-                    content.Headers.Add(item.Key, item.Value);
+                foreach (var kvp in argsHeader)
+                {
+                    var key = kvp.Key;
+                    var value = kvp.Value;
+                    request.Headers.TryAddWithoutValidation(key, value);
+                }
             }
 
-            return content;
-        }
-
-        private string GetResult(
-            string url,
-            IDictionary<string, string> args,
-            IDictionary<string, string> argsHeader,
-            RequestMethod requestMethod)
-        {
-            string responseStr = null;
-            string fullUrl = url + args?.ToUrlParamString();
-
-            for (int i = 0; i < RetryCount; i++)
+            HttpResponseMessage response;
+            using (var cts = new CancellationTokenSource(_clientOptions.Timeout))
             {
-                HttpRequestMessage message = null;
-                try
+                response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead,
+                    cts.Token);
+            }
+
+            try
+            {
+                if (response.RequestMessage is { RequestUri: { } })
+                    context.RequestUri = response.RequestMessage.RequestUri.ToString();
+                response.EnsureSuccessStatusCode();
+
+                using var responseStream = await response.Content.ReadAsStreamAsync();
+                return (await JsonSerializer.DeserializeAsync<T>(responseStream))!;
+            }
+            finally
+            {
+                response.Dispose();
+            }
+        });
+    }
+
+    private async Task<T> RunWithRetry<T>(RequestContext context, Func<Task<T>> func)
+    {
+        for (int i = 0; i < _clientOptions.RetryCount; i++)
+        {
+            var uri = context.RequestUri;
+            try
+            {
+                return await func();
+            }
+            catch (Exception ex)
+            {
+                if (context.RequestUri != uri)
                 {
-                    switch (requestMethod)
-                    {
-                        case RequestMethod.Get:
-                            message = new HttpRequestMessage(HttpMethod.Get, fullUrl);
-                            break;
-                        case RequestMethod.Delete:
-                            message = new HttpRequestMessage(HttpMethod.Delete, fullUrl);
-                            break;
-                        case RequestMethod.Post:
-                        case RequestMethod.Put:
-                            throw new NotSupportedException();
-                        default:
-                            throw new ArgumentOutOfRangeException(nameof(requestMethod), requestMethod, null);
-                    }
-
-                    if (argsHeader != null)
-                    {
-                        foreach (var item in argsHeader)
-                        {
-                            message.Headers.TryAddWithoutValidation(item.Key, item.Value);
-                        }
-                    }
-
-                    HttpResponseMessage response;
-                    using (var cts = new CancellationTokenSource(Timeout))
-                    {
-                        response = _httpClient.SendAsync(message, cts.Token).Result;
-                    }
-
-                    responseStr = response.Content.ReadAsStringAsync().Result;
-                    response.EnsureSuccessStatusCode();
-                    return responseStr;
+                    i--;
                 }
-                catch (Exception ex)
+                else
                 {
                     Debug.WriteLine(string.Format("Tried {0} time{1}. (>{2}ms): {3}",
                         i + 1,
                         i + 1 > 1 ? "s" : "",
-                        Timeout,
-                        fullUrl)
+                        _clientOptions.Timeout,
+                        context.RequestUri)
                     );
-                    if (message.RequestUri.OriginalString != fullUrl)
-                    {
-                        fullUrl = message.RequestUri.OriginalString;
-                        i--;
-                    }
+                }
 
-                    if (ex is HttpRequestException hre)
+                if (ex is HttpRequestException httpRequestException)
+                {
+                    if (httpRequestException.StackTrace?.Contains("EnsureSuccessStatusCode") == true)
                     {
-                        if (hre.StackTrace.Contains("EnsureSuccessStatusCode"))
-                        {
-                            throw;
-                        }
-                    }
-
-                    if (i == RetryCount - 1)
                         throw;
-                }
-                finally
-                {
-                    message?.Dispose();
-                }
-            }
-
-            return responseStr;
-        }
-
-        private string HttpRequest(string url, HttpContent content, RequestMethod requestMethod)
-        {
-            string responseStr = null;
-            for (int i = 0; i < RetryCount; i++)
-            {
-                try
-                {
-                    HttpResponseMessage response;
-                    switch (requestMethod)
-                    {
-                        case RequestMethod.Post:
-                            response = _httpClient.PostAsync(url, content).Result;
-                            break;
-                        case RequestMethod.Put:
-                            response = _httpClient.PutAsync(url, content).Result;
-                            break;
-                        case RequestMethod.Get:
-                        case RequestMethod.Delete:
-                            throw new NotSupportedException();
-                        default:
-                            throw new ArgumentOutOfRangeException(nameof(requestMethod), requestMethod, null);
                     }
-                    // read the Json asynchronously.
-
-                    // notice currently was auto decompressed with GZip,
-                    // because AutomaticDecompression was set to DecompressionMethods.GZip
-                    responseStr = response.Content.ReadAsStringAsync().Result;
-
-                    // ensure if the request is success.
-                    response.EnsureSuccessStatusCode();
-                    return responseStr;
                 }
-                catch (Exception ex)
-                {
-                    if (ex is HttpRequestException hre)
-                    {
-                        if (hre.StackTrace.Contains("EnsureSuccessStatusCode"))
-                        {
-                            throw;
-                        }
-                    }
 
-                    Debug.WriteLine(string.Format("Tried {0} time{1}. (>{2}ms): {3}",
-                        i + 1,
-                        i + 1 > 1 ? "s" : "",
-                        Timeout,
-                        url)
-                    );
-                    if (i == RetryCount - 1)
-                        throw;
-                }
+                if (i == _clientOptions.RetryCount - 1)
+                    throw;
             }
-
-            return responseStr;
         }
 
-        private static bool CheckValidationResult(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors errors)
+        throw new Exception("HttpRequest not success");
+    }
+
+    private static string? BuildQueries(IReadOnlyDictionary<string, string>? args)
+    {
+        if (args == null || args.Count < 1)
+            return null;
+
+        var sb = new StringBuilder("?");
+        int i = 0;
+        foreach (var kvp in args)
         {
-            return true; // always accept.  
+            var key = kvp.Key;
+            var value = kvp.Value;
+
+            if (i > 0) sb.Append('&');
+
+            sb.Append(key.Length < 65520 ? Uri.EscapeDataString(key) : HttpUtility.UrlEncode(key));
+            sb.Append('=');
+            sb.Append(value.Length < 65520 ? Uri.EscapeDataString(value) : HttpUtility.UrlEncode(value));
+            i++;
         }
 
-        public void Dispose()
-        {
-            _httpClient?.Dispose();
-        }
+        return sb.ToString();
     }
 }

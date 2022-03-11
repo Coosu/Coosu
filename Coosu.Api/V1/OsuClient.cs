@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Coosu.Api.HttpClient;
 using Coosu.Api.V1.Beatmap;
 using Coosu.Api.V1.Internal;
@@ -8,8 +9,6 @@ using Coosu.Api.V1.MultiPlayer;
 using Coosu.Api.V1.Replay;
 using Coosu.Api.V1.Score;
 using Coosu.Api.V1.User;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 [assembly: CLSCompliant(true)]
 
@@ -24,6 +23,7 @@ namespace Coosu.Api.V1
         /// Osu api key.
         /// </summary>
         public Key Key { get; }
+
         private static readonly HttpClientUtility HttpClientUtility = new HttpClientUtility();
 
         /// <summary>
@@ -33,18 +33,6 @@ namespace Coosu.Api.V1
         public OsuClient(string key)
         {
             Key = key;
-
-            var link = Key.CreateBeatmapLink();
-            string json = GetJson(link + "&h=\"-1\"");
-            object obj = JsonConvert.DeserializeObject(json);
-
-            if (!(obj is JObject jObj)) return;
-            if (jObj.Children().Count() != 1) return;
-            var error = jObj.Children().FirstOrDefault();
-            if (error?.Path == "error")
-            {
-                throw new InvalidOperationException(error.FirstOrDefault()?.ToString());
-            }
         }
 
         /// <summary>
@@ -53,7 +41,7 @@ namespace Coosu.Api.V1
         /// <param name="since">Return all beatmaps ranked since this date.</param>
         /// <param name="limitCount">Amount of results (1 - 500). Default value is 500.</param>
         /// <returns>Fetched beatmaps.</returns>
-        public OsuBeatmap[] GetBeatmaps(
+        public async Task<OsuBeatmap[]> GetBeatmaps(
             DateTimeOffset since,
             int? limitCount = null)
         {
@@ -62,8 +50,7 @@ namespace Coosu.Api.V1
             if (limitCount != null)
                 AppendLimit(limitCount, sb);
 
-            string json = GetJson(sb);
-            var obj = JsonConvert.DeserializeObject<OsuBeatmap[]>(json);
+            var obj = await HttpClientUtility.HttpGet<OsuBeatmap[]>(sb.ToString());
             return obj;
         }
 
@@ -74,7 +61,7 @@ namespace Coosu.Api.V1
         /// <param name="gameMode">Specify the game mode.</param>
         /// <param name="limitCount">Amount of results (1 - 500). Default value is 500.</param>
         /// <returns>Fetched beatmaps.</returns>
-        public OsuBeatmap[] GetBeatmaps(
+        public async Task<OsuBeatmap[]> GetBeatmaps(
             BeatmapSetId beatmapSetId,
             ConvertibleGameMode gameMode = null,
             int? limitCount = null)
@@ -87,8 +74,7 @@ namespace Coosu.Api.V1
             if (limitCount != null)
                 AppendLimit(limitCount, sb);
 
-            string json = GetJson(sb);
-            var obj = JsonConvert.DeserializeObject<OsuBeatmap[]>(json);
+            var obj = await HttpClientUtility.HttpGet<OsuBeatmap[]>(sb.ToString());
             return obj;
         }
 
@@ -97,10 +83,10 @@ namespace Coosu.Api.V1
         /// </summary>
         /// <param name="beatmapSetId">Specify a beatmap set id.</param>
         /// <returns>Fetched beatmaps.</returns>
-        public OsuBeatmapSet GetBeatmapSet(
+        public async Task<OsuBeatmapSet> GetBeatmapSet(
             BeatmapSetId beatmapSetId)
         {
-            var maps = GetBeatmaps(beatmapSetId);
+            var maps = await GetBeatmaps(beatmapSetId);
             return new OsuBeatmapSet(maps);
         }
 
@@ -109,11 +95,11 @@ namespace Coosu.Api.V1
         /// </summary>
         /// <param name="beatmapId">Specify a beatmap set id.</param>
         /// <returns>Fetched beatmaps.</returns>
-        public OsuBeatmapSet GetBeatmapSet(
+        public async Task<OsuBeatmapSet> GetBeatmapSet(
             BeatmapId beatmapId)
         {
-            var map = GetBeatmap(beatmapId);
-            return GetBeatmapSet(new BeatmapSetId(map.BeatmapSetId));
+            var map = await GetBeatmap(beatmapId);
+            return await GetBeatmapSet(new BeatmapSetId(map.BeatmapSetId));
         }
 
         /// <summary>
@@ -121,14 +107,13 @@ namespace Coosu.Api.V1
         /// </summary>
         /// <param name="beatmapId">Specify a beatmap id.</param>
         /// <returns>Fetched beatmap.</returns>
-        public OsuBeatmap GetBeatmap(
+        public async Task<OsuBeatmap?> GetBeatmap(
             BeatmapId beatmapId)
         {
             var sb = new StringBuilder(Key.CreateBeatmapLink());
             sb.Append($"&b={beatmapId}");
 
-            string json = GetJson(sb);
-            var obj = JsonConvert.DeserializeObject<OsuBeatmap[]>(json);
+            var obj = await HttpClientUtility.HttpGet<OsuBeatmap[]>(sb.ToString());
             return obj.FirstOrDefault();
         }
 
@@ -139,9 +124,9 @@ namespace Coosu.Api.V1
         /// <param name="gameMode">Specify the game mode.</param>
         /// <param name="limitCount">Amount of results (1 - 500). Default value is 500.</param>
         /// <returns>Fetched beatmaps.</returns>
-        public OsuBeatmap[] GetBeatmaps(
-            UserComponent nameOrId = null,
-            ConvertibleGameMode gameMode = null,
+        public async Task<OsuBeatmap[]> GetBeatmaps(
+            UserComponent? nameOrId = null,
+            ConvertibleGameMode? gameMode = null,
             int? limitCount = null)
         {
             var sb = new StringBuilder(Key.CreateBeatmapLink());
@@ -152,8 +137,7 @@ namespace Coosu.Api.V1
             if (limitCount != null)
                 AppendLimit(limitCount, sb);
 
-            string json = GetJson(sb);
-            var obj = JsonConvert.DeserializeObject<OsuBeatmap[]>(json);
+            var obj = await HttpClientUtility.HttpGet<OsuBeatmap[]>(sb.ToString());
             return obj;
         }
 
@@ -162,14 +146,13 @@ namespace Coosu.Api.V1
         /// </summary>
         /// <param name="hash">The beatmap hash. It can be used, for instance, if you're trying to get what beatmap has a replay played in, as .osr replays only provide beatmap hashes (example of hash: a5b99395a42bd55bc5eb1d2411cbdf8b).</param>
         /// <returns>Fetched beatmap.</returns>
-        public OsuBeatmap GetBeatmap(
+        public async Task<OsuBeatmap?> GetBeatmap(
             string hash)
         {
             var sb = new StringBuilder(Key.CreateBeatmapLink());
             sb.Append($"&h={hash}");
 
-            string json = GetJson(sb);
-            var obj = JsonConvert.DeserializeObject<OsuBeatmap[]>(json);
+            var obj = await HttpClientUtility.HttpGet<OsuBeatmap[]>(sb.ToString());
             return obj.FirstOrDefault();
         }
 
@@ -180,7 +163,7 @@ namespace Coosu.Api.V1
         /// <param name="gameMode">Specify the game mode. Default value is 0.</param>
         /// <param name="eventDays">Max number of days between now and last event date (1 - 31). Default value is 1.</param>
         /// <returns>Fetched users.</returns>
-        public OsuUser[] GetUsers(
+        public async Task<OsuUser[]> GetUsers(
             UserComponent nameOrId,
             GameMode? gameMode = null,
             int? eventDays = null)
@@ -192,8 +175,7 @@ namespace Coosu.Api.V1
             if (eventDays != null)
                 sb.Append($"&event_days={eventDays}");
 
-            string json = GetJson(sb);
-            var obj = JsonConvert.DeserializeObject<OsuUser[]>(json);
+            var obj = await HttpClientUtility.HttpGet<OsuUser[]>(sb.ToString());
             return obj;
         }
 
@@ -207,9 +189,9 @@ namespace Coosu.Api.V1
         /// <param name="mods">Specify a mod or mod combination.</param>
         /// <param name="limitCount">Amount of results from the top (1 - 100). Default value is 50.</param>
         /// <returns>Fetched scores.</returns>
-        public OsuPlayScore[] GetScores(
+        public async Task<OsuPlayScore[]> GetScores(
             BeatmapId beatmapId,
-            UserComponent nameOrId = null,
+            UserComponent? nameOrId = null,
             GameMode? gameMode = null,
             Mod? mods = null,
             int? limitCount = null)
@@ -224,8 +206,7 @@ namespace Coosu.Api.V1
             if (limitCount != null)
                 AppendLimit(limitCount, sb);
 
-            string json = GetJson(sb);
-            var obj = JsonConvert.DeserializeObject<OsuPlayScore[]>(json);
+            var obj = await HttpClientUtility.HttpGet<OsuPlayScore[]>(sb.ToString());
             return obj;
         }
 
@@ -236,7 +217,7 @@ namespace Coosu.Api.V1
         /// <param name="gameMode">Specify the game mode. Default value is 0.</param>
         /// <param name="limitCount">Amount of results (1 - 100). Default value is 10.</param>
         /// <returns>Fetched user's best scores.</returns>
-        public OsuUserBest[] GetUserBestScores(
+        public async Task<OsuUserBest[]> GetUserBestScores(
             UserComponent nameOrId,
             GameMode? gameMode = null,
             int? limitCount = null)
@@ -247,8 +228,7 @@ namespace Coosu.Api.V1
             else if (limitCount != null)
                 AppendLimit(limitCount, sb);
 
-            string json = GetJson(sb);
-            var obj = JsonConvert.DeserializeObject<OsuUserBest[]>(json);
+            var obj = await HttpClientUtility.HttpGet<OsuUserBest[]>(sb.ToString());
             return obj;
         }
 
@@ -259,7 +239,7 @@ namespace Coosu.Api.V1
         /// <param name="gameMode">Specify the game mode. Default value is 0.</param>
         /// <param name="limitCount">Amount of results (1 - 50). Default value is 10.</param>
         /// <returns>Fetched user's recent scores.</returns>
-        public OsuUserRecent[] GetUserRecentScores(
+        public async Task<OsuUserRecent[]> GetUserRecentScores(
             UserComponent nameOrId,
             GameMode? gameMode = null,
             int? limitCount = null)
@@ -270,8 +250,7 @@ namespace Coosu.Api.V1
             if (limitCount != null)
                 AppendLimit(limitCount, sb);
 
-            string json = GetJson(sb);
-            var obj = JsonConvert.DeserializeObject<OsuUserRecent[]>(json);
+            var obj = await HttpClientUtility.HttpGet<OsuUserRecent[]>(sb.ToString());
             return obj;
         }
 
@@ -280,12 +259,11 @@ namespace Coosu.Api.V1
         /// </summary>
         /// <param name="matchId">Match id to get information from.</param>
         /// <returns>Fetched multi-player lobby.</returns>
-        public OsuMatch GetMatch(int matchId)
+        public async Task<OsuMatch> GetMatch(int matchId)
         {
             string match = Key.CreateMatchLink(matchId);
 
-            string json = GetJson(match);
-            var obj = JsonConvert.DeserializeObject<OsuMatch>(json);
+            var obj = await HttpClientUtility.HttpGet<OsuMatch>(match);
             return obj;
         }
 
@@ -296,14 +274,13 @@ namespace Coosu.Api.V1
         /// <param name="nameOrId">The user that has played the beatmap.</param>
         /// <param name="beatmapId">The beatmap ID in which the replay was played.</param>
         /// <returns>Fetched replay data.</returns>
-        public OsuReplay GetReplay(
+        public async Task<OsuReplay> GetReplay(
             GameMode gameMode,
             UserComponent nameOrId,
             BeatmapId beatmapId)
         {
             string replay = Key.CreateReplayLink(gameMode, beatmapId, nameOrId);
-            string json = GetJson(replay);
-            OsuReplay obj = JsonConvert.DeserializeObject<OsuReplay>(json);
+            var obj = await HttpClientUtility.HttpGet<OsuReplay>(replay);
             return obj;
             // Note that the binary data you get when you decode above base64-string is not the contents of an .osr-file.
             // It is the LZMA stream referred to by the osu-wiki here:
@@ -311,15 +288,6 @@ namespace Coosu.Api.V1
             // https://osu.ppy.sh/wiki/Osr_(file_format)#Format
         }
 
-        private static string GetJson(StringBuilder sb)
-        {
-            return GetJson(sb.ToString());
-        }
-
-        private static string GetJson(string url)
-        {
-            return HttpClientUtility.HttpGet(url);
-        }
 
         private static void AppendGameMode(GameMode? gameMode, StringBuilder sb)
         {
