@@ -21,9 +21,6 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 6.0.x
-        
-    #- name: Restore dependencies
-    #  run: dotnet restore
       
     - name: dotnet pack
       run: |
@@ -97,7 +94,7 @@ jobs:
         dotnet nuget push "./ci-pack/Coosu.Api.${{ steps.version.outputs.version }}.nupkg"  --api-key ${{secrets.MILKI_COOSU_TOKEN}} --source "github"
         
     - name: Nuget Publish Coosu.Shared
-      uses: Rebel028/publish-nuget@v2.6.3
+      uses: Rebel028/publish-nuget@v2.7.0
       continue-on-error: true
       with:
         PROJECT_FILE_PATH: Coosu.Shared/Coosu.Shared.csproj
@@ -107,7 +104,7 @@ jobs:
         TAG_COMMIT: false
 
     - name: Nuget Publish Coosu.Storyboard
-      uses: Rebel028/publish-nuget@v2.6.3
+      uses: Rebel028/publish-nuget@v2.7.0
       continue-on-error: true
       with:
         PROJECT_FILE_PATH: Coosu.Storyboard/Coosu.Storyboard.csproj
@@ -117,7 +114,7 @@ jobs:
         TAG_COMMIT: false
 
     - name: Nuget Publish Coosu.Storyboard.Extensions
-      uses: Rebel028/publish-nuget@v2.6.3
+      uses: Rebel028/publish-nuget@v2.7.0
       continue-on-error: true
       with:
         PROJECT_FILE_PATH: Coosu.Storyboard.Extensions/Coosu.Storyboard.Extensions.csproj
@@ -127,7 +124,7 @@ jobs:
         TAG_COMMIT: false
 
     - name: Nuget Publish Coosu.Storyboard.OsbX
-      uses: Rebel028/publish-nuget@v2.6.3
+      uses: Rebel028/publish-nuget@v2.7.0
       continue-on-error: true
       with:
         PROJECT_FILE_PATH: Coosu.Storyboard.OsbX/Coosu.Storyboard.OsbX.csproj
@@ -137,7 +134,7 @@ jobs:
         TAG_COMMIT: false
 
     - name: Nuget Publish Coosu.Beatmap
-      uses: Rebel028/publish-nuget@v2.6.3
+      uses: Rebel028/publish-nuget@v2.7.0
       continue-on-error: true
       with:
         PROJECT_FILE_PATH: Coosu.Beatmap/Coosu.Beatmap.csproj
@@ -147,7 +144,7 @@ jobs:
         TAG_COMMIT: false
 
     - name: Nuget Publish Coosu.Api
-      uses: Rebel028/publish-nuget@v2.6.3
+      uses: Rebel028/publish-nuget@v2.7.0
       continue-on-error: true
       with:
         PROJECT_FILE_PATH: Coosu.Api/Coosu.Api.csproj
