@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
@@ -24,47 +25,57 @@ internal class HttpClientUtility
         ServicePointManager.ServerCertificateValidationCallback = (_, _, _, _) => true;
         AppDomain.CurrentDomain.ProcessExit += (_, _) =>
         {
-            _httpClient?.Dispose();
+            foreach (var httpClient in HttpClients)
+            {
+                httpClient.Value?.Dispose();
+            }
         };
-        _httpClient = null!;
     }
 
-    private static System.Net.Http.HttpClient _httpClient;
+    private static readonly ConcurrentDictionary<string, System.Net.Http.HttpClient> HttpClients = new();
+
     private readonly ClientOptions _clientOptions;
+    private readonly System.Net.Http.HttpClient _httpClient;
     private AuthenticationHeaderValue? _authorization;
 
     public HttpClientUtility(ClientOptions? clientCreationOptions = null)
     {
         _clientOptions = clientCreationOptions ??= new ClientOptions();
-        if (_httpClient != null!) return;
-        HttpMessageHandler handler;
-        if (clientCreationOptions.ProxyUrl == null)
-        {
-            handler = new HttpClientHandler
-            {
-                AutomaticDecompression = DecompressionMethods.GZip
-            };
-        }
-        else
-        {
-#if NET6_0_OR_GREATER
-            handler = new SocketsHttpHandler
-            {
-                Proxy = new WebProxy(clientCreationOptions.ProxyUrl),
-                AutomaticDecompression = DecompressionMethods.GZip
-            };
-#else
-            var httpClientHandler = new HttpClientHandler
-            {
-                AutomaticDecompression = DecompressionMethods.GZip,
-            };
-            var uri = new Uri(clientCreationOptions.ProxyUrl);
-            httpClientHandler.Proxy = new MihaZupan.HttpToSocks5Proxy(uri.Host, uri.Port);
-            handler = httpClientHandler;
-#endif
-        }
+        var standardizedUri = clientCreationOptions.ProxyUrl == null
+            ? ""
+            : new Uri(clientCreationOptions.ProxyUrl).AbsoluteUri;
 
-        _httpClient = new System.Net.Http.HttpClient(handler) { Timeout = clientCreationOptions.Timeout };
+        _httpClient = HttpClients.GetOrAdd(standardizedUri, proxyUri =>
+        {
+            HttpMessageHandler handler;
+            if (string.IsNullOrEmpty(proxyUri))
+            {
+                handler = new HttpClientHandler
+                {
+                    AutomaticDecompression = DecompressionMethods.GZip
+                };
+            }
+            else
+            {
+#if NET6_0_OR_GREATER
+                handler = new SocketsHttpHandler
+                {
+                    Proxy = new WebProxy(clientCreationOptions.ProxyUrl),
+                    AutomaticDecompression = DecompressionMethods.GZip
+                };
+#else
+                var httpClientHandler = new HttpClientHandler
+                {
+                    AutomaticDecompression = DecompressionMethods.GZip,
+                };
+                var uri = new Uri(proxyUri);
+                httpClientHandler.Proxy = new MihaZupan.HttpToSocks5Proxy(uri.Host, uri.Port);
+                handler = httpClientHandler;
+#endif
+            }
+
+            return new System.Net.Http.HttpClient(handler) { Timeout = clientCreationOptions.Timeout };
+        });
     }
 
     public void SetDefaultAuthorization(string scheme, string parameter)

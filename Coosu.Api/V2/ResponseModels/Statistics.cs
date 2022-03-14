@@ -10,7 +10,7 @@ namespace Coosu.Api.V2.ResponseModels
         public Level Level { get; set; }
 
         [JsonProperty("pp")]
-        public long PP { get; set; }
+        public float PP { get; set; }
 
         [JsonProperty("ranked_score")]
         public long RankedScore { get; set; }
