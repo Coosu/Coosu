@@ -13,6 +13,6 @@ namespace Coosu.Api.V2.ResponseModels
         public string Url { get; set; }
 
         [JsonProperty("id")]
-        public int? Id { get; set; } // nullable for custom
+        public object? Id { get; set; } // nullable for custom
     }
 }

@@ -30,7 +30,7 @@ public class Score
     public bool Perfect { get; set; }
 
     [JsonPropertyName("statistics")]
-    public Statistics Statistics { get; set; } = null!;
+    public ScoreStatistics Statistics { get; set; } = null!;
 
     [JsonPropertyName("rank")]
     public string Rank { get; set; } = null!;
