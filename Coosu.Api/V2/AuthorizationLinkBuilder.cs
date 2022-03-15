@@ -39,10 +39,10 @@ namespace Coosu.Api.V2
             string responseType = "code";
 
             sb.Append($"client_id={_clientId}");
-            sb.Append($"&redirect_uri={HttpUtility.UrlEncode(_registeredRedirectUri.OriginalString)}");
+            sb.Append($"&redirect_uri={HttpUtils.UrlEncode(_registeredRedirectUri.OriginalString)}");
             sb.Append($"&response_type={responseType}");
-            sb.Append($"&scope={HttpUtility.UrlEncode(string.Join(" ", scope.GetRequestArray()))}");
-            sb.Append($"&state={HttpUtility.UrlEncode(state)}");
+            sb.Append($"&scope={HttpUtils.UrlEncode(string.Join(" ", scope.GetRequestArray()))}");
+            sb.Append($"&state={HttpUtils.UrlEncode(state)}");
 
             return new Uri(sb.ToString());
         }
@@ -58,10 +58,10 @@ namespace Coosu.Api.V2
             var sb = new StringBuilder($"{TokenLink}?");
 
             sb.Append($"&client_id={_clientId}");
-            sb.Append($"&client_secret={HttpUtility.UrlEncode(clientSecret)}");
-            sb.Append($"&code={HttpUtility.UrlEncode(code)}");
+            sb.Append($"&client_secret={HttpUtils.UrlEncode(clientSecret)}");
+            sb.Append($"&code={HttpUtils.UrlEncode(code)}");
             sb.Append($"&grant_type=authorization_code");
-            sb.Append($"&redirect_uri={HttpUtility.UrlEncode(_registeredRedirectUri.OriginalString)}");
+            sb.Append($"&redirect_uri={HttpUtils.UrlEncode(_registeredRedirectUri.OriginalString)}");
 
             return new Uri(sb.ToString());
         }
@@ -76,7 +76,7 @@ namespace Coosu.Api.V2
             var sb = new StringBuilder($"{TokenLink}?");
 
             sb.Append($"&client_id={_clientId}");
-            sb.Append($"&client_secret={HttpUtility.UrlEncode(clientSecret)}");
+            sb.Append($"&client_secret={HttpUtils.UrlEncode(clientSecret)}");
             sb.Append($"&grant_type=client_credentials");
             sb.Append($"&scope=public");
 
@@ -93,10 +93,10 @@ namespace Coosu.Api.V2
             var sb = new StringBuilder($"{TokenLink}?");
 
             sb.Append($"&client_id={_clientId}");
-            sb.Append($"&client_secret={HttpUtility.UrlEncode(clientSecret)}");
+            sb.Append($"&client_secret={HttpUtils.UrlEncode(clientSecret)}");
             //sb.Append($"&code={code}");
             sb.Append($"&grant_type=refresh_token");
-            sb.Append($"&refresh_token={HttpUtility.UrlEncode(refreshToken)}");
+            sb.Append($"&refresh_token={HttpUtils.UrlEncode(refreshToken)}");
 
             return new Uri(sb.ToString());
         }

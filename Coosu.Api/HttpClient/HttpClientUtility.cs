@@ -254,9 +254,9 @@ internal class HttpClientUtility
 
             if (i > 0) sb.Append('&');
 
-            sb.Append(key.Length < 65520 ? Uri.EscapeDataString(key) : HttpUtility.UrlEncode(key));
+            sb.Append(HttpUtils.UrlEncode(key));
             sb.Append('=');
-            sb.Append(value.Length < 65520 ? Uri.EscapeDataString(value) : HttpUtility.UrlEncode(value));
+            sb.Append(HttpUtils.UrlEncode(value));
             i++;
         }
 

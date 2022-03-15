@@ -49,7 +49,7 @@ namespace Coosu.Api.V2.RequestModels
             var sb = new StringBuilder();
             if (!string.IsNullOrWhiteSpace(Query))
             {
-                sb.Append("q=" + HttpUtility.UrlEncode(Query));
+                sb.Append("q=" + HttpUtils.UrlEncode(Query));
             }
 
             if (OnlyRecommended || IncludeConverted || OnlySubscribedMappers)

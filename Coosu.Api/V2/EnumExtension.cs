@@ -1,44 +1,43 @@
 ﻿using System;
 
-namespace Coosu.Api.V2
+namespace Coosu.Api.V2;
+
+public static class EnumExtension
 {
-    public static class EnumExtension
+    public static string ToParamString(this GameMode gameMode)
     {
-        public static string ToParamString(this GameMode gameMode)
+        return gameMode switch
         {
-            switch (gameMode)
-            {
-                case GameMode.Osu:
-                    return "osu";
-                case GameMode.Taiko:
-                    return "taiko";
-                case GameMode.Fruits:
-                    return "fruits";
-                case GameMode.Mania:
-                    return "mania";
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(gameMode), gameMode, null);
-            }
-        }
-        public static string ToParamString(this UserBeatmapType beatmapType)
+            GameMode.Osu => "osu",
+            GameMode.Taiko => "taiko",
+            GameMode.Fruits => "fruits",
+            GameMode.Mania => "mania",
+            _ => throw new ArgumentOutOfRangeException(nameof(gameMode), gameMode, null)
+        };
+    }
+
+    public static string ToParamString(this ScoreType gameMode)
+    {
+        return gameMode switch
         {
-            switch (beatmapType)
-            {
-                case UserBeatmapType.Favourite:
-                    return "favourite";
-                case UserBeatmapType.Graveyard:
-                    return "graveyard";
-                case UserBeatmapType.Loved:
-                    return "loved";
-                case UserBeatmapType.MostPlayed:
-                    return "most_played";
-                case UserBeatmapType.RankedAndApproved:
-                    return "ranked_and_approved";
-                case UserBeatmapType.Unranked:
-                    return "unranked";
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(beatmapType), beatmapType, null);
-            }
-        }
+            ScoreType.Best => "best",
+            ScoreType.Firsts => "firsts",
+            ScoreType.Recent => "recent",
+            _ => throw new ArgumentOutOfRangeException(nameof(gameMode), gameMode, null)
+        };
+    }
+
+    public static string ToParamString(this UserBeatmapType beatmapType)
+    {
+        return beatmapType switch
+        {
+            UserBeatmapType.Favourite => "favourite",
+            UserBeatmapType.Graveyard => "graveyard",
+            UserBeatmapType.Loved => "loved",
+            UserBeatmapType.MostPlayed => "most_played",
+            UserBeatmapType.RankedAndApproved => "ranked_and_approved",
+            UserBeatmapType.Unranked => "unranked",
+            _ => throw new ArgumentOutOfRangeException(nameof(beatmapType), beatmapType, null)
+        };
     }
 }

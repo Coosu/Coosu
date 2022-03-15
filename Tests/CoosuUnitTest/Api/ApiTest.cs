@@ -15,17 +15,23 @@ namespace CoosuUnitTest.Api
         private readonly string _clientSecret;
         private readonly IConfiguration _configuration;
         private readonly UserToken _publicToken;
+        private readonly OsuClientV2 _client;
 
         public ApiTest()
         {
             var builder = new ConfigurationBuilder()
                 .AddUserSecrets<Secretes>();
 
+            var clientOptions = new ClientOptions()
+            {
+                ProxyUrl = "http://127.0.0.1:10801"
+            };
             _configuration = builder.Build();
             _clientId = int.Parse(_configuration["ClientId"]);
             _clientSecret = _configuration["ClientSecret"];
-            var client = new AuthorizationClient();
+            var client = new AuthorizationClient(clientOptions);
             _publicToken = client.GetPublicToken(_clientId, _clientSecret).Result;
+            _client = new OsuClientV2(_publicToken, clientOptions);
         }
 
         [TestMethod]
@@ -49,6 +55,13 @@ namespace CoosuUnitTest.Api
         {
             var v2 = new OsuClientV2(_publicToken);
             var beatmaps = await v2.User.GetUser("1243669", GameMode.Osu);
+        }
+
+        [TestMethod]
+        public async Task GetUserScores()
+        {
+            var v2 = new OsuClientV2(_publicToken);
+            var beatmaps = await v2.User.GetUserScores("1243669", ScoreType.Best, gameMode: GameMode.Mania);
         }
     }
 

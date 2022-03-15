@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Text;
+using System.Threading.Tasks;
 using System.Web;
 using Coosu.Api.HttpClient;
 using Coosu.Api.V2.ResponseModels;
@@ -43,15 +45,34 @@ public class UserEndpoint
     /// <returns></returns>
     public async Task<User> GetUser(string user, GameMode? gameMode = null)
     {
-        string route = $"/users/{HttpUtility.UrlEncode(user)}/{gameMode?.ToParamString()}";
+        string route = $"/users/{HttpUtils.UrlEncode(user)}/{gameMode?.ToParamString()}";
         var obj = await _httpClient.HttpGet<User>(OsuClientV2.BaseUri + route);
         return obj;
     }
 
     public async Task<Beatmapset[]> GetUserBeatmap(string user, UserBeatmapType type)
     {
-        string route = $"/users/{HttpUtility.UrlEncode(user)}/beatmapsets/{type.ToParamString()}?limit=500&offset=0";
+        string route = $"/users/{HttpUtils.UrlEncode(user)}/beatmapsets/{type.ToParamString()}?limit=500&offset=0";
         var obj = await _httpClient.HttpGet<Beatmapset[]>(OsuClientV2.BaseUri + route);
+        return obj;
+    }
+
+    public async Task<Score[]> GetUserScores(string user, ScoreType type,
+        bool includeFails = false,
+        GameMode? gameMode = null,
+        Pagination? pagination = null)
+    {
+        string route = $"/users/{HttpUtils.UrlEncode(user)}/scores/{type.ToParamString()}";
+        var dict = new Dictionary<string, string>();
+        if (includeFails) dict.Add("include_fails", "1");
+        if (gameMode != null) dict.Add("mode", gameMode.Value.ToParamString());
+        if (pagination != null)
+        {
+            dict.Add("offset", pagination.Offset.ToString());
+            dict.Add("limit", pagination.Limit.ToString());
+        }
+
+        var obj = await _httpClient.HttpGet<Score[]>(OsuClientV2.BaseUri + route, dict);
         return obj;
     }
 }
