@@ -39,10 +39,10 @@ public class Score
     public DateTimeOffset CreatedAt { get; set; }
 
     [JsonPropertyName("best_id")]
-    public long BestId { get; set; }
+    public long? BestId { get; set; }
 
     [JsonPropertyName("pp")]
-    public double Pp { get; set; }
+    public double? PP { get; set; }
 
     [JsonPropertyName("mode")]
     public string ModeString { get; set; } = null!;
