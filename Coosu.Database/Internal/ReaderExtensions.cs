@@ -102,6 +102,6 @@ internal static class ReaderExtensions
 
     public static DateTime ReadDateTimeA(this BinaryReader binaryReader)
     {
-        return new DateTimeOffset(binaryReader.ReadInt64(), TimeSpan.Zero).LocalDateTime;
+        return new DateTime(binaryReader.ReadInt64());
     }
 }

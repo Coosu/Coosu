@@ -4,7 +4,7 @@ using System.IO;
 using Coosu.Database.DataTypes;
 using Coosu.Database.Internal;
 using Coosu.Database.Utils;
-
+using B = Coosu.Database.DataTypes.Beatmap;
 namespace Coosu.Database;
 
 /// <summary>
@@ -93,7 +93,7 @@ public class OsuDbReader : ReaderBase, IDisposable
 
     public IntDoublePair GetIntDoublePair() => (IntDoublePair)Value!;
     public TimingPoint GetTimingPoint() => (TimingPoint)Value!;
-    public TimingPoint GetDateTime() => (TimingPoint)Value!;
+    public DateTime GetDateTime() => (DateTime)Value!;
 
     public void Dispose()
     {
@@ -105,29 +105,33 @@ public class OsuDbReader : ReaderBase, IDisposable
     {
         if (_beatmapItemIndex >= BeatmapSequence.Length - 1)
         {
-            if (ValidateEndArray(_beatmapCount, ref _beatmapIndex))
+            if (_beatmapIndex == _beatmapCount - 1 && NodeType != NodeType.ObjectEnd)
+            {
+                EndObject();
                 return;
+            }
+
+            if (ValidateEndArray(_beatmapCount, ref _beatmapIndex))
+            {
+                return;
+            }
 
             _beatmapIndex++;
             _beatmapItemIndex = -1;
-            _objectStart = false;
-            Name = null;
-            Value = null;
-            DataType = DataType.Object;
-            NodeType = NodeType.ObjectEnd;
+            EndObject();
             return;
         }
 
         if (!_objectStart && _beatmapItemIndex == -1)
         {
             NodeType = NodeType.ObjectStart;
-            Name = null;
+            Name = _arrays.Peek();
             Value = null;
             DataType = DataType.Object;
             _objectStart = true;
             return;
         }
-        
+
         _beatmapItemIndex++;
 
         Name = BeatmapSequence[_beatmapItemIndex];
@@ -159,12 +163,21 @@ public class OsuDbReader : ReaderBase, IDisposable
         }
     }
 
+    private void EndObject()
+    {
+        _objectStart = false;
+        Name = _arrays.Peek();
+        Value = null;
+        DataType = DataType.Object;
+        NodeType = NodeType.ObjectEnd;
+    }
+
     private void ReadStarRatings()
     {
         if (ValidateEndArray(_innerCount, ref _innerIndex)) return;
         _innerIndex++;
 
-        Name = null;
+        Name = _arrays.Peek();
         NodeType = NodeType.KeyValue;
         DataType = DataType.IntDoublePair;
         Value = ReadValueByType(DataType);
@@ -175,7 +188,7 @@ public class OsuDbReader : ReaderBase, IDisposable
         if (ValidateEndArray(_innerCount, ref _innerIndex)) return;
         _innerIndex++;
 
-        Name = null;
+        Name = _arrays.Peek();
         NodeType = NodeType.KeyValue;
         DataType = DataType.TimingPoint;
         Value = ReadValueByType(DataType);
@@ -227,29 +240,32 @@ public class OsuDbReader : ReaderBase, IDisposable
 
     public static readonly string[] BeatmapSequence =
     {
-        "Artist", "ArtistUnicode", "Title", "TitleUnicode", "Creator", "Difficulty",
-        "AudioFileName", "MD5Hash", "FileName", "RankedStatus", "CirclesCount", "SlidersCount", "SpinnersCount",
-        "LastModifiedTime", "ApproachRate", "CircleSize", "HPDrain", "OverallDifficulty", "SliderVelocity",
+        nameof(B.Artist), nameof(B.ArtistUnicode), nameof(B.Title), nameof(B.TitleUnicode),
+        nameof(B.Creator), nameof(B.Difficulty),
+        nameof(B.AudioFileName), nameof(B.MD5Hash), nameof(B.FileName),
+        nameof(B.RankedStatus), nameof(B.CirclesCount), nameof(B.SlidersCount), nameof(B.SpinnersCount),
+        "LastModified", "ApproachRate", "CircleSize", "HpDrain", "OverallDifficulty", "SliderVelocity",
 
-        "StarRatingStandardCount", "StarRatingStandard[]", "StarRatingTaikoCount", "StarRatingTaiko[]",
-        "StarRatingCtbCount", "StarRatingCtb[]", "StarRatingManiaCount", "StarRatingMania[]",
+        "StarRatingStandardCount", "StarRatingStandards[]", "StarRatingTaikoCount", "StarRatingTaikos[]",
+        "StarRatingCtbCount", "StarRatingCtbs[]", "StarRatingManiaCount", "StarRatingManias[]",
 
         "DrainTime", "TotalTime", "AudioPreviewTime",
         "TimingPointCount", "TimingPoints[]",
 
         "BeatmapId", "BeatmapSetId", "ThreadId",
         "GradeStandard", "GradeTaiko", "GradeCtb", "GradeMania",
-        "LocalOffset", "StackLeniency", "Ruleset", "SongSource", "SongTags", "OnlineOffset",
-        "TitleFont", "IsUnplayed", "LastTimePlayed", "IsOsz2", "FolderName", "LastTimeChecked",
-        "IsSoundIgnored", "IsSkinIgnored", "IsStoryboardDisabled", "IsVideoDisabled", "IsVisualOverrideEnabled",
+        "LocalOffset", "StackLeniency", "GameMode", "Source", "Tags", "OnlineOffset",
+        "TitleFont", "IsUnplayed", "LastPlayed", "IsOsz2", "FolderName", "LastTimeChecked",
+        "IsSoundIgnored", "IsSkinIgnored", "IsStoryboardDisabled", "IsVideoDisabled", "IsVisualOverride",
         "LastModification?", "ManiaScrollSpeed",
     };
 
     public static readonly DataType[] BeatmapSequenceType =
     {
-        DataType.String, DataType.String, DataType.String, DataType.String, DataType.String, DataType.String,
-        DataType.String, DataType.String, DataType.String, DataType.Byte, DataType.Int16, DataType.Int16,
-        DataType.Int16,
+        DataType.String, DataType.String, DataType.String, DataType.String,
+        DataType.String, DataType.String,
+        DataType.String, DataType.String, DataType.String,
+        DataType.Byte, DataType.Int16, DataType.Int16, DataType.Int16,
         DataType.DateTime, DataType.Single, DataType.Single, DataType.Single, DataType.Single, DataType.Double,
 
         DataType.Int32, DataType.Array, DataType.Int32, DataType.Array,

@@ -8,13 +8,11 @@ using System.Threading.Tasks;
 using Coosu.Beatmap;
 using Coosu.Beatmap.Sections.HitObject;
 using Coosu.Database;
+using Coosu.Database.Serialization;
 using Coosu.Storyboard;
 using Coosu.Storyboard.Easing;
-using Coosu.Storyboard.Extensions;
 using Coosu.Storyboard.Extensions.Computing;
 using Coosu.Storyboard.Extensions.Optimizing;
-using Coosu.Storyboard.Utils;
-using Newtonsoft.Json;
 
 namespace CoosuTest
 {
@@ -23,20 +21,24 @@ namespace CoosuTest
         static async Task Main(string[] args)
         {
             var list = new List<ValueTuple<string?, object?, string, string>>(8294626);
+            var osuDb = OsuDb.ReadFromFile(@"D:\osu!small.db");
+
             using (var ok = new OsuDbReader(@"E:\Games\osu!\osu!.db"))
             {
-                while (ok.Read())
-                {
-                    var name = ok.Name;
-                    var value = ok.Value;
-                    var nodeType = ok.NodeType;
-                    var dataType = ok.DataType;
-                    var valueTuple = (name, value, nodeType.ToString(), dataType.ToString());
-                    list.Add(valueTuple);
-                    Console.WriteLine(valueTuple);
-                }
+                var allBeatmaps = ok.EnumerateBeatmaps().ToList();
+             
+                //while (ok.Read())
+                //{
+                //    var name = ok.Name;
+                //    var value = ok.Value;
+                //    var nodeType = ok.NodeType;
+                //    var dataType = ok.DataType;
+                //    var valueTuple = (name, value, nodeType.ToString(), dataType.ToString());
+                //    list.Add(valueTuple);
+                //    Console.WriteLine(valueTuple);
+                //}
             }
-            
+
             var dir = new OsuDirectory(@"E:\Games\osu!\Songs\take yf");
             await dir.InitializeAsync();
             var osuFile = dir.OsuFiles.FirstOrDefault(k => k.Metadata.Version?.Contains("~") == true);
