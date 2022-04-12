@@ -2,5 +2,5 @@
 
 public enum NodeType
 {
-    Attribute, FileStart, FileEnd, ObjectStart, ObjectEnd, ArrayStart, ArrayEnd
+    KeyValue, FileStart, FileEnd, ObjectStart, ObjectEnd, ArrayStart, ArrayEnd
 }

@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Coosu.Database;
+namespace Coosu.Database.Internal;
 
-public static class StaticTypes
+internal static class StaticTypes
 {
     public static readonly Type Byte = typeof(byte);
     public static readonly Type Int16 = typeof(short);

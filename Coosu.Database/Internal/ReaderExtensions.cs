@@ -2,8 +2,10 @@
 using System.Buffers;
 using System.IO;
 using System.Text;
+using Coosu.Database.DataTypes;
+using Coosu.Database.Utils;
 
-namespace Coosu.Database;
+namespace Coosu.Database.Internal;
 
 internal static class ReaderExtensions
 {
@@ -72,9 +74,8 @@ internal static class ReaderExtensions
         }
     }
 
-    public static (int Int, double Double) ReadIntDoublePairA(this BinaryReader binaryReader)
+    public static IntDoublePair ReadIntDoublePairA(this BinaryReader binaryReader)
     {
-        (int Int, double Double) tuple;
         var flag = binaryReader.ReadByte();
         if (flag != 0x08)
         {
@@ -82,7 +83,7 @@ internal static class ReaderExtensions
                 "Error while reading IntDoublePair first flag.");
         }
 
-        tuple.Int = binaryReader.ReadInt32();
+        var intValue = binaryReader.ReadInt32();
         flag = binaryReader.ReadByte();
         if (flag != 0x0d)
         {
@@ -90,14 +91,13 @@ internal static class ReaderExtensions
                 "Error while reading IntDoublePair second flag.");
         }
 
-        tuple.Double = binaryReader.ReadDouble();
-
-        return tuple;
+        var doubleValue = binaryReader.ReadDouble();
+        return new IntDoublePair(intValue, doubleValue);
     }
 
-    public static (double Bpm, double Offset, bool IsInherited) ReadTimingPointA(this BinaryReader binaryReader)
+    public static TimingPoint ReadTimingPointA(this BinaryReader binaryReader)
     {
-        return (binaryReader.ReadDouble(), binaryReader.ReadDouble(), !binaryReader.ReadBoolean());
+        return new TimingPoint(binaryReader.ReadDouble(), binaryReader.ReadDouble(), !binaryReader.ReadBoolean());
     }
 
     public static DateTime ReadDateTimeA(this BinaryReader binaryReader)

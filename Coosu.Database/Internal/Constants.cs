@@ -1,4 +1,4 @@
-﻿namespace Coosu.Database;
+﻿namespace Coosu.Database.Internal;
 
 internal static class Constants
 {

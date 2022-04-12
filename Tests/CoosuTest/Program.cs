@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -21,7 +22,8 @@ namespace CoosuTest
     {
         static async Task Main(string[] args)
         {
-            using (var ok = new OsuDbReader(@"E:\Games\osu!\osu!.db")) 
+            var list = new List<ValueTuple<string?, object?, string, string>>(8294626);
+            using (var ok = new OsuDbReader(@"E:\Games\osu!\osu!.db"))
             {
                 while (ok.Read())
                 {
@@ -29,16 +31,12 @@ namespace CoosuTest
                     var value = ok.Value;
                     var nodeType = ok.NodeType;
                     var dataType = ok.DataType;
-                    //Console.WriteLine(JsonConvert.SerializeObject(new
-                    //{
-                    //    name,
-                    //    value,
-                    //    nodeType = nodeType.ToString(),
-                    //    dataType = dataType.ToString()
-                    //}));
+                    var valueTuple = (name, value, nodeType.ToString(), dataType.ToString());
+                    list.Add(valueTuple);
+                    Console.WriteLine(valueTuple);
                 }
             }
-
+            
             var dir = new OsuDirectory(@"E:\Games\osu!\Songs\take yf");
             await dir.InitializeAsync();
             var osuFile = dir.OsuFiles.FirstOrDefault(k => k.Metadata.Version?.Contains("~") == true);
