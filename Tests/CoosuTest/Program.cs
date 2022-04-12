@@ -6,12 +6,14 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Coosu.Beatmap;
 using Coosu.Beatmap.Sections.HitObject;
+using Coosu.Database;
 using Coosu.Storyboard;
 using Coosu.Storyboard.Easing;
 using Coosu.Storyboard.Extensions;
 using Coosu.Storyboard.Extensions.Computing;
 using Coosu.Storyboard.Extensions.Optimizing;
 using Coosu.Storyboard.Utils;
+using Newtonsoft.Json;
 
 namespace CoosuTest
 {
@@ -19,7 +21,25 @@ namespace CoosuTest
     {
         static async Task Main(string[] args)
         {
-            var dir = new OsuDirectory(@"C:\Users\milkitic\Downloads\1376486 Risshuu feat. Choko - Take [no video]");
+            using (var ok = new OsuDbReader(@"E:\Games\osu!\osu!.db")) 
+            {
+                while (ok.Read())
+                {
+                    var name = ok.Name;
+                    var value = ok.Value;
+                    var nodeType = ok.NodeType;
+                    var dataType = ok.DataType;
+                    //Console.WriteLine(JsonConvert.SerializeObject(new
+                    //{
+                    //    name,
+                    //    value,
+                    //    nodeType = nodeType.ToString(),
+                    //    dataType = dataType.ToString()
+                    //}));
+                }
+            }
+
+            var dir = new OsuDirectory(@"E:\Games\osu!\Songs\take yf");
             await dir.InitializeAsync();
             var osuFile = dir.OsuFiles.FirstOrDefault(k => k.Metadata.Version?.Contains("~") == true);
             var slider1 = osuFile.HitObjects.HitObjectList.FirstOrDefault(k => k.ObjectType == HitObjectType.Slider);
