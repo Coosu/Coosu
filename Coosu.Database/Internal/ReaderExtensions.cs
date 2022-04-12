@@ -13,6 +13,7 @@ internal static class ReaderExtensions
     {
         var flag = binaryReader.ReadByte();
         if (flag == 0x00) return "";
+        return binaryReader.ReadString();
         if (flag != 0x0b)
         {
             throw new ArgumentOutOfRangeException(nameof(flag), $"0x{flag:X2}",
