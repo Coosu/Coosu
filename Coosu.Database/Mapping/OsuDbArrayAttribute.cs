@@ -9,7 +9,7 @@ public class OsuDbArrayAttribute : Attribute
         SubItemType = type;
     }
     public Type SubItemType { get; }
-    public bool IsObject { get; set; }
+    public DataType SubDataType { get; set; } = DataType.Unknown;
     public string? LengthDeclaration { get; set; }
     public Type? Converter { get; set; }
     public Type? ValueHandler { get; set; }

@@ -64,7 +64,9 @@ public record Beatmap
     public int AudioPreviewTime { get; set; }
     internal int TimingPointCount => TimingPoints?.Count ?? 0;
 
-    [OsuDbArray(typeof(TimingPoint), LengthDeclaration = nameof(TimingPointCount))]
+    [OsuDbArray(typeof(TimingPoint),
+        LengthDeclaration = nameof(TimingPointCount),
+        ValueHandler = typeof(TimingPointHandler))]
     public List<TimingPoint>? TimingPoints { get; set; }
     public int BeatmapId { get; set; }
     public int BeatmapSetId { get; set; }
@@ -90,5 +92,6 @@ public record Beatmap
     public bool IsStoryboardDisabled { get; set; }
     public bool IsVideoDisabled { get; set; }
     public bool IsVisualOverride { get; set; }
+    internal int LastModification { get; set; }
     public byte ManiaScrollSpeed { get; set; }
 }

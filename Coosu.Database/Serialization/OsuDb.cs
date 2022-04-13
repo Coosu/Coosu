@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Coosu.Database.DataTypes;
+using Coosu.Database.Internal;
 using Coosu.Database.Mapping;
 using Coosu.Database.Mapping.Converting;
 
@@ -16,19 +17,19 @@ public class OsuDb
     public string PlayerName { get; set; }
     internal int BeatmapCount => Beatmaps?.Count ?? 0;
     [OsuDbArray(typeof(Beatmap),
-        IsObject = true, LengthDeclaration = nameof(BeatmapCount),
+        SubDataType = DataType.Object, LengthDeclaration = nameof(BeatmapCount),
         Converter = typeof(IntDoublePair2ModKeyValueConverter))]
     public List<Beatmap> Beatmaps { get; set; } = new();
     public Permissions Permissions { get; set; }
-    public static OsuDb ReadFromFile(string path)
+    public static OsuDb ReadFromFile(string path, MappingHelper? mappingHelper = null)
     {
-        return ReadFromStream(File.OpenRead(path));
+        return ReadFromStream(File.OpenRead(path), mappingHelper);
     }
 
-    public static OsuDb ReadFromStream(Stream stream)
+    public static OsuDb ReadFromStream(Stream stream, MappingHelper? mappingHelper = null)
     {
         var osuDb = new OsuDb();
-        using var reader = new OsuDbReader(stream);
+        using var reader = new OsuDbReader(stream, mappingHelper);
 
         int itemIndex = -1;
         int beatmapCount = 0;

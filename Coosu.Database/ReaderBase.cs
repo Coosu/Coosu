@@ -1,13 +1,16 @@
-﻿using Coosu.Database.DataTypes;
+﻿using System;
+using Coosu.Database.DataTypes;
 
 namespace Coosu.Database;
 
 public abstract class ReaderBase
 {
     public string? Name { get; protected set; }
+    public string? Path { get; protected set; }
     public object? Value { get; protected set; }
     public NodeType NodeType { get; protected set; }
     public DataType DataType { get; protected set; }
+    public Type? TargetType { get; protected set; }
 
     public byte GetByte() => (byte)Value!;
     public short GetInt16() => (short)Value!;

@@ -7,7 +7,7 @@ namespace Coosu.Database.Mapping.Converting;
 
 public class IntDoublePairHandler : ValueHandler<IntDoublePair>
 {
-    public override IntDoublePair ReadValue(BinaryReader binaryReader, Type targetType)
+    public override IntDoublePair ReadValue(BinaryReader binaryReader, DataType targetType)
     {
         return binaryReader.ReadIntDoublePairA();
     }

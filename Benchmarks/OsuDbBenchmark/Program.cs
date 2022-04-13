@@ -5,6 +5,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Running;
 using Coosu.Database;
+using Coosu.Database.Internal;
 using Coosu.Database.Serialization;
 using osu.Shared.Serialization;
 using OsuParsers.Decoders;
@@ -22,10 +23,17 @@ var summary = BenchmarkRunner.Run<TestTask>(/*config*/);
 [Orderer(SummaryOrderPolicy.FastestToSlowest)]
 public class TestTask
 {
+    private readonly MappingHelper _mappingHelper;
+
+    public TestTask()
+    {
+        _mappingHelper = new MappingHelper(typeof(OsuDb));
+    }
+
     [Benchmark(Baseline = true)]
     public object Coosu()
     {
-        return OsuDb.ReadFromFile(@"D:\osu!small.db");
+        return OsuDb.ReadFromFile(@"D:\osu!small.db", _mappingHelper);
     }
 
     [Benchmark]

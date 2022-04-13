@@ -1,35 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
 using Coosu.Database.Mapping;
 using Coosu.Database.Mapping.Converting;
-using B = Coosu.Database.DataTypes.Beatmap;
 
 namespace Coosu.Database.Internal;
 
-internal sealed class MappingHelper
+public sealed class MappingHelper
 {
     private readonly Dictionary<string, int> _arrayCountStorage = new();
     private readonly Dictionary<Type, IValueHandler> _sharedHandlers = new();
 
     public MappingHelper(Type type)
     {
-        Mapping = GetClassMapping(type);
-        ArrayCountStorage = new ReadOnlyDictionary<string, int>(_arrayCountStorage);
+        Mapping = GetClassMapping(type, null, type.Name, type.Name);
     }
 
-    public IReadOnlyDictionary<string, int> ArrayCountStorage { get; }
-    public ClassMapping Mapping { get; }
+    internal Dictionary<string, int> ArrayCountStorage => _arrayCountStorage;
+    internal ClassMapping Mapping { get; }
 
-    private ClassMapping GetClassMapping(Type type)
+    private ClassMapping GetClassMapping(Type type, IMapping? baseMapping, string className, string classPath)
     {
         var propertyMapping = type.GetProperties(
                 BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
             .Where(k => !k.Name.Equals("EqualityContract", StringComparison.Ordinal))
             .ToDictionary(k => k.Name, k => k);
-        var classMapping = new ClassMapping();
+        var classMapping = new ClassMapping
+        {
+            BaseMapping = baseMapping,
+            Name = className,
+            Path = classPath
+        };
 
         foreach (var kvp in propertyMapping)
         {
@@ -38,47 +40,108 @@ internal sealed class MappingHelper
             var attribute = propertyInfo.GetCustomAttribute<OsuDbIgnoreAttribute>();
             if (attribute != null) continue;
             var arrAttr = propertyInfo.GetCustomAttribute<OsuDbArrayAttribute>();
+
+            var propertyName = propertyInfo.Name;
+            var propertyPath = classPath + "." + propertyName;
+
             if (arrAttr == null)
             {
-                classMapping.Mapping.Add(propertyInfo.Name, new PropertyMapping
+                classMapping.Mapping.Add(new PropertyMapping
                 {
-                    BaseClass = classMapping,
+                    BaseMapping = classMapping,
                     TargetType = propertyInfo.PropertyType,
+                    TargetDataType = ConvertType(propertyInfo.GetCustomAttribute<OsuDbTypeAttribute>(),
+                        propertyInfo.PropertyType),
                     ValueHandler = DefaultValueHandler.Instance,
-                    FullName = type.FullName + "." + propertyInfo.Name
+                    Name = propertyName,
+                    Path = propertyPath
                 });
             }
             else
             {
-                var arrLenName = type.FullName + "." + propertyMapping[arrAttr.LengthDeclaration].Name;
+                var arrLenName = classPath + "." + propertyMapping[arrAttr.LengthDeclaration].Name;
                 _arrayCountStorage.Add(arrLenName, -1);
                 var arrayMapping = new ArrayMapping
                 {
                     SubItemType = arrAttr.SubItemType,
-                    BaseClass = classMapping,
+                    SubDataType = arrAttr.SubDataType,
+                    BaseMapping = classMapping,
                     LengthDeclarationMember = arrLenName,
-                    IsObjectArray = arrAttr.IsObject,
+                    IsObjectArray = arrAttr.SubDataType is DataType.Object,
+                    Name = propertyName + "[]",
+                    Path = propertyPath + "[]"
                 };
 
                 if (arrayMapping.IsObjectArray)
                 {
-                    arrayMapping.ClassMapping = GetClassMapping(arrAttr.SubItemType);
+                    arrayMapping.ClassMapping = GetClassMapping(arrAttr.SubItemType, arrayMapping,
+                        propertyName, propertyPath);
                 }
                 else
                 {
+                    DataType arrAttrSubDataType;
+                    if (arrAttr.SubDataType != DataType.Unknown)
+                    {
+                        arrAttrSubDataType = arrAttr.SubDataType;
+                    }
+                    else
+                    {
+                        arrAttrSubDataType = ConvertType(propertyInfo.GetCustomAttribute<OsuDbTypeAttribute>(),
+                            arrAttr.SubItemType);
+                    }
+
                     arrayMapping.PropertyMapping = new PropertyMapping
                     {
-                        BaseClass = classMapping,
-                        TargetType = propertyInfo.PropertyType,
-                        ValueHandler = GetSharedValueHandler(arrAttr.ValueHandler) ?? DefaultValueHandler.Instance
+                        BaseMapping = classMapping,
+                        TargetType = arrAttr.SubItemType,
+                        TargetDataType = arrAttrSubDataType,
+                        ValueHandler = GetSharedValueHandler(arrAttr.ValueHandler) ?? DefaultValueHandler.Instance,
+                        Name = propertyName,
+                        Path = propertyPath
                     };
                 }
 
-                classMapping.Mapping.Add(propertyInfo.Name, arrayMapping);
+                classMapping.Mapping.Add(arrayMapping);
             }
         }
 
         return classMapping;
+    }
+
+    private static DataType ConvertType(OsuDbTypeAttribute? attribute, Type targetType)
+    {
+        if (attribute != null)
+            return attribute.DataType;
+        if (targetType == StaticTypes.Boolean)
+            return DataType.Boolean;
+        if (targetType == StaticTypes.Byte)
+            return DataType.Byte;
+        if (targetType == StaticTypes.Int16)
+            return DataType.Int16;
+        if (targetType == StaticTypes.Int32)
+            return DataType.Int32;
+        if (targetType == StaticTypes.Int64)
+            return DataType.Int64;
+        if (targetType == StaticTypes.Single)
+            return DataType.Single;
+        if (targetType == StaticTypes.Double)
+            return DataType.Double;
+        if (targetType == StaticTypes.String)
+            return DataType.String;
+        if (targetType == StaticTypes.DateTime)
+            return DataType.DateTime;
+        if (targetType == StaticTypes.IntDoublePair)
+            return DataType.Double;
+        if (targetType == StaticTypes.TimingPoint)
+            return DataType.String;
+
+        if (targetType.IsEnum)
+        {
+            var type = Enum.GetUnderlyingType(targetType);
+            return ConvertType(null, type);
+        }
+
+        throw new NotSupportedException("Type supported: " + targetType);
     }
 
     private IValueHandler? GetSharedValueHandler(Type? type)
@@ -93,60 +156,4 @@ internal sealed class MappingHelper
         _sharedHandlers.Add(type, value);
         return value;
     }
-
-    public static readonly string[] GeneralSequence =
-    {
-        "OsuVersion", "FolderCount", "AccountUnlocked", "AccountUnlockDate", "PlayerName", "BeatmapCount",
-        "Beatmaps[]", "UserPermission"
-    };
-
-    public static readonly DataType[] GeneralSequenceType =
-    {
-        DataType.Int32, DataType.Int32, DataType.Boolean, DataType.DateTime, DataType.String, DataType.Int32,
-        DataType.Array, DataType.Int32
-    };
-
-    public static readonly string[] BeatmapSequence =
-    {
-        nameof(B.Artist), nameof(B.ArtistUnicode), nameof(B.Title), nameof(B.TitleUnicode),
-        nameof(B.Creator), nameof(B.Difficulty),
-        nameof(B.AudioFileName), nameof(B.MD5Hash), nameof(B.FileName),
-        nameof(B.RankedStatus), nameof(B.CirclesCount), nameof(B.SlidersCount), nameof(B.SpinnersCount),
-        "LastModified", "ApproachRate", "CircleSize", "HpDrain", "OverallDifficulty", "SliderVelocity",
-
-        "StarRatingStandardCount", "StarRatingStandards[]", "StarRatingTaikoCount", "StarRatingTaikos[]",
-        "StarRatingCtbCount", "StarRatingCtbs[]", "StarRatingManiaCount", "StarRatingManias[]",
-
-        "DrainTime", "TotalTime", "AudioPreviewTime",
-        "TimingPointCount", "TimingPoints[]",
-
-        "BeatmapId", "BeatmapSetId", "ThreadId",
-        "GradeStandard", "GradeTaiko", "GradeCtb", "GradeMania",
-        "LocalOffset", "StackLeniency", "GameMode", "Source", "Tags", "OnlineOffset",
-        "TitleFont", "IsUnplayed", "LastPlayed", "IsOsz2", "FolderName", "LastTimeChecked",
-        "IsSoundIgnored", "IsSkinIgnored", "IsStoryboardDisabled", "IsVideoDisabled", "IsVisualOverride",
-        "LastModification?", "ManiaScrollSpeed",
-    };
-
-    public static readonly DataType[] BeatmapSequenceType =
-    {
-        DataType.String, DataType.String, DataType.String, DataType.String,
-        DataType.String, DataType.String,
-        DataType.String, DataType.String, DataType.String,
-        DataType.Byte, DataType.Int16, DataType.Int16, DataType.Int16,
-        DataType.DateTime, DataType.Single, DataType.Single, DataType.Single, DataType.Single, DataType.Double,
-
-        DataType.Int32, DataType.Array, DataType.Int32, DataType.Array,
-        DataType.Int32, DataType.Array, DataType.Int32, DataType.Array,
-
-        DataType.Int32, DataType.Int32, DataType.Int32,
-        DataType.Int32, DataType.Array,
-
-        DataType.Int32, DataType.Int32, DataType.Int32,
-        DataType.Byte, DataType.Byte, DataType.Byte, DataType.Byte,
-        DataType.Int16, DataType.Single, DataType.Byte, DataType.String, DataType.String, DataType.Int16,
-        DataType.String, DataType.Boolean, DataType.DateTime, DataType.Boolean, DataType.String, DataType.DateTime,
-        DataType.Boolean, DataType.Boolean, DataType.Boolean, DataType.Boolean, DataType.Boolean,
-        DataType.Int32, DataType.Byte
-    };
 }

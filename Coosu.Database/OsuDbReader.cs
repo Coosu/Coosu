@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Coosu.Database.DataTypes;
 using Coosu.Database.Internal;
+using Coosu.Database.Mapping;
 using Coosu.Database.Serialization;
 using Coosu.Database.Utils;
 
@@ -14,88 +15,137 @@ namespace Coosu.Database;
 /// </summary>
 public class OsuDbReader : ReaderBase, IDisposable
 {
-    private static readonly MappingHelper MappingHelper;
-    static OsuDbReader()
-    {
-        MappingHelper = new MappingHelper(typeof(OsuDb));
-    }
-
     private readonly Stream _stream;
     private readonly BinaryReader _binaryReader;
+    private readonly MappingHelper _mappingHelper;
 
-    private bool _documentStart;
-    private bool _objectStart;
+    private IMapping _currentMapping;
 
-    private int _innerIndex = -1;
-    private int _innerCount;
-
-    private int _beatmapIndex;
-    private int _beatmapCount;
-
-    private int _generalItemIndex = -1;
-    private int _beatmapItemIndex = -1;
-
-    private readonly Stack<Action> _arrayHandlers = new();
-    private readonly Stack<string> _arrays = new();
-
-    public OsuDbReader(string path) : this(File.OpenRead(path))
+    public OsuDbReader(string path, MappingHelper? mappingHelper = null) : this(File.OpenRead(path), mappingHelper)
     {
     }
 
-    public OsuDbReader(Stream stream)
+    public OsuDbReader(Stream stream, MappingHelper? mappingHelper = null)
     {
         _stream = stream;
         _binaryReader = new BinaryReader(stream);
+        _mappingHelper = mappingHelper ?? new MappingHelper(typeof(OsuDb));
+        _currentMapping = _mappingHelper.Mapping;
     }
 
     public bool Read()
     {
-        if (_generalItemIndex >= MappingHelper.GeneralSequence.Length - 1)
+        try
         {
-            if (NodeType == NodeType.FileEnd) return false;
-            Name = null;
-            Value = null;
-            DataType = DataType.Object;
-            NodeType = NodeType.FileEnd;
-            return true;
-        }
-
-        if (!_documentStart && _generalItemIndex == -1)
-        {
-            NodeType = NodeType.FileStart;
-            _documentStart = true;
-            return true;
-        }
-
-        if (_arrayHandlers.Count == 0)
-        {
-            _generalItemIndex++;
-            Name = MappingHelper.GeneralSequence[_generalItemIndex];
-            DataType = MappingHelper.GeneralSequenceType[_generalItemIndex];
-            if (DataType != DataType.Array)
+            var c = _currentMapping;
+            if (_currentMapping is ClassMapping classMapping)
             {
-                NodeType = NodeType.KeyValue;
-                Value = ReadValueByType(DataType);
-
-                if (_generalItemIndex is 5) // BeatmapCount
+                var memberIndex = classMapping.CurrentMemberIndex;
+                if (memberIndex == -1)
                 {
-                    _beatmapCount = (int)Value;
+                    classMapping.CurrentMemberIndex++;
+                    Name = classMapping.Name;
+                    Path = classMapping.Path;
+                    NodeType = classMapping.BaseMapping == null ? NodeType.FileStart : NodeType.ObjectStart;
+                    DataType = DataType.Object;
+                    TargetType = null;
+                    Value = null;
+                    return true;
                 }
-            }
-            else
-            {
-                NodeType = NodeType.ArrayStart;
-                Value = null;
-                _arrayHandlers.Push(ReadBeatmap);
-                _arrays.Push(Name);
-            }
-        }
-        else
-        {
-            _arrayHandlers.Peek().Invoke();
-        }
 
-        return true;
+                if (memberIndex > classMapping.Mapping.Count - 1)
+                {
+                    Name = classMapping.Name;
+                    Path = classMapping.Path;
+                    DataType = DataType.Object;
+                    TargetType = null;
+                    Value = null;
+                    classMapping.CurrentMemberIndex = -1;
+                    if (classMapping.BaseMapping != null)
+                    {
+                        NodeType = NodeType.ObjectEnd;
+                        _currentMapping = classMapping.BaseMapping;
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+
+                var subMapping = classMapping.Mapping[memberIndex];
+                if (subMapping is PropertyMapping propertyMapping)
+                {
+                    Name = propertyMapping.Name;
+                    Path = propertyMapping.Path;
+                    NodeType = NodeType.KeyValue;
+                    DataType = propertyMapping.TargetDataType;
+                    TargetType = propertyMapping.TargetType;
+                    Value = propertyMapping.ValueHandler.ReadValue(_binaryReader, propertyMapping.TargetDataType);
+                    if (_mappingHelper.ArrayCountStorage.ContainsKey(propertyMapping.Path))
+                    {
+                        _mappingHelper.ArrayCountStorage[propertyMapping.Path] = Convert.ToInt32(Value);
+                    }
+                }
+                else if (subMapping is ArrayMapping arrayMapping)
+                {
+                    arrayMapping.Length = _mappingHelper.ArrayCountStorage[arrayMapping.LengthDeclarationMember];
+                    Name = arrayMapping.Name;
+                    Path = arrayMapping.Path;
+                    NodeType = NodeType.ArrayStart;
+                    DataType = DataType.Array;
+                    TargetType = null;
+                    Value = null;
+                    _currentMapping = arrayMapping;
+                }
+
+                classMapping.CurrentMemberIndex++;
+            }
+            else if (_currentMapping is ArrayMapping arrayMapping)
+            {
+                var itemIndex = arrayMapping.CurrentItemIndex;
+                if (itemIndex > arrayMapping.Length - 1)
+                {
+                    Name = arrayMapping.Name;
+                    Path = arrayMapping.Path;
+                    NodeType = NodeType.ArrayEnd;
+                    DataType = DataType.Array;
+                    TargetType = null;
+                    Value = null;
+                    _currentMapping = arrayMapping.BaseMapping;
+                    arrayMapping.CurrentItemIndex = 0;
+                    return true;
+                }
+
+                if (arrayMapping.IsObjectArray)
+                {
+                    _currentMapping = arrayMapping.ClassMapping!;
+                    var result = Read();
+                    arrayMapping.CurrentItemIndex++;
+                    return result;
+                }
+
+                var propertyMapping = arrayMapping.PropertyMapping!;
+                Name = propertyMapping.Name;
+                Path = propertyMapping.Path;
+                NodeType = NodeType.KeyValue;
+                DataType = propertyMapping.TargetDataType;
+                TargetType = propertyMapping.TargetType;
+                Value = propertyMapping.ValueHandler.ReadValue(_binaryReader, propertyMapping.TargetDataType);
+                arrayMapping.CurrentItemIndex++;
+            }
+
+            return true;
+        }
+        finally
+        {
+            //Console.WriteLine("Name = " + GetString(Name) + "; " +
+            //                  "Path = " + GetString(Path) + "; " +
+            //                  "Value = " + GetString(Value) + "; " +
+            //                  "NodeType = " + GetString(NodeType) + "; " +
+            //                  "DataType = " + GetString(DataType) + "; " +
+            //                  "TargetType = " + GetString(TargetType));
+        }
     }
 
     public IntDoublePair GetIntDoublePair() => (IntDoublePair)Value!;
@@ -108,128 +158,9 @@ public class OsuDbReader : ReaderBase, IDisposable
         _binaryReader.Dispose();
     }
 
-    private void ReadBeatmap()
+    private static string GetString(object? obj)
     {
-        if (_beatmapItemIndex >= MappingHelper.BeatmapSequence.Length - 1)
-        {
-            if (_beatmapIndex == _beatmapCount - 1 && NodeType != NodeType.ObjectEnd)
-            {
-                EndObject();
-                return;
-            }
-
-            if (ValidateEndArray(_beatmapCount, ref _beatmapIndex))
-            {
-                return;
-            }
-
-            _beatmapIndex++;
-            _beatmapItemIndex = -1;
-            EndObject();
-            return;
-        }
-
-        if (!_objectStart && _beatmapItemIndex == -1)
-        {
-            NodeType = NodeType.ObjectStart;
-            Name = _arrays.Peek();
-            Value = null;
-            DataType = DataType.Object;
-            _objectStart = true;
-            return;
-        }
-
-        _beatmapItemIndex++;
-
-        Name = MappingHelper.BeatmapSequence[_beatmapItemIndex];
-        DataType = MappingHelper.BeatmapSequenceType[_beatmapItemIndex];
-        if (DataType != DataType.Array)
-        {
-            NodeType = NodeType.KeyValue;
-            Value = ReadValueByType(DataType);
-        }
-        else
-        {
-            NodeType = NodeType.ArrayStart;
-            if (_beatmapItemIndex is 20 or 22 or 24 or 26)
-            {
-                _innerCount = (int)Value!;
-
-                _arrayHandlers.Push(ReadStarRatings);
-                _arrays.Push(Name);
-            }
-            else if (_beatmapItemIndex is 31)
-            {
-                _innerCount = (int)Value!;
-
-                _arrayHandlers.Push(ReadTimingPoints);
-                _arrays.Push(Name);
-            }
-
-            Value = null;
-        }
-    }
-
-    private void EndObject()
-    {
-        _objectStart = false;
-        Name = _arrays.Peek();
-        Value = null;
-        DataType = DataType.Object;
-        NodeType = NodeType.ObjectEnd;
-    }
-
-    private void ReadStarRatings()
-    {
-        if (ValidateEndArray(_innerCount, ref _innerIndex)) return;
-        _innerIndex++;
-
-        Name = _arrays.Peek();
-        NodeType = NodeType.KeyValue;
-        DataType = DataType.IntDoublePair;
-        Value = ReadValueByType(DataType);
-    }
-
-    private void ReadTimingPoints()
-    {
-        if (ValidateEndArray(_innerCount, ref _innerIndex)) return;
-        _innerIndex++;
-
-        Name = _arrays.Peek();
-        NodeType = NodeType.KeyValue;
-        DataType = DataType.TimingPoint;
-        Value = ReadValueByType(DataType);
-    }
-
-    private bool ValidateEndArray(int count, ref int index)
-    {
-        if (index < count - 1) return false;
-        index = -1;
-        _arrayHandlers.Pop();
-        Name = _arrays.Pop();
-        Value = null;
-        DataType = DataType.Array;
-        NodeType = NodeType.ArrayEnd;
-        return true;
-    }
-
-    private object ReadValueByType(DataType dataType)
-    {
-        return dataType switch
-        {
-            DataType.Byte => _binaryReader.ReadByte(),
-            DataType.Int16 => _binaryReader.ReadInt16(),
-            DataType.Int32 => _binaryReader.ReadInt32(),
-            DataType.Int64 => _binaryReader.ReadInt64(),
-            DataType.ULEB128 => _stream.ReadLEB128Unsigned(),
-            DataType.Single => _binaryReader.ReadSingle(),
-            DataType.Double => _binaryReader.ReadDouble(),
-            DataType.Boolean => _binaryReader.ReadBoolean(),
-            DataType.String => _binaryReader.ReadStringA(),
-            DataType.IntDoublePair => _binaryReader.ReadIntDoublePairA(),
-            DataType.TimingPoint => _binaryReader.ReadTimingPointA(),
-            DataType.DateTime => _binaryReader.ReadDateTimeA(),
-            _ => throw new ArgumentOutOfRangeException(nameof(dataType), dataType, null)
-        };
+        if (obj == null) return "NULL";
+        return obj.ToString();
     }
 }
