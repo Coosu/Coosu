@@ -44,7 +44,7 @@ public class OsuDbReader : ReaderBase, IDisposable
 
     public bool Read()
     {
-        if (_generalItemIndex >= GeneralSequence.Length - 1)
+        if (_generalItemIndex >= OsuDbReaderMapping.GeneralSequence.Length - 1)
         {
             if (NodeType == NodeType.FileEnd) return false;
             Name = null;
@@ -64,8 +64,8 @@ public class OsuDbReader : ReaderBase, IDisposable
         if (_arrayHandlers.Count == 0)
         {
             _generalItemIndex++;
-            Name = GeneralSequence[_generalItemIndex];
-            DataType = GeneralSequenceType[_generalItemIndex];
+            Name = OsuDbReaderMapping.GeneralSequence[_generalItemIndex];
+            DataType = OsuDbReaderMapping.GeneralSequenceType[_generalItemIndex];
             if (DataType != DataType.Array)
             {
                 NodeType = NodeType.KeyValue;
@@ -104,7 +104,7 @@ public class OsuDbReader : ReaderBase, IDisposable
 
     private void ReadBeatmap()
     {
-        if (_beatmapItemIndex >= BeatmapSequence.Length - 1)
+        if (_beatmapItemIndex >= OsuDbReaderMapping.BeatmapSequence.Length - 1)
         {
             if (_beatmapIndex == _beatmapCount - 1 && NodeType != NodeType.ObjectEnd)
             {
@@ -135,8 +135,8 @@ public class OsuDbReader : ReaderBase, IDisposable
 
         _beatmapItemIndex++;
 
-        Name = BeatmapSequence[_beatmapItemIndex];
-        DataType = BeatmapSequenceType[_beatmapItemIndex];
+        Name = OsuDbReaderMapping.BeatmapSequence[_beatmapItemIndex];
+        DataType = OsuDbReaderMapping.BeatmapSequenceType[_beatmapItemIndex];
         if (DataType != DataType.Array)
         {
             NodeType = NodeType.KeyValue;

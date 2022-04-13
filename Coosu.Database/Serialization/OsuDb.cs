@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Coosu.Database.Annotations;
 using Coosu.Database.DataTypes;
+using Coosu.Database.Handlers;
 
 namespace Coosu.Database.Serialization;
 
@@ -15,7 +14,10 @@ public class OsuDb
     public bool AccountUnlocked { get; set; }
     public DateTime UnlockDate { get; set; }
     public string PlayerName { get; set; }
-    //public int BeatmapCount { get; set; }
+    internal int BeatmapCount => Beatmaps?.Count ?? 0;
+    [OsuDbArray(typeof(Beatmap),
+        IsObject = true, LengthDeclaration = nameof(BeatmapCount),
+        Converter = typeof(IntDoublePair2ModKeyValueConverter))]
     public List<Beatmap> Beatmaps { get; set; } = new();
     public Permissions Permissions { get; set; }
     public static OsuDb ReadFromFile(string path)

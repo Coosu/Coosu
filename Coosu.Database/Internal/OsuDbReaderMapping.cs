@@ -1,15 +1,122 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Linq;
+using System.Reflection;
+using Coosu.Database.Annotations;
 using Coosu.Database.DataTypes;
-using Coosu.Database.Internal;
+using Coosu.Database.Handlers;
+using Coosu.Database.Serialization;
 using Coosu.Database.Utils;
 using B = Coosu.Database.DataTypes.Beatmap;
 
 namespace Coosu.Database.Internal;
 
+
+public interface IMapping
+{
+}
+public class PropertyMapping : IMapping
+{
+    public ClassMapping BaseClass { get; set; }
+    public Type TargetType { get; set; }
+    public IValueHandler? ValueHandler { get; set; }
+}
+
+public class ArrayMapping : IMapping
+{
+    public ClassMapping BaseClass { get; set; }
+    public string LengthDeclarationMember { get; set; }
+    public Type SubItemType { get; set; }
+    public ClassMapping? ClassMapping { get; set; }
+    public PropertyMapping? PropertyMapping { get; set; }
+    public bool IsObjectArray { get; set; }
+    public Func<object>? ArrayCreation { get; set; }
+}
+public class ClassMapping : IMapping
+{
+    public Dictionary<string, IMapping> Mapping { get; set; } = new();
+}
+
 internal static class OsuDbReaderMapping
 {
+    private static ClassMapping _classMapping;
+    private static readonly Dictionary<Type, IValueHandler> SharedHandlers = new();
+    private static readonly Dictionary<string, int> ArrayCountStorage = new();
+
+    static OsuDbReaderMapping()
+    {
+        var type = typeof(OsuDb);
+        var mapping = _classMapping = GetClassMapping(type);
+    }
+
+    private static ClassMapping GetClassMapping(Type type)
+    {
+        var propertyMapping = type.GetProperties(
+                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+            .Where(k => !k.Name.Equals("EqualityContract", StringComparison.Ordinal))
+            .ToDictionary(k => k.Name, k => k);
+        var classMapping = new ClassMapping();
+
+        foreach (var kvp in propertyMapping)
+        {
+            var propertyInfo = kvp.Value;
+
+            var attribute = propertyInfo.GetCustomAttribute<OsuDbIgnoreAttribute>();
+            if (attribute != null) continue;
+            var arrAttr = propertyInfo.GetCustomAttribute<OsuDbArrayAttribute>();
+            if (arrAttr == null)
+            {
+                classMapping.Mapping.Add(propertyInfo.Name, new PropertyMapping
+                {
+                    BaseClass = classMapping,
+                    TargetType = propertyInfo.PropertyType,
+                    ValueHandler = DefaultValueHandler.Instance
+                });
+            }
+            else
+            {
+                var arrayMapping = new ArrayMapping
+                {
+                    SubItemType = arrAttr.SubItemType,
+                    BaseClass = classMapping,
+                    LengthDeclarationMember = type.FullName + "." + propertyMapping[arrAttr.LengthDeclaration].Name,
+                    IsObjectArray = arrAttr.IsObject,
+                };
+                
+                if (arrayMapping.IsObjectArray)
+                {
+                    arrayMapping.ClassMapping = GetClassMapping(arrAttr.SubItemType);
+                }
+                else
+                {
+                    arrayMapping.PropertyMapping = new PropertyMapping
+                    {
+                        BaseClass = classMapping,
+                        TargetType = propertyInfo.PropertyType,
+                        ValueHandler = GetSharedValueHandler(arrAttr.ValueHandler) ?? DefaultValueHandler.Instance
+                    };
+                }
+
+                classMapping.Mapping.Add(propertyInfo.Name, arrayMapping);
+            }
+        }
+
+        return classMapping;
+    }
+
+    private static IValueHandler? GetSharedValueHandler(Type? type)
+    {
+        if (type == null) return null;
+        if (SharedHandlers.TryGetValue(type, out var value))
+        {
+            return value;
+        }
+
+        value = (IValueHandler)Activator.CreateInstance(type);
+        SharedHandlers.Add(type, value);
+        return value;
+    }
+
     public static readonly string[] GeneralSequence =
     {
         "OsuVersion", "FolderCount", "AccountUnlocked", "AccountUnlockDate", "PlayerName", "BeatmapCount",
@@ -65,4 +172,5 @@ internal static class OsuDbReaderMapping
         DataType.Boolean, DataType.Boolean, DataType.Boolean, DataType.Boolean, DataType.Boolean,
         DataType.Int32, DataType.Byte
     };
+
 }
