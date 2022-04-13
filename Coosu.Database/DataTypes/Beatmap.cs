@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Coosu.Database.DataTypes;
 
@@ -28,14 +25,26 @@ public record Beatmap
     public float OverallDifficulty { get; set; }
     public double SliderVelocity { get; set; }
 
+    internal int StarRatingStdCount { get; set; }
+    [OsuDbArray(LengthDeclaration = nameof(StarRatingStdCount), Converter = typeof(IntDoublePair2ModKeyValueConverter))]
     public Dictionary<Mods, double>? StarRatingStd { get; set; }
+    internal int StarRatingTaikoCount { get; set; }
+    [OsuDbArray(LengthDeclaration = nameof(StarRatingTaikoCount), Converter = typeof(IntDoublePair2ModKeyValueConverter))]
     public Dictionary<Mods, double>? StarRatingTaiko { get; set; }
+    internal int StarRatingCtbCount { get; set; }
+    [OsuDbArray(LengthDeclaration = nameof(StarRatingCtbCount), Converter = typeof(IntDoublePair2ModKeyValueConverter))]
     public Dictionary<Mods, double>? StarRatingCtb { get; set; }
+    internal int StarRatingManiaCount { get; set; }
+
+    [OsuDbArray(LengthDeclaration = nameof(StarRatingManiaCount), Converter = typeof(IntDoublePair2ModKeyValueConverter))]
     public Dictionary<Mods, double>? StarRatingMania { get; set; }
 
     public int DrainTime { get; set; }
     public int TotalTime { get; set; }
     public int AudioPreviewTime { get; set; }
+    internal int TimingPointCount { get; set; }
+
+    [OsuDbArray(LengthDeclaration = nameof(TimingPointCount))]
     public List<TimingPoint>? TimingPoints { get; set; }
     public int BeatmapId { get; set; }
     public int BeatmapSetId { get; set; }
@@ -62,4 +71,33 @@ public record Beatmap
     public bool IsVideoDisabled { get; set; }
     public bool IsVisualOverride { get; set; }
     public byte ManiaScrollSpeed { get; set; }
+}
+
+public class IntDoublePair2ModKeyValueConverter : ValueConverter<IntDoublePair, KeyValuePair<Mods, double>>
+{
+    public override KeyValuePair<Mods, double> Convert(IntDoublePair obj)
+    {
+        return new KeyValuePair<Mods, double>((Mods)obj.IntValue, obj.DoubleValue);
+    }
+}
+
+public abstract class ValueConverter<TIn, TOut> : IValueConverter
+{
+    public abstract TOut Convert(TIn obj);
+
+    object IValueConverter.Convert(object obj)
+    {
+        return Convert((TIn)obj)!;
+    }
+}
+
+public interface IValueConverter
+{
+    object Convert(object obj);
+}
+
+public class OsuDbArrayAttribute : Attribute
+{
+    public string? LengthDeclaration { get; set; }
+    public Type? Converter { get; set; }
 }

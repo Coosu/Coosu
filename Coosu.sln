@@ -65,7 +65,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OsbCompressingBenchmark", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Coosu.Database", "Coosu.Database\Coosu.Database.csproj", "{2D2C4B35-C345-40DE-947B-DFD1E1E225A4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OsuDbBenchmark", "Benchmarks\OsuDbBenchmark\OsuDbBenchmark.csproj", "{BF08EF26-7659-4265-834C-3BA4AAAAB848}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OsuDbBenchmark", "Benchmarks\OsuDbBenchmark\OsuDbBenchmark.csproj", "{BF08EF26-7659-4265-834C-3BA4AAAAB848}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
