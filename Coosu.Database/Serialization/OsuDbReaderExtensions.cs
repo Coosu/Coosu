@@ -36,7 +36,7 @@ public static class OsuDbReaderExtensions
             }
 
             if (nodeType == NodeType.ArrayEnd &&
-                reader.Path?.EndsWith("Beatmaps[]", StringComparison.Ordinal) == true)
+                reader.Name?.Equals("Beatmaps[]", StringComparison.Ordinal) == true)
             {
                 yield break;
             }
