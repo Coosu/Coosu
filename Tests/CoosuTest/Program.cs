@@ -24,7 +24,6 @@ namespace CoosuTest
         {
             var list = new List<ValueTuple<string?, object?, string, string>>(8294626);
             MappingHelper _mappingHelper = new MappingHelper(typeof(OsuDb));
-            _mappingHelper = null;
             for (int i = 0; i < 10; i++)
             {
                 var osuDb = OsuDb.ReadFromFile(@"D:\osu!small.db", _mappingHelper);

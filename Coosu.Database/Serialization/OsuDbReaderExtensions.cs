@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Coosu.Database.DataTypes;
 
 namespace Coosu.Database.Serialization;
@@ -32,6 +33,12 @@ public static class OsuDbReaderExtensions
                     count++;
                     beatmap = default;
                 }
+            }
+
+            if (nodeType == NodeType.ArrayEnd &&
+                reader.Path?.EndsWith("Beatmaps[]", StringComparison.Ordinal) == true)
+            {
+                yield break;
             }
 
             if (beatmap == default)
@@ -132,14 +139,14 @@ public static class OsuDbReaderExtensions
                     arrayCount = reader.GetInt32();
                     break;
                 case 31:
-                {
-                    if (arrayCount > 0)
                     {
-                        FillTimingPoints(beatmap.TimingPoints = new(arrayCount), reader);
-                    }
+                        if (arrayCount > 0)
+                        {
+                            FillTimingPoints(beatmap.TimingPoints = new(arrayCount), reader);
+                        }
 
-                    break;
-                }
+                        break;
+                    }
                 case 32:
                     beatmap.BeatmapId = reader.GetInt32();
                     break;
