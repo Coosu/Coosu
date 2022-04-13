@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Coosu.Database.Annotations;
+namespace Coosu.Database.Mapping;
 
 public class OsuDbArrayAttribute : Attribute
 {

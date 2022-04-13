@@ -1,8 +1,7 @@
 ﻿using System;
 using System.IO;
-using Coosu.Database.Annotations;
 
-namespace Coosu.Database.Handlers;
+namespace Coosu.Database.Mapping.Converting;
 
 internal class DefaultValueHandler : IValueHandler
 {

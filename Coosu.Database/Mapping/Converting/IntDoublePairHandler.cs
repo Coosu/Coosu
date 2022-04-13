@@ -1,10 +1,9 @@
 ﻿using System;
 using System.IO;
-using Coosu.Database.Annotations;
 using Coosu.Database.DataTypes;
 using Coosu.Database.Internal;
 
-namespace Coosu.Database.Handlers;
+namespace Coosu.Database.Mapping.Converting;
 
 public class IntDoublePairHandler : ValueHandler<IntDoublePair>
 {

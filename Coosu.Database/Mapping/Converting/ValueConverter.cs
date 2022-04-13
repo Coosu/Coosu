@@ -1,4 +1,4 @@
-﻿namespace Coosu.Database.Annotations;
+﻿namespace Coosu.Database.Mapping.Converting;
 
 public abstract class ValueConverter<TIn, TOut> : IValueConverter
 {

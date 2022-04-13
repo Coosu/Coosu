@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using Coosu.Database.Annotations;
-using Coosu.Database.Handlers;
+using Coosu.Database.Mapping;
+using Coosu.Database.Mapping.Converting;
 
 namespace Coosu.Database.DataTypes;
 

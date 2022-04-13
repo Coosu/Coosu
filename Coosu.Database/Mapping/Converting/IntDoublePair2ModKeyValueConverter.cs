@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
-using Coosu.Database.Annotations;
 using Coosu.Database.DataTypes;
 
-namespace Coosu.Database.Handlers;
+namespace Coosu.Database.Mapping.Converting;
 
 public class IntDoublePair2ModKeyValueConverter : ValueConverter<IntDoublePair, KeyValuePair<Mods, double>>
 {

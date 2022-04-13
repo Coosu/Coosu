@@ -2,54 +2,25 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Coosu.Database.Annotations;
-using Coosu.Database.DataTypes;
-using Coosu.Database.Handlers;
-using Coosu.Database.Serialization;
-using Coosu.Database.Utils;
+using Coosu.Database.Mapping;
+using Coosu.Database.Mapping.Converting;
 using B = Coosu.Database.DataTypes.Beatmap;
 
 namespace Coosu.Database.Internal;
 
+internal sealed class MappingHelper
+{
+    private readonly Dictionary<Type, IValueHandler> _sharedHandlers = new();
+    private readonly Dictionary<string, int> _arrayCountStorage = new();
 
-public interface IMapping
-{
-}
-public class PropertyMapping : IMapping
-{
-    public ClassMapping BaseClass { get; set; }
-    public Type TargetType { get; set; }
-    public IValueHandler? ValueHandler { get; set; }
-}
-
-public class ArrayMapping : IMapping
-{
-    public ClassMapping BaseClass { get; set; }
-    public string LengthDeclarationMember { get; set; }
-    public Type SubItemType { get; set; }
-    public ClassMapping? ClassMapping { get; set; }
-    public PropertyMapping? PropertyMapping { get; set; }
-    public bool IsObjectArray { get; set; }
-    public Func<object>? ArrayCreation { get; set; }
-}
-public class ClassMapping : IMapping
-{
-    public Dictionary<string, IMapping> Mapping { get; set; } = new();
-}
-
-internal static class OsuDbReaderMapping
-{
-    private static ClassMapping _classMapping;
-    private static readonly Dictionary<Type, IValueHandler> SharedHandlers = new();
-    private static readonly Dictionary<string, int> ArrayCountStorage = new();
-
-    static OsuDbReaderMapping()
+    public MappingHelper(Type type)
     {
-        var type = typeof(OsuDb);
-        var mapping = _classMapping = GetClassMapping(type);
+        Mapping = GetClassMapping(type);
     }
 
-    private static ClassMapping GetClassMapping(Type type)
+    public ClassMapping Mapping { get; }
+
+    private ClassMapping GetClassMapping(Type type)
     {
         var propertyMapping = type.GetProperties(
                 BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
@@ -82,7 +53,7 @@ internal static class OsuDbReaderMapping
                     LengthDeclarationMember = type.FullName + "." + propertyMapping[arrAttr.LengthDeclaration].Name,
                     IsObjectArray = arrAttr.IsObject,
                 };
-                
+
                 if (arrayMapping.IsObjectArray)
                 {
                     arrayMapping.ClassMapping = GetClassMapping(arrAttr.SubItemType);
@@ -104,16 +75,16 @@ internal static class OsuDbReaderMapping
         return classMapping;
     }
 
-    private static IValueHandler? GetSharedValueHandler(Type? type)
+    private IValueHandler? GetSharedValueHandler(Type? type)
     {
         if (type == null) return null;
-        if (SharedHandlers.TryGetValue(type, out var value))
+        if (_sharedHandlers.TryGetValue(type, out var value))
         {
             return value;
         }
 
         value = (IValueHandler)Activator.CreateInstance(type);
-        SharedHandlers.Add(type, value);
+        _sharedHandlers.Add(type, value);
         return value;
     }
 
@@ -172,5 +143,4 @@ internal static class OsuDbReaderMapping
         DataType.Boolean, DataType.Boolean, DataType.Boolean, DataType.Boolean, DataType.Boolean,
         DataType.Int32, DataType.Byte
     };
-
 }

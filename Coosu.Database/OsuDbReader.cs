@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using Coosu.Database.DataTypes;
 using Coosu.Database.Internal;
+using Coosu.Database.Mapping;
+using Coosu.Database.Serialization;
 using Coosu.Database.Utils;
 using B = Coosu.Database.DataTypes.Beatmap;
 
@@ -14,6 +16,12 @@ namespace Coosu.Database;
 /// </summary>
 public class OsuDbReader : ReaderBase, IDisposable
 {
+    private static readonly MappingHelper MappingHelper;
+    static OsuDbReader()
+    {
+        MappingHelper = new MappingHelper(typeof(OsuDb));
+    }
+
     private readonly Stream _stream;
     private readonly BinaryReader _binaryReader;
 
@@ -44,7 +52,7 @@ public class OsuDbReader : ReaderBase, IDisposable
 
     public bool Read()
     {
-        if (_generalItemIndex >= OsuDbReaderMapping.GeneralSequence.Length - 1)
+        if (_generalItemIndex >= MappingHelper.GeneralSequence.Length - 1)
         {
             if (NodeType == NodeType.FileEnd) return false;
             Name = null;
@@ -64,8 +72,8 @@ public class OsuDbReader : ReaderBase, IDisposable
         if (_arrayHandlers.Count == 0)
         {
             _generalItemIndex++;
-            Name = OsuDbReaderMapping.GeneralSequence[_generalItemIndex];
-            DataType = OsuDbReaderMapping.GeneralSequenceType[_generalItemIndex];
+            Name = MappingHelper.GeneralSequence[_generalItemIndex];
+            DataType = MappingHelper.GeneralSequenceType[_generalItemIndex];
             if (DataType != DataType.Array)
             {
                 NodeType = NodeType.KeyValue;
@@ -104,7 +112,7 @@ public class OsuDbReader : ReaderBase, IDisposable
 
     private void ReadBeatmap()
     {
-        if (_beatmapItemIndex >= OsuDbReaderMapping.BeatmapSequence.Length - 1)
+        if (_beatmapItemIndex >= MappingHelper.BeatmapSequence.Length - 1)
         {
             if (_beatmapIndex == _beatmapCount - 1 && NodeType != NodeType.ObjectEnd)
             {
@@ -135,8 +143,8 @@ public class OsuDbReader : ReaderBase, IDisposable
 
         _beatmapItemIndex++;
 
-        Name = OsuDbReaderMapping.BeatmapSequence[_beatmapItemIndex];
-        DataType = OsuDbReaderMapping.BeatmapSequenceType[_beatmapItemIndex];
+        Name = MappingHelper.BeatmapSequence[_beatmapItemIndex];
+        DataType = MappingHelper.BeatmapSequenceType[_beatmapItemIndex];
         if (DataType != DataType.Array)
         {
             NodeType = NodeType.KeyValue;

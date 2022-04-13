@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using Coosu.Database.Annotations;
 using Coosu.Database.DataTypes;
-using Coosu.Database.Handlers;
+using Coosu.Database.Mapping;
+using Coosu.Database.Mapping.Converting;
 
 namespace Coosu.Database.Serialization;
 
