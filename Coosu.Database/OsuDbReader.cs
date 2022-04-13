@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using Coosu.Database.DataTypes;
 using Coosu.Database.Internal;
-using Coosu.Database.Mapping;
 using Coosu.Database.Serialization;
 using Coosu.Database.Utils;
-using B = Coosu.Database.DataTypes.Beatmap;
 
 namespace Coosu.Database;
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
 using Coosu.Database.Mapping;
@@ -10,14 +11,16 @@ namespace Coosu.Database.Internal;
 
 internal sealed class MappingHelper
 {
-    private readonly Dictionary<Type, IValueHandler> _sharedHandlers = new();
     private readonly Dictionary<string, int> _arrayCountStorage = new();
+    private readonly Dictionary<Type, IValueHandler> _sharedHandlers = new();
 
     public MappingHelper(Type type)
     {
         Mapping = GetClassMapping(type);
+        ArrayCountStorage = new ReadOnlyDictionary<string, int>(_arrayCountStorage);
     }
 
+    public IReadOnlyDictionary<string, int> ArrayCountStorage { get; }
     public ClassMapping Mapping { get; }
 
     private ClassMapping GetClassMapping(Type type)
@@ -41,16 +44,19 @@ internal sealed class MappingHelper
                 {
                     BaseClass = classMapping,
                     TargetType = propertyInfo.PropertyType,
-                    ValueHandler = DefaultValueHandler.Instance
+                    ValueHandler = DefaultValueHandler.Instance,
+                    FullName = type.FullName + "." + propertyInfo.Name
                 });
             }
             else
             {
+                var arrLenName = type.FullName + "." + propertyMapping[arrAttr.LengthDeclaration].Name;
+                _arrayCountStorage.Add(arrLenName, -1);
                 var arrayMapping = new ArrayMapping
                 {
                     SubItemType = arrAttr.SubItemType,
                     BaseClass = classMapping,
-                    LengthDeclarationMember = type.FullName + "." + propertyMapping[arrAttr.LengthDeclaration].Name,
+                    LengthDeclarationMember = arrLenName,
                     IsObjectArray = arrAttr.IsObject,
                 };
 
