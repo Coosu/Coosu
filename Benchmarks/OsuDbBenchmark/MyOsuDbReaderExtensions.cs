@@ -9,8 +9,8 @@ public class SimpleBeatmapInfo
     public string ArtistUnicode { get; set; } = null!;
     public string Title { get; set; } = null!;
     public string TitleUnicode { get; set; } = null!;
-    public string Creator { get; set; } = null!; //mapper
-    public string Version { get; set; } = null!;//difficulty name
+    public string Creator { get; set; } = null!;
+    public string Version { get; set; } = null!;
     public string BeatmapFileName { get; set; } = null!;
     public DateTime LastModified { get; set; }
     public double DefaultStarRatingStd { get; set; }
