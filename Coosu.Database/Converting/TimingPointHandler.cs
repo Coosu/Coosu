@@ -2,9 +2,9 @@
 using Coosu.Database.DataTypes;
 using Coosu.Database.Internal;
 
-namespace Coosu.Database.Mapping.Converting;
+namespace Coosu.Database.Converting;
 
-public class TimingPointHandler : ValueHandler<TimingPoint>
+public sealed class TimingPointHandler : ValueHandler<TimingPoint>
 {
     public override TimingPoint ReadValue(BinaryReader binaryReader, DataType targetType)
     {

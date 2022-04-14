@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using Coosu.Database.DataTypes;
 
-namespace Coosu.Database.Mapping.Converting;
+namespace Coosu.Database.Converting;
 
-public class IntDoublePair2ModKeyValueConverter : ValueConverter<IntDoublePair, KeyValuePair<Mods, double>>
+public sealed class IntDoublePair2ModKeyValueConverter : ValueConverter<IntDoublePair, KeyValuePair<Mods, double>>
 {
     public override KeyValuePair<Mods, double> Convert(IntDoublePair obj)
     {

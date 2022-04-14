@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using Coosu.Database.Mapping;
-using Coosu.Database.Mapping.Converting;
+using Coosu.Database.Annotations;
+using Coosu.Database.Converting;
 
 namespace Coosu.Database.DataTypes;
 
@@ -14,7 +14,7 @@ public record Beatmap
     public string Creator { get; set; } = null!;
     public string Difficulty { get; set; } = null!;
     public string AudioFileName { get; set; } = null!;
-    public string MD5Hash { get; set; } = null!;
+    public string Md5Hash { get; set; } = null!;
     public string FileName { get; set; } = null!;
     public RankedStatus RankedStatus { get; set; }
     public short CirclesCount { get; set; }
@@ -29,32 +29,28 @@ public record Beatmap
 
     internal int StarRatingStdCount => StarRatingStd?.Count ?? 0;
 
-    [OsuDbArray(typeof(IntDoublePair),
-        LengthDeclaration = nameof(StarRatingStdCount),
+    [StructureArray(typeof(IntDoublePair), nameof(StarRatingStdCount),
         ValueHandler = typeof(IntDoublePairHandler),
         Converter = typeof(IntDoublePair2ModKeyValueConverter))]
     public Dictionary<Mods, double>? StarRatingStd { get; set; }
 
     internal int StarRatingTaikoCount => StarRatingTaiko?.Count ?? 0;
 
-    [OsuDbArray(typeof(IntDoublePair),
-        LengthDeclaration = nameof(StarRatingTaikoCount),
+    [StructureArray(typeof(IntDoublePair), nameof(StarRatingTaikoCount),
         ValueHandler = typeof(IntDoublePairHandler),
         Converter = typeof(IntDoublePair2ModKeyValueConverter))]
     public Dictionary<Mods, double>? StarRatingTaiko { get; set; }
 
     internal int StarRatingCtbCount => StarRatingCtb?.Count ?? 0;
 
-    [OsuDbArray(typeof(IntDoublePair),
-        LengthDeclaration = nameof(StarRatingCtbCount),
+    [StructureArray(typeof(IntDoublePair), nameof(StarRatingCtbCount),
         ValueHandler = typeof(IntDoublePairHandler),
         Converter = typeof(IntDoublePair2ModKeyValueConverter))]
     public Dictionary<Mods, double>? StarRatingCtb { get; set; }
 
     internal int StarRatingManiaCount => StarRatingMania?.Count ?? 0;
 
-    [OsuDbArray(typeof(IntDoublePair),
-        LengthDeclaration = nameof(StarRatingManiaCount),
+    [StructureArray(typeof(IntDoublePair), nameof(StarRatingManiaCount),
         ValueHandler = typeof(IntDoublePairHandler),
         Converter = typeof(IntDoublePair2ModKeyValueConverter))]
     public Dictionary<Mods, double>? StarRatingMania { get; set; }
@@ -64,8 +60,7 @@ public record Beatmap
     public int AudioPreviewTime { get; set; }
     internal int TimingPointCount => TimingPoints?.Count ?? 0;
 
-    [OsuDbArray(typeof(TimingPoint),
-        LengthDeclaration = nameof(TimingPointCount),
+    [StructureArray(typeof(TimingPoint), nameof(TimingPointCount),
         ValueHandler = typeof(TimingPointHandler))]
     public List<TimingPoint>? TimingPoints { get; set; }
     public int BeatmapId { get; set; }

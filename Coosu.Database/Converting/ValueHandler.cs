@@ -1,7 +1,7 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
+using Coosu.Database.Annotations;
 
-namespace Coosu.Database.Mapping.Converting;
+namespace Coosu.Database.Converting;
 
 public abstract class ValueHandler<T> : IValueHandler
 {

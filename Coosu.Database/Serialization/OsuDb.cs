@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Coosu.Database.Annotations;
+using Coosu.Database.Converting;
 using Coosu.Database.DataTypes;
-using Coosu.Database.Internal;
-using Coosu.Database.Mapping;
-using Coosu.Database.Mapping.Converting;
 
 namespace Coosu.Database.Serialization;
 
@@ -16,20 +15,20 @@ public class OsuDb
     public DateTime UnlockDate { get; set; }
     public string PlayerName { get; set; }
     internal int BeatmapCount => Beatmaps?.Count ?? 0;
-    [OsuDbArray(typeof(Beatmap),
-        SubDataType = DataType.Object, LengthDeclaration = nameof(BeatmapCount),
+    [StructureArray(typeof(Beatmap), nameof(BeatmapCount),
+        SubDataType = DataType.Object,
         Converter = typeof(IntDoublePair2ModKeyValueConverter))]
     public List<Beatmap> Beatmaps { get; set; } = new();
     public Permissions Permissions { get; set; }
-    public static OsuDb ReadFromFile(string path, MappingHelper? mappingHelper = null)
+    public static OsuDb ReadFromFile(string path)
     {
-        return ReadFromStream(File.OpenRead(path), mappingHelper);
+        return ReadFromStream(File.OpenRead(path));
     }
 
-    public static OsuDb ReadFromStream(Stream stream, MappingHelper? mappingHelper = null)
+    public static OsuDb ReadFromStream(Stream stream)
     {
         var osuDb = new OsuDb();
-        using var reader = new OsuDbReader(stream, mappingHelper);
+        using var reader = new OsuDbReader(stream);
 
         int itemIndex = -1;
         int beatmapCount = 0;

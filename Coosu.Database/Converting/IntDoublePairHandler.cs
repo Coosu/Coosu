@@ -1,11 +1,10 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using Coosu.Database.DataTypes;
 using Coosu.Database.Internal;
 
-namespace Coosu.Database.Mapping.Converting;
+namespace Coosu.Database.Converting;
 
-public class IntDoublePairHandler : ValueHandler<IntDoublePair>
+public sealed class IntDoublePairHandler : ValueHandler<IntDoublePair>
 {
     public override IntDoublePair ReadValue(BinaryReader binaryReader, DataType targetType)
     {

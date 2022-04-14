@@ -79,7 +79,7 @@ public static class OsuDbReaderExtensions
                     beatmap.AudioFileName = reader.GetString();
                     break;
                 case 7:
-                    beatmap.MD5Hash = reader.GetString();
+                    beatmap.Md5Hash = reader.GetString();
                     break;
                 case 8:
                     beatmap.FileName = reader.GetString();

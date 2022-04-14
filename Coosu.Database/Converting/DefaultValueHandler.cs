@@ -1,11 +1,12 @@
 ﻿using System;
 using System.IO;
+using Coosu.Database.Annotations;
 using Coosu.Database.Internal;
 using Coosu.Database.Utils;
 
-namespace Coosu.Database.Mapping.Converting;
+namespace Coosu.Database.Converting;
 
-internal class DefaultValueHandler : IValueHandler
+internal sealed class DefaultValueHandler : IValueHandler
 {
     private DefaultValueHandler()
     {

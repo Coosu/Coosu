@@ -1,7 +1,6 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 
-namespace Coosu.Database.Mapping.Converting;
+namespace Coosu.Database.Annotations;
 
 public interface IValueHandler
 {

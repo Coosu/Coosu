@@ -1,4 +1,4 @@
-﻿namespace Coosu.Database.Mapping.Converting;
+﻿namespace Coosu.Database.Annotations;
 
 public interface IValueConverter
 {

@@ -23,17 +23,10 @@ var summary = BenchmarkRunner.Run<TestTask>(/*config*/);
 [Orderer(SummaryOrderPolicy.FastestToSlowest)]
 public class TestTask
 {
-    private readonly MappingHelper _mappingHelper;
-
-    public TestTask()
-    {
-        _mappingHelper = new MappingHelper(typeof(OsuDb));
-    }
-
     [Benchmark(Baseline = true)]
     public object Coosu()
     {
-        return OsuDb.ReadFromFile(@"D:\osu!small.db", _mappingHelper);
+        return OsuDb.ReadFromFile(@"D:\osu!small.db");
     }
 
     [Benchmark]
