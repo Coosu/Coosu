@@ -139,7 +139,7 @@ internal sealed class StructureHelper
             return ConvertType(null, type);
         }
 
-        throw new NotSupportedException("Type supported: " + targetType);
+        throw new NotSupportedException("Type not supported: " + targetType);
     }
 
     private IValueHandler? GetSharedValueHandler(Type? type)
