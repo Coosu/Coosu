@@ -4,18 +4,17 @@ using System.Linq;
 using System.Reflection;
 using Coosu.Database.Annotations;
 using Coosu.Database.Converting;
-using Coosu.Database.Internal;
 
-namespace Coosu.Database;
+namespace Coosu.Database.Internal;
 
-public sealed class MappingHelper
+internal sealed class StructureHelper
 {
     private readonly Dictionary<Type, IValueHandler> _sharedHandlers = new();
     private readonly HashSet<int> _lengthNodeIds = new();
 
-    public MappingHelper(Type type)
+    public StructureHelper(Type type)
     {
-        Structure = GetClassStructure(type, null, type.Name, type.Name);
+        RootStructure = GetClassStructure(type, null, type.Name, type.Name);
         NodeLengthFlags = new bool[LastId];
         foreach (var lengthNodeId in _lengthNodeIds)
         {
@@ -23,19 +22,19 @@ public sealed class MappingHelper
         }
     }
 
-    public IDbStructure Structure { get; }
+    public IDbStructure RootStructure { get; }
     public int LastId { get; private set; }
 
     internal bool[] NodeLengthFlags { get; }
 
-    private ClassStructure GetClassStructure(Type type, IDbStructure? baseStructure, string className, string classPath)
+    private ObjectStructure GetClassStructure(Type type, IDbStructure? baseStructure, string className, string classPath)
     {
         var propertyMapping = type.GetProperties(
                 BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
             .Where(k => !k.Name.Equals("EqualityContract", StringComparison.Ordinal))
             .ToDictionary(k => k.Name, k => k);
 
-        var classStructure = new ClassStructure(GetNextNodeId(), className, classPath, baseStructure);
+        var objectStructure = new ObjectStructure(GetNextNodeId(), className, classPath, baseStructure);
 
         foreach (var kvp in propertyMapping)
         {
@@ -52,26 +51,26 @@ public sealed class MappingHelper
             {
                 var nodeId = GetNextNodeId();
                 var forceStructure = propertyInfo.GetCustomAttribute<StructureTypeAttribute>();
-                classStructure.Structures.Add(
-                    new PropertyStructure(nodeId, propertyName, propertyPath, classStructure,
+                objectStructure.Structures.Add(
+                    new PropertyStructure(nodeId, propertyName, propertyPath, objectStructure,
                         propertyInfo.PropertyType,
                         ConvertType(forceStructure, propertyInfo.PropertyType),
                         DefaultValueHandler.Instance)
                 );
-                classStructure.MemberNameIdMapping.Add(propertyName, nodeId);
+                objectStructure.MemberNameIdMapping.Add(propertyName, nodeId);
                 continue;
             }
 
-            var lengthNodeId = classStructure.MemberNameIdMapping[arrAttr.LengthMemberName];
+            var lengthNodeId = objectStructure.MemberNameIdMapping[arrAttr.LengthMemberName];
             _lengthNodeIds.Add(lengthNodeId);
             var arrayStructure = new ArrayStructure(
-                GetNextNodeId(), propertyName + "[]", propertyPath + "[]", classStructure,
+                GetNextNodeId(), propertyName + "[]", propertyPath + "[]", objectStructure,
                 arrAttr.ItemType, arrAttr.SubDataType, arrAttr.SubDataType is DataType.Object, lengthNodeId);
 
             if (arrayStructure.IsObjectArray)
             {
                 arrayStructure.ObjectStructure = GetClassStructure(arrAttr.ItemType, arrayStructure,
-                    propertyName, propertyPath);
+                    propertyName + "[].Item", propertyPath + "[].Item");
             }
             else
             {
@@ -84,20 +83,22 @@ public sealed class MappingHelper
                 {
                     arrAttrSubDataType = ConvertType(propertyInfo.GetCustomAttribute<StructureTypeAttribute>(),
                         arrAttr.ItemType);
+                    arrayStructure.SubDataType = arrAttrSubDataType;
                 }
 
                 arrayStructure.PropertyStructure =
-                    new PropertyStructure(GetNextNodeId(), propertyName, propertyPath, classStructure,
+                    new PropertyStructure(GetNextNodeId(), propertyName + "[].Item",
+                        propertyPath + "[].Item", objectStructure,
                         arrAttr.ItemType,
                         arrAttrSubDataType,
                         GetSharedValueHandler(arrAttr.ValueHandler) ?? DefaultValueHandler.Instance
                     );
             }
 
-            classStructure.Structures.Add(arrayStructure);
+            objectStructure.Structures.Add(arrayStructure);
         }
 
-        return classStructure;
+        return objectStructure;
     }
 
     private int GetNextNodeId()

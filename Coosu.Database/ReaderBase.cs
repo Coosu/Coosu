@@ -1,10 +1,10 @@
 ﻿using System;
-using Coosu.Database.DataTypes;
 
 namespace Coosu.Database;
 
 public abstract class ReaderBase
 {
+    public int NodeId { get; protected set; }
     public string? Name { get; protected set; }
     public string? Path { get; protected set; }
     public object? Value { get; protected set; }

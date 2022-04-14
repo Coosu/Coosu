@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace Coosu.Database.Internal;
 
+[DebuggerDisplay("Array: {NodeId}, {Path}")]
 internal sealed class ArrayStructure : IDbStructure
 {
     public ArrayStructure(int nodeId, string name, string path, IDbStructure baseStructure,
@@ -23,10 +25,10 @@ internal sealed class ArrayStructure : IDbStructure
     public IDbStructure BaseStructure { get; }
 
     public Type ItemType { get; }
-    public DataType SubDataType { get; }
+    public DataType SubDataType { get; internal set; }
     public bool IsObjectArray { get; }
     public int LengthNodeId { get; }
 
-    public ClassStructure? ObjectStructure { get; set; }
+    public ObjectStructure? ObjectStructure { get; set; }
     public PropertyStructure? PropertyStructure { get; set; }
 }

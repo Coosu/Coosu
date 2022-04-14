@@ -1,11 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using Coosu.Database.DataTypes;
+using Coosu.Database.Internal;
 
 namespace Coosu.Database.Serialization;
 
 public static class OsuDbReaderExtensions
 {
+    static OsuDbReaderExtensions()
+    {
+        var mappingHelper = OsuDbReader.StructureHelper;
+        var rootStructure = (ObjectStructure)mappingHelper.RootStructure;
+        var arrayStructure = (ArrayStructure)rootStructure.Structures[6];
+        var beatmapStructure = arrayStructure.ObjectStructure;
+    }
+
     public static IEnumerable<Beatmap> EnumerateBeatmaps(this OsuDbReader reader)
     {
         Beatmap? beatmap = default;
@@ -35,8 +44,7 @@ public static class OsuDbReaderExtensions
                 }
             }
 
-            if (nodeType == NodeType.ArrayEnd &&
-                reader.Name?.Equals("Beatmaps[]", StringComparison.Ordinal) == true)
+            if (nodeType == NodeType.ArrayEnd && reader.NodeId == 7)
             {
                 yield break;
             }

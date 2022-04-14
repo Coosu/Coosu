@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Diagnostics;
 using Coosu.Database.Annotations;
 
 namespace Coosu.Database.Internal;
 
+[DebuggerDisplay("Property: {NodeId}, {Path}")]
 internal sealed class PropertyStructure : IDbStructure
 {
     public PropertyStructure(int nodeId, string name, string path, IDbStructure baseStructure,

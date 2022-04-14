@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Buffers;
 using System.IO;
-using System.Text;
 using Coosu.Database.DataTypes;
-using Coosu.Database.Utils;
 
 namespace Coosu.Database.Internal;
 
@@ -14,65 +11,65 @@ internal static class ReaderExtensions
         var flag = binaryReader.ReadByte();
         if (flag == 0x00) return "";
         return binaryReader.ReadString();
-//        if (flag != 0x0b)
-//        {
-//            throw new ArgumentOutOfRangeException(nameof(flag), $"0x{flag:X2}",
-//                "Error while reading string flag.");
-//        }
+        //        if (flag != 0x0b)
+        //        {
+        //            throw new ArgumentOutOfRangeException(nameof(flag), $"0x{flag:X2}",
+        //                "Error while reading string flag.");
+        //        }
 
-//        var rawLength = binaryReader.BaseStream.ReadLEB128Unsigned();
-//        if (rawLength > int.MaxValue)
-//        {
-//            throw new ArgumentException("Error while reading string flag. The string length is too long.");
-//        }
+        //        var rawLength = binaryReader.BaseStream.ReadLEB128Unsigned();
+        //        if (rawLength > int.MaxValue)
+        //        {
+        //            throw new ArgumentException("Error while reading string flag. The string length is too long.");
+        //        }
 
-//        var length = (int)rawLength;
-//        if (length == 0) return "";
+        //        var length = (int)rawLength;
+        //        if (length == 0) return "";
 
-//        byte[]? buffer = null;
+        //        byte[]? buffer = null;
 
-//        Span<byte> span = length <= Constants.MaxStackLength
-//            ? stackalloc byte[length]
-//            : buffer = ArrayPool<byte>.Shared.Rent(length);
-//        try
-//        {
-//            if (buffer != null)
-//            {
-//                span = span.Slice(0, length);
-//            }
+        //        Span<byte> span = length <= Constants.MaxStackLength
+        //            ? stackalloc byte[length]
+        //            : buffer = ArrayPool<byte>.Shared.Rent(length);
+        //        try
+        //        {
+        //            if (buffer != null)
+        //            {
+        //                span = span.Slice(0, length);
+        //            }
 
-//#if NETFRAMEWORK
-//            for (var i = 0; i < span.Length; i++)
-//            {
-//                span[i] = (byte)binaryReader.BaseStream.ReadByte();
-//            }
+        //#if NETFRAMEWORK
+        //            for (var i = 0; i < span.Length; i++)
+        //            {
+        //                span[i] = (byte)binaryReader.BaseStream.ReadByte();
+        //            }
 
-//            unsafe
-//            {
-//                fixed (byte* p = span)
-//                {
-//                    var str = Encoding.UTF8.GetString(p, span.Length);
-//                    return str;
-//                }
-//            }
-//#else
-//            var readLen = binaryReader.BaseStream.Read(span);
-//            if (readLen < length)
-//            {
-//                throw new ArgumentException("Error while reading string. The string length doesn't match.");
-//            }
+        //            unsafe
+        //            {
+        //                fixed (byte* p = span)
+        //                {
+        //                    var str = Encoding.UTF8.GetString(p, span.Length);
+        //                    return str;
+        //                }
+        //            }
+        //#else
+        //            var readLen = binaryReader.BaseStream.Read(span);
+        //            if (readLen < length)
+        //            {
+        //                throw new ArgumentException("Error while reading string. The string length doesn't match.");
+        //            }
 
-//            var str = Encoding.UTF8.GetString(span);
-//            return str;
-//#endif
-//        }
-//        finally
-//        {
-//            if (buffer != null)
-//            {
-//                ArrayPool<byte>.Shared.Return(buffer);
-//            }
-//        }
+        //            var str = Encoding.UTF8.GetString(span);
+        //            return str;
+        //#endif
+        //        }
+        //        finally
+        //        {
+        //            if (buffer != null)
+        //            {
+        //                ArrayPool<byte>.Shared.Return(buffer);
+        //            }
+        //        }
     }
 
     public static IntDoublePair ReadIntDoublePairA(this BinaryReader binaryReader)

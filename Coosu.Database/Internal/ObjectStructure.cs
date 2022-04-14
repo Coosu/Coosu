@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Coosu.Database.Internal;
 
-internal sealed class ClassStructure : IDbStructure
+[DebuggerDisplay("Class: {NodeId}, {Path}")]
+internal sealed class ObjectStructure : IDbStructure
 {
-    public ClassStructure(int nodeId, string name, string path, IDbStructure? baseStructure)
+    public ObjectStructure(int nodeId, string name, string path, IDbStructure? baseStructure)
     {
         NodeId = nodeId;
         Name = name;

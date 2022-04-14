@@ -15,11 +15,14 @@ public class OsuDb
     public DateTime UnlockDate { get; set; }
     public string PlayerName { get; set; }
     internal int BeatmapCount => Beatmaps?.Count ?? 0;
+
     [StructureArray(typeof(Beatmap), nameof(BeatmapCount),
         SubDataType = DataType.Object,
         Converter = typeof(IntDoublePair2ModKeyValueConverter))]
     public List<Beatmap> Beatmaps { get; set; } = new();
+
     public Permissions Permissions { get; set; }
+
     public static OsuDb ReadFromFile(string path)
     {
         return ReadFromStream(File.OpenRead(path));
@@ -62,5 +65,4 @@ public class OsuDb
 
         return osuDb;
     }
-
 }
