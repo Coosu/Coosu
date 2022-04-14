@@ -10,12 +10,13 @@ internal static class ReaderExtensions
     {
         var flag = binaryReader.ReadByte();
         if (flag == 0x00) return "";
+        if (flag != 0x0b)
+        {
+            throw new ArgumentOutOfRangeException(nameof(flag), $"0x{flag:X2}",
+                "Error while reading string flag.");
+        }
+
         return binaryReader.ReadString();
-        //        if (flag != 0x0b)
-        //        {
-        //            throw new ArgumentOutOfRangeException(nameof(flag), $"0x{flag:X2}",
-        //                "Error while reading string flag.");
-        //        }
 
         //        var rawLength = binaryReader.BaseStream.ReadLEB128Unsigned();
         //        if (rawLength > int.MaxValue)
