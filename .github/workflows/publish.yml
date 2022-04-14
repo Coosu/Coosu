@@ -25,6 +25,7 @@ jobs:
     - name: dotnet pack
       run: |
         dotnet nuget add source --username Milkitic --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/Milkitic/index.json"     
+        dotnet build Coosu.Database --configuration Release -p:CI=true
         dotnet build Coosu.Shared --configuration Release -p:CI=true
         dotnet build Coosu.Storyboard --configuration Release -p:CI=true
         dotnet build Coosu.Storyboard.Extensions --configuration Release -p:CI=true
@@ -75,6 +76,7 @@ jobs:
         prerelease: true
         draft: false
         files: |
+          ./ci-pack/Coosu.Database.${{ steps.version.outputs.version }}.nupkg
           ./ci-pack/Coosu.Shared.${{ steps.version.outputs.version }}.nupkg
           ./ci-pack/Coosu.Storyboard.${{ steps.version.outputs.version }}.nupkg
           ./ci-pack/Coosu.Storyboard.Extensions.${{ steps.version.outputs.version }}.nupkg
@@ -86,13 +88,24 @@ jobs:
     - name: Create Github Package
       if: ${{ success() }}
       run: |
+        dotnet nuget push "./ci-pack/Coosu.Database.${{ steps.version.outputs.version }}.nupkg"  --api-key ${{secrets.MILKI_COOSU_TOKEN}} --source "github"
         dotnet nuget push "./ci-pack/Coosu.Shared.${{ steps.version.outputs.version }}.nupkg"  --api-key ${{secrets.MILKI_COOSU_TOKEN}} --source "github"
         dotnet nuget push "./ci-pack/Coosu.Storyboard.${{ steps.version.outputs.version }}.nupkg"  --api-key ${{secrets.MILKI_COOSU_TOKEN}} --source "github"
         dotnet nuget push "./ci-pack/Coosu.Storyboard.Extensions.${{ steps.version.outputs.version }}.nupkg"  --api-key ${{secrets.MILKI_COOSU_TOKEN}} --source "github"
         dotnet nuget push "./ci-pack/Coosu.Storyboard.OsbX.${{ steps.version.outputs.version }}.nupkg"  --api-key ${{secrets.MILKI_COOSU_TOKEN}} --source "github"
         dotnet nuget push "./ci-pack/Coosu.Beatmap.${{ steps.version.outputs.version }}.nupkg"  --api-key ${{secrets.MILKI_COOSU_TOKEN}} --source "github"
         dotnet nuget push "./ci-pack/Coosu.Api.${{ steps.version.outputs.version }}.nupkg"  --api-key ${{secrets.MILKI_COOSU_TOKEN}} --source "github"
-        
+                
+    - name: Nuget Publish Coosu.Database
+      uses: Rebel028/publish-nuget@v2.7.0
+      continue-on-error: true
+      with:
+        PROJECT_FILE_PATH: Coosu.Database/Coosu.Database.csproj
+        VERSION_STATIC: ${{ steps.version.outputs.version }}
+        NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+        GITHUB_USER: Milkitic
+        TAG_COMMIT: false
+
     - name: Nuget Publish Coosu.Shared
       uses: Rebel028/publish-nuget@v2.7.0
       continue-on-error: true
