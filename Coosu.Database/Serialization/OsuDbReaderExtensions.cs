@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Coosu.Database.DataTypes;
 using Coosu.Database.Internal;
 
@@ -7,25 +6,27 @@ namespace Coosu.Database.Serialization;
 
 public static class OsuDbReaderExtensions
 {
+    private static readonly ObjectStructure _beatmapStructure;
+
     static OsuDbReaderExtensions()
     {
         var mappingHelper = OsuDbReader.StructureHelper;
         var rootStructure = (ObjectStructure)mappingHelper.RootStructure;
         var arrayStructure = (ArrayStructure)rootStructure.Structures[6];
-        var beatmapStructure = arrayStructure.ObjectStructure;
+        _beatmapStructure = arrayStructure.ObjectStructure!;
     }
 
     public static IEnumerable<Beatmap> EnumerateBeatmaps(this OsuDbReader reader)
     {
         Beatmap? beatmap = default;
         int count = 0;
-        int itemIndex = -1;
         int arrayCount = 0;
 
         while (reader.Read())
         {
             var name = reader.Name;
             var nodeType = reader.NodeType;
+            var nodeId = reader.NodeId;
 
             if (nodeType == NodeType.ObjectStart)
             {
@@ -37,14 +38,13 @@ public static class OsuDbReaderExtensions
             {
                 if (beatmap != null)
                 {
-                    itemIndex = -1;
                     yield return beatmap;
                     count++;
                     beatmap = default;
                 }
             }
 
-            if (nodeType == NodeType.ArrayEnd && reader.NodeId == 7)
+            if (nodeType == NodeType.ArrayEnd && nodeId == 7)
             {
                 yield break;
             }
@@ -54,184 +54,73 @@ public static class OsuDbReaderExtensions
                 continue;
             }
 
-            if (nodeType is NodeType.ArrayStart or NodeType.KeyValue)
-            {
-                itemIndex++;
-            }
-            else
+            if (nodeType is not (NodeType.ArrayStart or NodeType.KeyValue))
             {
                 continue;
             }
 
-            switch (itemIndex)
-            {
-                case 0:
-                    beatmap.Artist = reader.GetString();
-                    break;
-                case 1:
-                    beatmap.ArtistUnicode = reader.GetString();
-                    break;
-                case 2:
-                    beatmap.Title = reader.GetString();
-                    break;
-                case 3:
-                    beatmap.TitleUnicode = reader.GetString();
-                    break;
-                case 4:
-                    beatmap.Creator = reader.GetString();
-                    break;
-                case 5:
-                    beatmap.Difficulty = reader.GetString();
-                    break;
-                case 6:
-                    beatmap.AudioFileName = reader.GetString();
-                    break;
-                case 7:
-                    beatmap.Md5Hash = reader.GetString();
-                    break;
-                case 8:
-                    beatmap.FileName = reader.GetString();
-                    break;
-                case 9:
-                    beatmap.RankedStatus = (RankedStatus)reader.GetByte();
-                    break;
-                case 10:
-                    beatmap.CirclesCount = reader.GetInt16();
-                    break;
-                case 11:
-                    beatmap.SlidersCount = reader.GetInt16();
-                    break;
-                case 12:
-                    beatmap.SpinnersCount = reader.GetInt16();
-                    break;
-                case 13:
-                    beatmap.LastModified = reader.GetDateTime();
-                    break;
-                case 14:
-                    beatmap.ApproachRate = reader.GetSingle();
-                    break;
-                case 15:
-                    beatmap.CircleSize = reader.GetSingle();
-                    break;
-                case 16:
-                    beatmap.HpDrain = reader.GetSingle();
-                    break;
-                case 17:
-                    beatmap.OverallDifficulty = reader.GetSingle();
-                    break;
-                case 18:
-                    beatmap.SliderVelocity = reader.GetDouble();
-                    break;
-                case 20:
-                    FillStarRating(beatmap.StarRatingStd = new(), reader);
-                    break;
-                case 22:
-                    FillStarRating(beatmap.StarRatingTaiko = new(), reader);
-                    break;
-                case 24:
-                    FillStarRating(beatmap.StarRatingCtb = new(), reader);
-                    break;
-                case 26:
-                    FillStarRating(beatmap.StarRatingMania = new(), reader);
-                    break;
-                case 27:
-                    beatmap.DrainTime = reader.GetInt32();
-                    break;
-                case 28:
-                    beatmap.TotalTime = reader.GetInt32();
-                    break;
-                case 29:
-                    beatmap.AudioPreviewTime = reader.GetInt32();
-                    break;
-                case 30:
-                    arrayCount = reader.GetInt32();
-                    break;
-                case 31:
-                    {
-                        if (arrayCount > 0)
-                        {
-                            FillTimingPoints(beatmap.TimingPoints = new(arrayCount), reader);
-                        }
-
-                        break;
-                    }
-                case 32:
-                    beatmap.BeatmapId = reader.GetInt32();
-                    break;
-                case 33:
-                    beatmap.BeatmapSetId = reader.GetInt32();
-                    break;
-                case 34:
-                    beatmap.ThreadId = reader.GetInt32();
-                    break;
-                case 35:
-                    beatmap.GradeStandard = (Grade)reader.GetByte();
-                    break;
-                case 36:
-                    beatmap.GradeTaiko = (Grade)reader.GetByte();
-                    break;
-                case 37:
-                    beatmap.GradeCtb = (Grade)reader.GetByte();
-                    break;
-                case 38:
-                    beatmap.GradeMania = (Grade)reader.GetByte();
-                    break;
-                case 39:
-                    beatmap.LocalOffset = reader.GetInt16();
-                    break;
-                case 40:
-                    beatmap.StackLeniency = reader.GetSingle();
-                    break;
-                case 41:
-                    beatmap.GameMode = (DbGameMode)reader.GetByte();
-                    break;
-                case 42:
-                    beatmap.Source = reader.GetString();
-                    break;
-                case 43:
-                    beatmap.Tags = reader.GetString();
-                    break;
-                case 44:
-                    beatmap.OnlineOffset = reader.GetInt16();
-                    break;
-                case 45:
-                    beatmap.TitleFont = reader.GetString();
-                    break;
-                case 46:
-                    beatmap.IsUnplayed = reader.GetBoolean();
-                    break;
-                case 47:
-                    beatmap.LastPlayed = reader.GetDateTime();
-                    break;
-                case 48:
-                    beatmap.IsOsz2 = reader.GetBoolean();
-                    break;
-                case 49:
-                    beatmap.FolderName = reader.GetString();
-                    break;
-                case 50:
-                    beatmap.LastTimeChecked = reader.GetDateTime();
-                    break;
-                case 51:
-                    beatmap.IsSoundIgnored = reader.GetBoolean();
-                    break;
-                case 52:
-                    beatmap.IsSkinIgnored = reader.GetBoolean();
-                    break;
-                case 53:
-                    beatmap.IsStoryboardDisabled = reader.GetBoolean();
-                    break;
-                case 54:
-                    beatmap.IsVideoDisabled = reader.GetBoolean();
-                    break;
-                case 55:
-                    beatmap.IsVisualOverride = reader.GetBoolean();
-                    break;
-                case 57:
-                    beatmap.ManiaScrollSpeed = reader.GetByte();
-                    break;
-            }
+            FillProperty(reader, nodeId, beatmap, ref arrayCount);
         }
+    }
+
+    private static void FillProperty(OsuDbReader reader, int nodeId, Beatmap beatmap, ref int arrayCount)
+    {
+        if (nodeId == 9) beatmap.Artist = reader.GetString();
+        else if (nodeId == 10) beatmap.ArtistUnicode = reader.GetString();
+        else if (nodeId == 11) beatmap.Title = reader.GetString();
+        else if (nodeId == 12) beatmap.TitleUnicode = reader.GetString();
+        else if (nodeId == 13) beatmap.Creator = reader.GetString();
+        else if (nodeId == 14) beatmap.Difficulty = reader.GetString();
+        else if (nodeId == 15) beatmap.AudioFileName = reader.GetString();
+        else if (nodeId == 16) beatmap.Md5Hash = reader.GetString();
+        else if (nodeId == 17) beatmap.FileName = reader.GetString();
+        else if (nodeId == 18) beatmap.RankedStatus = (RankedStatus)reader.GetByte();
+        else if (nodeId == 19) beatmap.CirclesCount = reader.GetInt16();
+        else if (nodeId == 20) beatmap.SlidersCount = reader.GetInt16();
+        else if (nodeId == 21) beatmap.SpinnersCount = reader.GetInt16();
+        else if (nodeId == 22) beatmap.LastModified = reader.GetDateTime();
+        else if (nodeId == 23) beatmap.ApproachRate = reader.GetSingle();
+        else if (nodeId == 24) beatmap.CircleSize = reader.GetSingle();
+        else if (nodeId == 25) beatmap.HpDrain = reader.GetSingle();
+        else if (nodeId == 26) beatmap.OverallDifficulty = reader.GetSingle();
+        else if (nodeId == 27) beatmap.SliderVelocity = reader.GetDouble();
+        else if (nodeId == 29) FillStarRating(beatmap.StarRatingStd = new(), reader);
+        else if (nodeId == 32) FillStarRating(beatmap.StarRatingTaiko = new(), reader);
+        else if (nodeId == 35) FillStarRating(beatmap.StarRatingCtb = new(), reader);
+        else if (nodeId == 38) FillStarRating(beatmap.StarRatingMania = new(), reader);
+        else if (nodeId == 40) beatmap.DrainTime = reader.GetInt32();
+        else if (nodeId == 41) beatmap.TotalTime = reader.GetInt32();
+        else if (nodeId == 42) beatmap.AudioPreviewTime = reader.GetInt32();
+        else if (nodeId == 43) arrayCount = reader.GetInt32();
+        else if (nodeId == 44)
+        {
+            if (arrayCount > 0) FillTimingPoints(beatmap.TimingPoints = new(arrayCount), reader);
+        }
+        else if (nodeId == 46) beatmap.BeatmapId = reader.GetInt32();
+        else if (nodeId == 47) beatmap.BeatmapSetId = reader.GetInt32();
+        else if (nodeId == 48) beatmap.ThreadId = reader.GetInt32();
+        else if (nodeId == 49) beatmap.GradeStandard = (Grade)reader.GetByte();
+        else if (nodeId == 50) beatmap.GradeTaiko = (Grade)reader.GetByte();
+        else if (nodeId == 51) beatmap.GradeCtb = (Grade)reader.GetByte();
+        else if (nodeId == 52) beatmap.GradeMania = (Grade)reader.GetByte();
+        else if (nodeId == 53) beatmap.LocalOffset = reader.GetInt16();
+        else if (nodeId == 54) beatmap.StackLeniency = reader.GetSingle();
+        else if (nodeId == 55) beatmap.GameMode = (DbGameMode)reader.GetByte();
+        else if (nodeId == 56) beatmap.Source = reader.GetString();
+        else if (nodeId == 57) beatmap.Tags = reader.GetString();
+        else if (nodeId == 58) beatmap.OnlineOffset = reader.GetInt16();
+        else if (nodeId == 59) beatmap.TitleFont = reader.GetString();
+        else if (nodeId == 60) beatmap.IsUnplayed = reader.GetBoolean();
+        else if (nodeId == 61) beatmap.LastPlayed = reader.GetDateTime();
+        else if (nodeId == 62) beatmap.IsOsz2 = reader.GetBoolean();
+        else if (nodeId == 63) beatmap.FolderName = reader.GetString();
+        else if (nodeId == 64) beatmap.LastTimeChecked = reader.GetDateTime();
+        else if (nodeId == 65) beatmap.IsSoundIgnored = reader.GetBoolean();
+        else if (nodeId == 66) beatmap.IsSkinIgnored = reader.GetBoolean();
+        else if (nodeId == 67) beatmap.IsStoryboardDisabled = reader.GetBoolean();
+        else if (nodeId == 68) beatmap.IsVideoDisabled = reader.GetBoolean();
+        else if (nodeId == 69) beatmap.IsVisualOverride = reader.GetBoolean();
+        else if (nodeId == 71) beatmap.ManiaScrollSpeed = reader.GetByte();
     }
 
     private static void FillTimingPoints(List<TimingPoint> timingPoints, OsuDbReader osuDbReader)
