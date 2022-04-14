@@ -55,9 +55,9 @@ public record Beatmap
         Converter = typeof(IntDoublePair2ModKeyValueConverter))]
     public Dictionary<Mods, double>? StarRatingMania { get; set; }
 
-    public int DrainTime { get; set; }
-    public int TotalTime { get; set; }
-    public int AudioPreviewTime { get; set; }
+    public TimeSpan DrainTime { get; set; }
+    public TimeSpan TotalTime { get; set; }
+    public TimeSpan AudioPreviewTime { get; set; }
     internal int TimingPointCount => TimingPoints?.Count ?? 0;
 
     [StructureArray(typeof(TimingPoint), nameof(TimingPointCount),

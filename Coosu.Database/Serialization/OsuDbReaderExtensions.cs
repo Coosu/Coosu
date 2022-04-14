@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Coosu.Database.DataTypes;
 using Coosu.Database.Internal;
 
@@ -88,9 +89,9 @@ public static class OsuDbReaderExtensions
         else if (nodeId == 32) FillStarRating(beatmap.StarRatingTaiko = new(), reader);
         else if (nodeId == 35) FillStarRating(beatmap.StarRatingCtb = new(), reader);
         else if (nodeId == 38) FillStarRating(beatmap.StarRatingMania = new(), reader);
-        else if (nodeId == 40) beatmap.DrainTime = reader.GetInt32();
-        else if (nodeId == 41) beatmap.TotalTime = reader.GetInt32();
-        else if (nodeId == 42) beatmap.AudioPreviewTime = reader.GetInt32();
+        else if (nodeId == 40) beatmap.DrainTime = TimeSpan.FromSeconds(reader.GetInt32());
+        else if (nodeId == 41) beatmap.TotalTime = TimeSpan.FromMilliseconds(reader.GetInt32());
+        else if (nodeId == 42) beatmap.AudioPreviewTime = TimeSpan.FromMilliseconds(reader.GetInt32());
         else if (nodeId == 43) arrayCount = reader.GetInt32();
         else if (nodeId == 44)
         {
