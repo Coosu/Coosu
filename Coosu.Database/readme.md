@@ -1,7 +1,7 @@
 # Coosu.Database
 A library for reading osu database.
 
-*Currently support osu!.db only*
+**Currently support osu!.db only**
 
 ## Basic Usage
 ```cs
@@ -19,9 +19,10 @@ For the most of time, we only need to get partial information from the database.
 
 So this library introduced `OsuDbReader` class, which allowed users to implement the object handling themselves.
 
-*Default beatmap handling implementation: `Coosu.Database.Serialization.OsuDbReaderExtensions`
+*Default beatmap handling implementation: `Coosu.Database.Serialization.OsuDbReaderExtensions`*
 
-Benchmark between different libraraies with 3000 beatmaps database (including custom implementation)
+### Benchmark
+Benchmark between different libraraies with 3000 beatmaps database (including custom implementation):
 ``` ini
 
 BenchmarkDotNet=v0.13.1, OS=Windows 10.0.19044.1586 (21H2)
@@ -46,7 +47,7 @@ AMD Ryzen 7 5800H with Radeon Graphics, 1 CPU, 16 logical and 8 physical cores
 | Holly's      | .NET Framework 4.8 | 95.19 ms | 1.666 ms | 1.477 ms | 95.89 ms |  1.38 |    0.07 |     61 MB |
 
 
-Guide for custom beatmap handling:
+### Guide for custom beatmap handling
 
 MyBeatmap.cs
 ```cs
