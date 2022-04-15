@@ -7,14 +7,14 @@ namespace Coosu.Database.Serialization;
 
 public static class OsuDbReaderExtensions
 {
-    private static readonly ObjectStructure _beatmapStructure;
+    private static readonly ObjectStructure BeatmapStructure;
 
     static OsuDbReaderExtensions()
     {
         var mappingHelper = OsuDbReader.StructureHelper;
         var rootStructure = (ObjectStructure)mappingHelper.RootStructure;
         var arrayStructure = (ArrayStructure)rootStructure.Structures[6];
-        _beatmapStructure = arrayStructure.ObjectStructure!;
+        BeatmapStructure = arrayStructure.ObjectStructure!;
     }
 
     public static IEnumerable<Beatmap> EnumerateBeatmaps(this OsuDbReader reader)

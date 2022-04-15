@@ -16,7 +16,7 @@ using OsuParsers.Decoders;
 
 var summary = BenchmarkRunner.Run<OsuDbReadingTask>(/*config*/);
 
-//[SimpleJob(RuntimeMoniker.Net472)]
+[SimpleJob(RuntimeMoniker.Net472)]
 [SimpleJob(RuntimeMoniker.Net60/*, baseline: true*/)]
 [MemoryDiagnoser]
 [Orderer(SummaryOrderPolicy.FastestToSlowest)]
@@ -26,8 +26,8 @@ public class OsuDbReadingTask
 
     public OsuDbReadingTask()
     {
-        //_allBytes = File.ReadAllBytes(@"D:\osu!small.db");
-        _allBytes = File.ReadAllBytes(@"E:\Games\osu!\osu!.db");
+        _allBytes = File.ReadAllBytes(@"D:\osu!small.db");
+        //_allBytes = File.ReadAllBytes(@"E:\Games\osu!\osu!.db");
     }
 
     [Benchmark]
@@ -35,18 +35,18 @@ public class OsuDbReadingTask
     {
         using var ms = new MemoryStream(_allBytes);
         using var reader = new OsuDbReader(ms);
-        return reader.EnumerateMyBeatmaps().ToArray();
+        return reader.EnumerateTinyBeatmaps().ToArray();
     }
 
     [Benchmark(Baseline = true)]
-    public object Coosu()
+    public object CoosuDefault()
     {
         using var ms = new MemoryStream(_allBytes);
         return OsuDb.ReadFromStream(ms);
     }
 
     [Benchmark]
-    public object Holly()
+    public object Holly_osu_database_reader()
     {
         using var ms = new MemoryStream(_allBytes);
         return osu_database_reader.BinaryFiles.OsuDb.Read(ms);
