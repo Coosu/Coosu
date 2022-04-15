@@ -20,32 +20,33 @@ public static class OsuDbReaderExtensions
     public static IEnumerable<Beatmap> EnumerateBeatmaps(this OsuDbReader reader)
     {
         Beatmap? beatmap = default;
-        int count = 0;
+        //int index = 0;
         int arrayCount = 0;
 
         while (reader.Read())
         {
-            var name = reader.Name;
-            var nodeType = reader.NodeType;
-            var nodeId = reader.NodeId;
+            //Console.WriteLine("Name = " + GetString(reader.Name) + "; " +
+            //                  "Path = " + GetString(reader.Path) + "; " +
+            //                  "Value = " + GetString(reader.Value) + "; " +
+            //                  "NodeType = " + GetString(reader.NodeType) + "; " +
+            //                  "DataType = " + GetString(reader.DataType) + "; " +
+            //                  "TargetType = " + GetString(reader.TargetType));
 
-            if (nodeType == NodeType.ObjectStart)
+            if (reader.NodeType == NodeType.ObjectStart)
             {
                 beatmap = new Beatmap();
+                //Console.WriteLine("Beatmap index: " + index);
                 continue;
             }
 
-            if (nodeType == NodeType.ObjectEnd)
+            if (reader.NodeType == NodeType.ObjectEnd && beatmap != null)
             {
-                if (beatmap != null)
-                {
-                    yield return beatmap;
-                    count++;
-                    beatmap = default;
-                }
+                yield return beatmap;
+                //index++;
+                beatmap = default;
             }
 
-            if (nodeType == NodeType.ArrayEnd && nodeId == 7)
+            if (reader.NodeType == NodeType.ArrayEnd && reader.NodeId == 7)
             {
                 yield break;
             }
@@ -55,17 +56,18 @@ public static class OsuDbReaderExtensions
                 continue;
             }
 
-            if (nodeType is not (NodeType.ArrayStart or NodeType.KeyValue))
+            if (reader.NodeType is not (NodeType.ArrayStart or NodeType.KeyValue))
             {
                 continue;
             }
 
-            FillProperty(reader, nodeId, beatmap, ref arrayCount);
+            FillProperty(reader, beatmap, ref arrayCount);
         }
     }
 
-    private static void FillProperty(OsuDbReader reader, int nodeId, Beatmap beatmap, ref int arrayCount)
+    private static void FillProperty(OsuDbReader reader, Beatmap beatmap, ref int arrayCount)
     {
+        var nodeId = reader.NodeId;
         if (nodeId == 9) beatmap.Artist = reader.GetString();
         else if (nodeId == 10) beatmap.ArtistUnicode = reader.GetString();
         else if (nodeId == 11) beatmap.Title = reader.GetString();
@@ -134,7 +136,7 @@ public static class OsuDbReaderExtensions
         }
     }
 
-    private static void FillStarRating(IDictionary<Mods, double> dictionary, OsuDbReader osuDbReader)
+    private static void FillStarRating(Dictionary<Mods, double> dictionary, OsuDbReader osuDbReader)
     {
         while (osuDbReader.Read())
         {
@@ -144,4 +146,10 @@ public static class OsuDbReaderExtensions
             dictionary.Add(mods, data.DoubleValue);
         }
     }
+
+    //private static string GetString(object? obj)
+    //{
+    //    if (obj == null) return "NULL";
+    //    return obj.ToString();
+    //}
 }

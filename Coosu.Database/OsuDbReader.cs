@@ -44,30 +44,22 @@ public class OsuDbReader : ReaderBase, IDisposable
         new Span<int>(_memberIndexes).Fill(-1);
     }
 
+    public IntDoublePair GetIntDoublePair() => (IntDoublePair)Value!;
+    public TimingPoint GetTimingPoint() => (TimingPoint)Value!;
+    public DateTime GetDateTime() => (DateTime)Value!;
+
     public bool Read()
     {
-        try
+        if (_currentDbStructure is ObjectStructure objectStructure)
         {
-            if (_currentDbStructure is ObjectStructure objectStructure)
-            {
-                return ReadObject(objectStructure);
-            }
-            else if (_currentDbStructure is ArrayStructure arrayStructure)
-            {
-                return ReadArray(arrayStructure);
-            }
+            return ReadObject(objectStructure);
+        }
+        else if (_currentDbStructure is ArrayStructure arrayStructure)
+        {
+            return ReadArray(arrayStructure);
+        }
 
-            return true;
-        }
-        finally
-        {
-            //Console.WriteLine("Name = " + GetString(Name) + "; " +
-            //                  "Path = " + GetString(Path) + "; " +
-            //                  "Value = " + GetString(Value) + "; " +
-            //                  "NodeType = " + GetString(NodeType) + "; " +
-            //                  "DataType = " + GetString(DataType) + "; " +
-            //                  "TargetType = " + GetString(TargetType));
-        }
+        return true;
     }
 
     private bool ReadObject(ObjectStructure objectStructure)
@@ -83,9 +75,7 @@ public class OsuDbReader : ReaderBase, IDisposable
             DataType = DataType.Object;
             TargetType = null;
             Value = null;
-            {
-                return true;
-            }
+            return true;
         }
 
         if (memberIndex > objectStructure.Structures.Count - 1)
@@ -104,9 +94,7 @@ public class OsuDbReader : ReaderBase, IDisposable
 
             NodeType = NodeType.ObjectEnd;
             _currentDbStructure = objectStructure.BaseStructure;
-            {
-                return true;
-            }
+            return true;
         }
 
         var subStructure = objectStructure.Structures[memberIndex];
@@ -154,19 +142,16 @@ public class OsuDbReader : ReaderBase, IDisposable
             Value = null;
             _currentDbStructure = arrayStructure.BaseStructure;
             _arrayIndexes[arrayStructure.NodeId] = 0;
-            {
-                return true;
-            }
+            return true;
         }
 
         if (arrayStructure.IsObjectArray)
         {
             _currentDbStructure = arrayStructure.ObjectStructure!;
-            var result = Read();
+            if (!Read()) return false;
+
             _arrayIndexes[arrayStructure.NodeId] = itemIndex + 1;
-            {
-                return true;
-            }
+            return true;
         }
 
         var propertyStructure = arrayStructure.PropertyStructure!;
@@ -181,19 +166,9 @@ public class OsuDbReader : ReaderBase, IDisposable
         return true;
     }
 
-    public IntDoublePair GetIntDoublePair() => (IntDoublePair)Value!;
-    public TimingPoint GetTimingPoint() => (TimingPoint)Value!;
-    public DateTime GetDateTime() => (DateTime)Value!;
-
     public void Dispose()
     {
         _stream.Dispose();
         _binaryReader.Dispose();
     }
-
-    //private static string GetString(object? obj)
-    //{
-    //    if (obj == null) return "NULL";
-    //    return obj.ToString();
-    //}
 }
