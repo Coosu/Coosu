@@ -14,7 +14,7 @@ var beatmapCount = osuDb.Beatmaps.Count;
 Console.WriteLine(beatmapCount);
 ```
 
-## Advaced Usage
+## Advanced Usage
 For the most of time, we only need to get partial information from the database. But most of the databases are very huge, this will lead to memory peak and unnecessary CPU usage caused by a large number of `Beatmap` instance.
 
 So this library introduced `OsuDbReader` class, which allowed users to implement the object handling themselves.
