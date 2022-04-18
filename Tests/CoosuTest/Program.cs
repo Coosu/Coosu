@@ -22,6 +22,8 @@ namespace CoosuTest
     {
         static async Task Main(string[] args)
         {
+            //var osu = await OsuFile.ReadFromFileAsync(@"E:/Games/osu!\Songs\BmsToOsu/IIDX\29075\P -  (bms2osu) [lv.10].osu");
+            var osu = await OsuFile.ReadFromFileAsync(@"E:/Games/osu!\Songs\BmsToOsu/IIDX\29075\P -  (bms2osu) [lv.10].osu");
             var list = new List<ValueTuple<string?, object?, string, string>>(8294626);
             for (int i = 0; i < 10; i++)
             {

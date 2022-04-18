@@ -72,7 +72,7 @@ namespace Coosu.Beatmap.Sections
                 else if (isInitial)
                     currentRed = _timingSection.TimingList.First(t => !t.IsInherit);
 
-                if (_timingSection.TimingList.Count > i)
+                if (_timingSection.TimingList.Count > i + 1)
                     nextT = _timingSection.TimingList[i + 1].Offset;
                 else
                     nextT = null;
