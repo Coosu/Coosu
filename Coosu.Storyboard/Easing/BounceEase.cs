@@ -5,7 +5,7 @@ namespace Coosu.Storyboard.Easing
     /// <summary>
     ///     This class implements an easing function that can be used to simulate bouncing
     /// </summary>
-    public class BounceEase : EasingFunctionBase
+    public sealed class BounceEase : EasingFunctionBase
     {
         private int _bounces = 3;
         private double _bounciness = 2d;
@@ -105,8 +105,8 @@ namespace Coosu.Storyboard.Easing
             };
         }
 
-        public static BounceEase InstanceIn => new() { EasingMode = EasingMode.EaseIn, ThrowIfChangeProperty = true };
-        public static BounceEase InstanceOut => new() { EasingMode = EasingMode.EaseOut, ThrowIfChangeProperty = true };
-        public static BounceEase InstanceInOut => new() { EasingMode = EasingMode.EaseInOut, ThrowIfChangeProperty = true };
+        public static BounceEase InstanceIn { get; } = new() { EasingMode = EasingMode.EaseIn, ThrowIfChangeProperty = true };
+        public static BounceEase InstanceOut { get; } = new() { EasingMode = EasingMode.EaseOut, ThrowIfChangeProperty = true };
+        public static BounceEase InstanceInOut { get; } = new() { EasingMode = EasingMode.EaseInOut, ThrowIfChangeProperty = true };
     }
 }

@@ -1,12 +1,11 @@
-﻿using System;
+﻿using System.Threading.Tasks;
 using Coosu.Api.HttpClient;
 using Coosu.Api.V2.RequestModels;
 using Coosu.Api.V2.ResponseModels;
-using Newtonsoft.Json;
 
 namespace Coosu.Api.V2
 {
-    public class BeatmapEndpoint : IDisposable
+    public class BeatmapEndpoint
     {
         private readonly TokenBase _token;
         private readonly HttpClientUtility _httpClient;
@@ -28,12 +27,10 @@ namespace Coosu.Api.V2
         /// </summary>
         /// <param name="id">b id</param>
         /// <returns></returns>
-        public Beatmap GetBeatmap(int id)
+        public async Task<Beatmap> GetBeatmap(int id)
         {
             string route = $"/beatmaps/{id}";
-            var json = _httpClient.HttpGet(OsuClientV2.BaseUri + route);
-
-            var obj = JsonConvert.DeserializeObject<Beatmap>(json);
+            var obj = await _httpClient.HttpGet<Beatmap>(OsuClientV2.BaseUri + route);
             return obj;
         }
 
@@ -43,12 +40,10 @@ namespace Coosu.Api.V2
         /// </summary>
         /// <param name="id">s id</param>
         /// <returns></returns>
-        public Beatmapset GetBeatmapset(int id)
+        public async Task<Beatmapset> GetBeatmapset(int id)
         {
             string route = $"/beatmapsets/{id}";
-            var json = _httpClient.HttpGet(OsuClientV2.BaseUri + route);
-
-            var obj = JsonConvert.DeserializeObject<Beatmapset>(json);
+            var obj = await _httpClient.HttpGet<Beatmapset>(OsuClientV2.BaseUri + route);
             return obj;
         }
 
@@ -58,9 +53,9 @@ namespace Coosu.Api.V2
         /// </summary>
         /// <param name="query">keywords.</param>
         /// <returns></returns>
-        public BeatmapsetSearchResult SearchBeatmapset(string? query)
+        public async Task<BeatmapsetSearchResult> SearchBeatmapset(string? query)
         {
-            return SearchBeatmapset(new SearchOptions
+            return await SearchBeatmapset(new SearchOptions
             {
                 Query = query
             });
@@ -72,20 +67,13 @@ namespace Coosu.Api.V2
         /// </summary>
         /// <param name="searchOptions">Search options.</param>
         /// <returns></returns>
-        public BeatmapsetSearchResult SearchBeatmapset(SearchOptions? searchOptions = null)
+        public async Task<BeatmapsetSearchResult> SearchBeatmapset(SearchOptions? searchOptions = null)
         {
             string route = $"/beatmapsets/search/";
             var options = searchOptions?.GetQueryString();
             var actualRoute = string.IsNullOrWhiteSpace(options) ? route : route + "filters?" + options;
-            var json = _httpClient.HttpGet(OsuClientV2.BaseUri + actualRoute);
-
-            var obj = JsonConvert.DeserializeObject<BeatmapsetSearchResult>(json);
+            var obj = await _httpClient.HttpGet<BeatmapsetSearchResult>(OsuClientV2.BaseUri + actualRoute);
             return obj;
-        }
-
-        public void Dispose()
-        {
-            _httpClient?.Dispose();
         }
     }
 }

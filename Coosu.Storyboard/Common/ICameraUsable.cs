@@ -6,19 +6,19 @@
         /// Camera initial X.
         /// The default value is determined by the group's center x.
         /// </summary>
-        public double DefaultX { get; set; }
+        public float DefaultX { get; set; }
 
         /// <summary>
         /// Camera initial Y.
         /// The default value is determined by the group's center y.
         /// </summary>
-        public double DefaultY { get; set; }
+        public float DefaultY { get; set; }
 
         /// <summary>
         /// Camera initial Z.
         /// The default value is 1.
         /// </summary>
-        public double DefaultZ { get; set; }
+        public float DefaultZ { get; set; }
 
         /// <summary>
         /// Camera ID.

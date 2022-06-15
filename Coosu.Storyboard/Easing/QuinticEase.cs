@@ -3,7 +3,7 @@
     /// <summary>
     /// This class implements an easing function that gives a quintic curve toward the destination
     /// </summary>
-    public class QuinticEase : EasingFunctionBase
+    public sealed class QuinticEase : EasingFunctionBase
     {
         protected override double EaseInCore(double normalizedTime)
         {
@@ -21,8 +21,8 @@
             };
         }
 
-        public static QuinticEase InstanceIn => new() { EasingMode = EasingMode.EaseIn };
-        public static QuinticEase InstanceOut => new() { EasingMode = EasingMode.EaseOut };
-        public static QuinticEase InstanceInOut => new() { EasingMode = EasingMode.EaseInOut };
+        public static QuinticEase InstanceIn { get; } = new() { EasingMode = EasingMode.EaseIn, ThrowIfChangeProperty = true };
+        public static QuinticEase InstanceOut { get; } = new() { EasingMode = EasingMode.EaseOut, ThrowIfChangeProperty = true };
+        public static QuinticEase InstanceInOut { get; } = new() { EasingMode = EasingMode.EaseInOut, ThrowIfChangeProperty = true };
     }
 }

@@ -2,21 +2,22 @@
 
 namespace Coosu.Beatmap.Configurable
 {
-    public class SectionPropertyAttribute : Attribute
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Class)]
+    public sealed class SectionPropertyAttribute : Attribute
     {
-        public string Name { get; }
+        public const double DefaultValue = double.MaxValue;
+        public string? Name { get; }
+
+        public object? Default { get; set; }
 
         public SectionPropertyAttribute() : this(null)
         {
         }
 
-        public SectionPropertyAttribute(string name)
+        public SectionPropertyAttribute(string? name)
         {
-            var tmp = name?.Trim();
-            if (tmp == "")
-                Name = null;
-            else
-                Name = tmp;
+            var trimmed = name?.Trim();
+            Name = trimmed == string.Empty ? null : trimmed;
         }
     }
 }

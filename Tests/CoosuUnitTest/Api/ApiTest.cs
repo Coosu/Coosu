@@ -1,5 +1,9 @@
+using System.Threading.Tasks;
+using Coosu.Api.HttpClient;
 using Coosu.Api.V2;
 using Coosu.Api.V2.RequestModels;
+using Coosu.Api.V2.ResponseModels;
+using Microsoft.Extensions.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CoosuUnitTest.Api
@@ -7,13 +11,34 @@ namespace CoosuUnitTest.Api
     [TestClass]
     public class ApiTest
     {
-        [TestMethod]
-        public void SearchBeatmapset()
+        private readonly int _clientId;
+        private readonly string _clientSecret;
+        private readonly IConfiguration _configuration;
+        private readonly UserToken _publicToken;
+        private readonly OsuClientV2 _client;
+
+        public ApiTest()
         {
-            var client = new AuthorizationClient();
-            var publicToken = client.GetPublicToken(11169, "");
-            var v2 = new OsuClientV2(publicToken);
-            var beatmaps = v2.Beatmap.SearchBeatmapset(new SearchOptions
+            var builder = new ConfigurationBuilder()
+                .AddUserSecrets<Secretes>();
+
+            var clientOptions = new ClientOptions()
+            {
+                ProxyUrl = "http://127.0.0.1:10801"
+            };
+            _configuration = builder.Build();
+            _clientId = int.Parse(_configuration["ClientId"]);
+            _clientSecret = _configuration["ClientSecret"];
+            var client = new AuthorizationClient(clientOptions);
+            _publicToken = client.GetPublicToken(_clientId, _clientSecret).Result;
+            _client = new OsuClientV2(_publicToken, clientOptions);
+        }
+
+        [TestMethod]
+        public async Task SearchBeatmapset()
+        {
+            var v2 = new OsuClientV2(_publicToken);
+            var beatmaps = await v2.Beatmap.SearchBeatmapset(new SearchOptions
             {
                 BeatmapsetStatus = BeatmapsetStatus.Any,
                 Gamemode = GameMode.Osu,
@@ -24,5 +49,25 @@ namespace CoosuUnitTest.Api
                 //Language = LanguageType.Instrumental
             });
         }
+
+        [TestMethod]
+        public async Task SearchUser()
+        {
+            var v2 = new OsuClientV2(_publicToken);
+            var beatmaps = await v2.User.GetUser("1243669", GameMode.Osu);
+        }
+
+        [TestMethod]
+        public async Task GetUserScores()
+        {
+            var v2 = new OsuClientV2(_publicToken);
+            var beatmaps = await v2.User.GetUserScores("1243669", ScoreType.Best, gameMode: GameMode.Mania);
+        }
+    }
+
+    public class Secretes
+    {
+        public string ClientId { get; set; }
+        public string ClientSecret { get; set; }
     }
 }

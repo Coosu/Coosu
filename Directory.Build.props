@@ -1,7 +1,7 @@
 <Project>
 
   <PropertyGroup Label="GeneralProps" Condition="$(MSBuildProjectName.StartsWith('Coosu')) == 'true'">
-    <LangVersion>9.0</LangVersion>
+    <LangVersion>10.0</LangVersion>
     <nullable>enable</nullable>
     <Authors>Coosu</Authors>
     <RepositoryUrl>https://github.com/Coosu/Coosu.git</RepositoryUrl>

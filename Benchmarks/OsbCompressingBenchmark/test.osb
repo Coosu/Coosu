@@ -1,0 +1,9 @@
+[Events]
+//Background and Video events
+//Storyboard Layer 0 (Background)
+Sprite,Background,Centre,"SB\output\99C6_3S.png",0,240
+ F,0,62745,63074,0.000512,0
+ MX,2,62745,63074,370,274.0816
+ S,0,62747,,0.9
+//Storyboard Layer 4 (Overlay)
+//Storyboard Sound Samples

@@ -1,23 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Coosu.Api.HttpClient;
 using Coosu.Api.V2.ResponseModels;
-using Newtonsoft.Json;
 
 namespace Coosu.Api.V2
 {
-    public class AuthorizationClient : IDisposable
+    public class AuthorizationClient
     {
-        private HttpClientUtility _httpClient;
+        private readonly HttpClientUtility _httpClientUtility;
         private const string TokenLink = "https://osu.ppy.sh/oauth/token";
 
-        public AuthorizationClient(ClientOptions options = null)
+        public AuthorizationClient(ClientOptions? options = null)
         {
-            options = options ?? new ClientOptions();
-            _httpClient = new HttpClientUtility(options.Socks5ProxyOptions);
+            _httpClientUtility = new HttpClientUtility(options);
         }
 
-        public UserToken GetUserToken(int clientId, Uri registeredRedirectUri, string clientSecret, string code)
+        public async Task<UserToken> GetUserToken(int clientId, Uri registeredRedirectUri, string clientSecret, string code)
         {
             var dic = new Dictionary<string, string>
             {
@@ -28,13 +27,12 @@ namespace Coosu.Api.V2
                 ["redirect_uri"] = registeredRedirectUri.OriginalString,
             };
 
-            var result = _httpClient.HttpPostJson(TokenLink, dic);
-            var deserializeObject = JsonConvert.DeserializeObject<UserToken>(result);
+            var deserializeObject = await _httpClientUtility.HttpPost<UserToken>(TokenLink, dic);
             deserializeObject.CreateTime = DateTimeOffset.Now;
             return deserializeObject;
         }
 
-        public UserToken RefreshUserToken(int clientId, string clientSecret, string refreshToken)
+        public async Task<UserToken> RefreshUserToken(int clientId, string clientSecret, string refreshToken)
         {
             var dic = new Dictionary<string, string>
             {
@@ -44,13 +42,12 @@ namespace Coosu.Api.V2
                 ["refresh_token"] = refreshToken
             };
 
-            var result = _httpClient.HttpPostJson(TokenLink, dic);
-            var deserializeObject = JsonConvert.DeserializeObject<UserToken>(result);
+            var deserializeObject = await _httpClientUtility.HttpPost<UserToken>(TokenLink, dic);
             deserializeObject.CreateTime = DateTimeOffset.Now;
             return deserializeObject;
         }
 
-        public UserToken GetPublicToken(int clientId, string clientSecret)
+        public async Task<UserToken> GetPublicToken(int clientId, string clientSecret)
         {
             var dic = new Dictionary<string, string>
             {
@@ -60,16 +57,9 @@ namespace Coosu.Api.V2
                 ["scope"] = "public"
             };
 
-            var result = _httpClient.HttpPostJson(TokenLink, dic);
-            var deserializeObject = JsonConvert.DeserializeObject<UserToken>(result);
+            var deserializeObject = await _httpClientUtility.HttpPost<UserToken>(TokenLink, dic);
             deserializeObject.CreateTime = DateTimeOffset.Now;
             return deserializeObject;
-        }
-
-        /// <inheritdoc />
-        public void Dispose()
-        {
-            _httpClient?.Dispose();
         }
     }
 }

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Coosu.Shared;
+using Coosu.Shared.Mathematics;
 using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Utils;
 
@@ -12,36 +13,72 @@ namespace Coosu.Storyboard.Events
 {
     public sealed class Trigger : ISubEventHost, IEvent
     {
+        public event Action? TimingChanged;
+
         internal ISceneObject? _baseObject;
         private const string HitSound = "HitSound";
+        private float _startTime;
+        private float _endTime;
+        private ICollection<IKeyEvent> _events = new SortedSet<IKeyEvent>(EventSequenceComparer.Instance);
+
+        private float? _cachedMaxTime;
+        private float? _cachedMaxStartTime;
+
+        public IReadOnlyCollection<IKeyEvent> Events
+        {
+            get => (IReadOnlyCollection<IKeyEvent>)_events;
+            internal set => _events = value as ICollection<IKeyEvent> ?? throw new Exception(
+                $"The collection should be {nameof(ICollection<IKeyEvent>)}");
+        }
 
         public EventType EventType { get; } = EventTypes.Trigger;
 
         public bool EnableGroupedSerialization { get; set; } /*= true;*/
-        public ICollection<IKeyEvent> Events { get; set; } =
-            new SortedSet<IKeyEvent>(new EventTimingComparer());
 
-        public double StartTime { get; set; }
-        public double EndTime { get; set; }
+        public float StartTime
+        {
+            get => _startTime;
+            set
+            {
+                if (Precision.AlmostEquals(_startTime, value)) return;
+                _startTime = value;
+                TimingChanged?.Invoke();
+            }
+        }
+
+        public float EndTime
+        {
+            get => _endTime;
+            set
+            {
+                if (Precision.AlmostEquals(_endTime, value)) return;
+                _endTime = value;
+                TimingChanged?.Invoke();
+            }
+        }
+
         public string TriggerName { get; set; }
 
-        public double MaxTime =>
-            EndTime +
-            (Events.Count > 0
-                ? Events.Max(k => k.EndTime)
-                : 0);
+        public float MaxTime()
+        {
+            if (_cachedMaxTime != null) return _cachedMaxTime.Value;
+            return (float)(_cachedMaxTime =
+                EndTime + (Events.Count > 0 ? Events.Max(k => k.EndTime) : 0));
+        }
 
-        public double MinTime => StartTime;
+        public float MinTime() => StartTime;
 
-        public double MaxStartTime =>
-            EndTime +
-            (Events.Count > 0
-                ? Events.Max(k => k.StartTime)
-                : 0); //if hitsound played at end time
+        public float MaxStartTime()
+        {
+            if (_cachedMaxStartTime != null) return _cachedMaxStartTime.Value;
+            return (float)(_cachedMaxStartTime =
+                EndTime + (Events.Count > 0 ? Events.Max(k => k.StartTime) : 0));   //if hitsound played at end time
 
-        public double MinEndTime => StartTime; // if no hitsound here
+        }
 
-        public Trigger(double startTime, double endTime, TriggerType triggerType, bool listenSample = false, uint? customSampleSet = null)
+        public float MinEndTime() => StartTime; // if no hitsound here
+
+        public Trigger(float startTime, float endTime, TriggerType triggerType, bool listenSample = false, uint? customSampleSet = null)
         {
             StartTime = startTime;
             EndTime = endTime;
@@ -49,7 +86,7 @@ namespace Coosu.Storyboard.Events
             TriggerName = GetTriggerString(triggerType, listenSample, customSampleSet);
         }
 
-        public Trigger(double startTime, double endTime, string triggerName)
+        public Trigger(float startTime, float endTime, string triggerName)
         {
             StartTime = startTime;
             EndTime = endTime;
@@ -112,13 +149,40 @@ namespace Coosu.Storyboard.Events
             return sb.ToString();
         }
 
-        public void AdjustTiming(double offset)
+        public void AdjustTiming(float offset)
         {
             StartTime += offset;
         }
+
+        IReadOnlyCollection<IKeyEvent> IEventHost.Events => Events;
+
         public void AddEvent(IKeyEvent @event)
         {
-            Events.Add(@event);
+            _events.Add(@event);
+            @event.TimingChanged += ResetCacheAndRaiseTimingChanged;
+            ResetCacheAndRaiseTimingChanged();
+        }
+
+        public bool RemoveEvent(IKeyEvent @event)
+        {
+            @event.TimingChanged -= ResetCacheAndRaiseTimingChanged;
+            var removeEvent = _events.Remove(@event);
+            if (removeEvent)
+                ResetCacheAndRaiseTimingChanged();
+            return removeEvent;
+        }
+
+        public void ClearEvents(IComparer<IKeyEvent>? comparer = null)
+        {
+            var valid = _events.Count > 0;
+            foreach (var @event in _events)
+                @event.TimingChanged -= ResetCacheAndRaiseTimingChanged;
+            _events.Clear();
+            if (comparer == null)
+                _events = new HashSet<IKeyEvent>();
+            else
+                _events = new SortedSet<IKeyEvent>(comparer);
+            if (valid) ResetCacheAndRaiseTimingChanged();
         }
 
         ISceneObject? ISubEventHost.BaseObject
@@ -131,10 +195,20 @@ namespace Coosu.Storyboard.Events
         {
             var trigger = new Trigger(StartTime, EndTime, TriggerName)
             {
-                Events = Events.Select(k => k.Clone()).Cast<IKeyEvent>().ToList(),
                 EnableGroupedSerialization = EnableGroupedSerialization
             };
+
+            foreach (var keyEvent in _events)
+                trigger.AddEvent((IKeyEvent)keyEvent.Clone());
+
             return trigger;
+        }
+
+        private void ResetCacheAndRaiseTimingChanged()
+        {
+            _cachedMaxTime = null;
+            _cachedMaxStartTime = null;
+            TimingChanged?.Invoke();
         }
     }
 }

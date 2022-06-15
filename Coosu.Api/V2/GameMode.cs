@@ -1,28 +1,27 @@
-﻿namespace Coosu.Api.V2
+﻿namespace Coosu.Api.V2;
+
+/// <summary>
+/// Available game modes
+/// </summary>
+public enum GameMode
 {
     /// <summary>
-    /// Available game modes
+    /// osu!standard
     /// </summary>
-    public enum GameMode
-    {
-        /// <summary>
-        /// osu!standard
-        /// </summary>
-        Osu,
+    Osu,
 
-        /// <summary>
-        /// osu!taiko
-        /// </summary>
-        Taiko,
+    /// <summary>
+    /// osu!taiko
+    /// </summary>
+    Taiko,
 
-        /// <summary>
-        /// osu!catch
-        /// </summary>
-        Fruits,
+    /// <summary>
+    /// osu!catch
+    /// </summary>
+    Fruits,
 
-        /// <summary>
-        /// osu!mania
-        /// </summary>
-        Mania
-    }
+    /// <summary>
+    /// osu!mania
+    /// </summary>
+    Mania
 }

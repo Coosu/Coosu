@@ -3,7 +3,7 @@
 namespace Coosu.Beatmap.Sections.HitObject
 {
     [Flags]
-    public enum HitsoundType : short
+    public enum HitsoundType : byte
     {
         Normal = 0x1,
         Whistle = 0x2,

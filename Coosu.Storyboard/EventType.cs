@@ -4,11 +4,11 @@ using System.Diagnostics;
 namespace Coosu.Storyboard
 {
     [DebuggerDisplay("Flag = {Flag}")]
-    public struct EventType : IEquatable<EventType>, IComparable<EventType>, IComparable
+    public sealed class EventType : IEquatable<EventType>, IComparable<EventType>, IComparable
     {
-        public string Flag { get; }
-        public int Size { get; }
-        public int Index { get; }
+        public readonly string Flag;
+        public readonly int Size;
+        public readonly int Index;
 
         public EventType(string flag, int size, int index)
         {
@@ -17,9 +17,9 @@ namespace Coosu.Storyboard
             Index = index;
         }
 
-        public bool Equals(EventType other)
+        public bool Equals(EventType? other)
         {
-            return Flag == other.Flag;
+            return Flag == other?.Flag;
         }
 
         public override bool Equals(object obj)
@@ -83,9 +83,4 @@ namespace Coosu.Storyboard
             return left.CompareTo(right) >= 0;
         }
     }
-
-    //public enum EventType
-    //{
-    //    Move, Fade, Scale, Rotate, Color, MoveX, MoveY, Vector, Parameter, Loop, Trigger
-    //}
 }

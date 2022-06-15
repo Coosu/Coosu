@@ -1,4 +1,5 @@
-﻿using Coosu.Storyboard.Easing;
+﻿using System.Collections.Generic;
+using Coosu.Storyboard.Easing;
 using Coosu.Storyboard.Events;
 
 namespace Coosu.Storyboard.OsbX.Actions
@@ -9,8 +10,8 @@ namespace Coosu.Storyboard.OsbX.Actions
         {
         }
 
-        public ZoomOut(EasingFunctionBase easing, double startTime, double endTime, double[] start, double[] end)
-            : base(easing, startTime, endTime, start, end)
+        public ZoomOut(EasingFunctionBase easing, float startTime, float endTime, List<float> values)
+            : base(easing, startTime, endTime, values)
         {
         }
 

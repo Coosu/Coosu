@@ -5,7 +5,7 @@ namespace Coosu.Storyboard.Events
     [Flags]
 #pragma warning disable format
 // @formatter:off
-    public enum TriggerType
+    public enum TriggerType : byte
     {
         HitSound         = 0b0000,
         HitSoundWhistle  = 0b0001,

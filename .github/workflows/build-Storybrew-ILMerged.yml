@@ -1,7 +1,7 @@
 name: Build
 on:
   push:
-    branches: [ 'ci/ilmerge' ]
+    branches: [ 'develop' ]
 
 jobs:
   build:
@@ -23,7 +23,7 @@ jobs:
     - name: dotnet Build Coosu.Storyboard.Storybrew ILMerged 
       shell: pwsh
       run: |
-        dotnet build Coosu.Storyboard.Storybrew --configuration Release --output ci-build
+        dotnet build Coosu.Storyboard.Storybrew --configuration Release --output ci-build -p:CI=true
         mkdir ILMerge -Force
         mkdir artifact -Force
         Invoke-WebRequest https://github.com/Milkitic/ILMerge/releases/download/3.0.41.49566/ILMerge-Windows.7z -OutFile "ILMerge/cli.zip"

@@ -1,34 +1,21 @@
 ﻿using System;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
-namespace Coosu.Api.V1.Internal
+namespace Coosu.Api.V1.Internal;
+
+internal class ParseStringConverter : JsonConverter<long?>
 {
-    internal class ParseStringConverter : JsonConverter
+    public override long? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        public override bool CanConvert(Type t) => t == typeof(long) || t == typeof(long?);
+        if (reader.TokenType == JsonTokenType.Null) return null;
+        if (reader.TokenType == JsonTokenType.Number)
+            return reader.GetInt64();
+        return long.Parse(reader.GetString());
+    }
 
-        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
-        {
-            if (reader.TokenType == JsonToken.Null) return null;
-            var value = serializer.Deserialize<string>(reader);
-            if (long.TryParse(value, out long l))
-            {
-                return l;
-            }
-            throw new Exception("Cannot unmarshal type long");
-        }
-
-        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
-        {
-            if (untypedValue == null)
-            {
-                serializer.Serialize(writer, null);
-                return;
-            }
-            var value = (long)untypedValue;
-            serializer.Serialize(writer, value.ToString());
-        }
-
-        public static readonly ParseStringConverter Singleton = new ParseStringConverter();
+    public override void Write(Utf8JsonWriter writer, long? value, JsonSerializerOptions options)
+    {
+        throw new NotImplementedException();
     }
 }

@@ -5,7 +5,7 @@ namespace Coosu.Storyboard.Easing
     /// <summary>
     /// This class implements an easing function that gives an elastic/springy curve
     /// </summary>
-    public class ElasticEase : EasingFunctionBase
+    public sealed class ElasticEase : EasingFunctionBase
     {
         private int _oscillations = 3;
         private double _springiness = 3;
@@ -78,10 +78,10 @@ namespace Coosu.Storyboard.Easing
             };
         }
 
-        public static ElasticEase InstanceIn => new() { EasingMode = EasingMode.EaseIn, ThrowIfChangeProperty = true };
-        public static ElasticEase InstanceQuarterOut => new() { EasingMode = EasingMode.EaseOut, Springiness = 3d / 4, ThrowIfChangeProperty = true };
-        public static ElasticEase InstanceHalfOut => new() { EasingMode = EasingMode.EaseOut, Springiness = 3d / 2, ThrowIfChangeProperty = true };
-        public static ElasticEase InstanceOut => new() { EasingMode = EasingMode.EaseOut, ThrowIfChangeProperty = true };
-        public static ElasticEase InstanceInOut => new() { EasingMode = EasingMode.EaseInOut, ThrowIfChangeProperty = true };
+        public static ElasticEase InstanceIn { get; } = new() { EasingMode = EasingMode.EaseIn, ThrowIfChangeProperty = true };
+        public static ElasticEase InstanceQuarterOut { get; } = new() { EasingMode = EasingMode.EaseOut, Springiness = 3d / 4, ThrowIfChangeProperty = true };
+        public static ElasticEase InstanceHalfOut { get; } = new() { EasingMode = EasingMode.EaseOut, Springiness = 3d / 2, ThrowIfChangeProperty = true };
+        public static ElasticEase InstanceOut { get; } = new() { EasingMode = EasingMode.EaseOut, ThrowIfChangeProperty = true };
+        public static ElasticEase InstanceInOut { get; } = new() { EasingMode = EasingMode.EaseInOut, ThrowIfChangeProperty = true };
     }
 }

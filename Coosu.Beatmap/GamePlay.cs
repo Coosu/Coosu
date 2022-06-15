@@ -2,7 +2,7 @@
 
 namespace Coosu.Beatmap
 {
-    public class GamePlay
+    public sealed class GamePlay
     {
         private readonly OsuFile _osuFile;
 

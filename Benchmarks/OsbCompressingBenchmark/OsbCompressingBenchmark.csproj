@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFrameworks>net48;netcoreapp3.1;net6.0</TargetFrameworks>
+    <LangVersion>10.0</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BenchmarkDotNet" Version="0.13.1" />
+    <PackageReference Include="Coosu.Storyboard.Extensions" Version="2.1.1-beta.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Coosu.Storyboard.Extensions\Coosu.Storyboard.Extensions.csproj" Aliases="localbuild" />
+    <ProjectReference Include="..\..\Coosu.Storyboard\Coosu.Storyboard.csproj" Aliases="localbuild" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="*.osb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

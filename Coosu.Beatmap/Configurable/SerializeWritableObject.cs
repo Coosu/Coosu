@@ -6,11 +6,9 @@ namespace Coosu.Beatmap.Configurable
     {
         public string ToSerializedString()
         {
-            using (var sb = new StringWriter())
-            {
-                AppendSerializedString(sb);
-                return sb.ToString();
-            }
+            using var sb = new StringWriter();
+            AppendSerializedString(sb);
+            return sb.ToString();
         }
 
         public abstract void AppendSerializedString(TextWriter textWriter);
