@@ -57,28 +57,57 @@ namespace Coosu.Storyboard.OsbX.SubjectHandlers
 
     public class Camera2Object : ISceneObject, IDefinedObject
     {
+        private ICollection<IKeyEvent> _events = new SortedSet<IKeyEvent>(EventSequenceComparer.Instance);
         public ObjectType ObjectType { get; } = 99;
         public int? RowInSource { get; set; }
         public object Tag { get; set; }
-        public double DefaultY { get; set; }
-        public double DefaultX { get; set; }
-        public double DefaultZ { get; set; }
+        public float DefaultY { get; set; }
+        public float DefaultX { get; set; }
+        public float DefaultZ { get; set; }
         public string CameraIdentifier { get; set; }
         public List<Loop> LoopList { get; } = new();
         public List<Trigger> TriggerList { get; } = new();
-        public double MaxTime => Events.Count > 0 ? Events.Max(k => k.EndTime) : 0;
-        public double MinTime => Events.Count > 0 ? Events.Min(k => k.StartTime) : 0;
-        public double MaxStartTime => Events.Count > 0 ? Events.Max(k => k.StartTime) : 0;
-        public double MinEndTime => Events.Count > 0 ? Events.Min(k => k.EndTime) : 0;
+        public float MaxTime() => Events.Count > 0 ? Events.Max(k => k.EndTime) : 0;
+        public float MinTime() => Events.Count > 0 ? Events.Min(k => k.StartTime) : 0;
+        public float MaxStartTime() => Events.Count > 0 ? Events.Max(k => k.StartTime) : 0;
+        public float MinEndTime() => Events.Count > 0 ? Events.Min(k => k.EndTime) : 0;
         public bool EnableGroupedSerialization { get; set; }
 
         // EventHosts
-        public ICollection<IKeyEvent> Events { get; set; } =
-            new SortedSet<IKeyEvent>(new EventTimingComparer());
+
+        public IReadOnlyCollection<IKeyEvent> Events
+        {
+            get => (IReadOnlyCollection<IKeyEvent>)_events;
+            internal set => _events = value as ICollection<IKeyEvent> ?? throw new Exception(
+                $"The collection should be {nameof(ICollection<IKeyEvent>)}");
+        }
+
+        IReadOnlyCollection<IKeyEvent> IEventHost.Events
+        {
+            get => Events;
+            //set => Events = value;
+        }
 
         public void AddEvent(IKeyEvent @event)
         {
-            Events.Add(@event);
+            throw new NotImplementedException("The camera transform is currently not implemented.");
+            _events.Add(@event);
+        }
+
+        public bool RemoveEvent(IKeyEvent @event)
+        {
+            throw new NotImplementedException("The camera transform is currently not implemented.");
+            return _events.Remove(@event);
+        }
+
+        public void ClearEvents(IComparer<IKeyEvent>? comparer)
+        {
+            throw new NotImplementedException("The camera transform is currently not implemented.");
+            _events.Clear();
+            if (comparer == null)
+                _events = new HashSet<IKeyEvent>();
+            else
+                _events = new SortedSet<IKeyEvent>(comparer);
         }
 
         static Camera2Object()

@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Coosu.Storyboard
 {
     public static class EventTypes
     {
-        #region static members
-
-        private static readonly Dictionary<string, EventType> DictionaryStore = new(StringComparer.OrdinalIgnoreCase);
+        private static readonly Dictionary<string, EventType> DictionaryStore = new(/*StringComparer.OrdinalIgnoreCase*/);
         private static readonly Dictionary<int, EventType> DictionaryStoreIndex = new();
-        private static readonly Dictionary<string, EventType> NonBasicDictionaryStore = new(StringComparer.OrdinalIgnoreCase);
+        private static readonly Dictionary<string, EventType> NonBasicDictionaryStore = new(/*StringComparer.OrdinalIgnoreCase*/);
 
         static EventTypes()
         {
@@ -30,8 +27,13 @@ namespace Coosu.Storyboard
         {
             if (DictionaryStore.ContainsKey(type.Flag)) return;
             DictionaryStore.Add(type.Flag, type);
+            DictionaryStore.Add(type.Index.ToString(), type);
             DictionaryStoreIndex.Add(type.Index, type);
-            if (type.Size < 0) NonBasicDictionaryStore.Add(type.Flag, type);
+            if (type.Size < 0)
+            {
+                NonBasicDictionaryStore.Add(type.Index.ToString(), type);
+                NonBasicDictionaryStore.Add(type.Flag, type);
+            }
         }
 
         public static void SignType(string flag, int size, int index)
@@ -39,15 +41,16 @@ namespace Coosu.Storyboard
             if (DictionaryStore.ContainsKey(flag)) return;
             var type = new EventType(flag, size, index);
             DictionaryStoreIndex.Add(index, type);
+            DictionaryStore.Add(index.ToString(), type);
             DictionaryStore.Add(flag, type);
         }
 
-        public static EventType GetValue(string flag)
+        public static EventType? GetValue(string flag)
         {
             return DictionaryStore.TryGetValue(flag, out var val) ? val : default;
         }
 
-        public static EventType GetValue(int index)
+        public static EventType? GetValue(int index)
         {
             return DictionaryStoreIndex.TryGetValue(index, out var val) ? val : default;
         }
@@ -61,8 +64,6 @@ namespace Coosu.Storyboard
         {
             return !NonBasicDictionaryStore.ContainsKey(flag);
         }
-
-        #endregion
 
         public static EventType Loop { get; } = new("L", -1, 0);
         public static EventType Move { get; } = new("M", 2, 1);

@@ -1,7 +1,12 @@
-﻿namespace Coosu.Beatmap.MetaData
+﻿using System.Diagnostics;
+
+namespace Coosu.Beatmap.MetaData
 {
-    public struct MapIdentity : IMapIdentifiable
+    [DebuggerDisplay("{DebuggerDisplay()}")]
+    public readonly struct MapIdentity : IMapIdentifiable
     {
+        private static readonly MapIdentity _default = new();
+
         public MapIdentity(string folderName, string version, bool inOwnDb) : this()
         {
             FolderName = folderName;
@@ -14,11 +19,11 @@
         public bool InOwnDb { get; }
         public MapIdentity GetIdentity() => this;
 
-        public static MapIdentity Default { get; } = new MapIdentity();
+        public static ref readonly MapIdentity Default => ref _default;
 
         public override bool Equals(object obj)
         {
-            if (obj == null || !(obj is MapIdentity mi))
+            if (obj is not MapIdentity mi)
             {
                 return false;
             }
@@ -28,7 +33,7 @@
 
         public override int GetHashCode() => base.GetHashCode();
 
-        public override string ToString()
+        private string DebuggerDisplay()
         {
             if (this.IsMapTemporary())
                 return $"temp: \"{FolderName}\"";

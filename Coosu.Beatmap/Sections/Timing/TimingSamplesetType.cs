@@ -1,6 +1,6 @@
 ﻿namespace Coosu.Beatmap.Sections.Timing
 {
-    public enum TimingSamplesetType
+    public enum TimingSamplesetType : byte
     {
         Normal,
         Soft,

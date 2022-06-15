@@ -12,23 +12,23 @@ namespace Coosu.Storyboard.Storybrew
         {
             var easing = ConvertEasing(e.Easing.GetEasingType());
             if (e.EventType == EventTypes.Scale)
-                brewObj.Scale(easing, e.StartTime, e.EndTime, e.Start[0], e.End[0]);
+                brewObj.Scale(easing, e.StartTime, e.EndTime, e.GetValue(0), e.GetValue(1));
             else if (e.EventType == EventTypes.Fade)
-                brewObj.Fade(easing, e.StartTime, e.EndTime, e.Start[0], e.End[0]);
+                brewObj.Fade(easing, e.StartTime, e.EndTime, e.GetValue(0), e.GetValue(1));
             else if (e.EventType == EventTypes.Rotate)
-                brewObj.Rotate(easing, e.StartTime, e.EndTime, e.Start[0], e.End[0]);
+                brewObj.Rotate(easing, e.StartTime, e.EndTime, e.GetValue(0), e.GetValue(1));
             else if (e.EventType == EventTypes.MoveX)
-                brewObj.MoveX(easing, e.StartTime, e.EndTime, e.Start[0], e.End[0]);
+                brewObj.MoveX(easing, e.StartTime, e.EndTime, e.GetValue(0), e.GetValue(1));
             else if (e.EventType == EventTypes.MoveY)
-                brewObj.MoveY(easing, e.StartTime, e.EndTime, e.Start[0], e.End[0]);
+                brewObj.MoveY(easing, e.StartTime, e.EndTime, e.GetValue(0), e.GetValue(1));
             else if (e.EventType == EventTypes.Move)
-                brewObj.Move(easing, e.StartTime, e.EndTime, e.Start[0], e.Start[1], e.End[0], e.End[1]);
+                brewObj.Move(easing, e.StartTime, e.EndTime, e.GetValue(0), e.GetValue(1), e.GetValue(2), e.GetValue(3));
             else if (e.EventType == EventTypes.Vector)
-                brewObj.ScaleVec(easing, e.StartTime, e.EndTime, e.Start[0], e.Start[1], e.End[0], e.End[1]);
+                brewObj.ScaleVec(easing, e.StartTime, e.EndTime, e.GetValue(0), e.GetValue(1), e.GetValue(2), e.GetValue(3));
             else if (e.EventType == EventTypes.Color)
                 brewObj.Color(easing, e.StartTime, e.EndTime,
-                    e.Start[0] / 255d, e.Start[1] / 255d, e.Start[2] / 255d,
-                    e.End[0] / 255d, e.End[1] / 255d, e.End[2] / 255d);
+                    e.GetValue(0) / 255d, e.GetValue(1) / 255d, e.GetValue(2) / 255d,
+                    e.GetValue(3) / 255d, e.GetValue(4) / 255d, e.GetValue(5) / 255d);
             else if (e.EventType == EventTypes.Parameter)
             {
                 var type = ((Parameter)e).Type;

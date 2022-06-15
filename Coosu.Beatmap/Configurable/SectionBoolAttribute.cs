@@ -2,13 +2,13 @@
 
 namespace Coosu.Beatmap.Configurable
 {
-    public class SectionBoolAttribute : Attribute
+    public sealed class SectionBoolAttribute : Attribute
     {
-        public BoolParseOption Option { get; }
+        public BoolParseType Type { get; }
 
-        public SectionBoolAttribute(BoolParseOption option)
+        public SectionBoolAttribute(BoolParseType type)
         {
-            Option = option;
+            Type = type;
         }
     }
 }

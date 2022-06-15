@@ -50,7 +50,7 @@ namespace Coosu.Storyboard.Utils
         public static async Task WriteElementEventsAsync(TextWriter writer, ISceneObject sceneObject, bool group)
         {
             var sprite = sceneObject as Sprite;
-            if (sprite != null)
+            if (sprite?.LoopList != null)
                 foreach (var loop in sprite.LoopList)
                     await WriteSubEventHostAsync(writer, loop, @group);
 
@@ -59,7 +59,7 @@ namespace Coosu.Storyboard.Utils
             else
                 await WriteSequentialEventAsync(writer, sceneObject.Events, 1);
 
-            if (sprite != null)
+            if (sprite?.TriggerList != null)
                 foreach (var trigger in sprite.TriggerList)
                     await WriteSubEventHostAsync(writer, trigger, @group);
         }

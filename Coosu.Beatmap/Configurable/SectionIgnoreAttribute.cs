@@ -2,7 +2,7 @@
 
 namespace Coosu.Beatmap.Configurable
 {
-    public class SectionIgnoreAttribute : Attribute
+    public sealed class SectionIgnoreAttribute : Attribute
     {
     }
 }

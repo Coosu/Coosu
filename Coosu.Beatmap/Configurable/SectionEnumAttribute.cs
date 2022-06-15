@@ -2,7 +2,7 @@
 
 namespace Coosu.Beatmap.Configurable
 {
-    public class SectionEnumAttribute : Attribute
+    public sealed class SectionEnumAttribute : Attribute
     {
         public EnumParseOption Option { get; }
 

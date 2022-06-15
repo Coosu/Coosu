@@ -1,6 +1,6 @@
 ﻿namespace Coosu.Beatmap.Sections.HitObject
 {
-    public enum HitObjectType
+    public enum HitObjectType : byte
     {
         Circle,
         Slider,

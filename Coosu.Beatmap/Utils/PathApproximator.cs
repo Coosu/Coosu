@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Numerics;
+using Coosu.Shared.Mathematics;
 
 namespace Coosu.Beatmap.Utils
 {

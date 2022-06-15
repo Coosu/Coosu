@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using Coosu.Shared;
 using Coosu.Shared.Mathematics;
 using Coosu.Storyboard.Common;
 
@@ -7,7 +9,7 @@ namespace Coosu.Storyboard
 {
     public class TimeRange
     {
-        private readonly SortedSet<TimingPoint> _timingPoints = new(new TimingPointComparer());
+        private readonly List<TimingPoint> _timingPoints = new();
         private List<RangeValue<double>>? _timingList;
         public List<RangeValue<double>> TimingList => _timingList ??= GetTimingList();
 
@@ -21,8 +23,8 @@ namespace Coosu.Storyboard
         public void Add(double startTime, double endTime)
         {
             if (startTime.Equals(endTime)) return;
-            _timingPoints.Add(new TimingPoint(startTime, true));
-            _timingPoints.Add(new TimingPoint(endTime, false));
+            _timingPoints.AddSorted(new TimingPoint(startTime, true), TimingPointComparer.Instance);
+            _timingPoints.AddSorted(new TimingPoint(endTime, false), TimingPointComparer.Instance);
             _timingList = null;
         }
 
@@ -30,10 +32,9 @@ namespace Coosu.Storyboard
         {
             var list = new List<RangeValue<double>>();
             double? tmpStart = null, tmpEnd = null;
-            var array = _timingPoints.ToArray();
-            for (var i = 0; i < array.Length; i++)
+            for (var i = 0; i < _timingPoints.Count; i++)
             {
-                var timingPoint = array[i];
+                var timingPoint = _timingPoints[i];
                 if (tmpStart == null && tmpEnd == null)
                 {
                     if (timingPoint.IsStart)
@@ -43,12 +44,12 @@ namespace Coosu.Storyboard
                 }
                 else if (tmpEnd == null)
                 {
-                    if (!timingPoint.IsStart && i != array.Length - 1 &&
-                        array[i + 1].IsStart &&
-                        !timingPoint.Timing.Equals(array[i + 1].Timing) ||
-
+                    if (!timingPoint.IsStart && i != _timingPoints.Count - 1 &&
+                        _timingPoints[i + 1].IsStart &&
+                        !Precision.AlmostEquals(timingPoint.Timing, _timingPoints[i + 1].Timing)
+                        ||
                         !timingPoint.IsStart &&
-                        i == array.Length - 1)
+                        i == _timingPoints.Count - 1)
                     {
                         tmpEnd = timingPoint.Timing;
                         list.Add(new RangeValue<double>(tmpStart!.Value, tmpEnd.Value));
@@ -78,34 +79,37 @@ namespace Coosu.Storyboard
 
         public bool OnTimingRangeBound(out RangeValue<double> patterned, double timingPoint)
         {
-            //int i = 0;
-            foreach (var range in TimingList)
+            for (var i = 0; i < TimingList.Count; i++)
             {
-                if (timingPoint.Equals(range.StartTime) || timingPoint.Equals(range.EndTime))
+                var range = TimingList[i];
+                if (Precision.AlmostEquals(timingPoint, range.StartTime) ||
+                    Precision.AlmostEquals(timingPoint, range.EndTime))
                 {
                     patterned = range;
                     return true;
                 }
-
-                //i++;
             }
 
             patterned = default;
             return false;
         }
 
-        public bool ContainsTimingPoint(out RangeValue<double> patterned, params double[] time)
+        public bool ContainsTimingPoint(out RangeValue<double> patterned, params double[] timeList)
         {
-            //int i = 0;
-            foreach (var range in TimingList)
+            Array.Sort(timeList);
+            if (timeList.Length == 0)
+                throw new ArgumentOutOfRangeException("length", timeList.Length, null);
+
+            var first = timeList[0];
+            var last = timeList[timeList.Length - 1];
+            for (var i = 0; i < TimingList.Count; i++)
             {
-                if (time.All(t => t >= range.StartTime && t <= range.EndTime))
+                var range = TimingList[i];
+                if (first >= range.StartTime && last <= range.EndTime)
                 {
                     patterned = range;
                     return true;
                 }
-
-                //i++;
             }
 
             patterned = default;

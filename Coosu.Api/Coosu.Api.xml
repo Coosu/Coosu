@@ -1944,18 +1944,34 @@
         </member>
         <member name="M:Coosu.Api.V2.BeatmapEndpoint.GetBeatmap(System.Int32)">
             <summary>
-            Similar to Get User but with authenticated user (token owner) as user id.
-            <code>scope = identify</code>
+            Get beatmap detail
+            <code>scope = public</code>
             </summary>
             <param name="id">b id</param>
             <returns></returns>
         </member>
         <member name="M:Coosu.Api.V2.BeatmapEndpoint.GetBeatmapset(System.Int32)">
             <summary>
-            Similar to Get User but with authenticated user (token owner) as user id.
-            <code>scope = identify</code>
+            Get beatmapset detail
+            <code>scope = public</code>
             </summary>
             <param name="id">s id</param>
+            <returns></returns>
+        </member>
+        <member name="M:Coosu.Api.V2.BeatmapEndpoint.SearchBeatmapset(System.String)">
+            <summary>
+            Search beatmaps
+            <code>scope = identify/public</code>
+            </summary>
+            <param name="query">keywords.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Coosu.Api.V2.BeatmapEndpoint.SearchBeatmapset(Coosu.Api.V2.RequestModels.SearchOptions)">
+            <summary>
+            Search beatmaps
+            <code>scope = identify/public</code>
+            </summary>
+            <param name="searchOptions">Search options.</param>
             <returns></returns>
         </member>
         <member name="T:Coosu.Api.V2.GameMode">
@@ -1981,6 +1997,76 @@
         <member name="F:Coosu.Api.V2.GameMode.Mania">
             <summary>
             osu!mania
+            </summary>
+        </member>
+        <member name="F:Coosu.Api.V2.RequestModels.LanguageType.Any">
+            <summary>
+            Any languages are included.
+            </summary>
+        </member>
+        <member name="F:Coosu.Api.V2.RequestModels.LanguageType.Unspecified">
+            <summary>
+            Other languages.
+            </summary>
+        </member>
+        <member name="F:Coosu.Api.V2.RequestModels.LanguageType.English">
+            <summary>
+            Other languages.
+            </summary>
+        </member>
+        <member name="F:Coosu.Api.V2.RequestModels.LanguageType.Japanese">
+            <summary>
+            Japanese language.
+            </summary>
+        </member>
+        <member name="F:Coosu.Api.V2.RequestModels.LanguageType.Chinese">
+            <summary>
+            Chinese language.
+            </summary>
+        </member>
+        <member name="F:Coosu.Api.V2.RequestModels.LanguageType.Instrumental">
+            <summary>
+            Instrumental music without vocals.
+            </summary>
+        </member>
+        <member name="F:Coosu.Api.V2.RequestModels.LanguageType.Korean">
+            <summary>
+            Korean language.
+            </summary>
+        </member>
+        <member name="F:Coosu.Api.V2.RequestModels.LanguageType.French">
+            <summary>
+            French language.
+            </summary>
+        </member>
+        <member name="F:Coosu.Api.V2.RequestModels.LanguageType.German">
+            <summary>
+            German language.
+            </summary>
+        </member>
+        <member name="F:Coosu.Api.V2.RequestModels.LanguageType.Swedish">
+            <summary>
+            Swedish language.
+            </summary>
+        </member>
+        <member name="F:Coosu.Api.V2.RequestModels.LanguageType.Spanish">
+            <summary>
+            Spanish language.
+            </summary>
+        </member>
+        <member name="F:Coosu.Api.V2.RequestModels.LanguageType.Italian">
+            <summary>
+            Italian language.
+            </summary>
+        </member>
+        <member name="F:Coosu.Api.V2.RequestModels.LanguageType.Russian">
+            <summary>
+            Russian language.
+            </summary>
+        </member>
+        <member name="F:Coosu.Api.V2.RequestModels.LanguageType.Polish">
+            <summary>
+            Polish language.
             </summary>
         </member>
         <member name="P:Coosu.Api.V2.ResponseModels.UserToken.RefreshToken">

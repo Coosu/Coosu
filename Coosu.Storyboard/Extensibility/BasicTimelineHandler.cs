@@ -1,5 +1,7 @@
 ﻿using System;
-using System.Globalization;
+using System.Collections.Generic;
+using System.Text;
+using Coosu.Shared;
 using Coosu.Storyboard.Easing;
 using Coosu.Storyboard.Events;
 
@@ -9,65 +11,41 @@ namespace Coosu.Storyboard.Extensibility
     {
         public override string Serialize(T raw)
         {
-            bool sequenceEqual = true;
-            int count = raw.Start.Length;
-            if (raw.End.Length != count)
+            if (!raw.IsHalfFilled && !raw.IsFilled)
             {
                 throw new Exception("The starting parameter's count should equal to the ending parameter's count");
             }
 
-            for (int i = 0; i < count; i++)
-            {
-                if (!raw.Start[i].Equals(raw.End[i]))
-                {
-                    sequenceEqual = false;
-                    break;
-                }
-            }
+            raw.Fill();
+            var sequenceEqual = raw.IsStartsEqualsEnds();
+            var size = raw.EventType.Size;
 
-            var cultureInfo = CultureInfo.InvariantCulture;
-            string script;
+            var sb = new StringBuilder();
             if (sequenceEqual)
             {
-                if (count == 1)
-                    script = raw.Start[0].ToString(cultureInfo);
-                else if (count == 2)
-                    script = raw.Start[0].ToString(cultureInfo) + "," +
-                             raw.Start[1].ToString(cultureInfo);
-                else if (count == 3)
-                    script = raw.Start[0].ToString(cultureInfo) + "," +
-                             raw.Start[1].ToString(cultureInfo) + "," +
-                             raw.Start[2].ToString(cultureInfo);
-                else
-                    script = string.Join(",", raw.Start);
+                for (int i = 0; i < size; i++)
+                {
+                    sb.Append(raw.GetValue(i).ToIcString());
+                    if (i != size - 1)
+                        sb.Append(',');
+                }
             }
             else
             {
-                if (count == 1)
-                    script = raw.Start[0].ToString(cultureInfo) + "," +
-                             raw.End[0].ToString(cultureInfo);
-                else if (count == 2)
-                    script = raw.Start[0].ToString(cultureInfo) + "," +
-                             raw.Start[1].ToString(cultureInfo) + "," +
-                             raw.End[0].ToString(cultureInfo) + "," +
-                             raw.End[1].ToString(cultureInfo);
-                else if (count == 3)
-                    script = raw.Start[0].ToString(cultureInfo) + "," +
-                             raw.Start[1].ToString(cultureInfo) + "," +
-                             raw.Start[2].ToString(cultureInfo) + "," +
-                             raw.End[0].ToString(cultureInfo) + "," +
-                             raw.End[1].ToString(cultureInfo) + "," +
-                             raw.End[2].ToString(cultureInfo);
-                else
-                    script = $"{string.Join(",", raw.Start)},{string.Join(",", raw.End)}";
+                for (int i = 0; i < size * 2; i++)
+                {
+                    sb.Append(raw.GetValue(i).ToIcString());
+                    if (i != size - 1)
+                        sb.Append(',');
+                }
             }
 
             var e = raw.EventType.Flag;
             var easing = ((int)raw.Easing.GetEasingType()).ToString();
-            var startT = Math.Round(raw.StartTime).ToString(cultureInfo);
-            var endT = raw.StartTime.Equals(raw.EndTime) ? "" : Math.Round(raw.EndTime).ToString(cultureInfo);
+            var startT = Math.Round(raw.StartTime).ToIcString();
+            var endT = raw.StartTime.Equals(raw.EndTime) ? "" : Math.Round(raw.EndTime).ToIcString();
 
-            return $"{e},{easing},{startT},{endT},{script}";
+            return $"{e},{easing},{startT},{endT},{sb}";
         }
 
         public override T Deserialize(string[] split)
@@ -80,32 +58,25 @@ namespace Coosu.Storyboard.Extensibility
             }
 
             var easing = EasingConvert.ToEasing(split[1]);
-            var startTime = double.Parse(split[2]);
-            var endTime = string.IsNullOrWhiteSpace(split[3]) ? startTime : double.Parse(split[3]);
+            var startTime = float.Parse(split[2]);
+            var endTime = string.IsNullOrWhiteSpace(split[3]) ? startTime : float.Parse(split[3]);
 
-            var start = new double[ParameterDimension];
-            var end = new double[ParameterDimension];
+            var value = new List<float>(ParameterDimension * 2);
             if (paramLength == ParameterDimension)
             {
                 int j = 4;
                 for (int i = 0; i < ParameterDimension; i++, j++)
                 {
-                    start[i] = double.Parse(split[j]);
+                    value[i] = float.Parse(split[j]);
+                    value[i + ParameterDimension] = float.Parse(split[j]);
                 }
-
-                start.CopyTo(end, 0);
             }
             else if (paramLength == ParameterDimension * 2)
             {
                 int j = 4;
-                for (int i = 0; i < ParameterDimension; i++, j++)
+                for (int i = 0; i < ParameterDimension * 2; i++, j++)
                 {
-                    start[i] = double.Parse(split[j]);
-                }
-
-                for (int i = 0; i < ParameterDimension; i++, j++)
-                {
-                    end[i] = double.Parse(split[j]);
+                    value[i] = float.Parse(split[j]);
                 }
             }
 
@@ -114,8 +85,7 @@ namespace Coosu.Storyboard.Extensibility
                 Easing = easing.ToEasingFunction(),
                 StartTime = startTime,
                 EndTime = endTime,
-                Start = start,
-                End = end
+                Values = value
             };
         }
     }

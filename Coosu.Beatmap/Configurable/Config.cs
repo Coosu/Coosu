@@ -2,8 +2,13 @@
 {
     public abstract class Config
     {
-        internal abstract void HandleCustom(string line);
+        public abstract void HandleCustom(string line);
 
-        internal ReadOptions Options { get; set; }
+        public virtual void OnDeserialized()
+        {
+        }
+
+        [SectionIgnore]
+        public ReadOptions Options { get; set; }
     }
 }

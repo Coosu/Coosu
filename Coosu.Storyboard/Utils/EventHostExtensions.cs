@@ -1,11 +1,12 @@
 ﻿using System.Linq;
 using Coosu.Storyboard.Common;
 
-namespace Coosu.Storyboard.Utils
+// ReSharper disable once CheckNamespace
+namespace Coosu.Storyboard
 {
     public static class EventHostExtensions
     {
-        public static void Adjust(this IDetailedEventHost eventHost, double offsetX, double offsetY, double offsetTiming)
+        public static void Adjust(this IDetailedEventHost eventHost, float offsetX, float offsetY, float offsetTiming)
         {
             if (eventHost is ISceneObject iso)
             {

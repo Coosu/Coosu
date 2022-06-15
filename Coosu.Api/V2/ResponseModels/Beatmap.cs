@@ -1,5 +1,7 @@
 ﻿using System;
-using Newtonsoft.Json;
+using JsonPropertyAttribute = System.Text.Json.Serialization.JsonPropertyNameAttribute;
+using JsonConverterAttribute = System.Text.Json.Serialization.JsonConverterAttribute;
+using JsonIgnoreAttribute = System.Text.Json.Serialization.JsonIgnoreAttribute;
 
 namespace Coosu.Api.V2.ResponseModels
 {
@@ -89,7 +91,7 @@ namespace Coosu.Api.V2.ResponseModels
         [JsonProperty("failtimes")]
         public Failtimes Failtimes { get; set; }
 
-        [JsonProperty("max_combo", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("max_combo")]
         public long? MaxCombo { get; set; }
     }
 }

@@ -2,7 +2,8 @@
 using System.Threading.Tasks;
 using Coosu.Storyboard.Common;
 
-namespace Coosu.Storyboard.Utils
+// ReSharper disable once CheckNamespace
+namespace Coosu.Storyboard
 {
     public static class ScriptableExtensions
     {
@@ -12,6 +13,7 @@ namespace Coosu.Storyboard.Utils
             await scriptable.WriteScriptAsync(sw);
             return sw.ToString();
         }
+
         public static string ToScriptString(this IScriptable scriptable)
         {
             using var sw = new StringWriter();
@@ -24,6 +26,7 @@ namespace Coosu.Storyboard.Utils
             await scriptable.WriteHeaderAsync(sw);
             return sw.ToString();
         }
+
         public static string GetHeaderString(this IScriptable scriptable)
         {
             using var sw = new StringWriter();

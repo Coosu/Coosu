@@ -1,6 +1,6 @@
 ﻿namespace Coosu.Storyboard.Easing
 {
-    public class LinearEase : EasingFunctionBase
+    public sealed class LinearEase : EasingFunctionBase
     {
         protected override double EaseInCore(double normalizedTime)
         {

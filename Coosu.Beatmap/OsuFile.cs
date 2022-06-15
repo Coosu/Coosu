@@ -9,15 +9,9 @@ using Coosu.Beatmap.Sections.Timing;
 
 namespace Coosu.Beatmap
 {
-    public class LocalOsuFile : OsuFile
-    {
-        public string OriginPath { get; internal set; }
-        public bool ReadSuccess { get; set; } = true;
-        public Exception ReadException { get; set; }
-    }
-
     public class OsuFile : Config
     {
+        private const string VerFlag = "osu file format v";
         public int Version { get; set; }
         public GeneralSection General { get; set; }
         public EditorSection Editor { get; set; }
@@ -28,77 +22,166 @@ namespace Coosu.Beatmap
         public ColorSection Colours { get; set; }
         public HitObjectSection HitObjects { get; set; }
 
-        public static async Task<LocalOsuFile> ReadFromFileAsync(string path, Action<ReadOptions> readOptionFactory = null)
+        public static LocalOsuFile ReadFromFile(string path, Action<OsuReadOptions>? readOptionFactory = null)
         {
-            return await Task.Run(() =>
-            {
-#if NETFRAMEWORK
-                var targetPath = path?.StartsWith(@"\\?\") == true ? path : @"\\?\" + path;
+#if NETFRAMEWORK && NET462_OR_GREATER
+            var targetPath = System.IO.Path.IsPathRooted(path)
+                ? (path?.StartsWith(@"\\?\") == true
+                    ? path
+                    : @"\\?\" + path)
+                : path;
 #else
-                var targetPath = path;
+            var targetPath = path;
 #endif
-                try
+            var options = new OsuReadOptions();
+            readOptionFactory?.Invoke(options);
+            using var sr = new StreamReader(targetPath);
+            var localOsuFile = ConfigConvert.DeserializeObject<LocalOsuFile>(sr, options);
+            localOsuFile.OriginPath = targetPath;
+            return localOsuFile;
+        }
+        public static async Task<LocalOsuFile> ReadFromFileAsync(string path, Action<OsuReadOptions>? readOptionFactory = null)
+        {
+#if NETFRAMEWORK && NET462_OR_GREATER
+            var targetPath = System.IO.Path.IsPathRooted(path)
+                ? (path?.StartsWith(@"\\?\") == true
+                    ? path
+                    : @"\\?\" + path)
+                : path;
+#else
+            var targetPath = path;
+#endif
+            var options = new OsuReadOptions();
+            readOptionFactory?.Invoke(options);
+            var localOsuFile = await Task
+                .Run(() =>
                 {
-                    using (var sr = new StreamReader(targetPath))
-                    {
-                        var localOsuFile = ConfigConvert.DeserializeObject<LocalOsuFile>(sr, readOptionFactory);
-                        localOsuFile.OriginPath = targetPath;
-                        return localOsuFile;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    return new LocalOsuFile { ReadSuccess = false, ReadException = ex, OriginPath = targetPath };
-                }
-            }).ConfigureAwait(false);
+                    using var sr = new StreamReader(targetPath);
+                    return ConfigConvert.DeserializeObject<LocalOsuFile>(sr, options);
+                })
+                .ConfigureAwait(false);
+            localOsuFile.OriginPath = targetPath;
+            return localOsuFile;
         }
 
         public override string ToString() => Path;
 
-        //todo: not optimized
-        public void WriteOsuFile(string path, string newDiffName = null)
+        public void WriteOsuFile(string path, string? newDiffName = null)
         {
-            File.WriteAllText(path,
-                string.Format("osu file format v{0}\r\n\r\n{1}{2}{3}{4}{5}{6}{7}{8}", Version,
-                    General?.ToSerializedString(),
-                    Editor?.ToSerializedString(),
-                    Metadata?.ToSerializedString(newDiffName),
-                    Difficulty?.ToSerializedString(),
-                    Events?.ToSerializedString(),
-                    TimingPoints?.ToSerializedString(),
-                    Colours?.ToSerializedString(),
-                    HitObjects?.ToSerializedString()));
+            using var sw = new StreamWriter(path);
+            sw.Write(VerFlag);
+            sw.WriteLine(Version);
+            sw.WriteLine();
+
+            General.AppendSerializedString(sw);
+            sw.WriteLine();
+
+            Editor.AppendSerializedString(sw);
+            sw.WriteLine();
+
+            Metadata.AppendSerializedString(sw, newDiffName);
+            sw.WriteLine();
+
+            Difficulty.AppendSerializedString(sw);
+            sw.WriteLine();
+
+            Events.AppendSerializedString(sw);
+            sw.WriteLine();
+
+            TimingPoints.AppendSerializedString(sw);
+            sw.WriteLine(Environment.NewLine);
+
+            Colours.AppendSerializedString(sw);
+            sw.WriteLine();
+
+            HitObjects.AppendSerializedString(sw);
         }
 
-        internal override void HandleCustom(string line)
+        public override void OnDeserialized()
         {
-            const string verFlag = "osu file format v";
+            if (((OsuReadOptions)Options).AutoCompute)
+                this.HitObjects.ComputeSlidersByCurrentSettings();
+        }
 
-            if (line.StartsWith(verFlag))
+        public override void HandleCustom(string line)
+        {
+            if (Version != 0) return;
+            if (line.StartsWith(VerFlag, StringComparison.Ordinal))
             {
-                var str = line.Replace(verFlag, "");
+                var str = line.Substring(VerFlag.Length);
                 if (!int.TryParse(str, out var verNum))
-                    throw new BadOsuFormatException("未知的osu版本: " + str);
+                    throw new BadOsuFormatException("Unknown osu file format: " + str);
                 if (verNum < 5)
                     throw new VersionNotSupportedException(verNum);
                 Version = verNum;
             }
             else
             {
-                throw new BadOsuFormatException("存在问题头声明: " + line);
+                throw new BadOsuFormatException("Invalid header declaration: " + line);
             }
         }
 
         public static async Task<bool> OsbFileHasStoryboard(string osbPath)
         {
-            using (var sr = new StreamReader(osbPath))
+            using var sr = new StreamReader(osbPath);
+            var line = await sr.ReadLineAsync();
+
+            bool inSbSection = false;
+            bool hasInSbSection = false;
+
+            while (!sr.EndOfStream)
             {
-                var line = await sr.ReadLineAsync();
+                if (line.StartsWith("//"))
+                {
+                    if (line.StartsWith("//Storyboard Layer"))
+                    {
+                        inSbSection = true;
+                        hasInSbSection = true;
+                    }
+                    else if (hasInSbSection)
+                    {
+                        break;
+                    }
+                }
+                else if (inSbSection)
+                {
+                    if (!string.IsNullOrWhiteSpace(line))
+                        return true;
+                }
 
-                bool inSbSection = false;
-                bool hasInSbSection = false;
+                line = await sr.ReadLineAsync();
+            }
 
-                while (!sr.EndOfStream)
+            return false;
+        }
+
+        public static async Task<bool> FileHasStoryboard(string mapPath)
+        {
+            using var sr = new StreamReader(mapPath);
+            var line = await sr.ReadLineAsync();
+            bool hasEvent = false;
+            bool inEventsSection = false;
+            bool inSbSection = false;
+            bool hasInSbSection = false;
+
+            while (!sr.EndOfStream)
+            {
+                if (line == null) break;
+
+                if (line.StartsWith("[") && line.EndsWith("]"))
+                {
+                    if (line == "[Events]")
+                    {
+                        inEventsSection = true;
+                        hasEvent = true;
+
+                    }
+                    else if (hasEvent)
+                    {
+                        break;
+                    }
+                }
+                else if (inEventsSection)
                 {
                     if (line.StartsWith("//"))
                     {
@@ -117,64 +200,9 @@ namespace Coosu.Beatmap
                         if (!string.IsNullOrWhiteSpace(line))
                             return true;
                     }
-
-                    line = await sr.ReadLineAsync();
                 }
 
-                return false;
-            }
-        }
-
-        public static async Task<bool> FileHasStoryboard(string mapPath)
-        {
-            using (var sr = new StreamReader(mapPath))
-            {
-                var line = await sr.ReadLineAsync();
-                bool hasEvent = false;
-                bool inEventsSection = false;
-                bool inSbSection = false;
-                bool hasInSbSection = false;
-
-                while (!sr.EndOfStream)
-                {
-                    if (line == null) break;
-
-                    if (line.StartsWith("[") && line.EndsWith("]"))
-                    {
-                        if (line == "[Events]")
-                        {
-                            inEventsSection = true;
-                            hasEvent = true;
-
-                        }
-                        else if (hasEvent)
-                        {
-                            break;
-                        }
-                    }
-                    else if (inEventsSection)
-                    {
-                        if (line.StartsWith("//"))
-                        {
-                            if (line.StartsWith("//Storyboard Layer"))
-                            {
-                                inSbSection = true;
-                                hasInSbSection = true;
-                            }
-                            else if (hasInSbSection)
-                            {
-                                break;
-                            }
-                        }
-                        else if (inSbSection)
-                        {
-                            if (!string.IsNullOrWhiteSpace(line))
-                                return true;
-                        }
-                    }
-
-                    line = await sr.ReadLineAsync();
-                }
+                line = await sr.ReadLineAsync();
             }
 
             return false;
@@ -195,7 +223,7 @@ namespace Coosu.Beatmap
             emptyFile.Events = new EventSection(emptyFile);
             emptyFile.HitObjects = new HitObjectSection(emptyFile);
             emptyFile.TimingPoints.TimingList = new List<TimingPoint>();
-            emptyFile.Events.SampleInfo = new List<StoryboardSampleData>();
+            emptyFile.Events.Samples = new List<StoryboardSampleData>();
             return emptyFile;
         }
 

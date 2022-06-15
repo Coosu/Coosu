@@ -1,6 +1,6 @@
 ﻿namespace Coosu.Beatmap.Sections.HitObject
 {
-    public enum ObjectSamplesetType
+    public enum ObjectSamplesetType : byte
     {
         Auto,
         Normal,

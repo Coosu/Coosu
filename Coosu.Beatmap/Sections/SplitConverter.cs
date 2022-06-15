@@ -1,77 +1,107 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using Coosu.Beatmap.Configurable;
+using Coosu.Shared;
+using Coosu.Shared.Numerics;
 
 namespace Coosu.Beatmap.Sections
 {
-    public class DoubleSplitConverter : ValueConverter<List<double>>
+    public sealed class DoubleSplitConverter : ValueConverter<List<double>>
     {
-        private readonly string _splitter;
+        private readonly char _splitter;
 
-        public DoubleSplitConverter(string splitter)
+        public DoubleSplitConverter(char splitter)
         {
             _splitter = splitter;
         }
 
-        public override List<double> ReadSection(string value)
+        public override List<double> ReadSection(ReadOnlySpan<char> value)
         {
-            return value == null
-                ? new List<double>()
-                : value.Split(new[] { _splitter }, System.StringSplitOptions.None)
-                    .Select(double.Parse)
-                    .ToList();
+            var list = new List<double>();
+            foreach (var subString in value.SpanSplit(_splitter))
+            {
+                list.Add(ParseHelper.ParseDouble(subString));
+            }
+
+            return list;
         }
 
-        public override string WriteSection(List<double> value)
+        public override void WriteSection(TextWriter textWriter, List<double> value)
         {
-            return value == null ? "" : string.Join(_splitter, value);
+            for (var i = 0; i < value.Count; i++)
+            {
+                var d = value[i];
+                textWriter.Write(d.ToIcString());
+                if (i < value.Count - 1)
+                    textWriter.Write(_splitter);
+            }
         }
     }
 
-    public class Int32SplitConverter : ValueConverter<List<int>>
+    public sealed class Int32SplitConverter : ValueConverter<List<int>>
     {
-        private readonly string _splitter;
+        private readonly char _splitter;
 
-        public Int32SplitConverter(string splitter)
+        public Int32SplitConverter(char splitter)
         {
             _splitter = splitter;
         }
 
-        public override List<int> ReadSection(string value)
+        public override List<int> ReadSection(ReadOnlySpan<char> value)
         {
-            return value == null
-                ? new List<int>()
-                : value.Split(new[] { _splitter }, System.StringSplitOptions.None)
-                    .Select(int.Parse)
-                    .ToList();
+            var list = new List<int>();
+            foreach (var subString in value.SpanSplit(_splitter))
+            {
+                list.Add(ParseHelper.ParseInt32(subString));
+            }
+
+            return list;
         }
 
-        public override string WriteSection(List<int> value)
+        public override void WriteSection(TextWriter textWriter, List<int> value)
         {
-            return value == null ? "" : string.Join(_splitter, value);
+            for (var i = 0; i < value.Count; i++)
+            {
+                var d = value[i];
+                textWriter.Write(d);
+                if (i < value.Count - 1)
+                    textWriter.Write(_splitter);
+            }
         }
     }
 
-    public class SplitConverter : ValueConverter<List<string>>
+    public sealed class SplitConverter : ValueConverter<List<string>>
     {
-        private readonly string _splitter;
+        private readonly char _splitter;
 
-        public SplitConverter(string splitter)
+        public SplitConverter(char splitter)
         {
             _splitter = splitter;
         }
 
-        public override List<string> ReadSection(string value)
+        public override List<string> ReadSection(ReadOnlySpan<char> value)
         {
-            return value == null
-                ? new List<string>()
-                : value.Split(new[] { _splitter }, System.StringSplitOptions.None)
-                    .ToList();
+            var list = new List<string>();
+            foreach (var subString in value.SpanSplit(_splitter))
+            {
+                list.Add(subString.ToString());
+            }
+
+            return list;
         }
 
-        public override string WriteSection(List<string> value)
+        public override void WriteSection(TextWriter textWriter, List<string> value)
         {
-            return value == null ? "" : string.Join(_splitter, value);
+            var sb = new StringBuilder();
+            for (var i = 0; i < value.Count; i++)
+            {
+                var d = value[i];
+                textWriter.Write(d);
+                if (i < value.Count - 1)
+                    textWriter.Write(_splitter);
+            }
         }
     }
 }

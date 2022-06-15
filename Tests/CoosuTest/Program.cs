@@ -1,14 +1,20 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Coosu.Beatmap;
+using Coosu.Beatmap.Sections.HitObject;
+using Coosu.Database;
+using Coosu.Database.Internal;
+using Coosu.Database.Serialization;
 using Coosu.Storyboard;
 using Coosu.Storyboard.Easing;
-using Coosu.Storyboard.Extensions;
 using Coosu.Storyboard.Extensions.Computing;
 using Coosu.Storyboard.Extensions.Optimizing;
-using Coosu.Storyboard.Utils;
+using Newtonsoft.Json;
 
 namespace CoosuTest
 {
@@ -16,6 +22,50 @@ namespace CoosuTest
     {
         static async Task Main(string[] args)
         {
+            //var osu = await OsuFile.ReadFromFileAsync(@"E:/Games/osu!\Songs\BmsToOsu/IIDX\29075\P -  (bms2osu) [lv.10].osu");
+            var osu = await OsuFile.ReadFromFileAsync(@"E:/Games/osu!\Songs\BmsToOsu/IIDX\29075\P -  (bms2osu) [lv.10].osu");
+            var list = new List<ValueTuple<string?, object?, string, string>>(8294626);
+            for (int i = 0; i < 10; i++)
+            {
+                var osuDb = OsuDb.ReadFromFile(@"D:\osu!small.db");
+            }
+
+            using (var ok = new OsuDbReader(@"D:\osu!small.db"))
+            {
+                //var allBeatmaps = ok.EnumerateBeatmaps().ToList();
+
+                while (ok.Read())
+                {
+                    var name = ok.Name;
+                    var path = ok.Path;
+
+                    if (path == "OsuDb.Beatmaps.StarRatingManiaCount")
+                    {
+
+                    }
+                    var value = ok.Value;
+                    var nodeType = ok.NodeType;
+                    var dataType = ok.DataType;
+                    //var valueTuple = (name, value, nodeType.ToString(), dataType?.ToString());
+                    //list.Add(valueTuple);
+                }
+            }
+
+            var dir = new OsuDirectory(@"E:\Games\osu!\Songs\take yf");
+            await dir.InitializeAsync();
+            var osuFile = dir.OsuFiles.FirstOrDefault(k => k.Metadata.Version?.Contains("~") == true);
+            var slider1 = osuFile.HitObjects.HitObjectList.FirstOrDefault(k => k.ObjectType == HitObjectType.Slider);
+            var slider = osuFile.HitObjects.HitObjectList.First(k => k.Offset == 48819);
+            var gg = slider.SliderInfo.GetSliderSlides();
+
+
+            var allHs = dir.OsuFiles.AsParallel().Select(k =>
+            {
+                return dir.GetHitsoundNodesAsync(k).Result;
+            }).SelectMany(k => k).ToArray();
+
+            var hitsounds = await dir.GetHitsoundNodesAsync(osuFile);
+
             var text1 = File.ReadAllText(
                 "D:\\GitHub\\ReOsuStoryboardPlayer\\ReOsuStoryboardPlayer.Core.UnitTest\\TestData\\" +
                 "test.osb");
@@ -40,7 +90,7 @@ namespace CoosuTest
             //Console.WriteLine(percent);
 
             var layer = new Layer();
-            layer.Camera2.RotateBy(new BackEase() { Amplitude = 2 }, startTime: 0, endTime: 500, Math.PI / 2);
+            layer.Camera2.RotateBy(new BackEase() { Amplitude = 2 }, startTime: 0, endTime: 500, (float)(Math.PI / 2));
             layer.Camera2.MoveBy(startTime: 0, endTime: 500, x: 300, y: 30);
             layer.Camera2.StandardizeEvents();
             //            layer = Layer.ParseFromText(@"

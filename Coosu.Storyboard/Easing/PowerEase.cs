@@ -7,7 +7,7 @@ namespace Coosu.Storyboard.Easing
     /// If the curve you desire is cubic, quadratic, quartic, or quintic it is better to use the 
     /// specialized easing functions.
     /// </summary>
-    public class PowerEase : EasingFunctionBase
+    public sealed class PowerEase : EasingFunctionBase
     {
         private double _power = 2;
 

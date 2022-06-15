@@ -5,13 +5,13 @@ using System.Diagnostics;
 namespace Coosu.Storyboard
 {
     [DebuggerDisplay("Name = {DebuggerDisplay}")]
-    public struct ObjectType : IEquatable<ObjectType>, IComparable<ObjectType>, IComparable
+    public sealed class ObjectType : IEquatable<ObjectType>, IComparable<ObjectType>, IComparable
     {
         private string? DebuggerDisplay => ObjectType.GetString(this);
 
         #region static members
 
-        private static readonly Dictionary<string, ObjectType> DictionaryStore = new(StringComparer.OrdinalIgnoreCase);
+        private static readonly Dictionary<string, ObjectType> DictionaryStore = new(/*StringComparer.OrdinalIgnoreCase*/);
         private static readonly Dictionary<ObjectType, string> BackDictionaryStore = new();
 
         static ObjectType()
@@ -50,16 +50,16 @@ namespace Coosu.Storyboard
 
         #endregion
 
-        public int Flag { get; }
+        public readonly int Flag;
 
         public ObjectType(int flag)
         {
             Flag = flag;
         }
 
-        public bool Equals(ObjectType other)
+        public bool Equals(ObjectType? other)
         {
-            return Flag == other.Flag;
+            return Flag == other?.Flag;
         }
 
         public override bool Equals(object obj)

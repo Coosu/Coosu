@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Easing;
 
@@ -8,38 +8,38 @@ namespace Coosu.Storyboard.Events
     {
         public override EventType EventType => EventTypes.Move;
 
-        public double StartX
+        public float StartX
         {
-            get => Start[0];
-            set => Start[0] = value;
+            get => GetValue(0);
+            set => SetValue(0, value);
         }
 
-        public double StartY
+        public float StartY
         {
-            get => Start[1];
-            set => Start[1] = value;
+            get => GetValue(1);
+            set => SetValue(1, value);
         }
 
-        public double EndX
+        public float EndX
         {
-            get => End[0];
-            set => End[0] = value;
+            get => GetValue(2);
+            set => SetValue(2, value);
         }
 
-        public double EndY
+        public float EndY
         {
-            get => End[1];
-            set => End[1] = value;
+            get => GetValue(3);
+            set => SetValue(3, value);
         }
 
-        public Move(EasingFunctionBase easing, double startTime, double endTime, double x1, double y1, double x2, double y2) :
-            base(easing, startTime, endTime, new[] { x1, y1 }, new[] { x2, y2 })
-        {
+        //public Move(EasingFunctionBase easing, double startTime, double endTime, double x1, double y1, double x2, double y2) :
+        //    base(easing, startTime, endTime, new[] { x1, y1 }, new[] { x2, y2 })
+        //{
 
-        }
+        //}
 
-        public Move(EasingFunctionBase easing, double startTime, double endTime, Span<double> start, Span<double> end)
-            : base(easing, startTime, endTime, start, end)
+        public Move(EasingFunctionBase easing, float startTime, float endTime, List<float> values)
+            : base(easing, startTime, endTime, values)
         {
         }
 
@@ -47,12 +47,12 @@ namespace Coosu.Storyboard.Events
         {
         }
 
-        public void AdjustPosition(double x, double y)
+        public void AdjustPosition(float x, float y)
         {
-            Start[0] += x;
-            Start[1] += y;
-            End[0] += x;
-            End[1] += y;
+            StartX += x;
+            StartY += y;
+            EndX += x;
+            EndY += y;
         }
     }
 }

@@ -1,209 +1,156 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 
 namespace Coosu.Beatmap.Configurable
 {
     public static class ConfigConvert
     {
-        public static T DeserializeObject<T>(string value, bool sequential = false) where T : Config
+        private static readonly Type SectionType = typeof(Section);
+        private static readonly Type ConfigType = typeof(Config);
+
+        public static T DeserializeObject<T>(string value, ReadOptions options) where T : Config
         {
-            using (StringReader sw = new StringReader(value))
-            {
-                return DeserializeObject<T>(sw);
-            }
+            using var sw = new StringReader(value);
+            return DeserializeObject<T>(sw, options);
         }
 
-        public static T DeserializeObject<T>(TextReader reader, Action<ReadOptions> readOptionFactory = null, bool sequential = false) where T : Config
+        public static T DeserializeObject<T>(TextReader reader, ReadOptions options) where T : Config
         {
-            var reflectInfos = AnalyzeType<T>();
-            var type = typeof(T);
-            var instance = (T)Activator.CreateInstance(type, true);
-            var line = reader.ReadLine();
-            Section currentSection = null;
-            bool skippingSection = false;
-            var options = new ReadOptions();
-            readOptionFactory?.Invoke(options);
-            instance.Options = options;
-            var list = new List<string>(options.Include);
+            if (options == null) throw new ArgumentNullException(nameof(options));
+            var reflectInfos = GetSectionsOfType<T>();
+            var configType = typeof(T);
+            var config = (T)Activator.CreateInstance(configType, true)!;
 
-            while (line != null)
+            //var options = new ReadOptions();
+            //configureReadOptions?.Invoke(options);
+            config.Options = options;
+
+            if (reflectInfos == null)
+                return config;
+            if (options.IncludeMode == true && options.Include.Count == 0)
+                return config;
+
+            Type[] constructorParameter = { configType };
+            Section? currentSection = null;
+            bool isSkippingSection = false;
+
+            var currentLine = reader.ReadLine();
+            while (currentLine != null)
             {
-                if (string.IsNullOrWhiteSpace(line))
+                if (string.IsNullOrWhiteSpace(currentLine))
                 {
-                    line = reader.ReadLine();
+                    currentLine = reader.ReadLine();
                     continue;
                 }
 
-                if (MatchedSection(line, out var sectionName))
+                if (MatchedSection(currentLine, out var sectionName))
                 {
-                    if (options.IncludeMode == true && list.Count == 0)
-                    {
-                        break;
-                    }
-
                     if (options.IncludeMode == null)
                     {
-                        skippingSection = false;
+                        isSkippingSection = false;
                     }
                     else if (options.IncludeMode == true && !options.Include.Contains(sectionName))
                     {
-                        skippingSection = true;
-                        list.Remove(sectionName);
+                        isSkippingSection = true;
                     }
                     else if (options.IncludeMode == false && options.Exclude.Contains(sectionName))
                     {
-                        skippingSection = true;
+                        isSkippingSection = true;
                     }
                     else
                     {
-                        skippingSection = false;
+                        isSkippingSection = false;
                     }
 
-                    var matched = reflectInfos.SingleOrDefault(k => k.Name == sectionName);
-                    if (matched != null)
+                    if (!isSkippingSection)
                     {
-                        if (!skippingSection)
+                        if (reflectInfos.TryGetValue(sectionName, out var reflectInfo))
                         {
-                            var constructors = matched.Type.GetConstructor(new[] { type });
-                            if (constructors != null)
-                                currentSection = Activator.CreateInstance(matched.Type, instance) as Section;
+                            var constructor = reflectInfo.Type.GetConstructor(constructorParameter);
+                            if (constructor != null)
+                                currentSection = Activator.CreateInstance(reflectInfo.Type, config) as Section;
                             else
-                                currentSection = Activator.CreateInstance(matched.Type) as Section;
-                            matched.PropertyInfo.SetValue(instance, currentSection);
+                                currentSection = Activator.CreateInstance(reflectInfo.Type) as Section;
+                            reflectInfo.PropertyInfo.SetValue(config, currentSection);
                         }
-                    }
-                    else
-                    {
-                        instance.HandleCustom(line);
+                        else
+                        {
+                            currentSection = null;
+                            config.HandleCustom(currentLine);
+                        }
                     }
                 }
                 else
                 {
-                    if (!skippingSection)
+                    if (!isSkippingSection)
                     {
                         if (currentSection != null)
-                            currentSection.Match(line);
+                            currentSection.Match(currentLine);
                         else
-                        {
-                            instance.HandleCustom(line);
-                        }
+                            config.HandleCustom(currentLine);
                     }
                 }
 
-                line = reader.ReadLine();
+                currentLine = reader.ReadLine();
             }
 
-            return instance;
+            config.OnDeserialized();
+            return config;
+        }
+
+        public static IReadOnlyDictionary<string, ReflectInfo>? GetSectionsOfType<T>()
+        {
+            var mainType = typeof(T);
+            if (!mainType.IsSubclassOf(ConfigType))
+                return null;
+
+            var reflectInfos = new Dictionary<string, ReflectInfo>();
+            var props = mainType
+                .GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+
+            foreach (var info in props)
+            {
+                AddSectionsIfPossible(info, reflectInfos);
+            }
+
+            return reflectInfos;
         }
 
         private static bool MatchedSection(string line, out string sectionName)
         {
-            if (line.StartsWith("[") && line.EndsWith("]"))
+            if (line[0] == '[' && line[line.Length - 1] == ']')
             {
                 sectionName = line.Substring(1, line.Length - 2);
                 return true;
             }
 
-            sectionName = null;
+            sectionName = null!;
             return false;
         }
 
-        private static List<ReflectInfo> AnalyzeType<T>()
+        private static void AddSectionsIfPossible(PropertyInfo info, IDictionary<string, ReflectInfo> reflectInfos)
         {
-            var reflectInfos = new List<ReflectInfo>();
-            var mainType = typeof(T);
-
-            if (mainType.IsSubclassOf(typeof(Config)))
-            {
-                var privateProp = mainType.GetProperties(BindingFlags.NonPublic | BindingFlags.Instance);
-                var publicProp = mainType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
-
-                foreach (var info in privateProp)
-                {
-                    AddInfo(info, reflectInfos, false);
-                }
-
-                foreach (var info in publicProp)
-                {
-                    AddInfo(info, reflectInfos, true);
-                }
-            }
-            return reflectInfos;
-        }
-
-        private static void AddInfo(PropertyInfo info, List<ReflectInfo> reflectInfos, bool isPublic)
-        {
-            var attributes = info.GetCustomAttributes().Union(
-                info.PropertyType.GetCustomAttributes(),
-                new AttributeComparer()
-            ).ToArray();
-            bool isDefined = GetProperties(attributes,
-                out var ignored,
-                out var propAttr);
-            if (ignored)
-            {
-                return;
-            }
-
-            if (!isDefined && !isPublic)
-            {
-                return;
-            }
-
             var propType = info.PropertyType;
-            if (propType?.IsSubclassOf(typeof(Section)) != true)
-            {
-                return;
-            }
+            if (info.SetMethod == null) return;
+            if (!propType.IsSubclassOf(SectionType)) return;
 
-            ExecuteType executeType;
-            //if (info.DeclaringType?.IsSubclassOf(typeof(KeyValueSection)) == true)
-            //{
-            //    executeType = ExecuteType.Match;
-            //}
-            //else if (info.DeclaringType?.IsSubclassOf(typeof(ICustomSection)) == true)
-            //{
-            //    executeType = ExecuteType.Match;
-            //}
+            var isPublic = info.SetMethod.IsPublic;
 
-            executeType = ExecuteType.Match;
-            string name = null;
-            if (propAttr != null)
-                name = propAttr.Name;
+            var ignore = info.GetCustomAttribute<SectionIgnoreAttribute>();
+            if (ignore != null) return;
+            ignore = info.PropertyType.GetCustomAttribute<SectionIgnoreAttribute>();
+            if (ignore != null) return;
 
-            if (name == null)
-                name = propType.Name;
+            var attr = info.GetCustomAttribute<SectionPropertyAttribute>() ??
+                       propType.GetCustomAttribute<SectionPropertyAttribute>();
+            if (attr == null && !isPublic) return;
 
-            var propName = propType.Name;
+            var name = attr?.Name ?? propType.Name;
 
-            var reflectInfo = new ReflectInfo(info, propType, executeType, name, attributes);
-            reflectInfos.Add(reflectInfo);
-        }
-
-        private static bool GetProperties(IEnumerable<Attribute> attributes,
-            out bool ignored,
-            out SectionPropertyAttribute propAttr)
-        {
-            ignored = false;
-            propAttr = null;
-            bool isDefined = false;
-            foreach (var attribute in attributes)
-            {
-                if (attribute is SectionIgnoreAttribute)
-                {
-                    ignored = true;
-                }
-                else if (attribute is SectionPropertyAttribute)
-                {
-                    isDefined = true;
-                    propAttr = (SectionPropertyAttribute)attribute;
-                }
-            }
-
-            return isDefined;
+            var reflectInfo = new ReflectInfo(info, propType, name);
+            reflectInfos.Add(name, reflectInfo);
         }
     }
 }
