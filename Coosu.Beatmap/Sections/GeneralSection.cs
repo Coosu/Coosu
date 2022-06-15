@@ -80,7 +80,7 @@ namespace Coosu.Beatmap.Sections
         /// <summary>
         /// Whether or not a warning about flashing colors should be shown at the beginning of the map
         /// </summary>
-        [SectionProperty("EpilepsyWarning")]
+        [SectionProperty("EpilepsyWarning", Default = false)]
         [SectionBool(BoolParseType.ZeroOne)]
         public bool EpilepsyWarning { get; set; } = false;
 

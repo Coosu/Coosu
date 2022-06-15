@@ -9,7 +9,7 @@ namespace Coosu.Beatmap.Sections
         /// <summary>
         /// Time in milliseconds of bookmarks
         /// </summary>
-        [SectionProperty("Bookmarks")]
+        [SectionProperty("Bookmarks", Default = SectionPropertyAttribute.DefaultValue)]
         [SectionConverter(typeof(Int32SplitConverter), ',')]
         public List<int> Bookmarks { get; set; } = new();
 

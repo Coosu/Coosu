@@ -17,7 +17,7 @@ namespace Coosu.Beatmap.Sections.Event
             textWriter.Write($"Sample,");
             textWriter.Write($"{Offset},");
             textWriter.Write($"{MagicalInt},");
-            textWriter.Write($"{Filename},");
+            textWriter.Write($"\"{Filename}\",");
             textWriter.Write(Volume);
         }
     }

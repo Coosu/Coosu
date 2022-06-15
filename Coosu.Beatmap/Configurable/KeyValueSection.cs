@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -121,9 +122,11 @@ namespace Coosu.Beatmap.Configurable
                 var rawObj = prop.GetValue(this);
                 if (sectionInfo.Attribute?.Default != null)
                 {
-                    if (sectionInfo.Attribute.Default is SectionPropertyAttribute.DefaultValue &&
-                        rawObj == default)
-                        continue;
+                    if (sectionInfo.Attribute.Default is SectionPropertyAttribute.DefaultValue)
+                    {
+                        if (rawObj == default) continue;
+                        if (rawObj is ICollection { Count: 0 }) continue;
+                    }
 
                     if (sectionInfo.Attribute.Default.GetHashCode() == rawObj?.GetHashCode())
                         continue;

@@ -154,6 +154,7 @@ namespace Coosu.Beatmap.Sections
             foreach (var sampleData in validSampleList)
             {
                 sampleData.AppendSerializedString(textWriter);
+                textWriter.WriteLine();
             }
 
             foreach (var pair in _unknownSection)
