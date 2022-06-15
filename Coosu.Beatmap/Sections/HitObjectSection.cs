@@ -34,8 +34,10 @@ namespace Coosu.Beatmap.Sections
 
         public void ComputeSlidersByCurrentSettings()
         {
-            _timingSection.TimingList.Sort(new TimingPointComparer());
-            HitObjectList.Sort(new HitObjectOffsetComparer());
+            _timingSection.TimingList.Sort(TimingPointComparer.Instance);
+            HitObjectList = HitObjectList
+                .OrderBy(k => k, HitObjectOffsetComparer.Instance)
+                .ToList(); // Use LINQ for stable sort
 
             var currentIndex = 0;
             double? nextTiming = default;
@@ -166,7 +168,7 @@ namespace Coosu.Beatmap.Sections
             int i = -1;
             int holdEnd = default;
             ReadOnlySpan<char> extras = default;
-            foreach (var span in others.SpanSplit(':'))
+            foreach (var span in others.SpanSplit(':', _holdArgs))
             {
                 i++;
                 switch (i)
