@@ -88,19 +88,32 @@ namespace Coosu.Beatmap
             Events.AppendSerializedString(sw);
             sw.WriteLine();
 
-            TimingPoints.AppendSerializedString(sw);
-            sw.WriteLine(Environment.NewLine);
+            if (TimingPoints != null)
+            {
+                TimingPoints.AppendSerializedString(sw);
+                sw.WriteLine(Environment.NewLine);
+            }
 
-            Colours.AppendSerializedString(sw);
-            sw.WriteLine();
+            if (Colours != null)
+            {
+                Colours.AppendSerializedString(sw);
+                sw.WriteLine();
+            }
 
-            HitObjects.AppendSerializedString(sw);
+            if (HitObjects != null)
+            {
+                HitObjects.AppendSerializedString(sw);
+            }
         }
 
         public override void OnDeserialized()
         {
             if (((OsuReadOptions)Options).AutoCompute)
-                this.HitObjects.ComputeSlidersByCurrentSettings();
+            {
+                var hitObjectSection = this.HitObjects;
+                if (hitObjectSection != null)
+                    hitObjectSection.ComputeSlidersByCurrentSettings();
+            }
         }
 
         public override void HandleCustom(string line)
