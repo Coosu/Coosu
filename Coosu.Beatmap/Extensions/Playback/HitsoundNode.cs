@@ -21,7 +21,8 @@
             float volume,
             float balance,
             string filename,
-            bool useUserSkin)
+            bool useUserSkin,
+            PlayablePriority playablePriority)
         {
             var soundElement = new PlayableNode
             {
@@ -29,7 +30,8 @@
                 Volume = volume,
                 Balance = balance,
                 Filename = filename,
-                UseUserSkin = useUserSkin
+                UseUserSkin = useUserSkin,
+                PlayablePriority = playablePriority
             };
             return soundElement;
         }

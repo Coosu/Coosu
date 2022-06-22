@@ -26,7 +26,7 @@ namespace Coosu.Beatmap
             _directory = new DirectoryInfo(directory).FullName;
         }
 
-        public async Task InitializeAsync()
+        public async Task InitializeAsync(string? specificOsuFilename = null)
         {
             var directoryInfo = new DirectoryInfo(_directory);
             var waveFiles = new List<string>();
@@ -46,8 +46,18 @@ namespace Coosu.Beatmap
                     }
                     else if (ext == ".osu")
                     {
+                        if (specificOsuFilename != null)
+                        {
+                            if (specificOsuFilename != k.Name)
+                            {
+                                return;
+                            }
+                        }
+
                         lock (osuFiles)
+                        {
                             osuFiles.Add(OsuFile.ReadFromFile(k.FullName));
+                        }
                     }
                 })
             );
@@ -103,7 +113,8 @@ namespace Coosu.Beatmap
                     timingPoint, hitObject, osuFile);
                 foreach (var (filename, useUserSkin, _) in tuples)
                 {
-                    var element = HitsoundNode.Create(itemOffset, volume, balance, filename, useUserSkin);
+                    var element = HitsoundNode.Create(itemOffset, volume, balance, filename, useUserSkin,
+                        PlayablePriority.Primary);
                     elements.Add(element);
                 }
             }
@@ -112,8 +123,9 @@ namespace Coosu.Beatmap
                 // edges
                 bool forceUseSlide = hitObject.SliderInfo.EdgeSamples == null;
                 var sliderEdges = hitObject.SliderInfo.GetEdges();
-                foreach (var item in sliderEdges)
+                for (var i = 0; i < sliderEdges.Length; i++)
                 {
+                    var item = sliderEdges[i];
                     var itemOffset = item.Offset;
                     var timingPoint = osuFile.TimingPoints.GetLine(itemOffset);
 
@@ -134,7 +146,8 @@ namespace Coosu.Beatmap
                         timingPoint, hitObject, osuFile);
                     foreach (var (filename, useUserSkin, _) in tuples)
                     {
-                        var element = HitsoundNode.Create((int)itemOffset, volume, balance, filename, useUserSkin);
+                        var element = HitsoundNode.Create((int)itemOffset, volume, balance, filename, useUserSkin,
+                            i == 0 ? PlayablePriority.Primary : PlayablePriority.Secondary);
                         elements.Add(element);
                     }
                 }
@@ -154,7 +167,7 @@ namespace Coosu.Beatmap
                             timingPoint, hitObject, osuFile)
                         .First();
 
-                    var element = HitsoundNode.Create((int)itemOffset, volume, balance, filename, useUserSkin);
+                    var element = HitsoundNode.Create((int)itemOffset, volume, balance, filename, useUserSkin, PlayablePriority.Effects);
                     elements.Add(element);
                 }
 
