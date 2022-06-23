@@ -12,6 +12,6 @@ namespace Coosu.Beatmap.Extensions.Playback
                                          $"P{(int)PlayablePriority}: " +
                                          $"V{(Volume * 10):#.#}: " +
                                          $"B{(Balance * 10):#.#}: " +
-                                         $"{Path.GetFileNameWithoutExtension(Filename)}";
+                                         $"{(Filename)}";
     }
 }

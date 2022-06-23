@@ -341,7 +341,7 @@ namespace Coosu.Beatmap
                 if (timingPoint.Track == 0)
                 {
                     filenameVsb.Append(fileNameWithoutExt);
-                    filenameVsb.Append(HitsoundFileCache.WavExtension);
+                    //filenameVsb.Append(HitsoundFileCache.WavExtension);
                     useUserSkin = true;
                 }
                 else if (WaveFiles.Contains(fileNameWithoutExt))
@@ -351,7 +351,7 @@ namespace Coosu.Beatmap
                 else
                 {
                     filenameVsb.Append(fileNameWithoutIndex);
-                    filenameVsb.Append(HitsoundFileCache.WavExtension);
+                    //filenameVsb.Append(HitsoundFileCache.WavExtension);
                     useUserSkin = true;
                 }
 
