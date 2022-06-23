@@ -52,35 +52,36 @@ namespace Coosu.Beatmap
 
         public static TimingPoint GetRedLine(this TimingSection timingSection, double offset)
         {
-            TimingPoint[] points = timingSection.TimingList
-                .Where(t => !t.IsInherit)
-                .Where(t => t.Offset + 0.5 < offset)
-                .ToArray();
-            return points.Length == 0 ? timingSection.TimingList.First(t => !t.IsInherit) : points.Last();
+            var redLine = timingSection.TimingList
+                .LastOrDefault(t => !t.IsInherit && t.Offset - 0.5 < offset);
+            if (redLine is null)
+                return timingSection.TimingList.First(t => !t.IsInherit);
+            return redLine;
         }
 
         public static TimingPoint GetLine(this TimingSection timingSection, double offset)
         {
-            var lines = timingSection.TimingList
-                .Where(t => t.Offset + 0.5 < offset)
-                .ToArray();
-            if (lines.Length == 0)
-                return timingSection.TimingList.First();
-            var timing = lines.Max(t => t.Offset);
-            var samePositionPoints = timingSection.TimingList
-                .Where(t => Math.Abs(t.Offset - timing) < 0.5)
-                .ToArray();
-            TimingPoint point;
-            if (samePositionPoints.Length > 1)
+            var line = timingSection.TimingList.LastOrDefault(t => t.Offset - 0.5 < offset);
+            if (line is null)
+                return timingSection.TimingList[0];
+            if (line.IsInherit)
+                return line;
+            // there might be possibility that multiple lines at same time
+            var index = timingSection.TimingList.IndexOf(line);
+            for (var i = index - 1; i >= 0; i--)
             {
-                var greens = samePositionPoints.Where(k => k.IsInherit);
-                point = greens.LastOrDefault() ?? samePositionPoints.Last();
-                // there might be possibility that two red lines at same time
+                var t = timingSection.TimingList[i];
+                if (t.Offset + 0.5 > line.Offset)
+                {
+                    if (t.IsInherit) return t;
+                }
+                else
+                {
+                    return line;
+                }
             }
-            else
-                point = samePositionPoints[0];
 
-            return point;
+            return line;
         }
 
         public static double[] GetTimingBars(this TimingSection timingSection)
