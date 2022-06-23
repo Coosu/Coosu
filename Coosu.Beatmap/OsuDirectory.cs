@@ -10,6 +10,7 @@ using Coosu.Beatmap.Extensions.Playback;
 using Coosu.Beatmap.Sections.GamePlay;
 using Coosu.Beatmap.Sections.HitObject;
 using Coosu.Beatmap.Sections.Timing;
+using Coosu.Beatmap.Utils;
 
 namespace Coosu.Beatmap
 {
@@ -319,12 +320,12 @@ namespace Coosu.Beatmap
             }
             else
             {
-                var hitsounds = GetHitsounds(itemHitsound, sampleStr, additionStr);
-                tuples.AddRange(osuFile.General.Mode == GameMode.Mania
-                    ? hitsounds.Take(1)
-                    : hitsounds);
+                var hitsounds = GetHitsounds(itemHitsound, sampleStr, additionStr,
+                    osuFile.General.Mode == GameMode.Mania);
+                tuples.AddRange(hitsounds);
             }
 
+            Span<char> chars = stackalloc char[32];
             for (var i = 0; i < tuples.Count; i++)
             {
                 var fileNameWithoutIndex = tuples[i].Item1;
@@ -336,23 +337,25 @@ namespace Coosu.Beatmap
                 var fileNameWithoutExt = fileNameWithoutIndex + indexStr;
 
                 bool useUserSkin;
-                string filename;
+                using var filenameVsb = new ValueStringBuilder(chars);
                 if (timingPoint.Track == 0)
                 {
-                    filename = fileNameWithoutExt + HitsoundFileCache.WavExtension;
+                    filenameVsb.Append(fileNameWithoutExt);
+                    filenameVsb.Append(HitsoundFileCache.WavExtension);
                     useUserSkin = true;
                 }
                 else if (WaveFiles.Contains(fileNameWithoutExt))
                 {
-                    filename = _cache.GetFileUntilFind(_directory, fileNameWithoutExt, out useUserSkin);
+                    filenameVsb.Append(_cache.GetFileUntilFind(_directory, fileNameWithoutExt, out useUserSkin));
                 }
                 else
                 {
-                    filename = fileNameWithoutIndex + HitsoundFileCache.WavExtension;
+                    filenameVsb.Append(fileNameWithoutIndex);
+                    filenameVsb.Append(HitsoundFileCache.WavExtension);
                     useUserSkin = true;
                 }
 
-                tuples[i] = (filename, useUserSkin, hitsoundType);
+                tuples[i] = (filenameVsb.ToString(), useUserSkin, hitsoundType);
             }
 
             return tuples;
@@ -373,7 +376,7 @@ namespace Coosu.Beatmap
         }
 
         private static IEnumerable<(string, bool, HitsoundType)> GetHitsounds(HitsoundType type,
-            string? sampleStr, string? additionStr)
+            string? sampleStr, string? additionStr, bool ignoreBase = false)
         {
             if (type == HitsoundType.Tick)
             {
@@ -395,6 +398,10 @@ namespace Coosu.Beatmap
                 yield return ($"{additionStr}-hitclap", false, type);
             if (type.HasFlag(HitsoundType.Finish))
                 yield return ($"{additionStr}-hitfinish", false, type);
+
+            if (ignoreBase)
+                yield break;
+
             if (type.HasFlag(HitsoundType.Normal) ||
                 (type & HitsoundType.Normal) == 0)
                 yield return ($"{sampleStr}-hitnormal", false, type);
