@@ -39,8 +39,7 @@ namespace CoosuUnitTest.Beatmap
 
             var hitsoundList = await osuDir.GetHitsoundNodesAsync(osuDir.OsuFiles[0]);
             var playableNodes = hitsoundList
-                .OrderBy(k => k.Offset)
-                .Where(k => k is PlayableNode { PlayablePriority: PlayablePriority.Primary })
+                .Where(k => k is PlayableNode { /*PlayablePriority: PlayablePriority.Primary*/ })
                 .Cast<PlayableNode>()
                 .ToList();
         }

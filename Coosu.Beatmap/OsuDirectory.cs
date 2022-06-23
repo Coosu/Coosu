@@ -19,7 +19,7 @@ namespace Coosu.Beatmap
         private readonly HitsoundFileCache _cache = new();
         private bool _isInitialized;
         public IReadOnlyList<OsuFile> OsuFiles { get; private set; }
-        public IReadOnlyList<string> WaveFiles { get; private set; }
+        public IReadOnlyCollection<string> WaveFiles { get; private set; }
 
         public OsuDirectory(string directory)
         {
@@ -29,7 +29,7 @@ namespace Coosu.Beatmap
         public async Task InitializeAsync(string? specificOsuFilename = null)
         {
             var directoryInfo = new DirectoryInfo(_directory);
-            var waveFiles = new List<string>();
+            var waveFiles = new HashSet<string>();
             var osuFiles = new List<OsuFile>();
             await Task.Run(() => directoryInfo
                 .EnumerateFiles("*", SearchOption.TopDirectoryOnly)
@@ -41,7 +41,7 @@ namespace Coosu.Beatmap
                     {
                         lock (waveFiles)
                         {
-                            waveFiles.Add(k.Name);
+                            waveFiles.Add(Path.GetFileNameWithoutExtension(k.FullName));
                         }
                     }
                     else if (ext == ".osu")
@@ -78,6 +78,7 @@ namespace Coosu.Beatmap
             {
                 hitObjects
                     .AsParallel()
+                    //.WithDegreeOfParallelism(1)
                     .ForAll(obj =>
                     {
                         try
@@ -91,7 +92,7 @@ namespace Coosu.Beatmap
                     });
             }).ConfigureAwait(false);
 
-            return elements.ToList();
+            return elements.OrderBy(k => k.Offset).ToList();
         }
 
         private void AddSingleHitObject(OsuFile osuFile, RawHitObject hitObject, ConcurrentBag<HitsoundNode> elements)
@@ -341,7 +342,7 @@ namespace Coosu.Beatmap
                     filename = fileNameWithoutExt + HitsoundFileCache.WavExtension;
                     useUserSkin = true;
                 }
-                else if (WaveFiles!.Contains(fileNameWithoutExt))
+                else if (WaveFiles.Contains(fileNameWithoutExt))
                 {
                     filename = _cache.GetFileUntilFind(_directory, fileNameWithoutExt, out useUserSkin);
                 }

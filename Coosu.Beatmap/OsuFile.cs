@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Coosu.Beatmap.Configurable;
 using Coosu.Beatmap.Sections;
@@ -19,7 +20,7 @@ namespace Coosu.Beatmap
         public DifficultySection Difficulty { get; set; }
         public EventSection Events { get; set; }
         public TimingSection TimingPoints { get; set; }
-        public ColorSection Colours { get; set; }
+        public ColorSection? Colours { get; set; }
         public HitObjectSection HitObjects { get; set; }
 
         public static LocalOsuFile ReadFromFile(string path, Action<OsuReadOptions>? readOptionFactory = null)
@@ -108,12 +109,13 @@ namespace Coosu.Beatmap
 
         public override void OnDeserialized()
         {
-            if (((OsuReadOptions)Options).AutoCompute)
-            {
-                var hitObjectSection = this.HitObjects;
-                if (hitObjectSection != null)
-                    hitObjectSection.ComputeSlidersByCurrentSettings();
-            }
+            var readOptions = (OsuReadOptions)Options;
+            if (!readOptions.AutoCompute) return;
+            var hitObjectSection = this.HitObjects;
+            if (hitObjectSection != null)
+                hitObjectSection.ComputeSlidersByCurrentSettings();
+            if (this.TimingPoints != null)
+                this.TimingPoints.TimingList = this.TimingPoints.TimingList.OrderBy(k => k.Offset).ToList();
         }
 
         public override void HandleCustom(string line)
