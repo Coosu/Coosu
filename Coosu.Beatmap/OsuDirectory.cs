@@ -19,15 +19,15 @@ namespace Coosu.Beatmap
         private readonly string _directory;
         private readonly HitsoundFileCache _cache = new();
         private bool _isInitialized;
-        public IReadOnlyList<OsuFile> OsuFiles { get; private set; }
-        public IReadOnlyCollection<string> WaveFiles { get; private set; }
+        public IReadOnlyList<OsuFile> OsuFiles { get; private set; } = Array.Empty<OsuFile>();
+        public IReadOnlyCollection<string> WaveFiles { get; private set; } = Array.Empty<string>();
 
         public OsuDirectory(string directory)
         {
             _directory = new DirectoryInfo(directory).FullName;
         }
 
-        public async Task InitializeAsync(string? specificOsuFilename = null)
+        public async Task InitializeAsync(string? specificOsuFilename = null, bool ignoreWaveFiles = false)
         {
             var directoryInfo = new DirectoryInfo(_directory);
             var waveFiles = new HashSet<string>();
@@ -40,9 +40,12 @@ namespace Coosu.Beatmap
                     var ext = Path.GetExtension(k.Name);
                     if (Array.IndexOf(HitsoundFileCache.SupportExtensions, ext) != -1)
                     {
-                        lock (waveFiles)
+                        if (!ignoreWaveFiles)
                         {
-                            waveFiles.Add(Path.GetFileNameWithoutExtension(k.FullName));
+                            lock (waveFiles)
+                            {
+                                waveFiles.Add(Path.GetFileNameWithoutExtension(k.FullName));
+                            }
                         }
                     }
                     else if (ext == ".osu")
@@ -91,6 +94,12 @@ namespace Coosu.Beatmap
                             throw new Exception("Error while analyzing the object: " + obj.ToSerializedString(), e);
                         }
                     });
+
+                osuFile.Events?.Samples?.AsParallel().ForAll(sampleData =>
+                {
+                    elements.Add(HitsoundNode.Create(sampleData.Offset, sampleData.Volume / 100f, 0,
+                        sampleData.Filename, false, PlayablePriority.Sampling));
+                });
             }).ConfigureAwait(false);
 
             return elements.OrderBy(k => k.Offset).ToList();
@@ -162,7 +171,7 @@ namespace Coosu.Beatmap
                     var timingPoint = osuFile.TimingPoints.GetLine(itemOffset);
 
                     float balance = ignoreBalance ? 0 : GetObjectBalance(sliderTick.Point.X);
-                    float volume = GetObjectVolume(hitObject, timingPoint) * 1.25f; // ticks x1.25
+                    float volume = GetObjectVolume(hitObject, timingPoint)/* * 1.25f*/; // ticks x1.25?
 
                     var (filename, useUserSkin, _) = AnalyzeHitsoundFiles(HitsoundType.Tick,
                             hitObject.SampleSet, hitObject.AdditionSet,

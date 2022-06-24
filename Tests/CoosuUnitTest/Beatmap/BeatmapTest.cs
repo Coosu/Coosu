@@ -32,8 +32,8 @@ namespace CoosuUnitTest.Beatmap
         [TestMethod]
         public async Task ReadHitsounds()
         {
-            var folder = @"F:\milkitic\Songs\1376486 Risshuu feat. Choko - Take";
-            var file = @"Risshuu feat. Choko - Take (yf_bmp) [Ta~ke take take take take take tatata~].osu";
+            var folder = @"F:\milkitic\others\1002455 supercell - Giniro Hikousen  (Ttm bootleg Edit)";
+            var file = @"supercell - Giniro Hikousen  (Ttm bootleg Edit) (yf_bmp) [7K Another].osu";
             var osuDir = new OsuDirectory(folder);
             await osuDir.InitializeAsync(file);
 

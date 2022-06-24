@@ -2,5 +2,5 @@
 
 public enum PlayablePriority
 {
-    Primary, Secondary, Effects
+    Primary, Secondary, Effects, Sampling
 }
