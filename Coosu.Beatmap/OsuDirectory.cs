@@ -82,7 +82,7 @@ namespace Coosu.Beatmap
             {
                 hitObjects
                     .AsParallel()
-                    //.WithDegreeOfParallelism(1)
+                    .WithDegreeOfParallelism(1)
                     .ForAll(obj =>
                     {
                         try
@@ -97,7 +97,7 @@ namespace Coosu.Beatmap
 
                 osuFile.Events?.Samples?.AsParallel().ForAll(sampleData =>
                 {
-                    elements.Add(HitsoundNode.Create(sampleData.Offset, sampleData.Volume / 100f, 0,
+                    elements.Add(HitsoundNode.Create(Guid.NewGuid(), sampleData.Offset, sampleData.Volume / 100f, 0,
                         sampleData.Filename, false, PlayablePriority.Sampling));
                 });
             }).ConfigureAwait(false);
@@ -122,9 +122,10 @@ namespace Coosu.Beatmap
                 var tuples = AnalyzeHitsoundFiles(hitObject.Hitsound,
                     hitObject.SampleSet, hitObject.AdditionSet,
                     timingPoint, hitObject, osuFile);
+                var guid = Guid.NewGuid();
                 foreach (var (filename, useUserSkin, _) in tuples)
                 {
-                    var element = HitsoundNode.Create(itemOffset, volume, balance, filename, useUserSkin,
+                    var element = HitsoundNode.Create(guid, itemOffset, volume, balance, filename, useUserSkin,
                         PlayablePriority.Primary);
                     elements.Add(element);
                 }
@@ -132,7 +133,7 @@ namespace Coosu.Beatmap
             else // sliders
             {
                 // edges
-                bool forceUseSlide = hitObject.SliderInfo.EdgeSamples == null;
+                bool forceUseSlide = hitObject.SliderInfo!.EdgeHitsounds == null;
                 var sliderEdges = hitObject.SliderInfo.GetEdges();
                 for (var i = 0; i < sliderEdges.Length; i++)
                 {
@@ -155,9 +156,10 @@ namespace Coosu.Beatmap
                     var tuples = AnalyzeHitsoundFiles(hitsoundType,
                         sample, addition,
                         timingPoint, hitObject, osuFile);
+                    var guid = Guid.NewGuid();
                     foreach (var (filename, useUserSkin, _) in tuples)
                     {
-                        var element = HitsoundNode.Create((int)itemOffset, volume, balance, filename, useUserSkin,
+                        var element = HitsoundNode.Create(guid, (int)itemOffset, volume, balance, filename, useUserSkin,
                             i == 0 ? PlayablePriority.Primary : PlayablePriority.Secondary);
                         elements.Add(element);
                     }
@@ -178,7 +180,8 @@ namespace Coosu.Beatmap
                             timingPoint, hitObject, osuFile)
                         .First();
 
-                    var element = HitsoundNode.Create((int)itemOffset, volume, balance, filename, useUserSkin, PlayablePriority.Effects);
+                    var element = HitsoundNode.Create(Guid.NewGuid(), (int)itemOffset, volume, balance, filename,
+                        useUserSkin, PlayablePriority.Effects);
                     elements.Add(element);
                 }
 
@@ -322,7 +325,7 @@ namespace Coosu.Beatmap
             Debug.Assert(sampleStr != null);
             Debug.Assert(additionStr != null);
 
-            if (hitObject.ObjectType == HitObjectType.Slider && hitObject.SliderInfo.EdgeHitsounds == null)
+            if (hitObject.ObjectType == HitObjectType.Slider && hitObject.SliderInfo!.EdgeHitsounds == null)
             {
                 var hitsounds = GetHitsounds(itemHitsound, sampleStr, additionStr);
                 tuples.AddRange(hitsounds);

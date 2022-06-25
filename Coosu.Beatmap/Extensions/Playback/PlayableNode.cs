@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.IO;
 
 namespace Coosu.Beatmap.Extensions.Playback
@@ -6,6 +7,10 @@ namespace Coosu.Beatmap.Extensions.Playback
     [DebuggerDisplay("{DebuggerDisplay}")]
     public class PlayableNode : HitsoundNode
     {
+        /// <summary>
+        /// Object identifier
+        /// </summary>
+        public Guid Guid { get; set; }
         public PlayablePriority PlayablePriority { get; set; }
 
         public string DebuggerDisplay => $"PL{(UseUserSkin ? "D" : "")}:{Offset}: " +

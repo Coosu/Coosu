@@ -1,4 +1,6 @@
-﻿namespace Coosu.Beatmap.Extensions.Playback
+﻿using System;
+
+namespace Coosu.Beatmap.Extensions.Playback
 {
     public abstract class HitsoundNode
     {
@@ -17,6 +19,7 @@
         public float Volume { get; internal set; }
 
         public static PlayableNode Create(
+            Guid guid,
             int offset,
             float volume,
             float balance,
@@ -26,6 +29,7 @@
         {
             var soundElement = new PlayableNode
             {
+                Guid = guid,
                 Offset = offset,
                 Volume = volume,
                 Balance = balance,
