@@ -126,7 +126,7 @@ namespace Coosu.Beatmap
                 foreach (var (filename, useUserSkin, _) in tuples)
                 {
                     var element = HitsoundNode.Create(guid, itemOffset, volume, balance, filename, useUserSkin,
-                        PlayablePriority.Primary);
+                        hitObject.ObjectType == HitObjectType.Spinner ? PlayablePriority.Secondary : PlayablePriority.Primary);
                     elements.Add(element);
                 }
             }
