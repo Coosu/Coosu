@@ -118,7 +118,6 @@ namespace Coosu.Beatmap
 
                 float balance = ignoreBalance ? 0 : GetObjectBalance(hitObject.X);
                 float volume = GetObjectVolume(hitObject, timingPoint);
-
                 var tuples = AnalyzeHitsoundFiles(hitObject.Hitsound,
                     hitObject.SampleSet, hitObject.AdditionSet,
                     timingPoint, hitObject, osuFile);
@@ -411,7 +410,7 @@ namespace Coosu.Beatmap
             if (type.HasFlag(HitsoundType.Finish))
                 yield return ($"{additionStr}-hitfinish", false, type);
 
-            if (ignoreBase)
+            if (ignoreBase && type != 0)
                 yield break;
 
             if (type.HasFlag(HitsoundType.Normal) ||
