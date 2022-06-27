@@ -43,16 +43,16 @@ namespace Coosu.Beatmap.Sections
         [SectionIgnore]
         public MetaString ArtistMeta => new(Artist, ArtistUnicode);
 
-        public void AppendSerializedString(TextWriter textWriter, string? newDiffName)
+        public void AppendSerializedString(TextWriter textWriter, string? overrideDifficulty)
         {
-            if (newDiffName == null)
+            if (overrideDifficulty == null)
             {
                 base.AppendSerializedString(textWriter);
                 return;
             }
 
             var clonedSection = (MetadataSection)this.MemberwiseClone();
-            clonedSection.Version = newDiffName;
+            clonedSection.Version = overrideDifficulty;
             clonedSection.AppendSerializedString(textWriter);
         }
     }

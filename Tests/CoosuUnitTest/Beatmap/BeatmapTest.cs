@@ -25,8 +25,7 @@ namespace CoosuUnitTest.Beatmap
             var file = @"Risshuu feat. Choko - Take (yf_bmp) [Ta~ke take take take take take tatata~].osu";
             var osuFile = await OsuFile.ReadFromFileAsync(Path.Combine(folder, file));
 
-            osuFile.Metadata.Version += " (TEST)";
-            osuFile.WriteOsuFile(Path.Combine(folder, osuFile.GetPath(osuFile.Metadata.Version)));
+            osuFile.SaveToDirectory(folder, osuFile.Metadata.Version + " (TEST)");
         }
 
         [TestMethod]

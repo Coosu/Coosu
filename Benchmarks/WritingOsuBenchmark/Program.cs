@@ -64,7 +64,7 @@ namespace WritingOsuBenchmark
                 throw new FileNotFoundException("Test file does not exists: " + fi.FullName);
             Environment.SetEnvironmentVariable("test_osu_path", fi.FullName);
             var osu = LocalCoosuNs.Beatmap.OsuFile.ReadFromFileAsync(fi.FullName).Result;
-            osu.WriteOsuFile("new.osu");
+            osu.Save("new.osu");
             using (var file = File.CreateText(@"new.json"))
             {
                 var serializer = new JsonSerializer()
@@ -123,7 +123,7 @@ namespace WritingOsuBenchmark
             [Benchmark(Baseline = true)]
             public async Task<object?> CoosuLatest_Write()
             {
-                _latest.WriteOsuFile("CoosuLatest_Write.txt");
+                _latest.Save("CoosuLatest_Write.txt");
                 return null;
             }
 

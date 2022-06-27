@@ -32,7 +32,7 @@ namespace ParsingPerformanceTest
                 throw new FileNotFoundException("Test file does not exists: " + fi.FullName);
             Environment.SetEnvironmentVariable("test_osu_path", fi.FullName);
             var osu = LocalCoosuNs.Beatmap.OsuFile.ReadFromFileAsync(fi.FullName).Result;
-            osu.WriteOsuFile("new.osu");
+            osu.Save("new.osu");
             var osu2 = NugetCoosuNs.Beatmap.OsuFile.ReadFromFileAsync(fi.FullName).Result;
             osu2.WriteOsuFile("old.osu");
             //var arr = new bool[15000]
