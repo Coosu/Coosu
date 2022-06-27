@@ -23,7 +23,12 @@ namespace CoosuTest
         static async Task Main(string[] args)
         {
             //var osu = await OsuFile.ReadFromFileAsync(@"E:/Games/osu!\Songs\BmsToOsu/IIDX\29075\P -  (bms2osu) [lv.10].osu");
-            var osu = await OsuFile.ReadFromFileAsync(@"E:/Games/osu!\Songs\BmsToOsu/IIDX\29075\P -  (bms2osu) [lv.10].osu");
+            var osuDir = new OsuDirectory(
+                @"C:\Users\milkitic\Downloads\859515 K A Z M A S A - Bon Appetit S (Oldskool HappyHardcore Remix) (Short Ver.)");
+            await osuDir.InitializeAsync(@"K A Z M A S A - Bon Appetit S (Oldskool HappyHardcore Remix) (Short Ver.) (BarkingMadDog) [blend s (230 bpm)].osu");
+            var o = await osuDir.GetHitsoundNodesAsync(osuDir.OsuFiles[0]);
+
+            //var osu = await OsuFile.ReadFromFileAsync(@"crack.osu");
             var list = new List<ValueTuple<string?, object?, string, string>>(8294626);
             for (int i = 0; i < 10; i++)
             {
