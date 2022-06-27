@@ -159,7 +159,7 @@ namespace Coosu.Beatmap.Configurable
                     var converter = attr.GetConverter();
 
                     textWriter.Write(name);
-                    textWriter.Write(FlagRule);
+                    textWriter.Write(FlagRule.SplitFlag);
                     if (rawObj != null) converter.WriteSection(textWriter, rawObj);
                     textWriter.WriteLine();
                     continue;
