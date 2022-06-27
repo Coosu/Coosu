@@ -333,15 +333,24 @@ namespace Coosu.Beatmap
                 currentGroup.Add(thisPoint);
                 if (thisPoint.Equals(nextPoint))
                 {
-                    groupedPoints.Add(currentGroup);
+                    if (currentGroup.Count > 1)
+                    {
+                        groupedPoints.Add(currentGroup);
+                    }
+
                     currentGroup = new List<Vector2>();
                 }
             }
 
             if (currentGroup.Count != 0 && nextPoint != null)
+            {
                 currentGroup.Add(nextPoint.Value);
+            }
+
             if (currentGroup.Count != 0)
+            {
                 groupedPoints.Add(currentGroup);
+            }
 
             if (groupedPoints.Count == 0 && rawPoints.Count != 0)
             {
