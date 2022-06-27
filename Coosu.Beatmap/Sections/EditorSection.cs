@@ -37,6 +37,6 @@ namespace Coosu.Beatmap.Sections
         [SectionProperty("TimelineZoom")]
         public double TimelineZoom { get; set; } = 1;
 
-        protected override string KeyValueFlag => ": ";
+        protected override FlagRule FlagRule { get; } = FlagRules.ColonSpace;
     }
 }

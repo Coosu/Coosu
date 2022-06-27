@@ -89,20 +89,41 @@ namespace Coosu.Beatmap.Configurable
 
         protected void MatchKeyValue(string line, out ReadOnlySpan<char> keySpan, out ReadOnlySpan<char> valueSpan)
         {
-            int index = MatchFlag(line);
-            if (index == -1)
-                throw new Exception($"Unknown Key-Value: {line}");
+            int index = MatchFlag(line, out var flagRule);
+            if (index == -1) throw new Exception($"Unknown Key-Value: {line}");
+
             keySpan = line.AsSpan(0, index);
-            if (TrimPairs)
+            if (flagRule.TrimType is TrimType.Key or TrimType.Both)
+            {
                 keySpan = keySpan.Trim();
-            valueSpan = line.AsSpan(index + KeyValueFlag.Length);
-            if (TrimPairs)
+            }
+
+            valueSpan = line.AsSpan(index + flagRule.SplitFlag.Length);
+            if (flagRule.TrimType is TrimType.Value or TrimType.Both)
+            {
                 valueSpan = valueSpan.Trim();
+            }
         }
 
-        protected int MatchFlag(string line)
+        protected int MatchFlag(string line, out FlagRule flagRule)
         {
-            var index = line.IndexOf(KeyValueFlag, StringComparison.Ordinal);
+            var index = line.IndexOf(FlagRule.SplitFlag, StringComparison.Ordinal);
+            if (index == -1)
+            {
+                flagRule = null;
+                foreach (var rule in FuzzyFlagRules)
+                {
+                    index = line.IndexOf(rule.SplitFlag, StringComparison.Ordinal);
+                    if (index == -1) continue;
+                    flagRule = rule;
+                    return index;
+                }
+            }
+            else
+            {
+                flagRule = FlagRule;
+            }
+
             return index;
         }
 
@@ -138,7 +159,7 @@ namespace Coosu.Beatmap.Configurable
                     var converter = attr.GetConverter();
 
                     textWriter.Write(name);
-                    textWriter.Write(KeyValueFlag);
+                    textWriter.Write(FlagRule);
                     if (rawObj != null) converter.WriteSection(textWriter, rawObj);
                     textWriter.WriteLine();
                     continue;
@@ -183,25 +204,14 @@ namespace Coosu.Beatmap.Configurable
                 }
 
                 textWriter.Write(name);
-                textWriter.Write(KeyValueFlag);
+                textWriter.Write(FlagRule);
                 textWriter.WriteLine(value);
             }
         }
 
-        protected virtual string KeyValueFlag { get; } = ":";
-        protected virtual bool TrimPairs { get; } = false;
+        protected virtual FlagRule FlagRule { get; } = FlagRules.Colon;
+        protected virtual IReadOnlyList<FlagRule> FuzzyFlagRules { get; } = FlagRules.FuzzyRules;
+
         protected readonly Dictionary<string, SectionInfo> PropertyInfos = new();
-    }
-
-    public class SectionInfo
-    {
-
-        public SectionInfo(PropertyInfo propertyInfo)
-        {
-            PropertyInfo = propertyInfo;
-        }
-
-        public PropertyInfo PropertyInfo { get; }
-        public SectionPropertyAttribute? Attribute { get; set; }
     }
 }

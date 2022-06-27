@@ -70,9 +70,14 @@ namespace Coosu.Beatmap.Configurable
                         {
                             var constructor = reflectInfo.Type.GetConstructor(constructorParameter);
                             if (constructor != null)
+                            {
                                 currentSection = Activator.CreateInstance(reflectInfo.Type, config) as Section;
+                            }
                             else
+                            {
                                 currentSection = Activator.CreateInstance(reflectInfo.Type) as Section;
+                            }
+
                             reflectInfo.PropertyInfo.SetValue(config, currentSection);
                         }
                         else
@@ -87,9 +92,13 @@ namespace Coosu.Beatmap.Configurable
                     if (!isSkippingSection)
                     {
                         if (currentSection != null)
+                        {
                             currentSection.Match(currentLine);
+                        }
                         else
+                        {
                             config.HandleCustom(currentLine);
+                        }
                     }
                 }
 

@@ -52,6 +52,6 @@ namespace Coosu.Beatmap.Sections
         [SectionConverter(typeof(ColorConverter))]
         public ReadyOnlyVector3<byte>? SliderBorder { get; set; }
 
-        protected override string KeyValueFlag => " : ";
+        protected override FlagRule FlagRule { get; } = FlagRules.SpaceColonSpace;
     }
 }

@@ -1,4 +1,5 @@
-﻿using Coosu.Beatmap.Configurable;
+﻿using System.Collections.Generic;
+using Coosu.Beatmap.Configurable;
 using Coosu.Beatmap.Sections.GamePlay;
 using Coosu.Beatmap.Sections.Timing;
 
@@ -111,6 +112,6 @@ namespace Coosu.Beatmap.Sections
         [SectionBool(BoolParseType.ZeroOne)]
         public bool SamplesMatchPlaybackRate { get; set; } = false;
 
-        protected override string KeyValueFlag => ": ";
+        protected override FlagRule FlagRule { get; } = FlagRules.ColonSpace;
     }
 }

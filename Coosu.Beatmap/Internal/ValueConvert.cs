@@ -20,6 +20,7 @@ namespace Coosu.Beatmap.Internal
         private static readonly Type TypeUInt64 = typeof(ulong);
         private static readonly Type TypeDouble = typeof(double);
         private static readonly Type TypeSingle = typeof(float);
+        private static readonly Type TypeString = typeof(string);
 
         public static bool ConvertValue(ReadOnlySpan<char> value, Type propType, out object? converted)
         {
@@ -27,6 +28,33 @@ namespace Coosu.Beatmap.Internal
             {
                 var b = ParseHelper.TryParseByte(value, out var result);
                 converted = result == 1;
+                return b;
+            }
+
+            if (propType == TypeString)
+            {
+                converted = value.ToString();
+                return true;
+            }
+
+            if (propType == TypeInt32)
+            {
+                var b = ParseHelper.TryParseInt32(value, out var result);
+                converted = result;
+                return b;
+            }
+
+            if (propType == TypeSingle)
+            {
+                var b = ParseHelper.TryParseSingle(value, out var result);
+                converted = result;
+                return b;
+            }
+
+            if (propType == TypeDouble)
+            {
+                var b = ParseHelper.TryParseDouble(value, out var result);
+                converted = result;
                 return b;
             }
 
@@ -57,13 +85,6 @@ namespace Coosu.Beatmap.Internal
                 return b;
             }
 
-            if (propType == TypeInt32)
-            {
-                var b = ParseHelper.TryParseInt32(value, out var result);
-                converted = result;
-                return b;
-            }
-
             if (propType == TypeUInt32)
             {
                 var b = ParseHelper.TryParseUInt32(value, out var result);
@@ -81,20 +102,6 @@ namespace Coosu.Beatmap.Internal
             if (propType == TypeUInt64)
             {
                 var b = ParseHelper.TryParseUInt64(value, out var result);
-                converted = result;
-                return b;
-            }
-
-            if (propType == TypeDouble)
-            {
-                var b = ParseHelper.TryParseDouble(value, out var result);
-                converted = result;
-                return b;
-            }
-
-            if (propType == TypeSingle)
-            {
-                var b = ParseHelper.TryParseSingle(value, out var result);
                 converted = result;
                 return b;
             }
