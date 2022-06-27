@@ -43,10 +43,10 @@ public class OsuFile : Config
         return emptyFile;
     }
 
-    public static OsuFile ReadFromStream(Stream stream, Action<OsuReadOptions>? readOptionFactory = null)
+    public static OsuFile ReadFromStream(Stream stream, Action<OsuReadOptions>? configReadOption = null)
     {
         var options = new OsuReadOptions();
-        readOptionFactory?.Invoke(options);
+        configReadOption?.Invoke(options);
         using var sr = new StreamReader(stream);
         OsuFile osuFile;
         if (stream is FileStream fs)
@@ -63,22 +63,23 @@ public class OsuFile : Config
         return osuFile;
     }
 
-    public static LocalOsuFile ReadFromFile(string path, Action<OsuReadOptions>? readOptionFactory = null)
+    public static LocalOsuFile ReadFromFile(string path, Action<OsuReadOptions>? configReadOption = null)
     {
         using var fs = new FileStream(GetActualPath(path), FileMode.Open, FileAccess.Read, FileShare.Read);
-        return (LocalOsuFile)ReadFromStream(fs, readOptionFactory);
+        return (LocalOsuFile)ReadFromStream(fs, configReadOption);
     }
 
     /// <summary>
     /// Note this is not async stream, but async parsing
     /// </summary>
     /// <param name="path"></param>
-    /// <param name="readOptionFactory"></param>
+    /// <param name="configReadOption"></param>
     /// <returns></returns>
-    public static async Task<LocalOsuFile> ReadFromFileAsync(string path, Action<OsuReadOptions>? readOptionFactory = null)
+    public static async Task<LocalOsuFile> ReadFromFileAsync(string path,
+        Action<OsuReadOptions>? configReadOption = null)
     {
         using var fs = new FileStream(GetActualPath(path), FileMode.Open, FileAccess.Read, FileShare.Read);
-        return await Task.Run(() => (LocalOsuFile)ReadFromStream(fs, readOptionFactory));
+        return await Task.Run(() => (LocalOsuFile)ReadFromStream(fs, configReadOption));
     }
 
     public void SaveToDirectory(string directory, string? difficultyName = null)
@@ -124,7 +125,9 @@ public class OsuFile : Config
         }
     }
 
-    protected OsuFile() { }
+    protected OsuFile()
+    {
+    }
 
     private string Filename => this.GetOsuFilename(Metadata.Version);
 
