@@ -26,8 +26,19 @@ public static class OsuFileExtensions
         ));
     }
 
-    public static async Task<bool> OsbFileHasStoryboard(string osbPath)
+    public static async Task<bool> OsuFileHasOsbStoryboard(this LocalOsuFile osuFile)
     {
+        var osbFile = GetOsbFilename(osuFile);
+        var folder = Path.GetDirectoryName(osuFile.OriginalPath);
+        var osbPath = Path.Combine(folder, osbFile);
+
+        return await HasOsbStoryboard(osbPath);
+    }
+
+    private static async Task<bool> HasOsbStoryboard(string osbPath)
+    {
+        if (!File.Exists(osbPath)) return false;
+
         using var sr = new StreamReader(osbPath);
         var line = await sr.ReadLineAsync();
 
@@ -60,9 +71,9 @@ public static class OsuFileExtensions
         return false;
     }
 
-    public static async Task<bool> FileHasStoryboard(string mapPath)
+    public static async Task<bool> OsuFileHasStoryboard(string osuPath)
     {
-        using var sr = new StreamReader(mapPath);
+        using var sr = new StreamReader(osuPath);
         var line = await sr.ReadLineAsync();
         bool hasEvent = false;
         bool inEventsSection = false;
