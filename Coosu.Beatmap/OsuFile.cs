@@ -82,11 +82,12 @@ public class OsuFile : Config
         return await Task.Run(() => (LocalOsuFile)ReadFromStream(fs, configReadOption));
     }
 
-    public void SaveToDirectory(string directory, string? difficultyName = null)
+    public string SaveToDirectory(string directory, string? difficultyName = null)
     {
         var fileName = this.GetOsuFilename(difficultyName ?? Metadata.Version);
         var path = Path.Combine(directory, fileName);
         WriteToPath(path, difficultyName);
+        return path;
     }
 
     public void Save(string path)
