@@ -90,7 +90,6 @@ public static class OsuFileExtensions
                 {
                     inEventsSection = true;
                     hasEvent = true;
-
                 }
                 else if (hasEvent)
                 {
