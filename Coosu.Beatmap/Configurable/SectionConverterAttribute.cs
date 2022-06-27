@@ -1,4 +1,5 @@
 ﻿using System;
+using Coosu.Beatmap.Internal;
 
 namespace Coosu.Beatmap.Configurable
 {
@@ -12,7 +13,7 @@ namespace Coosu.Beatmap.Configurable
 
         public SectionConverterAttribute(Type converterType, params object[] param)
         {
-            if (!converterType.IsSubclassOf(typeof(ValueConverter)))
+            if (!converterType.IsSubclassOf(StaticTypes.ValueConverter))
                 throw new Exception($"Type {converterType} isn\'t a converter.");
             _converterType = converterType;
             _param = param;

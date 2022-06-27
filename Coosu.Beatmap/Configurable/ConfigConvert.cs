@@ -2,13 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using Coosu.Beatmap.Internal;
 
 namespace Coosu.Beatmap.Configurable
 {
     public static class ConfigConvert
     {
-        private static readonly Type SectionType = typeof(Section);
-        private static readonly Type ConfigType = typeof(Config);
 
         public static T DeserializeObject<T>(string value, ReadOptions options) where T : Config
         {
@@ -112,7 +111,7 @@ namespace Coosu.Beatmap.Configurable
         public static IReadOnlyDictionary<string, ReflectInfo>? GetSectionsOfType<T>()
         {
             var mainType = typeof(T);
-            if (!mainType.IsSubclassOf(ConfigType))
+            if (!mainType.IsSubclassOf(StaticTypes.Config))
                 return null;
 
             var reflectInfos = new Dictionary<string, ReflectInfo>();
@@ -143,7 +142,7 @@ namespace Coosu.Beatmap.Configurable
         {
             var propType = info.PropertyType;
             if (info.SetMethod == null) return;
-            if (!propType.IsSubclassOf(SectionType)) return;
+            if (!propType.IsSubclassOf(StaticTypes.Section)) return;
 
             var isPublic = info.SetMethod.IsPublic;
 

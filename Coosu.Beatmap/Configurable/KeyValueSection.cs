@@ -65,7 +65,7 @@ namespace Coosu.Beatmap.Configurable
                     var converter = attr.GetConverter();
                     prop.SetValue(this, converter.ReadSection(valueSpan, propType));
                 }
-                else if (propType.BaseType == typeof(Enum))
+                else if (propType.BaseType == StaticTypes.Enum)
                 {
 #if NET6_0_OR_GREATER
                     prop.SetValue(this, Enum.Parse(propType, valueSpan));
@@ -165,7 +165,7 @@ namespace Coosu.Beatmap.Configurable
                     continue;
                 }
 
-                if (prop.GetMethod.ReturnType.BaseType == typeof(Enum) && rawObj != null)
+                if (prop.GetMethod.ReturnType.BaseType == StaticTypes.Enum && rawObj != null)
                 {
                     var enumAttr = prop.GetCustomAttribute<SectionEnumAttribute>(false);
                     if (enumAttr != null)
@@ -184,7 +184,7 @@ namespace Coosu.Beatmap.Configurable
                         }
                     }
                 }
-                else if (prop.GetMethod.ReturnType == typeof(bool) && rawObj != null)
+                else if (prop.GetMethod.ReturnType == StaticTypes.Boolean && rawObj != null)
                 {
                     var boolAttr = prop.GetCustomAttribute<SectionBoolAttribute>(false);
                     if (boolAttr != null)

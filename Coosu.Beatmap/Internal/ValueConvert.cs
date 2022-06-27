@@ -9,97 +9,85 @@ namespace Coosu.Beatmap.Internal
     internal static class ValueConvert
     {
         private static readonly Dictionary<string, MethodInfo?> MethodCache = new();
-        private static readonly Type TypeBoolean = typeof(bool);
-        private static readonly Type TypeByte = typeof(byte);
-        private static readonly Type TypeSbyte = typeof(sbyte);
-        private static readonly Type TypeInt16 = typeof(short);
-        private static readonly Type TypeUInt16 = typeof(ushort);
-        private static readonly Type TypeInt32 = typeof(int);
-        private static readonly Type TypeUInt32 = typeof(uint);
-        private static readonly Type TypeInt64 = typeof(long);
-        private static readonly Type TypeUInt64 = typeof(ulong);
-        private static readonly Type TypeDouble = typeof(double);
-        private static readonly Type TypeSingle = typeof(float);
-        private static readonly Type TypeString = typeof(string);
 
         public static bool ConvertValue(ReadOnlySpan<char> value, Type propType, out object? converted)
         {
-            if (propType == TypeBoolean)
+            if (propType == StaticTypes.Boolean)
             {
                 var b = ParseHelper.TryParseByte(value, out var result);
                 converted = result == 1;
                 return b;
             }
 
-            if (propType == TypeString)
+            if (propType == StaticTypes.String)
             {
                 converted = value.ToString();
                 return true;
             }
 
-            if (propType == TypeInt32)
+            if (propType == StaticTypes.Int32)
             {
                 var b = ParseHelper.TryParseInt32(value, out var result);
                 converted = result;
                 return b;
             }
 
-            if (propType == TypeSingle)
+            if (propType == StaticTypes.Single)
             {
                 var b = ParseHelper.TryParseSingle(value, out var result);
                 converted = result;
                 return b;
             }
 
-            if (propType == TypeDouble)
+            if (propType == StaticTypes.Double)
             {
                 var b = ParseHelper.TryParseDouble(value, out var result);
                 converted = result;
                 return b;
             }
 
-            if (propType == TypeByte)
+            if (propType == StaticTypes.Byte)
             {
                 var b = ParseHelper.TryParseByte(value, out var result);
                 converted = result;
                 return b;
             }
-            if (propType == TypeSbyte)
+            if (propType == StaticTypes.Sbyte)
             {
                 var b = ParseHelper.TryParseSByte(value, out var result);
                 converted = result;
                 return b;
             }
 
-            if (propType == TypeInt16)
+            if (propType == StaticTypes.Int16)
             {
                 var b = ParseHelper.TryParseInt16(value, out var result);
                 converted = result;
                 return b;
             }
 
-            if (propType == TypeUInt16)
+            if (propType == StaticTypes.UInt16)
             {
                 var b = ParseHelper.TryParseUInt16(value, out var result);
                 converted = result;
                 return b;
             }
 
-            if (propType == TypeUInt32)
+            if (propType == StaticTypes.UInt32)
             {
                 var b = ParseHelper.TryParseUInt32(value, out var result);
                 converted = result;
                 return b;
             }
 
-            if (propType == TypeInt64)
+            if (propType == StaticTypes.Int64)
             {
                 var b = ParseHelper.TryParseInt64(value, out var result);
                 converted = result;
                 return b;
             }
 
-            if (propType == TypeUInt64)
+            if (propType == StaticTypes.UInt64)
             {
                 var b = ParseHelper.TryParseUInt64(value, out var result);
                 converted = result;
@@ -107,16 +95,15 @@ namespace Coosu.Beatmap.Internal
             }
 
             object arg = value.ToString();
-            var type = typeof(Convert);
             var methodName = "To" + propType.Name;
             if (!MethodCache.TryGetValue(methodName, out var method))
             {
-                method = type.GetMethods()
+                method = StaticTypes.SystemConvert.GetMethods()
                     .FirstOrDefault(t =>
                     {
                         if (t.Name != methodName) return false;
                         var parameters = t.GetParameters();
-                        return parameters.Length == 1 && parameters[0].ParameterType == typeof(object);
+                        return parameters.Length == 1 && parameters[0].ParameterType == StaticTypes.Object;
                     });
                 MethodCache.Add(methodName, method);
             }
