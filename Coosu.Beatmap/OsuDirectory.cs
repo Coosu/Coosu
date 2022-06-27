@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Coosu.Beatmap.Extensions;
 using Coosu.Beatmap.Extensions.Playback;
+using Coosu.Beatmap.Internal;
 using Coosu.Beatmap.Sections.GamePlay;
 using Coosu.Beatmap.Sections.HitObject;
 using Coosu.Beatmap.Sections.Timing;
@@ -314,12 +315,15 @@ namespace Coosu.Beatmap
             var tuples = new List<(string, bool, HitsoundType)>();
 
             // hitnormal, sliderslide
-            string sampleStr = itemSample != ObjectSamplesetType.Auto
+            string sampleStr = Enum.IsDefined(StaticTypes.ObjectSamplesetType, itemSample) &&
+                               itemSample != ObjectSamplesetType.Auto
                 ? itemSample.ToHitsoundString(null)!
                 : timingPoint.TimingSampleset.ToHitsoundString();
 
             // hitclap, hitfinish, hitwhistle, slidertick, sliderwhistle
-            string additionStr = itemAddition.ToHitsoundString(sampleStr)!;
+            string additionStr = Enum.IsDefined(StaticTypes.ObjectSamplesetType, itemAddition)
+                ? itemAddition.ToHitsoundString(sampleStr)!
+                : timingPoint.TimingSampleset.ToHitsoundString();
 
             Debug.Assert(sampleStr != null);
             Debug.Assert(additionStr != null);
