@@ -204,7 +204,7 @@ namespace Coosu.Beatmap.Configurable
                 }
 
                 textWriter.Write(name);
-                textWriter.Write(FlagRule);
+                textWriter.Write(FlagRule.SplitFlag);
                 textWriter.WriteLine(value);
             }
         }
