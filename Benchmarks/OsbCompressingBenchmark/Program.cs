@@ -3,14 +3,11 @@ extern alias localbuild;
 
 using System;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Running;
-using localbuild::Coosu.Storyboard;
-using localbuild::Coosu.Storyboard.Extensions.Optimizing;
 using LocalCoosuNs = localbuild::Coosu;
 using NugetCoosuNs = Coosu;
 
@@ -28,13 +25,14 @@ namespace OsbCompressingBenchmark
                 throw new FileNotFoundException("Test file does not exists: " + fi.FullName);
             Environment.SetEnvironmentVariable("test_osb_path", fi.FullName);
 
-            var osu = Layer.ParseFromFileAsync(fi.FullName).Result;
-            var compressor = new SpriteCompressor(osu, new CompressOptions()
-            {
-                ThreadCount = 1
-            });
+            var layer = LocalCoosuNs.Storyboard.Layer.ParseFromFileAsync(fi.FullName).Result;
+            var compressor = new LocalCoosuNs.Storyboard.Extensions.Optimizing.SpriteCompressor(layer,
+                new LocalCoosuNs.Storyboard.Extensions.Optimizing.CompressOptions()
+                {
+                    ThreadCount = 1
+                });
             compressor.CompressAsync().Wait();
-            osu.SaveScriptAsync("new.osb").Wait();
+            layer.SaveScriptAsync("new.osb").Wait();
 
             var osu2 = NugetCoosuNs.Storyboard.Layer.ParseFromFileAsync(fi.FullName).Result;
             var compressor2 = new NugetCoosuNs.Storyboard.Extensions.Optimizing.SpriteCompressor(osu2);
@@ -52,7 +50,7 @@ namespace OsbCompressingBenchmark
         public class CompressingTask
         {
             private readonly string _path;
-            private readonly Layer _osuLocal;
+            private readonly LocalCoosuNs.Storyboard.Layer _osuLocal;
             private readonly NugetCoosuNs.Storyboard.Layer _osuNuget;
 
             public CompressingTask()
@@ -60,17 +58,18 @@ namespace OsbCompressingBenchmark
                 var path = Environment.GetEnvironmentVariable("test_osb_path");
                 _path = path;
                 Console.WriteLine(_path);
-                _osuLocal = Layer.ParseFromFileAsync(_path).Result;
+                _osuLocal = LocalCoosuNs.Storyboard.Layer.ParseFromFileAsync(_path).Result;
                 _osuNuget = NugetCoosuNs.Storyboard.Layer.ParseFromFileAsync(_path).Result;
             }
 
             [Benchmark(Baseline = true)]
             public async Task<object?> CoosuLatest_Compress()
             {
-                var compressor = new SpriteCompressor(_osuLocal, new CompressOptions()
-                {
-                    ThreadCount = 1
-                });
+                var compressor = new LocalCoosuNs.Storyboard.Extensions.Optimizing.SpriteCompressor(_osuLocal,
+                    new LocalCoosuNs.Storyboard.Extensions.Optimizing.CompressOptions()
+                    {
+                        ThreadCount = 1
+                    });
                 compressor.CompressAsync().Wait();
                 return null;
             }
@@ -89,11 +88,12 @@ namespace OsbCompressingBenchmark
             [Benchmark]
             public async Task<object?> CoosuLatest_ParseAndCompress()
             {
-                var osuLocal = await Layer.ParseFromFileAsync(_path);
-                var compressor = new SpriteCompressor(osuLocal, new CompressOptions()
-                {
-                    ThreadCount = 1
-                });
+                var osuLocal = await LocalCoosuNs.Storyboard.Layer.ParseFromFileAsync(_path);
+                var compressor = new LocalCoosuNs.Storyboard.Extensions.Optimizing.SpriteCompressor(osuLocal,
+                    new LocalCoosuNs.Storyboard.Extensions.Optimizing.CompressOptions()
+                    {
+                        ThreadCount = 1
+                    });
                 await compressor.CompressAsync();
                 return null;
             }
