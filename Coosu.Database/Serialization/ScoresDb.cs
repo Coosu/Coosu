@@ -6,24 +6,24 @@ using Coosu.Database.Internal;
 
 namespace Coosu.Database.Serialization;
 
-public class CollectionDb
+public class ScoresDb
 {
     public int OsuVersion { get; set; }
-    internal int CollectionCount => Collections?.Count ?? 0;
+    internal int CollectionCount => Beatmaps?.Count ?? 0;
 
-    [StructureArray(typeof(Collection), nameof(CollectionCount),
+    [StructureArray(typeof(ScoreBeatmap), nameof(CollectionCount),
         SubDataType = DataType.Object)]
-    public List<Collection> Collections { get; set; } = new();
+    public List<ScoreBeatmap> Beatmaps { get; set; } = new();
 
-    public static CollectionDb ReadFromFile(string path)
+    public static ScoresDb ReadFromFile(string path)
     {
         return ReadFromStream(File.OpenRead(path));
     }
 
-    public static CollectionDb ReadFromStream(Stream stream)
+    public static ScoresDb ReadFromStream(Stream stream)
     {
-        var collectionDb = new CollectionDb();
-        using var reader = new OsuDbReader(stream, StructureHelperPool.TypeCollectionDb);
+        var collectionDb = new ScoresDb();
+        using var reader = new OsuDbReader(stream, StructureHelperPool.TypeScoresDb);
 
         int itemIndex = -1;
         int collectionCount = 0;
@@ -45,8 +45,8 @@ public class CollectionDb
             else if (itemIndex == 1) collectionCount = reader.GetInt32();
             else if (itemIndex == 2)
             {
-                collectionDb.Collections.Capacity = collectionCount;
-                collectionDb.Collections.AddRange(reader.EnumerateCollections());
+                collectionDb.Beatmaps.Capacity = collectionCount;
+                collectionDb.Beatmaps.AddRange(reader.EnumerateScoreBeatmaps());
             }
         }
 

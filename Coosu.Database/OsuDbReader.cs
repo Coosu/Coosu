@@ -1,7 +1,9 @@
 ﻿using System;
 using System.IO;
+using Coosu.Database.Annotations;
 using Coosu.Database.DataTypes;
 using Coosu.Database.Internal;
+using Coosu.Database.Serialization;
 
 namespace Coosu.Database;
 
@@ -20,6 +22,7 @@ public class OsuDbReader : ReaderBase, IDisposable
     private readonly int[] _arrayCounts;
     private readonly int[] _arrayIndexes;
     private readonly int[] _memberIndexes;
+    private bool _hasTargetPractice = false; // Temporary hardcoded for TargetPractice
 
     public OsuDbReader(string path, Type? type = null) : this(File.OpenRead(path), type)
     {
@@ -97,6 +100,24 @@ public class OsuDbReader : ReaderBase, IDisposable
         var subStructure = objectStructure.Structures[memberIndex];
         if (subStructure is PropertyStructure propertyStructure)
         {
+            var ignoreWhen = propertyStructure.IgnoreWhenAttribute;
+            if (ignoreWhen != null) // Temporary hardcoded for TargetPractice
+            {
+                var memberName = ignoreWhen.MemberName;
+                var ignoreCondition = ignoreWhen.IgnoreCondition;
+                var desiredValue = ignoreWhen.Value;
+                if (memberName == nameof(Score.Mods) &&
+                    ignoreCondition == StructureIgnoreWhenAttribute.Condition.Contains &&
+                    (Mods)desiredValue == Mods.TargetPractice)
+                {
+                    if (!_hasTargetPractice)
+                    {
+                        _memberIndexes[objectStructure.NodeId] = memberIndex + 1;
+                        return Read();
+                    }
+                }
+            }
+
             NodeId = propertyStructure.NodeId;
             Name = propertyStructure.Name;
             Path = propertyStructure.Path;
@@ -107,6 +128,11 @@ public class OsuDbReader : ReaderBase, IDisposable
             if (_structureHelper.NodeLengthFlags[propertyStructure.NodeId])
             {
                 _arrayCounts[propertyStructure.NodeId] = Convert.ToInt32(Value);
+            }
+
+            if (NodeId == 23) // Temporary hardcoded for TargetPractice
+            {
+                _hasTargetPractice = ((Mods)Value & Mods.TargetPractice) != 0;
             }
         }
         else if (subStructure is ArrayStructure arrayStructure)

@@ -40,9 +40,10 @@ internal sealed class StructureHelper
         {
             var propertyInfo = kvp.Value;
 
-            var attribute = propertyInfo.GetCustomAttribute<StructureIgnoreAttribute>();
-            if (attribute != null) continue;
+            var ignoreAttr = propertyInfo.GetCustomAttribute<StructureIgnoreAttribute>();
+            if (ignoreAttr != null) continue;
             var arrAttr = propertyInfo.GetCustomAttribute<StructureArrayAttribute>();
+            var ignoreWhenAttr = propertyInfo.GetCustomAttribute<StructureIgnoreWhenAttribute>();
 
             var propertyName = propertyInfo.Name;
             var propertyPath = classPath + "." + propertyName;
@@ -55,7 +56,8 @@ internal sealed class StructureHelper
                     new PropertyStructure(nodeId, propertyName, propertyPath, objectStructure,
                         propertyInfo.PropertyType,
                         ConvertType(forceStructure, propertyInfo.PropertyType),
-                        DefaultValueHandler.Instance)
+                        DefaultValueHandler.Instance,
+                        ignoreWhenAttr)
                 );
                 objectStructure.MemberNameIdMapping.Add(propertyName, nodeId);
                 continue;
@@ -91,7 +93,8 @@ internal sealed class StructureHelper
                         propertyPath + "[].Item", objectStructure,
                         arrAttr.ItemType,
                         arrAttrSubDataType,
-                        GetSharedValueHandler(arrAttr.ValueHandler) ?? DefaultValueHandler.Instance
+                        GetSharedValueHandler(arrAttr.ValueHandler) ?? DefaultValueHandler.Instance,
+                        ignoreWhenAttr
                     );
             }
 

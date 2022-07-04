@@ -8,7 +8,8 @@ namespace Coosu.Database.Internal;
 internal sealed class PropertyStructure : IDbStructure
 {
     public PropertyStructure(int nodeId, string name, string path, IDbStructure baseStructure,
-        Type targetType, DataType targetDataType, IValueHandler valueHandler)
+        Type targetType, DataType targetDataType, IValueHandler valueHandler,
+        StructureIgnoreWhenAttribute? ignoreWhenAttribute)
     {
         NodeId = nodeId;
         Name = name;
@@ -17,6 +18,7 @@ internal sealed class PropertyStructure : IDbStructure
         TargetType = targetType;
         TargetDataType = targetDataType;
         ValueHandler = valueHandler;
+        IgnoreWhenAttribute = ignoreWhenAttribute;
     }
 
     public int NodeId { get; }
@@ -27,4 +29,5 @@ internal sealed class PropertyStructure : IDbStructure
     public Type TargetType { get; }
     public DataType TargetDataType { get; }
     public IValueHandler ValueHandler { get; }
+    public StructureIgnoreWhenAttribute? IgnoreWhenAttribute { get; }
 }
