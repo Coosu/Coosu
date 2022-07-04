@@ -1,10 +1,21 @@
 ﻿using System.Collections.Generic;
 using Coosu.Database.DataTypes;
+using Coosu.Database.Internal;
 
 namespace Coosu.Database.Serialization;
 
-public static partial class OsuDbReaderExtensions
+public static class OsuDbReaderCollectionDbExtensions
 {
+    private static readonly ObjectStructure BeatmapStructure;
+
+    static OsuDbReaderCollectionDbExtensions()
+    {
+        var mappingHelper = StructureHelperPool.GetHelperByType(StructureHelperPool.TypeCollectionDb);
+        var rootStructure = (ObjectStructure)mappingHelper.RootStructure;
+        var arrayStructure = (ArrayStructure)rootStructure.Structures[2];
+        BeatmapStructure = arrayStructure.ObjectStructure!;
+    }
+
     public static IEnumerable<Collection> EnumerateCollections(this OsuDbReader reader)
     {
         Collection? collection = default;

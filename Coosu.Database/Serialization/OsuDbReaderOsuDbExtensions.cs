@@ -5,11 +5,11 @@ using Coosu.Database.Internal;
 
 namespace Coosu.Database.Serialization;
 
-public static partial class OsuDbReaderExtensions
+public static class OsuDbReaderOsuDbExtensions
 {
     private static readonly ObjectStructure BeatmapStructure;
 
-    static OsuDbReaderExtensions()
+    static OsuDbReaderOsuDbExtensions()
     {
         var mappingHelper = StructureHelperPool.GetHelperByType(StructureHelperPool.TypeOsuDb);
         var rootStructure = (ObjectStructure)mappingHelper.RootStructure;
