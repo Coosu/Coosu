@@ -5,7 +5,7 @@ using Coosu.Database.Internal;
 
 namespace Coosu.Database.Serialization;
 
-public static class OsuDbReaderExtensions
+public static partial class OsuDbReaderExtensions
 {
     private static readonly ObjectStructure BeatmapStructure;
 
