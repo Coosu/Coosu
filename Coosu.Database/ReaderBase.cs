@@ -11,6 +11,7 @@ public abstract class ReaderBase
     public NodeType NodeType { get; protected set; }
     public DataType DataType { get; protected set; }
     public Type? TargetType { get; protected set; }
+    public bool IsEndOfStream { get; protected set; }
 
     public byte GetByte() => (byte)Value!;
     public short GetInt16() => (short)Value!;

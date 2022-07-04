@@ -11,7 +11,7 @@ public static class OsuDbReaderExtensions
 
     static OsuDbReaderExtensions()
     {
-        var mappingHelper = OsuDbReader.StructureHelper;
+        var mappingHelper = StructureHelperPool.GetHelperByType(StructureHelperPool.TypeOsuDb);
         var rootStructure = (ObjectStructure)mappingHelper.RootStructure;
         var arrayStructure = (ArrayStructure)rootStructure.Structures[6];
         BeatmapStructure = arrayStructure.ObjectStructure!;
@@ -23,7 +23,7 @@ public static class OsuDbReaderExtensions
         //int index = 0;
         int arrayCount = 0;
 
-        while (reader.Read())
+        while (!reader.IsEndOfStream && reader.Read())
         {
             //Console.WriteLine("Name = " + GetString(reader.Name) + "; " +
             //                  "Path = " + GetString(reader.Path) + "; " +
@@ -126,22 +126,22 @@ public static class OsuDbReaderExtensions
         else if (nodeId == 71) beatmap.ManiaScrollSpeed = reader.GetByte();
     }
 
-    private static void FillTimingPoints(List<TimingPoint> timingPoints, OsuDbReader osuDbReader)
+    private static void FillTimingPoints(List<TimingPoint> timingPoints, OsuDbReader reader)
     {
-        while (osuDbReader.Read())
+        while (!reader.IsEndOfStream && reader.Read())
         {
-            if (osuDbReader.NodeType == NodeType.ArrayEnd) break;
-            var timingPoint = osuDbReader.GetTimingPoint();
+            if (reader.NodeType == NodeType.ArrayEnd) break;
+            var timingPoint = reader.GetTimingPoint();
             timingPoints.Add(timingPoint);
         }
     }
 
-    private static void FillStarRating(Dictionary<Mods, double> dictionary, OsuDbReader osuDbReader)
+    private static void FillStarRating(Dictionary<Mods, double> dictionary, OsuDbReader reader)
     {
-        while (osuDbReader.Read())
+        while (!reader.IsEndOfStream && reader.Read())
         {
-            if (osuDbReader.NodeType == NodeType.ArrayEnd) break;
-            var data = osuDbReader.GetIntDoublePair();
+            if (reader.NodeType == NodeType.ArrayEnd) break;
+            var data = reader.GetIntDoublePair();
             var mods = (Mods)data.IntValue;
             dictionary.Add(mods, data.DoubleValue);
         }

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using Coosu.Database.Annotations;
-using Coosu.Database.Converting;
 using Coosu.Database.DataTypes;
 
 namespace Coosu.Database.Serialization;
@@ -17,8 +16,7 @@ public class OsuDb
     internal int BeatmapCount => Beatmaps?.Count ?? 0;
 
     [StructureArray(typeof(Beatmap), nameof(BeatmapCount),
-        SubDataType = DataType.Object,
-        Converter = typeof(IntDoublePair2ModKeyValueConverter))]
+        SubDataType = DataType.Object)]
     public List<Beatmap> Beatmaps { get; set; } = new();
 
     public Permissions Permissions { get; set; }
@@ -35,7 +33,7 @@ public class OsuDb
 
         int itemIndex = -1;
         int beatmapCount = 0;
-        while (reader.Read())
+        while (!reader.IsEndOfStream && reader.Read())
         {
             var name = reader.Name;
             var nodeType = reader.NodeType;

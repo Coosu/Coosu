@@ -2,7 +2,6 @@
 using System.IO;
 using Coosu.Database.DataTypes;
 using Coosu.Database.Internal;
-using Coosu.Database.Serialization;
 
 namespace Coosu.Database;
 
@@ -12,35 +11,31 @@ namespace Coosu.Database;
 /// </summary>
 public class OsuDbReader : ReaderBase, IDisposable
 {
-    internal static readonly StructureHelper StructureHelper;
-
-    static OsuDbReader()
-    {
-        StructureHelper = new StructureHelper(typeof(OsuDb));
-    }
-
     private readonly Stream _stream;
     private readonly BinaryReader _binaryReader;
 
     private IDbStructure _currentDbStructure;
 
+    private readonly StructureHelper _structureHelper;
     private readonly int[] _arrayCounts;
     private readonly int[] _arrayIndexes;
     private readonly int[] _memberIndexes;
 
-    public OsuDbReader(string path) : this(File.OpenRead(path))
+    public OsuDbReader(string path, Type? type = null) : this(File.OpenRead(path), type)
     {
     }
 
-    public OsuDbReader(Stream stream)
+    public OsuDbReader(Stream stream, Type? type = null)
     {
         _stream = stream;
         _binaryReader = new BinaryReader(stream);
-        _currentDbStructure = StructureHelper.RootStructure;
+        type ??= StructureHelperPool.TypeOsuDb;
+        _structureHelper = StructureHelperPool.GetHelperByType(type);
+        _currentDbStructure = _structureHelper.RootStructure;
 
-        _arrayCounts = new int[StructureHelper.LastId];
-        _arrayIndexes = new int[StructureHelper.LastId];
-        _memberIndexes = new int[StructureHelper.LastId];
+        _arrayCounts = new int[_structureHelper.LastId];
+        _arrayIndexes = new int[_structureHelper.LastId];
+        _memberIndexes = new int[_structureHelper.LastId];
         new Span<int>(_memberIndexes).Fill(-1);
     }
 
@@ -52,11 +47,13 @@ public class OsuDbReader : ReaderBase, IDisposable
     {
         if (_currentDbStructure is ObjectStructure objectStructure)
         {
-            return ReadObject(objectStructure);
+            var val = IsEndOfStream = !ReadObject(objectStructure);
+            return !val;
         }
         else if (_currentDbStructure is ArrayStructure arrayStructure)
         {
-            return ReadArray(arrayStructure);
+            var val = IsEndOfStream = !ReadArray(arrayStructure);
+            return !val;
         }
 
         return true;
@@ -107,7 +104,7 @@ public class OsuDbReader : ReaderBase, IDisposable
             DataType = propertyStructure.TargetDataType;
             TargetType = propertyStructure.TargetType;
             Value = propertyStructure.ValueHandler.ReadValue(_binaryReader, propertyStructure.TargetDataType);
-            if (StructureHelper.NodeLengthFlags[propertyStructure.NodeId])
+            if (_structureHelper.NodeLengthFlags[propertyStructure.NodeId])
             {
                 _arrayCounts[propertyStructure.NodeId] = Convert.ToInt32(Value);
             }
