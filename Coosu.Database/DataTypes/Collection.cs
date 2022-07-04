@@ -9,5 +9,5 @@ public record Collection
     internal int BeatmapHashCount => BeatmapHashes?.Count ?? 0;
 
     [StructureArray(typeof(string), nameof(BeatmapHashCount))]
-    public List<string> BeatmapHashes { get; set; }
+    public List<string> BeatmapHashes { get; set; } = new();
 }
