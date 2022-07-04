@@ -24,7 +24,7 @@ internal sealed class StructureHelper
 
     public IDbStructure RootStructure { get; }
     public int LastId { get; private set; }
-
+    internal Dictionary<string, int> PreservableNodeIds { get; } = new();
     internal bool[] NodeLengthFlags { get; }
 
     private ObjectStructure GetClassStructure(Type type, IDbStructure? baseStructure, string className, string classPath)
@@ -35,7 +35,7 @@ internal sealed class StructureHelper
             .ToDictionary(k => k.Name, k => k);
 
         var objectStructure = new ObjectStructure(GetNextNodeId(), className, classPath, baseStructure);
-
+        var ignoreWhenList = new HashSet<string>();
         foreach (var kvp in propertyMapping)
         {
             var propertyInfo = kvp.Value;
@@ -52,14 +52,18 @@ internal sealed class StructureHelper
             {
                 var nodeId = GetNextNodeId();
                 var forceStructure = propertyInfo.GetCustomAttribute<StructureTypeAttribute>();
-                objectStructure.Structures.Add(
-                    new PropertyStructure(nodeId, propertyName, propertyPath, objectStructure,
-                        propertyInfo.PropertyType,
-                        ConvertType(forceStructure, propertyInfo.PropertyType),
-                        DefaultValueHandler.Instance,
-                        ignoreWhenAttr)
-                );
+                var propertyStructure = new PropertyStructure(nodeId, propertyName, propertyPath, objectStructure,
+                    propertyInfo.PropertyType,
+                    ConvertType(forceStructure, propertyInfo.PropertyType),
+                    DefaultValueHandler.Instance,
+                    ignoreWhenAttr);
+                objectStructure.Structures.Add(propertyStructure);
                 objectStructure.MemberNameIdMapping.Add(propertyName, nodeId);
+                if (ignoreWhenAttr != null)
+                {
+                    ignoreWhenList.Add(ignoreWhenAttr.MemberName);
+                }
+
                 continue;
             }
 
@@ -88,17 +92,38 @@ internal sealed class StructureHelper
                     arrayStructure.SubDataType = arrAttrSubDataType;
                 }
 
+                var nodeId = GetNextNodeId();
                 arrayStructure.PropertyStructure =
-                    new PropertyStructure(GetNextNodeId(), propertyName + "[].Item",
+                    new PropertyStructure(nodeId, propertyName + "[].Item",
                         propertyPath + "[].Item", objectStructure,
                         arrAttr.ItemType,
                         arrAttrSubDataType,
                         GetSharedValueHandler(arrAttr.ValueHandler) ?? DefaultValueHandler.Instance,
                         ignoreWhenAttr
                     );
+                if (ignoreWhenAttr != null)
+                {
+                    ignoreWhenList.Add(ignoreWhenAttr.MemberName);
+                }
             }
 
             objectStructure.Structures.Add(arrayStructure);
+        }
+
+        foreach (var structure in objectStructure.Structures)
+        {
+            if (ignoreWhenList.Contains(structure.Name))
+            {
+                PreservableNodeIds.Add(structure.Name, structure.NodeId);
+            }
+        }
+
+        foreach (var structure in objectStructure.Structures)
+        {
+            if (structure is PropertyStructure { IgnoreWhenAttribute: { } } ps)
+            {
+                ps.IgnoreWhenAttribute.NodeId = PreservableNodeIds[ps.IgnoreWhenAttribute.MemberName];
+            }
         }
 
         return objectStructure;

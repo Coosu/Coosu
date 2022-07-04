@@ -45,6 +45,6 @@ public class Score
     public int ReplayLength { get; set; }
     public long OnlineScoreId { get; set; }
 
-    [StructureIgnoreWhen(nameof(Mods), StructureIgnoreWhenAttribute.Condition.Contains, Mods.TargetPractice)]
+    [StructureIgnoreWhen(nameof(Mods), StructureIgnoreWhenAttribute.Condition.NotContains, Mods.TargetPractice)]
     public double TargetPracticeAccuracy { get; set; }
 }

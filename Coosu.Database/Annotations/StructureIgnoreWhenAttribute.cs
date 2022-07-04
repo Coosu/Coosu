@@ -7,12 +7,8 @@ internal sealed class StructureIgnoreWhenAttribute : Attribute
 {
     public enum Condition
     {
-        Equals, Contains
+        Unequals, NotContains
     }
-
-    public string MemberName { get; }
-    public Condition IgnoreCondition { get; }
-    public object Value { get; }
 
     public StructureIgnoreWhenAttribute(string memberName, Condition ignoreCondition, object value)
     {
@@ -20,4 +16,9 @@ internal sealed class StructureIgnoreWhenAttribute : Attribute
         IgnoreCondition = ignoreCondition;
         Value = value;
     }
+
+    public string MemberName { get; }
+    public Condition IgnoreCondition { get; }
+    public object Value { get; }
+    internal int NodeId { get; set; } = -1;
 }

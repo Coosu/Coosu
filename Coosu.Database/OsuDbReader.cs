@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Coosu.Database.Annotations;
 using Coosu.Database.DataTypes;
 using Coosu.Database.Internal;
@@ -22,7 +24,7 @@ public class OsuDbReader : ReaderBase, IDisposable
     private readonly int[] _arrayCounts;
     private readonly int[] _arrayIndexes;
     private readonly int[] _memberIndexes;
-    private bool _hasTargetPractice = false; // Temporary hardcoded for TargetPractice
+    private readonly Dictionary<int, object?> _preservedValues;
 
     public OsuDbReader(string path, Type? type = null) : this(File.OpenRead(path), type)
     {
@@ -36,6 +38,7 @@ public class OsuDbReader : ReaderBase, IDisposable
         _structureHelper = StructureHelperPool.GetHelperByType(type);
         _currentDbStructure = _structureHelper.RootStructure;
 
+        _preservedValues = _structureHelper.PreservableNodeIds.Values.ToDictionary(k => k, k => default(object));
         _arrayCounts = new int[_structureHelper.LastId];
         _arrayIndexes = new int[_structureHelper.LastId];
         _memberIndexes = new int[_structureHelper.LastId];
@@ -101,20 +104,16 @@ public class OsuDbReader : ReaderBase, IDisposable
         if (subStructure is PropertyStructure propertyStructure)
         {
             var ignoreWhen = propertyStructure.IgnoreWhenAttribute;
-            if (ignoreWhen != null) // Temporary hardcoded for TargetPractice
+            if (ignoreWhen != null)
             {
                 var memberName = ignoreWhen.MemberName;
                 var ignoreCondition = ignoreWhen.IgnoreCondition;
                 var desiredValue = ignoreWhen.Value;
-                if (memberName == nameof(Score.Mods) &&
-                    ignoreCondition == StructureIgnoreWhenAttribute.Condition.Contains &&
-                    (Mods)desiredValue == Mods.TargetPractice)
+
+                if (CheckShouldIgnore(ignoreCondition, desiredValue, _preservedValues[ignoreWhen.NodeId]))
                 {
-                    if (!_hasTargetPractice)
-                    {
-                        _memberIndexes[objectStructure.NodeId] = memberIndex + 1;
-                        return Read();
-                    }
+                    _memberIndexes[objectStructure.NodeId] = memberIndex + 1;
+                    return Read();
                 }
             }
 
@@ -130,9 +129,9 @@ public class OsuDbReader : ReaderBase, IDisposable
                 _arrayCounts[propertyStructure.NodeId] = Convert.ToInt32(Value);
             }
 
-            if (NodeId == 23) // Temporary hardcoded for TargetPractice
+            if (_preservedValues.ContainsKey(NodeId))
             {
-                _hasTargetPractice = ((Mods)Value & Mods.TargetPractice) != 0;
+                _preservedValues[NodeId] = Value;
             }
         }
         else if (subStructure is ArrayStructure arrayStructure)
@@ -187,6 +186,36 @@ public class OsuDbReader : ReaderBase, IDisposable
         Value = propertyStructure.ValueHandler.ReadValue(_binaryReader, propertyStructure.TargetDataType);
         _arrayIndexes[arrayStructure.NodeId] = itemIndex + 1;
         return true;
+    }
+
+    private bool CheckShouldIgnore(StructureIgnoreWhenAttribute.Condition condition, object desiredValue, object? actualValue)
+    {
+        if (actualValue is null)
+        {
+            return false;
+        }
+
+        var desiredType = desiredValue.GetType();
+        //if (desiredValue.GetType() != actualValue.GetType())
+        //{
+        //    return false;
+        //}
+
+        //var convert = Convert.ChangeType(actualValue, desiredValue.GetType());
+
+        if (desiredValue is Enum desiredEnum)
+        {
+            var actualEnum = (Enum)Enum.ToObject(desiredType, actualValue);
+            return condition switch
+            {
+                StructureIgnoreWhenAttribute.Condition.NotContains => !(actualEnum.HasFlag(desiredEnum) ||
+                                                                   actualEnum.Equals(desiredEnum)),
+                StructureIgnoreWhenAttribute.Condition.Unequals => !(actualEnum.Equals(desiredEnum)),
+                _ => throw new ArgumentOutOfRangeException(nameof(condition), condition, null)
+            };
+        }
+
+        return false;
     }
 
     public void Dispose()
