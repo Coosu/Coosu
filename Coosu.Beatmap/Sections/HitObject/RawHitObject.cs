@@ -35,7 +35,10 @@ namespace Coosu.Beatmap.Sections.HitObject
             {
                 int ncBase = 0;
                 if ((RawType & RawObjectType.NewCombo) == RawObjectType.NewCombo)
+                {
                     ncBase = 1;
+                }
+
                 var newThing = 0b01110000 & (byte)RawType;
                 var ncCount = newThing >> 4;
                 return ncCount + ncBase;

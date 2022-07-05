@@ -17,7 +17,8 @@ namespace Coosu.Beatmap.Sections
             set => _title = MetaString.GetAsciiStr(value);
         }
 
-        [SectionProperty("TitleUnicode")] public string? TitleUnicode { get; set; }
+        [SectionProperty("TitleUnicode")]
+        public string? TitleUnicode { get; set; }
 
         [SectionProperty("Artist")]
         public string Artist
@@ -26,17 +27,26 @@ namespace Coosu.Beatmap.Sections
             set => _artist = MetaString.GetAsciiStr(value);
         }
 
-        [SectionProperty("ArtistUnicode")] public string? ArtistUnicode { get; set; }
-        [SectionProperty("Creator")] public string? Creator { get; set; }
-        [SectionProperty("Version")] public string? Version { get; set; }
-        [SectionProperty("Source")] public string? Source { get; set; }
+        [SectionProperty("ArtistUnicode")]
+        public string? ArtistUnicode { get; set; }
+
+        [SectionProperty("Creator")] 
+        public string? Creator { get; set; }
+
+        [SectionProperty("Version")]
+        public string? Version { get; set; }
+
+        [SectionProperty("Source")]
+        public string? Source { get; set; }
 
         [SectionProperty("Tags")]
         [SectionConverter(typeof(SplitConverter), ' ')]
         public List<string> TagList { get; set; } = new();
 
-        [SectionProperty("BeatmapID")] public int BeatmapId { get; set; } = -1;
-        [SectionProperty("BeatmapSetID")] public int BeatmapSetId { get; set; } = -1;
+        [SectionProperty("BeatmapID")] 
+        public int BeatmapId { get; set; } = -1;
+        [SectionProperty("BeatmapSetID")] 
+        public int BeatmapSetId { get; set; } = -1;
 
         [SectionIgnore]
         public MetaString TitleMeta => new(Title, TitleUnicode);
