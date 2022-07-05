@@ -34,8 +34,8 @@ public class OsuFile : Config
             Difficulty = new DifficultySection(),
             Editor = new EditorSection(),
             Metadata = new MetadataSection(),
-            TimingPoints = new TimingSection()
         };
+        emptyFile.TimingPoints = new TimingSection(emptyFile);
         emptyFile.Events = new EventSection(emptyFile);
         emptyFile.HitObjects = new HitObjectSection(emptyFile);
         emptyFile.TimingPoints.TimingList = new List<TimingPoint>();
@@ -116,7 +116,7 @@ public class OsuFile : Config
             var str = line.Substring(VerFlag.Length);
             if (!int.TryParse(str, out var verNum))
                 throw new BadOsuFormatException("Unknown osu file format: " + str);
-            if (verNum < 5)
+            if (verNum is < 3 or > 14)
                 throw new VersionNotSupportedException(verNum);
             Version = verNum;
         }

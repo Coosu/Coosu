@@ -11,6 +11,13 @@ namespace Coosu.Beatmap.Sections
     [SectionProperty("TimingPoints")]
     public sealed class TimingSection : Section
     {
+        private readonly OsuFile _osuFile;
+
+        public TimingSection(OsuFile osuFile)
+        {
+            _osuFile = osuFile;
+        }
+
         public List<TimingPoint> TimingList { get; set; } = new();
         [SectionIgnore]
         public double MinTime => TimingList.Count == 0 ? 0 : TimingList.Min(t => t.Offset);
@@ -24,7 +31,7 @@ namespace Coosu.Beatmap.Sections
             byte rhythm = default;
             var timingSampleset = TimingSamplesetType.None;
             ushort track = default;
-            byte volume = default;
+            byte volume = (byte)_osuFile.General.SampleVolume;
             bool inherit = default;
             Effects effects = default;
 
