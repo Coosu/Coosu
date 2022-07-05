@@ -92,7 +92,7 @@ namespace Coosu.Beatmap
                         }
                         catch (Exception e)
                         {
-                            throw new Exception("Error while analyzing the object: " + obj.ToSerializedString(), e);
+                            throw new Exception("Error while analyzing hitsound. Object Info: " + obj.ToSerializedString(), e);
                         }
                     });
 

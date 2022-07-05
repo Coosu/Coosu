@@ -102,20 +102,15 @@ namespace Coosu.Beatmap
                 return EmptyArray<SliderTick>.Value;
             }
 
-            Vector2 p1;
-            Vector2 p2;
-            Vector2 p3;
-            try
-            {
-                p1 = sliderInfo.StartPoint;
-                p2 = sliderInfo.ControlPoints[0];
-                p3 = sliderInfo.ControlPoints[1];
-            }
-            catch (IndexOutOfRangeException)
+            if (sliderInfo.ControlPoints.Count < 2)
             {
                 sliderInfo.SliderType = SliderType.Linear;
                 return ComputeBezierDiscreteData(sliderInfo, fixedInterval);
             }
+
+            var p1 = sliderInfo.StartPoint;
+            var p2 = sliderInfo.ControlPoints[0];
+            var p3 = sliderInfo.ControlPoints[1];
 
             var circle = GetCircle(p1, p2, p3);
 
