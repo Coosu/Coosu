@@ -22,6 +22,9 @@ namespace CoosuTest
     {
         static async Task Main(string[] args)
         {
+            //var osudb = OsuDb.ReadFromFile(@"C:\Users\milkitic\AppData\Local\osu!\osu!.db");
+            //var collectiondb = CollectionDb.ReadFromFile(@"C:\Users\milkitic\Documents\Tencent Files\2241521134\FileRecv\collection.db");
+            var scoresdb = ScoresDb.ReadFromFile(@"C:\Users\milkitic\AppData\Local\osu!\scores.db");
             var ms = new MemoryStream();
             var f = File.OpenRead(
                 @"D:\GitHub\Osu-Player\OsuPlayer.Wpf\bin\Debug\Songs\739119 3L - Spring of Dreams\3L - Spring of Dreams (Trust) [Lunatic].osu");

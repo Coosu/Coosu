@@ -29,7 +29,7 @@ namespace Coosu.Beatmap.Sections
             double offset = default;
             double factor = default;
             byte rhythm = default;
-            var timingSampleset = TimingSamplesetType.None;
+            var timingSampleset = _osuFile.General.SampleSet;
             ushort track = default;
             byte volume = (byte)_osuFile.General.SampleVolume;
             bool inherit = default;

@@ -31,8 +31,8 @@ namespace CoosuUnitTest.Beatmap
         [TestMethod]
         public async Task ReadHitsounds()
         {
-            var folder = @"E:\Games\osu!\Songs\21926 Hatsune Miku - Parade of Liarsosz\";
-            var file = "Hatsune Miku - Parade of Liars (Kiddo-Kun) [Krisom's Insane].osu";
+            var folder = @"C:\Users\milkitic\Downloads\18826 Shin Hae Chul - Sticks and Stones";
+            var file = "Shin Hae Chul - Sticks and Stones (Bikko) [Madness].osu";
             var osuDir = new OsuDirectory(folder);
             await osuDir.InitializeAsync(file);
 
