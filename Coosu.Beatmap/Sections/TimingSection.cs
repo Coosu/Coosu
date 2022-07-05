@@ -4,6 +4,7 @@ using System.Linq;
 using Coosu.Beatmap.Configurable;
 using Coosu.Beatmap.Sections.Timing;
 using Coosu.Shared;
+using Coosu.Shared.Numerics;
 
 namespace Coosu.Beatmap.Sections
 {
@@ -31,31 +32,17 @@ namespace Coosu.Beatmap.Sections
             foreach (var span in line.SpanSplit(','))
             {
                 i++;
-#if NETCOREAPP3_1_OR_GREATER
                 switch (i)
                 {
-                    case 0: offset = double.Parse(span); break;
-                    case 1: factor = double.Parse(span); break;
-                    case 2: rhythm = byte.Parse(span); break;
-                    case 3: timingSampleset = (TimingSamplesetType)(byte.Parse(span) - 1); break;
-                    case 4: track = ushort.Parse(span); break;
-                    case 5: volume = byte.Parse(span); break;
-                    case 6: inherit = byte.Parse(span) == 0; break;
-                    case 7: effects = (Effects)byte.Parse(span); break;
+                    case 0: offset = ParseHelper.ParseDouble(span); break;
+                    case 1: factor = ParseHelper.ParseDouble(span); break;
+                    case 2: rhythm = ParseHelper.ParseByte(span); break;
+                    case 3: timingSampleset = (TimingSamplesetType)(ParseHelper.ParseByte(span) - 1); break;
+                    case 4: track = ParseHelper.ParseUInt16(span); break;
+                    case 5: volume = ParseHelper.ParseByte(span); break;
+                    case 6: inherit = ParseHelper.ParseByte(span) == 0; break;
+                    case 7: effects = (Effects)ParseHelper.ParseByte(span); break;
                 }
-#else
-                switch (i)
-                {
-                    case 0: offset = double.Parse(span.ToString()); break;
-                    case 1: factor = double.Parse(span.ToString()); break;
-                    case 2: rhythm = byte.Parse(span.ToString()); break;
-                    case 3: timingSampleset = (TimingSamplesetType)(byte.Parse(span.ToString()) - 1); break;
-                    case 4: track = ushort.Parse(span.ToString()); break;
-                    case 5: volume = byte.Parse(span.ToString()); break;
-                    case 6: inherit = byte.Parse(span.ToString()) == 0; break;
-                    case 7: effects = (Effects)byte.Parse(span.ToString()); break;
-                }
-#endif
             }
 
             TimingList.Add(new TimingPoint

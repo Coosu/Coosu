@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 
 namespace Coosu.Shared.Numerics
@@ -87,21 +88,27 @@ namespace Coosu.Shared.Numerics
 #endif
         }
 
-        public static float ParseSingle(ReadOnlySpan<char> input)
+        public static float ParseSingle(ReadOnlySpan<char> input, NumberFormatInfo? nfi = null)
         {
+            if (nfi != null)
+                return float.Parse(input.ToString(), nfi);
+
 #if NETCOREAPP3_1_OR_GREATER
             return float.Parse(input);
 #else
-            return float.Parse(input.ToString());
+            return float.Parse(input.ToString(), nfi);
 #endif
         }
 
-        public static double ParseDouble(ReadOnlySpan<char> input)
+        public static double ParseDouble(ReadOnlySpan<char> input, NumberFormatInfo? nfi = null)
         {
+            if (nfi != null)
+                return double.Parse(input.ToString(), nfi);
+
 #if NETCOREAPP3_1_OR_GREATER
             return double.Parse(input);
 #else
-            return double.Parse(input.ToString());
+            return double.Parse(input.ToString(), nfi);
 #endif
         }
 
@@ -204,8 +211,10 @@ namespace Coosu.Shared.Numerics
 #endif
         }
 
-        public static bool TryParseSingle(ReadOnlySpan<char> input, out float value)
+        public static bool TryParseSingle(ReadOnlySpan<char> input, out float value, NumberFormatInfo? nfi = null)
         {
+            if (nfi != null) return float.TryParse(input.ToString(),
+                NumberStyles.Float | NumberStyles.AllowThousands, nfi, out value);
 #if NETCOREAPP3_1_OR_GREATER
             return float.TryParse(input, out value);
 #else
@@ -213,8 +222,10 @@ namespace Coosu.Shared.Numerics
 #endif
         }
 
-        public static bool TryParseDouble(ReadOnlySpan<char> input, out double value)
+        public static bool TryParseDouble(ReadOnlySpan<char> input, out double value, NumberFormatInfo? nfi = null)
         {
+            if (nfi != null) return double.TryParse(input.ToString(), 
+                NumberStyles.Float | NumberStyles.AllowThousands, nfi, out value);
 #if NETCOREAPP3_1_OR_GREATER
             return double.TryParse(input, out value);
 #else

@@ -10,7 +10,7 @@ namespace Coosu.Beatmap.Sections.HitObject
     public class SliderInfo : SerializeWritableObject
     {
         public SliderType SliderType { get; set; }
-        public IReadOnlyList<Vector2> ControlPoints { get; set; }
+        public IReadOnlyList<Vector2> ControlPoints { get; set; } = EmptyArray<Vector2>.Value;
         public int Repeat { get; set; }
         public double PixelLength { get; set; }
         public HitsoundType[]? EdgeHitsounds { get; set; }
@@ -28,17 +28,19 @@ namespace Coosu.Beatmap.Sections.HitObject
             for (var i = 0; i < ControlPoints.Count; i++)
             {
                 var controlPoint = ControlPoints[i];
-                textWriter.Write(controlPoint.X.ToIcString());
+                textWriter.Write(controlPoint.X.ToString(ValueConvert.NumberFormatInfo));
                 textWriter.Write(':');
-                textWriter.Write(controlPoint.Y.ToIcString());
+                textWriter.Write(controlPoint.Y.ToString(ValueConvert.NumberFormatInfo));
                 if (i < ControlPoints.Count - 1)
+                {
                     textWriter.Write('|');
+                }
             }
 
             textWriter.Write(',');
             textWriter.Write(Repeat);
             textWriter.Write(',');
-            textWriter.Write(PixelLength.ToIcString());
+            textWriter.Write(PixelLength.ToString(ValueConvert.NumberFormatInfo));
             if (EdgeHitsounds == null)
                 return;
 
@@ -48,7 +50,9 @@ namespace Coosu.Beatmap.Sections.HitObject
                 var edgeHitsound = EdgeHitsounds[i];
                 textWriter.Write((byte)edgeHitsound);
                 if (i < EdgeHitsounds.Length - 1)
+                {
                     textWriter.Write('|');
+                }
             }
 
             if (EdgeSamples == null || EdgeAdditions == null)
@@ -63,7 +67,9 @@ namespace Coosu.Beatmap.Sections.HitObject
                 textWriter.Write(':');
                 textWriter.Write((byte)edgeAddition);
                 if (i < EdgeSamples.Length - 1)
+                {
                     textWriter.Write('|');
+                }
             }
         }
     }

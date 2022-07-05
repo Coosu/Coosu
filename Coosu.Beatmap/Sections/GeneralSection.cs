@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Coosu.Beatmap.Configurable;
+﻿using Coosu.Beatmap.Configurable;
 using Coosu.Beatmap.Sections.GamePlay;
 using Coosu.Beatmap.Sections.Timing;
 
@@ -42,8 +41,8 @@ namespace Coosu.Beatmap.Sections
         /// <summary>
         /// Multiplier for the threshold in time where hit objects placed close together stack (0–1)
         /// </summary>
-        [SectionProperty("StackLeniency")]
-        public double StackLeniency { get; set; } = 0.7;
+        [SectionProperty("StackLeniency", UseSpecificFormat = true)]
+        public float StackLeniency { get; set; } = 0.7f;
 
         /// <summary>
         /// Game mode
@@ -111,6 +110,42 @@ namespace Coosu.Beatmap.Sections
         [SectionProperty("SamplesMatchPlaybackRate", Default = false)]
         [SectionBool(BoolParseType.ZeroOne)]
         public bool SamplesMatchPlaybackRate { get; set; } = false;
+
+        /// <summary>
+        /// Property for older versions.
+        /// <b>Use for proper reasons.</b>
+        /// </summary>
+        [SectionProperty("CustomSamples", Default = CustomSampleset.Default)]
+        public CustomSampleset CustomSamples { get; set; } = CustomSampleset.Default;
+
+        /// <summary>
+        /// Property for older versions.
+        /// <b>Use for proper reasons.</b>
+        /// </summary>
+        [SectionProperty("SampleVolume", Default = 100)]
+        public int SampleVolume { get; set; } = 100;
+
+        /// <summary>
+        /// Property for older versions.
+        /// <b>Use for proper reasons.</b>
+        /// </summary>
+        [SectionProperty("AudioHash", Default = SectionPropertyAttribute.DefaultValue)]
+        public string? AudioHash { get; set; }
+
+        /// <summary>
+        /// Property for older versions.
+        /// <b>Use for proper reasons.</b>
+        /// </summary>
+        [SectionProperty("AlwaysShowPlayfield", Default = false)]
+        [SectionBool(BoolParseType.ZeroOne)]
+        public bool AlwaysShowPlayfield { get; set; }
+
+        /// <summary>
+        /// Property for older versions.
+        /// <b>Use for proper reasons.</b>
+        /// </summary>
+        [SectionProperty("TimelineZoom", Default = 1)]
+        public float TimelineZoom { get; set; } = 1;
 
         protected override FlagRule FlagRule { get; } = FlagRules.ColonSpace;
     }

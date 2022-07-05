@@ -6,9 +6,6 @@ namespace Coosu.Beatmap.Configurable
     public sealed class SectionPropertyAttribute : Attribute
     {
         public const double DefaultValue = double.MaxValue;
-        public string? Name { get; }
-
-        public object? Default { get; set; }
 
         public SectionPropertyAttribute() : this(null)
         {
@@ -19,5 +16,9 @@ namespace Coosu.Beatmap.Configurable
             var trimmed = name?.Trim();
             Name = trimmed == string.Empty ? null : trimmed;
         }
+
+        public string? Name { get; }
+        public object? Default { get; set; }
+        public bool UseSpecificFormat { get; set; }
     }
 }

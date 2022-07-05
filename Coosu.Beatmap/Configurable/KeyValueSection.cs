@@ -27,6 +27,7 @@ namespace Coosu.Beatmap.Configurable
                     if (sectionPropertyAttr == null) continue;
                     PropertyInfos.Add(sectionPropertyAttr?.Name ?? propertyInfo.Name, new SectionInfo(propertyInfo)
                     {
+                        UseSpecificFormat = sectionPropertyAttr?.UseSpecificFormat ?? false,
                         Attribute = sectionPropertyAttr
                     });
                 }
@@ -37,6 +38,7 @@ namespace Coosu.Beatmap.Configurable
                     var sectionPropertyAttr = propertyInfo.GetCustomAttribute<SectionPropertyAttribute>();
                     PropertyInfos.Add(sectionPropertyAttr?.Name ?? propertyInfo.Name, new SectionInfo(propertyInfo)
                     {
+                        UseSpecificFormat = sectionPropertyAttr?.UseSpecificFormat ?? false,
                         Attribute = sectionPropertyAttr,
                     });
                 }
@@ -75,7 +77,7 @@ namespace Coosu.Beatmap.Configurable
                 }
                 else
                 {
-                    if (ValueConvert.ConvertValue(valueSpan, propType, out var converted))
+                    if (ValueConvert.ConvertValue(valueSpan, propType, out var converted, sectionInfo.UseSpecificFormat))
                     {
                         prop.SetValue(this, converted);
                     }

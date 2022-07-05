@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.IO;
 using Coosu.Beatmap.Configurable;
+using Coosu.Beatmap.Internal;
 using Coosu.Shared;
 
 namespace Coosu.Beatmap.Sections.Timing
@@ -57,8 +58,8 @@ namespace Coosu.Beatmap.Sections.Timing
 
         public override string ToString() =>
             string.Format("{0},{1},{2},{3},{4},{5},{6},{7}",
-                Offset,
-                Factor.ToString(CultureInfo.InvariantCulture),
+                Offset.ToString(ValueConvert.NumberFormatInfo),
+                Factor.ToString(ValueConvert.NumberFormatInfo),
                 Rhythm,
                 (int)TimingSampleset + 1,
                 Track,
@@ -68,9 +69,9 @@ namespace Coosu.Beatmap.Sections.Timing
 
         public override void AppendSerializedString(TextWriter textWriter)
         {
-            textWriter.Write(Offset);
+            textWriter.Write(Offset.ToString(ValueConvert.NumberFormatInfo));
             textWriter.Write(',');
-            textWriter.Write(Factor.ToIcString());
+            textWriter.Write(Factor.ToString(ValueConvert.NumberFormatInfo));
             textWriter.Write(',');
             textWriter.Write(Rhythm);
             textWriter.Write(',');

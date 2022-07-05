@@ -12,4 +12,5 @@ public class SectionInfo
 
     public PropertyInfo PropertyInfo { get; }
     public SectionPropertyAttribute? Attribute { get; set; }
+    public bool UseSpecificFormat { get; set; }
 }

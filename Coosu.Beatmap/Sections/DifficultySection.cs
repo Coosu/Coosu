@@ -5,17 +5,17 @@ namespace Coosu.Beatmap.Sections
     [SectionProperty("Difficulty")]
     public sealed class DifficultySection : KeyValueSection
     {
-        [SectionProperty("HPDrainRate")]
-        public double HpDrainRate { get; set; } = 5;
-        [SectionProperty("CircleSize")]
-        public double CircleSize { get; set; } = 5;
-        [SectionProperty("OverallDifficulty")]
-        public double OverallDifficulty { get; set; } = 5;
-        [SectionProperty("ApproachRate")]
-        public double ApproachRate { get; set; } = 5;
-        [SectionProperty("SliderMultiplier")]
+        [SectionProperty("HPDrainRate", UseSpecificFormat = true)]
+        public float HpDrainRate { get; set; } = 5;
+        [SectionProperty("CircleSize", UseSpecificFormat = true)]
+        public float CircleSize { get; set; } = 5;
+        [SectionProperty("OverallDifficulty", UseSpecificFormat = true)]
+        public float OverallDifficulty { get; set; } = 5;
+        [SectionProperty("ApproachRate", UseSpecificFormat = true)]
+        public float ApproachRate { get; set; } = 5;
+        [SectionProperty("SliderMultiplier", UseSpecificFormat = true)]
         public float SliderMultiplier { get; set; } = 1.0f;
-        [SectionProperty("SliderTickRate")]
+        [SectionProperty("SliderTickRate", UseSpecificFormat = true)]
         public float SliderTickRate { get; set; } = 1.0f;
     }
 }
