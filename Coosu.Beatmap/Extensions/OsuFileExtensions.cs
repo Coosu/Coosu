@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using Coosu.Shared.IO;
 
@@ -8,22 +9,29 @@ public static class OsuFileExtensions
 {
     public static string GetOsuFilename(this OsuFile osuFile, string? difficultyName)
     {
-        return PathUtils.EscapeFileName(string.Format("{0} - {1} ({2}){3}.osu",
-            osuFile.Metadata.Artist,
-            osuFile.Metadata.Title,
-            osuFile.Metadata.Creator,
-            string.IsNullOrEmpty(difficultyName) ? "" : $" [{difficultyName}]"
-        ));
+        var sb = new StringBuilder();
+        AppendGeneral(osuFile, sb);
+
+        var version = difficultyName ?? osuFile.Metadata.Version;
+
+        if (!string.IsNullOrEmpty(version))
+        {
+            sb.Append(" [");
+            sb.Append(version);
+            sb.Append("]");
+        }
+
+        sb.Append(".osu");
+        return PathUtils.EscapeFileName(sb.ToString());
     }
 
     public static string GetOsbFilename(this OsuFile osuFile)
     {
-        return PathUtils.EscapeFileName(string.Format(
-            "{0} - {1} ({2}).osb"
-            , osuFile.Metadata.Artist,
-            osuFile.Metadata.Title,
-            osuFile.Metadata.Creator
-        ));
+        var sb = new StringBuilder();
+        AppendGeneral(osuFile, sb);
+        sb.Append(".osb");
+
+        return PathUtils.EscapeFileName(sb.ToString());
     }
 
     public static async Task<bool> OsuFileHasOsbStoryboard(this LocalOsuFile osuFile)
@@ -121,5 +129,26 @@ public static class OsuFileExtensions
         }
 
         return false;
+    }
+
+    private static void AppendGeneral(OsuFile osuFile, StringBuilder sb)
+    {
+        if (!string.IsNullOrEmpty(osuFile.Metadata.Artist))
+        {
+            sb.Append(osuFile.Metadata.Artist);
+            sb.Append(" - ");
+            sb.Append(osuFile.Metadata.Title);
+        }
+        else
+        {
+            sb.Append(Path.GetFileNameWithoutExtension(osuFile.General.AudioFilename));
+        }
+
+        if (!string.IsNullOrEmpty(osuFile.Metadata.Creator))
+        {
+            sb.Append(" (");
+            sb.Append(osuFile.Metadata.Creator);
+            sb.Append(")");
+        }
     }
 }
