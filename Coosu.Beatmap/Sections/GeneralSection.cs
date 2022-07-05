@@ -144,7 +144,7 @@ namespace Coosu.Beatmap.Sections
         /// Property for older versions.
         /// <b>Use for proper reasons.</b>
         /// </summary>
-        [SectionProperty("TimelineZoom", Default = 1)]
+        [SectionProperty("TimelineZoom", Default = 1f)]
         public float TimelineZoom { get; set; } = 1;
 
         protected override FlagRule FlagRule { get; } = FlagRules.ColonSpace;
