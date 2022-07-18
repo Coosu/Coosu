@@ -87,6 +87,7 @@ namespace Coosu.Storyboard.Extensions.Computing
         {
             var events = host.Events
                 .Where(k => k is not RelativeEvent)
+                .Where(k => k is not Parameter)
                 .GroupBy(k => k.EventType);
             foreach (var kv in events)
             {

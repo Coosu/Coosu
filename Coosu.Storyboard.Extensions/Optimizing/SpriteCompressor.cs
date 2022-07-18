@@ -388,7 +388,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
         {
             int count = 0; //todo
             if (obsoleteList.TimingList.Count == 0) return;
-            var groups = host.Events.GroupBy(k => k.EventType);
+            var groups = host.Events.Where(k => k is not Parameter).GroupBy(k => k.EventType);
             foreach (var group in groups)
             {
                 var list = group.Cast<BasicEvent>().ToList();
