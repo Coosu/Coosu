@@ -112,9 +112,19 @@ namespace StorybrewScriptTest
         }
 
         public override double AudioDuration { get; } = 114514;
-        public override float[] GetFft(double time, string path = null)
+
+        public override float[] GetFft(double time, string path = null, bool splitChannels = false)
         {
             return EmptyArray<float>.Value;
         }
+
+        public override float GetFftFrequency(string path = null)
+        {
+            return 0;
+        }
+        //public override float[] GetFft(double time, string path = null)
+        //{
+        //    return EmptyArray<float>.Value;
+        //}
     }
 }
