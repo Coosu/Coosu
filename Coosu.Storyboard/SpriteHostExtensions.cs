@@ -109,6 +109,40 @@ namespace Coosu.Storyboard
             spriteHost.AddSprite(obj);
             return obj;
         }
+        
+        /// <summary>
+        /// Create a storyboard animation.
+        /// </summary>
+        /// <param name="filePath">Image file path.</param>
+        /// <param name="frameCount">The animation's total frame count.</param>
+        /// <param name="frameDelay">The animation's frame delay between each frames.</param>
+        /// <param name="loopType">The animation's loop type.</param>
+        /// <param name="layerType">The animation's layer.</param>
+        /// <param name="originType">The animation's origin.</param>
+        /// <param name="defaultX">The animation's default x.</param>
+        /// <param name="defaultY">The animation's default y.</param>
+        /// <returns>Created animation.</returns>
+        public static Animation CreateAnimation(
+            this ISpriteHost spriteHost,
+            string filePath,
+            int frameCount, float frameDelay, LoopType loopType,
+            LayerType layerType = LayerType.Foreground,
+            OriginType originType = OriginType.Centre,
+            int defaultX = 320, int defaultY = 240)
+        {
+            var obj = new Animation(
+                layerType,
+                originType,
+                filePath,
+                defaultX,
+                defaultY,
+                frameCount,
+                frameDelay,
+                loopType
+            );
+            spriteHost.AddSprite(obj);
+            return obj;
+        }
 
         /// <summary>
         /// Create a storyboard animation.
