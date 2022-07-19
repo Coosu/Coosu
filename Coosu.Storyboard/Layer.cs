@@ -37,7 +37,7 @@ namespace Coosu.Storyboard
         /// </summary>
         /// <param name="defaultZ">Layer Z-distance.</param>
         /// <param name="name">Layer name.</param>
-        public Layer(float defaultZ, string name = "CoosuDefaultLayer")
+        public Layer(double defaultZ, string name = "CoosuDefaultLayer")
         {
             Camera2.DefaultZ = defaultZ;
             Name = name;
@@ -58,7 +58,7 @@ namespace Coosu.Storyboard
             SceneObjects.AddRange(objects);
         }
 
-        public void AdjustTiming(float offset)
+        public void AdjustTiming(double offset)
         {
             foreach (var sceneObject in SceneObjects)
             {
@@ -66,7 +66,7 @@ namespace Coosu.Storyboard
             }
         }
 
-        public void AdjustPosition(float x, float y)
+        public void AdjustPosition(double x, double y)
         {
             foreach (var sceneObject in SceneObjects)
             {
@@ -127,10 +127,10 @@ namespace Coosu.Storyboard
             return GetEnumerator();
         }
 
-        public float MaxTime() => SceneObjects.Count == 0 ? 0 : SceneObjects.Max(k => k.MaxTime());
-        public float MinTime() => SceneObjects.Count == 0 ? 0 : SceneObjects.Min(k => k.MinTime());
-        public float MaxStartTime() => SceneObjects.Count == 0 ? 0 : SceneObjects.Max(k => k.MaxStartTime());
-        public float MinEndTime() => SceneObjects.Count == 0 ? 0 : SceneObjects.Min(k => k.MinEndTime());
+        public double MaxTime() => SceneObjects.Count == 0 ? 0 : SceneObjects.Max(k => k.MaxTime());
+        public double MinTime() => SceneObjects.Count == 0 ? 0 : SceneObjects.Min(k => k.MinTime());
+        public double MaxStartTime() => SceneObjects.Count == 0 ? 0 : SceneObjects.Max(k => k.MaxStartTime());
+        public double MinEndTime() => SceneObjects.Count == 0 ? 0 : SceneObjects.Min(k => k.MinEndTime());
 
         public IList<Sprite> Sprites => SceneObjects
             .Where(k => k is Sprite)
@@ -339,11 +339,11 @@ namespace Coosu.Storyboard
                         param2,
                         param3.Trim(QuoteChar),
 #if NETCOREAPP3_1_OR_GREATER
-                        float.Parse(param4),
-                        float.Parse(param5)
+                        double.Parse(param4),
+                        double.Parse(param5)
 #else
-                        float.Parse(param4.ToString()),
-                        float.Parse(param5.ToString())
+                        double.Parse(param4.ToString()),
+                        double.Parse(param5.ToString())
 #endif
                     );
                     context.CurrentObject.RowInSource = context.CurrentRow;
@@ -359,15 +359,15 @@ namespace Coosu.Storyboard
                         @param2,
                         @param3.Trim(QuoteChar),
 #if NETCOREAPP3_1_OR_GREATER
-                        float.Parse(@param4),
-                        float.Parse(@param5),
+                        double.Parse(@param4),
+                        double.Parse(@param5),
                         int.Parse(@param6),
-                        float.Parse(@param7),
+                        double.Parse(@param7),
 #else
-                        float.Parse(@param4.ToString()),
-                        float.Parse(@param5.ToString()),
+                        double.Parse(@param4.ToString()),
+                        double.Parse(@param5.ToString()),
                         int.Parse(@param6.ToString()),
-                        float.Parse(@param7.ToString()),
+                        double.Parse(@param7.ToString()),
 #endif
                         "LoopForever".AsSpan()
                     );
@@ -384,15 +384,15 @@ namespace Coosu.Storyboard
                         @param2,
                         @param3.Trim(QuoteChar),
 #if NETCOREAPP3_1_OR_GREATER
-                        float.Parse(@param4),
-                        float.Parse(@param5),
+                        double.Parse(@param4),
+                        double.Parse(@param5),
                         int.Parse(@param6),
-                        float.Parse(@param7),
+                        double.Parse(@param7),
 #else
-                        float.Parse(@param4.ToString()),
-                        float.Parse(@param5.ToString()),
+                        double.Parse(@param4.ToString()),
+                        double.Parse(@param5.ToString()),
                         int.Parse(@param6.ToString()),
-                        float.Parse(@param7.ToString()),
+                        double.Parse(@param7.ToString()),
 #endif
                         @param8
                     );
@@ -495,7 +495,7 @@ namespace Coosu.Storyboard
                 if (size >= 1)
                 {
                     var t = 0;
-                    var valueStore = new List<float>(size * 2);
+                    var valueStore = new List<double>(size * 2);
                     foreach (var span in rawParams.SpanSplit(SplitChar))
                     {
                         t++;
@@ -503,9 +503,9 @@ namespace Coosu.Storyboard
                         if (t >= 4)
                         {
 #if NETCOREAPP3_1_OR_GREATER
-                            valueStore.Add(float.Parse(span));
+                            valueStore.Add(double.Parse(span));
 #else
-                            valueStore.Add(float.Parse(span.ToString()));
+                            valueStore.Add(double.Parse(span.ToString()));
 #endif
                         }
                     }
@@ -521,7 +521,7 @@ namespace Coosu.Storyboard
                         var duration = endTime - startTime;
                         for (int i = 0, j = 0; i < rawParams.Length - size; i += size, j++)
                         {
-                            var copy = new List<float>(size * 2);
+                            var copy = new List<double>(size * 2);
 
                             for (int k = 0; k < size * 2; k++)
                             {
@@ -631,7 +631,7 @@ namespace Coosu.Storyboard
         private Sprite CreateSprite(ReadOnlySpan<char> layer,
             ReadOnlySpan<char> origin,
             ReadOnlySpan<char> imagePath,
-            float defaultX, float defaultY)
+            double defaultX, double defaultY)
         {
             var obj = new Sprite(layer, origin, imagePath, defaultX, defaultY);
             AddObject(obj);
@@ -641,8 +641,8 @@ namespace Coosu.Storyboard
         private Sprite CreateAnimation(ReadOnlySpan<char> layer,
             ReadOnlySpan<char> origin,
             ReadOnlySpan<char> imagePath,
-            float defaultX, float defaultY,
-            int frameCount, float frameDelay, ReadOnlySpan<char> loopType)
+            double defaultX, double defaultY,
+            int frameCount, double frameDelay, ReadOnlySpan<char> loopType)
         {
             var obj = new Animation(layer, origin, imagePath, defaultX, defaultY, frameCount, frameDelay, loopType);
             AddObject(obj);

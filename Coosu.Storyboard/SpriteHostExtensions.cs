@@ -1,4 +1,4 @@
-﻿using System.Numerics;
+﻿using Coosu.Shared.Numerics;
 using Coosu.Storyboard.Common;
 
 namespace Coosu.Storyboard
@@ -82,7 +82,7 @@ namespace Coosu.Storyboard
             string filePath,
             LayerType layerType,
             OriginType originType,
-            Vector2 defaultLocation)
+            Vector2D defaultLocation)
         {
             var obj = new Sprite(layerType, originType, filePath, defaultLocation.X, defaultLocation.Y);
             spriteHost.AddSprite(obj);
@@ -103,7 +103,7 @@ namespace Coosu.Storyboard
             string filePath,
             LayerType layerType,
             OriginType originType,
-            float defaultX, float defaultY)
+            double defaultX, double defaultY)
         {
             var obj = new Sprite(layerType, originType, filePath, defaultX, defaultY);
             spriteHost.AddSprite(obj);
@@ -125,7 +125,7 @@ namespace Coosu.Storyboard
         public static Animation CreateAnimation(
             this ISpriteHost spriteHost,
             string filePath,
-            int frameCount, float frameDelay, LoopType loopType,
+            int frameCount, double frameDelay, LoopType loopType,
             LayerType layerType = LayerType.Foreground,
             OriginType originType = OriginType.Centre,
             int defaultX = 320, int defaultY = 240)
@@ -162,7 +162,7 @@ namespace Coosu.Storyboard
             LayerType layerType,
             OriginType originType,
             int defaultX, int defaultY,
-            int frameCount, float frameDelay, LoopType loopType)
+            int frameCount, double frameDelay, LoopType loopType)
         {
             var obj = new Animation(
                 layerType,

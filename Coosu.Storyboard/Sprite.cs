@@ -20,10 +20,10 @@ namespace Coosu.Storyboard
         private string DebuggerDisplay => this.GetHeaderString();
         private ICollection<IKeyEvent> _events = new SortedSet<IKeyEvent>(EventSequenceComparer.Instance);
 
-        private float? _cachedMaxTime;
-        private float? _cachedMinTime;
-        private float? _cachedMaxStartTime;
-        private float? _cachedMinEndTime;
+        private double? _cachedMaxTime;
+        private double? _cachedMinTime;
+        private double? _cachedMaxStartTime;
+        private double? _cachedMinEndTime;
 
         public virtual ObjectType ObjectType { get; } = ObjectTypes.Sprite;
 
@@ -34,12 +34,12 @@ namespace Coosu.Storyboard
         public OriginType OriginType { get; }
         public string ImagePath { get; }
         /// <inheritdoc />
-        public float DefaultX { get; set; }
+        public double DefaultX { get; set; }
         /// <inheritdoc />
-        public float DefaultY { get; set; }
+        public double DefaultY { get; set; }
 
         /// <inheritdoc />
-        public float DefaultZ { get; set; }
+        public double DefaultZ { get; set; }
         /// <inheritdoc />
         public string CameraIdentifier { get; set; } = "00000000-0000-0000-0000-000000000000";
 
@@ -66,64 +66,64 @@ namespace Coosu.Storyboard
             private set => _triggerList = (List<Trigger>)value;
         }
 
-        public float MaxTime()
+        public double MaxTime()
         {
             if (_cachedMaxTime != null) return _cachedMaxTime.Value;
             if (Events.Count == 0 && LoopList.Count == 0 && TriggerList.Count == 0)
-                return float.NaN;
+                return double.NaN;
 
-            var max = Events.Count == 0 ? float.MinValue : Events.Max(k => k.EndTime);
-            var loopMax = LoopList.Count == 0 ? float.MinValue : LoopList.Max(k => k.OuterMaxTime());
+            var max = Events.Count == 0 ? double.MinValue : Events.Max(k => k.EndTime);
+            var loopMax = LoopList.Count == 0 ? double.MinValue : LoopList.Max(k => k.OuterMaxTime());
             max = max >= loopMax ? max : loopMax;
 
-            var triggerMax = TriggerList.Count == 0 ? float.MinValue : TriggerList.Max(k => k.MaxTime());
+            var triggerMax = TriggerList.Count == 0 ? double.MinValue : TriggerList.Max(k => k.MaxTime());
             max = max >= triggerMax ? max : triggerMax;
-            return (float)(_cachedMaxTime = max);
+            return (double)(_cachedMaxTime = max);
         }
 
-        public float MinTime()
+        public double MinTime()
         {
             if (_cachedMinTime != null) return _cachedMinTime.Value;
             if (Events.Count == 0 && LoopList.Count == 0 && TriggerList.Count == 0)
-                return float.NaN;
+                return double.NaN;
 
-            var min = Events.Count == 0 ? float.MaxValue : Events.Min(k => k.StartTime);
-            var loopMin = LoopList.Count == 0 ? float.MaxValue : LoopList.Min(k => k.OuterMinTime());
+            var min = Events.Count == 0 ? double.MaxValue : Events.Min(k => k.StartTime);
+            var loopMin = LoopList.Count == 0 ? double.MaxValue : LoopList.Min(k => k.OuterMinTime());
             min = min <= loopMin ? min : loopMin;
 
-            var triggerMin = TriggerList.Count == 0 ? float.MaxValue : TriggerList.Min(k => k.MinTime());
+            var triggerMin = TriggerList.Count == 0 ? double.MaxValue : TriggerList.Min(k => k.MinTime());
             min = min <= triggerMin ? min : triggerMin;
-            return (float)(_cachedMinTime = min);
+            return (double)(_cachedMinTime = min);
         }
 
-        public float MaxStartTime()
+        public double MaxStartTime()
         {
             if (_cachedMaxStartTime != null) return _cachedMaxStartTime.Value;
             if (Events.Count == 0 && LoopList.Count == 0 && TriggerList.Count == 0)
-                return float.NaN;
+                return double.NaN;
 
-            var max = Events.Count == 0 ? float.MinValue : Events.Max(k => k.StartTime);
-            var loopMax = LoopList.Count == 0 ? float.MinValue : LoopList.Max(k => k.OuterMinTime());
+            var max = Events.Count == 0 ? double.MinValue : Events.Max(k => k.StartTime);
+            var loopMax = LoopList.Count == 0 ? double.MinValue : LoopList.Max(k => k.OuterMinTime());
             max = max >= loopMax ? max : loopMax;
 
-            var triggerMax = TriggerList.Count == 0 ? float.MinValue : TriggerList.Max(k => k.MinTime());
+            var triggerMax = TriggerList.Count == 0 ? double.MinValue : TriggerList.Max(k => k.MinTime());
             max = max >= triggerMax ? max : triggerMax;
-            return (float)(_cachedMaxStartTime = max);
+            return (double)(_cachedMaxStartTime = max);
         }
 
-        public float MinEndTime()
+        public double MinEndTime()
         {
             if (_cachedMinEndTime != null) return _cachedMinEndTime.Value;
             if (Events.Count == 0 && LoopList.Count == 0 && TriggerList.Count == 0)
-                return float.NaN;
+                return double.NaN;
 
-            var min = Events.Count == 0 ? float.MaxValue : Events.Min(k => k.EndTime);
-            var loopMin = LoopList.Count == 0 ? float.MaxValue : LoopList.Min(k => k.OuterMaxTime());
+            var min = Events.Count == 0 ? double.MaxValue : Events.Min(k => k.EndTime);
+            var loopMin = LoopList.Count == 0 ? double.MaxValue : LoopList.Min(k => k.OuterMaxTime());
             min = min <= loopMin ? min : loopMin;
 
-            var triggerMin = TriggerList.Count == 0 ? float.MaxValue : TriggerList.Min(k => k.MaxTime());
+            var triggerMin = TriggerList.Count == 0 ? double.MaxValue : TriggerList.Min(k => k.MaxTime());
             min = min <= triggerMin ? min : triggerMin;
-            return (float)(_cachedMinEndTime = min);
+            return (double)(_cachedMinEndTime = min);
         }
 
         public bool EnableGroupedSerialization { get; set; }/* = true;*/
@@ -142,7 +142,7 @@ namespace Coosu.Storyboard
         /// <param name="imagePath">Set image path.</param>
         /// <param name="defaultX">Set default x-coordinate of location.</param>
         /// <param name="defaultY">Set default x-coordinate of location.</param>
-        public Sprite(LayerType layerType, OriginType originType, string imagePath, float defaultX, float defaultY)
+        public Sprite(LayerType layerType, OriginType originType, string imagePath, double defaultX, double defaultY)
         {
             LayerType = layerType;
             OriginType = originType;
@@ -152,7 +152,7 @@ namespace Coosu.Storyboard
         }
 
         public Sprite(ReadOnlySpan<char> layer, ReadOnlySpan<char> origin, ReadOnlySpan<char> imagePath,
-            float defaultX, float defaultY)
+            double defaultX, double defaultY)
         {
             //ObjectType = OsbObjectType.Parse(type);
             LayerType = layer.ToLayerType();

@@ -7,37 +7,37 @@ namespace Coosu.Storyboard.Events
     {
         public override EventType EventType => EventTypes.Color;
 
-        public float StartR
+        public double StartR
         {
             get => GetValue(0);
             set => SetValue(0, value);
         }
 
-        public float StartG
+        public double StartG
         {
             get => GetValue(1);
             set => SetValue(1, value);
         }
 
-        public float StartB
+        public double StartB
         {
             get => GetValue(2);
             set => SetValue(2, value);
         }
 
-        public float EndR
+        public double EndR
         {
             get => GetValue(3);
             set => SetValue(3, value);
         }
 
-        public float EndG
+        public double EndG
         {
             get => GetValue(4);
             set => SetValue(4, value);
         }
 
-        public float EndB
+        public double EndB
         {
             get => GetValue(5);
             set => SetValue(5, value);
@@ -49,7 +49,7 @@ namespace Coosu.Storyboard.Events
         //{
         //}
 
-        public Color(EasingFunctionBase easing, float startTime, float endTime, List<float> values)
+        public Color(EasingFunctionBase easing, double startTime, double endTime, List<double> values)
             : base(easing, startTime, endTime, values)
         {
         }

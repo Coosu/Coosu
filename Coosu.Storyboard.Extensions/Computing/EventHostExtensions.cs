@@ -267,7 +267,7 @@ namespace Coosu.Storyboard.Extensions.Computing
 
         public static bool HasEffectiveTiming(this IDetailedEventHost eventHost)
         {
-            if (float.IsNaN(eventHost.MaxTime()) || float.IsNaN(eventHost.MinTime()))
+            if (double.IsNaN(eventHost.MaxTime()) || double.IsNaN(eventHost.MinTime()))
                 return false;
             if (eventHost.MaxTime() < eventHost.MinTime())
                 return false;
@@ -276,7 +276,7 @@ namespace Coosu.Storyboard.Extensions.Computing
             return true;
         }
 
-        public static List<float> ComputeFrame(this IEventHost eventHost, EventType eventType, float time, int? accuracy)
+        public static List<double> ComputeFrame(this IEventHost eventHost, EventType eventType, double time, int? accuracy)
         {
             if (eventType.Size < 1) throw new ArgumentOutOfRangeException(nameof(eventType), eventType, "Only support sized event type.");
             var basicEvents = eventHost.Events
@@ -503,7 +503,7 @@ namespace Coosu.Storyboard.Extensions.Computing
                                                     discretizingTargetStandardEvents.Remove((bounded.StartTime, relative.Key.StartTime));
                                                 }
 
-                                                List<float> computedFrame2;
+                                                List<double> computedFrame2;
                                                 var relativeFrame2 = @event.ComputeFrame(bounded.EndTime, discretizingAccuracy); //get
                                                 computedFrame2 = @event.EventType.ComputeRelative(bounded.GetEnds().ToArray(), relativeFrame2, discretizingAccuracy);
                                                 if (!relative.Key.StartTime.Equals(bounded.EndTime))
@@ -549,7 +549,7 @@ namespace Coosu.Storyboard.Extensions.Computing
                                                     discretizingTargetStandardEvents.Remove((relative.Key.StartTime, bounded.StartTime));
                                                 }
 
-                                                List<float> computedFrame2;
+                                                List<double> computedFrame2;
                                                 var absoluteFrame2 = BasicEventExtensions.ComputeFrame(allThisTypeStandardEvents,
                                                     targetStdType, relative.Key.EndTime, discretizingAccuracy);
                                                 computedFrame2 = @event.EventType.ComputeRelative(absoluteFrame2, relative.Value.GetEnds().ToArray(), discretizingAccuracy);

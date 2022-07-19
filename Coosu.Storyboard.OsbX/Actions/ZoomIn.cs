@@ -10,7 +10,7 @@ namespace Coosu.Storyboard.OsbX.Actions
         {
         }
 
-        public ZoomIn(EasingFunctionBase easing, float startTime, float endTime, List<float> values)
+        public ZoomIn(EasingFunctionBase easing, double startTime, double endTime, List<double> values)
             : base(easing, startTime, endTime, values)
         {
         }

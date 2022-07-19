@@ -6,27 +6,27 @@ namespace Coosu.Storyboard.Events
     public sealed class Vector : BasicEvent
     {
         public override EventType EventType => EventTypes.Vector;
-        public override float DefaultValue { get; } = 1f;
+        public override double DefaultValue { get; } = 1;
 
-        public float StartScaleX
+        public double StartScaleX
         {
             get => GetValue(0);
             set => SetValue(0, value);
         }
 
-        public float StartScaleY
+        public double StartScaleY
         {
             get => GetValue(1);
             set => SetValue(1, value);
         }
 
-        public float EndScaleX
+        public double EndScaleX
         {
             get => GetValue(2);
             set => SetValue(2, value);
         }
 
-        public float EndScaleY
+        public double EndScaleY
         {
             get => GetValue(3);
             set => SetValue(3, value);
@@ -37,7 +37,7 @@ namespace Coosu.Storyboard.Events
         //{
         //}
 
-        public Vector(EasingFunctionBase easing, float startTime, float endTime, List<float> values)
+        public Vector(EasingFunctionBase easing, double startTime, double endTime, List<double> values)
             : base(easing, startTime, endTime, values)
         {
         }

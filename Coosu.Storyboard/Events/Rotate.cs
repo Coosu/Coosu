@@ -7,13 +7,13 @@ namespace Coosu.Storyboard.Events
     {
         public override EventType EventType => EventTypes.Rotate;
 
-        public float StartRotate
+        public double StartRotate
         {
             get => GetValue(0);
             set => SetValue(0, value);
         }
 
-        public float EndRotate
+        public double EndRotate
         {
             get => GetValue(1);
             set => SetValue(1, value);
@@ -24,7 +24,7 @@ namespace Coosu.Storyboard.Events
         //{
         //}
 
-        public Rotate(EasingFunctionBase easing, float startTime, float endTime, List<float> values)
+        public Rotate(EasingFunctionBase easing, double startTime, double endTime, List<double> values)
             : base(easing, startTime, endTime, values)
         {
         }

@@ -7,7 +7,7 @@ namespace Coosu.Storyboard
 {
     public static class KeyEventExtensions
     {
-        public static float GetStartsValue(this IKeyEvent e, int index)
+        public static double GetStartsValue(this IKeyEvent e, int index)
         {
             //#if NET5_0_OR_GREATER
             //            return e.GetStartsSpan()[index];
@@ -16,7 +16,7 @@ namespace Coosu.Storyboard
             //#endif
         }
 
-        public static float GetEndsValue(this IKeyEvent e, int index)
+        public static double GetEndsValue(this IKeyEvent e, int index)
         {
             if (e.EventType.Size < 1)
                 throw new NotSupportedException("Not support the specified event size: " + e.EventType.Size);
@@ -27,7 +27,7 @@ namespace Coosu.Storyboard
             //#endif
         }
 
-        public static void SetStartsValue(this IKeyEvent e, int index, float value)
+        public static void SetStartsValue(this IKeyEvent e, int index, double value)
         {
             //#if NET5_0_OR_GREATER
             //            e.GetStartsSpan()[index] = value;
@@ -36,7 +36,7 @@ namespace Coosu.Storyboard
             //#endif
         }
 
-        public static void SetEndsValue(this IKeyEvent e, int index, float value)
+        public static void SetEndsValue(this IKeyEvent e, int index, double value)
         {
             if (e.EventType.Size < 1)
                 throw new NotSupportedException("Not support the specified event size: " + e.EventType.Size);
@@ -46,7 +46,7 @@ namespace Coosu.Storyboard
             e.SetValue(index + e.EventType.Size, value);
         }
 
-        public static void SetRawValues(this IKeyEvent e, IEnumerable<float> startValues, IEnumerable<float> endValues)
+        public static void SetRawValues(this IKeyEvent e, IEnumerable<double> startValues, IEnumerable<double> endValues)
         {
             e.SetStarts(startValues);
             e.SetEnds(endValues);

@@ -8,13 +8,13 @@ namespace Coosu.Storyboard.Events
     {
         public override EventType EventType => EventTypes.MoveX;
 
-        public float StartX
+        public double StartX
         {
             get => GetValue(0);
             set => SetValue(0, value);
         }
 
-        public float EndX
+        public double EndX
         {
             get => GetValue(1);
             set => SetValue(1, value);
@@ -25,7 +25,7 @@ namespace Coosu.Storyboard.Events
         //{
         //}
 
-        public MoveX(EasingFunctionBase easing, float startTime, float endTime, List<float> values)
+        public MoveX(EasingFunctionBase easing, double startTime, double endTime, List<double> values)
             : base(easing, startTime, endTime, values)
         {
         }
@@ -34,7 +34,7 @@ namespace Coosu.Storyboard.Events
         {
         }
 
-        public void AdjustPosition(float x, float y)
+        public void AdjustPosition(double x, double y)
         {
             StartX += x;
             EndX += x;

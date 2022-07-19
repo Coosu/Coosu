@@ -15,7 +15,7 @@ namespace Coosu.Storyboard.Extensions.Computing
                    move.StartY.Equals(sprite.DefaultY);
         }
 
-        public static List<float> ComputeFrame(this BasicEvent e, float currentTime, int? accuracy)
+        public static List<double> ComputeFrame(this BasicEvent e, double currentTime, int? accuracy)
         {
             var easing = e.Easing;
             var size = e.EventType.Size;
@@ -29,20 +29,20 @@ namespace Coosu.Storyboard.Extensions.Computing
             var endTime = (int)e.EndTime;
 
             var normalizedTime = (currentTime - startTime) / (endTime - startTime);
-            var easedTime = (float)easing.Ease(normalizedTime);
+            var easedTime = (double)easing.Ease(normalizedTime);
 
-            var list = new List<float>(size);
+            var list = new List<double>(size);
             for (int i = 0; i < size; i++)
             {
                 var val = (values[i + size] - values[i]) * easedTime + values[i];
                 if (accuracy == null) list.Add(val);
-                else list.Add((float)Math.Round(val, accuracy.Value));
+                else list.Add((double)Math.Round(val, accuracy.Value));
             }
 
             return list;
         }
 
-        public static List<float> ComputeFrame(IEnumerable<BasicEvent> events, EventType eventType, float time, int? accuracy)
+        public static List<double> ComputeFrame(IEnumerable<BasicEvent> events, EventType eventType, double time, int? accuracy)
         {
             var basicEvents = events
                 .OrderBy(k => k.StartTime)
@@ -77,7 +77,7 @@ namespace Coosu.Storyboard.Extensions.Computing
             var thisTime = startTime - (startTime % discretizingInterval);
             var nextTime = startTime - (startTime % discretizingInterval) + discretizingInterval;
             if (nextTime > endTime) nextTime = endTime;
-            List<float> reusableValue = e.ComputeFrame(nextTime, nextTime == endTime ? null : discretizingAccuracy);
+            List<double> reusableValue = e.ComputeFrame(nextTime, nextTime == endTime ? null : discretizingAccuracy);
 
             eventList.Add(BasicEvent.Create(targetEventType, LinearEase.Instance,
                 startTime, nextTime, e.GetStarts(), reusableValue));
@@ -87,7 +87,7 @@ namespace Coosu.Storyboard.Extensions.Computing
                 thisTime += discretizingInterval;
                 nextTime += discretizingInterval;
                 if (nextTime > endTime) nextTime = endTime;
-                List<float> newValue = e.ComputeFrame(nextTime, nextTime == endTime ? null : discretizingAccuracy);
+                List<double> newValue = e.ComputeFrame(nextTime, nextTime == endTime ? null : discretizingAccuracy);
                 eventList.Add(BasicEvent.Create(targetEventType, LinearEase.Instance, thisTime, nextTime,
                     reusableValue.ToList(), newValue));
                 reusableValue = newValue;

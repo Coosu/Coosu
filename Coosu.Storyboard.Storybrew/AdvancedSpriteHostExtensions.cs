@@ -13,9 +13,9 @@ namespace Coosu.Storyboard
     {
         public static SpriteGroup CreateText(this ISpriteHost spriteHost,
             string text,
-            float startTime,
-            float initialX,
-            float initialY,
+            double startTime,
+            double initialX,
+            double initialY,
             Action<CoosuTextOptionsBuilder> configure)
         {
             var builder = new CoosuTextOptionsBuilder();
@@ -25,9 +25,9 @@ namespace Coosu.Storyboard
 
         public static SpriteGroup CreateText(this ISpriteHost spriteHost,
             string text,
-            float startTime,
-            float initialX,
-            float initialY,
+            double startTime,
+            double initialX,
+            double initialY,
             OriginType origin,
             Action<CoosuTextOptionsBuilder> configure)
         {
@@ -38,9 +38,9 @@ namespace Coosu.Storyboard
 
         public static SpriteGroup CreateText(this ISpriteHost spriteHost,
             string text,
-            float startTime,
-            float initialX,
-            float initialY,
+            double startTime,
+            double initialX,
+            double initialY,
             LayerType layer = LayerType.Foreground,
             OriginType origin = OriginType.Centre,
             CoosuTextOptions? textOptions = null)
@@ -95,7 +95,7 @@ namespace Coosu.Storyboard
                     var deg = textOptions.ShadowDirection;
                     var x = r * Math.Cos(deg / 180d * Math.PI);
                     var y = r * Math.Sin(deg / 180d * Math.PI);
-                    var sprite = spriteGroup.CreateSprite(filePath, layer, textOptions.Origin, (float)x, (float)y);
+                    var sprite = spriteGroup.CreateSprite(filePath, layer, textOptions.Origin, (double)x, (double)y);
                     if (scale) AdjustScale(sprite, startTime, textOptions);
                     sprite.Tag = i;
                 }
@@ -135,22 +135,22 @@ namespace Coosu.Storyboard
             return spriteGroup;
         }
 
-        private static void AdjustScale(IEventHost sprite, float startTime, CoosuTextOptions textOptions)
+        private static void AdjustScale(IEventHost sprite, double startTime, CoosuTextOptions textOptions)
         {
             var isVertical = textOptions.Orientation == Orientation.Vertical;
             var useYAdd = isVertical && textOptions.RotateBy90 == false;
             if (!isVertical)
             {
-                sprite.Vector(startTime, (float)textOptions.XScale, (float)textOptions.YScale);
+                sprite.Vector(startTime, (double)textOptions.XScale, (double)textOptions.YScale);
             }
             else if (!useYAdd)
             {
-                sprite.Vector(startTime, (float)textOptions.YScale, (float)textOptions.XScale);
-                sprite.Rotate(startTime, (float)(Math.PI / 2));
+                sprite.Vector(startTime, (double)textOptions.YScale, (double)textOptions.XScale);
+                sprite.Rotate(startTime, (double)(Math.PI / 2));
             }
             else
             {
-                sprite.Vector(startTime, (float)textOptions.XScale, (float)textOptions.YScale);
+                sprite.Vector(startTime, (double)textOptions.XScale, (double)textOptions.YScale);
             }
         }
     }

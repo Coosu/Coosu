@@ -34,15 +34,15 @@ namespace Coosu.Storyboard.OsbX.SubjectHandlers
             var layerType = (LayerType)Enum.Parse(typeof(LayerType), split[1]);
             var origin = (OriginType)Enum.Parse(typeof(OriginType), split[2]);
             var path = split[3].Trim('\"');
-            var defX = float.Parse(split[4]);
-            var defY = float.Parse(split[5]);
+            var defX = double.Parse(split[4]);
+            var defY = double.Parse(split[5]);
 
-            float defaultZ = 1;
+            double defaultZ = 1;
             string cameraIdentifier = Guid.Empty.ToString();
             if (split.Length == 9)
             {
                 cameraIdentifier = split[6];
-                defaultZ = float.TryParse(split[7], out var result) ? result : 1f;
+                defaultZ = double.TryParse(split[7], out var result) ? result : 1f;
                 var absolute = int.Parse(split[8]) != 0;
                 if (absolute)
                 {

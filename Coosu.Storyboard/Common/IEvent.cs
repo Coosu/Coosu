@@ -6,7 +6,7 @@ namespace Coosu.Storyboard.Common
     {
         event Action? TimingChanged;
         EventType EventType { get; }
-        float StartTime { get; set; }
-        float EndTime { get; set; }
+        double StartTime { get; set; }
+        double EndTime { get; set; }
     }
 }

@@ -16,15 +16,15 @@ namespace Coosu.Storyboard.Extensions
     {
         public event Action? TimingChanged;
 
-        private List<float> _values;
-        private float _startTime;
-        private float _endTime;
+        private List<double> _values;
+        private double _startTime;
+        private double _endTime;
         private string DebuggerDisplay => this.GetHeaderString();
         public EventType EventType { get; }
 
         public EasingFunctionBase Easing { get; set; } = LinearEase.Instance;
 
-        public float StartTime
+        public double StartTime
         {
             get => _startTime;
             set
@@ -35,7 +35,7 @@ namespace Coosu.Storyboard.Extensions
             }
         }
 
-        public float EndTime
+        public double EndTime
         {
             get => _endTime;
             set
@@ -46,54 +46,54 @@ namespace Coosu.Storyboard.Extensions
             }
         }
 
-        public virtual float DefaultValue => 0;
+        public virtual double DefaultValue => 0;
 
-        internal List<float> TagValues { get; set; }
+        internal List<double> TagValues { get; set; }
 
-        public IReadOnlyList<float> Values
+        public IReadOnlyList<double> Values
         {
             get => _values;
-            internal set => _values = (List<float>)value;
+            internal set => _values = (List<double>)value;
         }
 
 
 #if NET5_0_OR_GREATER
-        public virtual Span<float> GetStartsSpan()
+        public virtual Span<double> GetStartsSpan()
         {
             throw new NotSupportedException("The relative events have no starts or ends.");
         }
 
-        public Span<float> GetEndsSpan()
+        public Span<double> GetEndsSpan()
         {
             throw new NotSupportedException("The relative events have no starts or ends.");
         }
 #endif
-        public IEnumerable<float> GetStarts()
+        public IEnumerable<double> GetStarts()
         {
             throw new NotSupportedException("The relative events have no starts or ends.");
         }
 
-        public IEnumerable<float> GetEnds()
+        public IEnumerable<double> GetEnds()
         {
             throw new NotSupportedException("The relative events have no starts or ends.");
         }
 
-        public void SetStarts(IEnumerable<float> startValues)
+        public void SetStarts(IEnumerable<double> startValues)
         {
-            TagValues = startValues is List<float> startValueList ? startValueList : startValues.ToList();
+            TagValues = startValues is List<double> startValueList ? startValueList : startValues.ToList();
             if (TagValues.Count != EventType.Size) throw new ArgumentException();
         }
 
-        public void SetEnds(IEnumerable<float> endValues)
+        public void SetEnds(IEnumerable<double> endValues)
         {
-            Values = endValues is List<float> endValuesList ? endValuesList : endValues.ToList();
+            Values = endValues is List<double> endValuesList ? endValuesList : endValues.ToList();
             if (Values.Count != EventType.Size) throw new ArgumentException();
         }
 
         public virtual bool IsHalfFilled => false;
         public virtual bool IsFilled => Values.Count == EventType.Size;
 
-        public virtual float GetValue(int index)
+        public virtual double GetValue(int index)
         {
             if (index >= EventType.Size)
                 throw new ArgumentOutOfRangeException(nameof(index), index,
@@ -105,7 +105,7 @@ namespace Coosu.Storyboard.Extensions
             return GetValueImpl(index);
         }
 
-        public virtual void SetValue(int index, float value)
+        public virtual void SetValue(int index, double value)
         {
             if (index >= EventType.Size)
                 throw new ArgumentOutOfRangeException(nameof(index), index,
@@ -135,7 +135,7 @@ namespace Coosu.Storyboard.Extensions
             return true;
         }
 
-        public void AdjustTiming(float offset)
+        public void AdjustTiming(double offset)
         {
             StartTime += offset;
             EndTime += offset;
@@ -162,24 +162,24 @@ namespace Coosu.Storyboard.Extensions
 
         public RelativeEvent()
         {
-            _values = new List<float>();
+            _values = new List<double>();
         }
 
         public RelativeEvent(EventType eventType)
         {
             EventType = eventType;
-            _values = new List<float>();
-            TagValues = new List<float>();
+            _values = new List<double>();
+            TagValues = new List<double>();
         }
 
-        public RelativeEvent(EventType eventType, EasingFunctionBase easing, float startTime, float endTime, List<float> byValues)
+        public RelativeEvent(EventType eventType, EasingFunctionBase easing, double startTime, double endTime, List<double> byValues)
         {
             EventType = eventType;
             Easing = easing;
             StartTime = startTime;
             EndTime = endTime;
             _values = byValues;
-            TagValues = new List<float>(_values.Count);
+            TagValues = new List<double>(_values.Count);
         }
 
         protected virtual async Task WriteExtraScriptAsync(TextWriter textWriter)
@@ -187,7 +187,7 @@ namespace Coosu.Storyboard.Extensions
             Fill();
             for (int i = 0; i < Values.Count; i++)
             {
-                if (!float.IsNaN(TagValues[i]))
+                if (!double.IsNaN(TagValues[i]))
                 {
                     await textWriter.WriteAsync(TagValues[i].ToIcString());
                     await textWriter.WriteAsync('~');
@@ -214,7 +214,7 @@ namespace Coosu.Storyboard.Extensions
 
                 while (TagValues.Count < size)
                 {
-                    _values.Add(float.NaN);
+                    _values.Add(double.NaN);
                 }
             }
             else
@@ -226,18 +226,18 @@ namespace Coosu.Storyboard.Extensions
 
                 while (index > TagValues.Count - 1)
                 {
-                    _values.Add(float.NaN);
+                    _values.Add(double.NaN);
                 }
             }
         }
 
-        protected float GetValueImpl(int index)
+        protected double GetValueImpl(int index)
         {
             Fill(index + 1);
             return _values[index];
         }
 
-        protected void SetValueImpl(int index, float value)
+        protected void SetValueImpl(int index, double value)
         {
             Fill(index + 1);
             _values[index] = value;

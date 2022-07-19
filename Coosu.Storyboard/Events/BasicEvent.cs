@@ -17,15 +17,15 @@ namespace Coosu.Storyboard.Events
     public abstract class BasicEvent : IKeyEvent
     {
         public event Action? TimingChanged;
-        internal List<float> _values;
-        private float _startTime;
-        private float _endTime;
+        internal List<double> _values;
+        private double _startTime;
+        private double _endTime;
         private string DebuggerDisplay => this.GetHeaderString();
 
         public abstract EventType EventType { get; }
         public EasingFunctionBase Easing { get; set; } = LinearEase.Instance;
 
-        public float StartTime
+        public double StartTime
         {
             get => _startTime;
             set
@@ -36,7 +36,7 @@ namespace Coosu.Storyboard.Events
             }
         }
 
-        public float EndTime
+        public double EndTime
         {
             get => _endTime;
             set
@@ -47,15 +47,15 @@ namespace Coosu.Storyboard.Events
             }
         }
 
-        public virtual float DefaultValue => 0;
-        public IReadOnlyList<float> Values
+        public virtual double DefaultValue => 0;
+        public IReadOnlyList<double> Values
         {
             get => _values;
-            internal set => _values = (List<float>)value;
+            internal set => _values = (List<double>)value;
         }
 
 #if NET5_0_OR_GREATER
-        public Span<float> GetStartsSpan()
+        public Span<double> GetStartsSpan()
         {
             Fill();
             var size = EventType.Size;
@@ -65,7 +65,7 @@ namespace Coosu.Storyboard.Events
             return span;
         }
 
-        public Span<float> GetEndsSpan()
+        public Span<double> GetEndsSpan()
         {
             Fill();
             var size = EventType.Size;
@@ -75,7 +75,7 @@ namespace Coosu.Storyboard.Events
             return span;
         }
 #endif
-        public IEnumerable<float> GetStarts()
+        public IEnumerable<double> GetStarts()
         {
             Fill();
             var size = EventType.Size;
@@ -83,7 +83,7 @@ namespace Coosu.Storyboard.Events
             return span;
         }
 
-        public IEnumerable<float> GetEnds()
+        public IEnumerable<double> GetEnds()
         {
             Fill();
             var size = EventType.Size;
@@ -94,7 +94,7 @@ namespace Coosu.Storyboard.Events
         public virtual bool IsHalfFilled => Values.Count == EventType.Size;
         public virtual bool IsFilled => Values.Count == EventType.Size * 2;
 
-        public virtual float GetValue(int index)
+        public virtual double GetValue(int index)
         {
             if (index >= EventType.Size * 2)
                 throw new ArgumentOutOfRangeException(nameof(index), index,
@@ -106,7 +106,7 @@ namespace Coosu.Storyboard.Events
             return GetValueImpl(index);
         }
 
-        public virtual void SetValue(int index, float value)
+        public virtual void SetValue(int index, double value)
         {
             if (index >= EventType.Size * 2)
                 throw new ArgumentOutOfRangeException(nameof(index), index,
@@ -118,9 +118,9 @@ namespace Coosu.Storyboard.Events
             SetValueImpl(index, value);
         }
 
-        public void SetStarts(IEnumerable<float> startValues)
+        public void SetStarts(IEnumerable<double> startValues)
         {
-            if (startValues is IReadOnlyList<float> l)
+            if (startValues is IReadOnlyList<double> l)
             {
                 for (var i = 0; i < EventType.Size; i++)
                 {
@@ -140,9 +140,9 @@ namespace Coosu.Storyboard.Events
             }
         }
 
-        public void SetEnds(IEnumerable<float> endValues)
+        public void SetEnds(IEnumerable<double> endValues)
         {
-            if (endValues is IReadOnlyList<float> l)
+            if (endValues is IReadOnlyList<double> l)
             {
                 for (var i = 0; i < EventType.Size; i++)
                 {
@@ -197,7 +197,7 @@ namespace Coosu.Storyboard.Events
 #endif
         }
 
-        public void AdjustTiming(float offset)
+        public void AdjustTiming(double offset)
         {
             StartTime += offset;
             EndTime += offset;
@@ -223,10 +223,10 @@ namespace Coosu.Storyboard.Events
 
         protected BasicEvent()
         {
-            _values = new List<float>();
+            _values = new List<double>();
         }
 
-        protected BasicEvent(EasingFunctionBase easing, float startTime, float endTime, List<float> values)
+        protected BasicEvent(EasingFunctionBase easing, double startTime, double endTime, List<double> values)
         {
             Easing = easing;
             _startTime = startTime;
@@ -273,13 +273,13 @@ namespace Coosu.Storyboard.Events
             }
         }
 
-        protected float GetValueImpl(int index)
+        protected double GetValueImpl(int index)
         {
             Fill(index + 1);
             return _values[index];
         }
 
-        protected void SetValueImpl(int index, float value)
+        protected void SetValueImpl(int index, double value)
         {
             Fill(index + 1);
             _values[index] = value;
@@ -304,9 +304,9 @@ namespace Coosu.Storyboard.Events
         }
 
         public static IKeyEvent Create(EventType e, EasingFunctionBase easing,
-            float startTime, float endTime, Span<float> startValues, Span<float> endValues)
+            double startTime, double endTime, Span<double> startValues, Span<double> endValues)
         {
-            var list = new List<float>();
+            var list = new List<double>();
             foreach (var startValue in startValues) list.Add(startValue);
             foreach (var endValue in endValues) list.Add(endValue);
 
@@ -314,9 +314,9 @@ namespace Coosu.Storyboard.Events
         }
 
         public static IKeyEvent Create(EventType e, EasingFunctionBase easing,
-            float startTime, float endTime, IEnumerable<float> startValues, IEnumerable<float> endValues)
+            double startTime, double endTime, IEnumerable<double> startValues, IEnumerable<double> endValues)
         {
-            var list = new List<float>();
+            var list = new List<double>();
             list.AddRange(startValues);
             list.AddRange(endValues);
 
@@ -324,7 +324,7 @@ namespace Coosu.Storyboard.Events
         }
 
         public static IKeyEvent Create(EventType e, EasingFunctionBase easing,
-            float startTime, float endTime, List<float> values)
+            double startTime, double endTime, List<double> values)
         {
             var size = e.Size;
             if (size != 0 && values.Count != size && values.Count != size * 2)

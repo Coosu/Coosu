@@ -10,7 +10,7 @@ namespace Coosu.Storyboard.Extensions.Computing
 {
     public static class KeyEventExtensions
     {
-        public static float[]? GetDefaultValue(this IKeyEvent e)
+        public static double[]? GetDefaultValue(this IKeyEvent e)
         {
             return e.EventType.GetDefaultValue();
         }
@@ -120,7 +120,7 @@ namespace Coosu.Storyboard.Extensions.Computing
             var thisTime = startTime - (startTime % discretizingInterval);
             var nextTime = startTime - (startTime % discretizingInterval) + discretizingInterval;
             if (nextTime > endTime) nextTime = endTime;
-            List<float> reusableValue = e.ComputeFrame(nextTime, nextTime == endTime ? null : discretizingAccuracy);
+            List<double> reusableValue = e.ComputeFrame(nextTime, nextTime == endTime ? null : discretizingAccuracy);
 
             eventList.Add(new RelativeEvent(targetEventType, LinearEase.Instance,
                 startTime, nextTime, reusableValue.ToList()));
@@ -130,7 +130,7 @@ namespace Coosu.Storyboard.Extensions.Computing
                 thisTime += discretizingInterval;
                 nextTime += discretizingInterval;
                 if (nextTime > endTime) nextTime = endTime;
-                List<float> newValue = e.ComputeFrame(nextTime, nextTime == endTime ? null : discretizingAccuracy);
+                List<double> newValue = e.ComputeFrame(nextTime, nextTime == endTime ? null : discretizingAccuracy);
                 var newValueCopy = newValue.ToList();
 
                 if (absolute)
@@ -139,7 +139,7 @@ namespace Coosu.Storyboard.Extensions.Computing
                     {
                         newValue[i] = discretizingAccuracy == null
                             ? newValue[i] - reusableValue[i]
-                            : (float)Math.Round(newValue[i] - reusableValue[i], discretizingAccuracy.Value);
+                            : (double)Math.Round(newValue[i] - reusableValue[i], discretizingAccuracy.Value);
                         reusableValue[i] = newValueCopy[i];
                     }
                 }
@@ -158,7 +158,7 @@ namespace Coosu.Storyboard.Extensions.Computing
             return eventList;
         }
 
-        public static List<float> ComputeFrame(this IKeyEvent e, float currentTime, int? accuracy)
+        public static List<double> ComputeFrame(this IKeyEvent e, double currentTime, int? accuracy)
         {
             if (e.EventType.Index < 100)
             {
@@ -168,21 +168,21 @@ namespace Coosu.Storyboard.Extensions.Computing
             var easing = e.Easing;
             var size = e.EventType.Size;
 
-            var start = new float[size];
+            var start = new double[size];
             var end = e.GetEnds().ToArray();
 
             var startTime = (int)e.StartTime;
             var endTime = (int)e.EndTime;
 
             var normalizedTime = (currentTime - startTime) / (endTime - startTime);
-            var easedTime = (float)easing.Ease(normalizedTime);
+            var easedTime = (double)easing.Ease(normalizedTime);
 
-            var list = new List<float>(size);
+            var list = new List<double>(size);
             for (int i = 0; i < size; i++)
             {
                 var val = (end[i] - start[i]) * easedTime + start[i];
                 if (accuracy == null) list.Add(val);
-                else list.Add((float)Math.Round(val, accuracy.Value));
+                else list.Add((double)Math.Round(val, accuracy.Value));
             }
 
             return list;

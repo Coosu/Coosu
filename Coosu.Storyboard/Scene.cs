@@ -77,7 +77,7 @@ namespace Coosu.Storyboard
             await writer.WriteLineAsync("//Storyboard Sound Samples");
         }
 
-        public void AdjustTiming(float offset)
+        public void AdjustTiming(double offset)
         {
             foreach (var layer in Layers.Values)
             {
@@ -85,7 +85,7 @@ namespace Coosu.Storyboard
             }
         }
 
-        public void AdjustPosition(float x, float y)
+        public void AdjustPosition(double x, double y)
         {
             foreach (var layer in Layers.Values)
             {

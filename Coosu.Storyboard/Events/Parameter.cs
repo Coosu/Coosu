@@ -20,7 +20,7 @@ namespace Coosu.Storyboard.Events
         public override bool IsFilled => Values.Count == 1;
         public override bool IsHalfFilled => Values.Count == 1;
 
-        public override float GetValue(int index)
+        public override double GetValue(int index)
         {
             if (index != 0)
                 throw new ArgumentOutOfRangeException(nameof(index), index,
@@ -28,7 +28,7 @@ namespace Coosu.Storyboard.Events
             return base.GetValueImpl(index);
         }
 
-        public override void SetValue(int index, float value)
+        public override void SetValue(int index, double value)
         {
             if (index != 0)
                 throw new ArgumentOutOfRangeException(nameof(index), index,
@@ -54,7 +54,7 @@ namespace Coosu.Storyboard.Events
         //{
         //}
 
-        public Parameter(float startTime, float endTime, List<float> values) :
+        public Parameter(double startTime, double endTime, List<double> values) :
             base(EasingType.Linear.ToEasingFunction(), startTime, endTime, values)
         {
         }

@@ -17,12 +17,12 @@ namespace Coosu.Storyboard.Events
 
         internal ISceneObject? _baseObject;
         private const string HitSound = "HitSound";
-        private float _startTime;
-        private float _endTime;
+        private double _startTime;
+        private double _endTime;
         private ICollection<IKeyEvent> _events = new SortedSet<IKeyEvent>(EventSequenceComparer.Instance);
 
-        private float? _cachedMaxTime;
-        private float? _cachedMaxStartTime;
+        private double? _cachedMaxTime;
+        private double? _cachedMaxStartTime;
 
         public IReadOnlyCollection<IKeyEvent> Events
         {
@@ -35,7 +35,7 @@ namespace Coosu.Storyboard.Events
 
         public bool EnableGroupedSerialization { get; set; } /*= true;*/
 
-        public float StartTime
+        public double StartTime
         {
             get => _startTime;
             set
@@ -46,7 +46,7 @@ namespace Coosu.Storyboard.Events
             }
         }
 
-        public float EndTime
+        public double EndTime
         {
             get => _endTime;
             set
@@ -59,26 +59,26 @@ namespace Coosu.Storyboard.Events
 
         public string TriggerName { get; set; }
 
-        public float MaxTime()
+        public double MaxTime()
         {
             if (_cachedMaxTime != null) return _cachedMaxTime.Value;
-            return (float)(_cachedMaxTime =
+            return (double)(_cachedMaxTime =
                 EndTime + (Events.Count > 0 ? Events.Max(k => k.EndTime) : 0));
         }
 
-        public float MinTime() => StartTime;
+        public double MinTime() => StartTime;
 
-        public float MaxStartTime()
+        public double MaxStartTime()
         {
             if (_cachedMaxStartTime != null) return _cachedMaxStartTime.Value;
-            return (float)(_cachedMaxStartTime =
+            return (double)(_cachedMaxStartTime =
                 EndTime + (Events.Count > 0 ? Events.Max(k => k.StartTime) : 0));   //if hitsound played at end time
 
         }
 
-        public float MinEndTime() => StartTime; // if no hitsound here
+        public double MinEndTime() => StartTime; // if no hitsound here
 
-        public Trigger(float startTime, float endTime, TriggerType triggerType, bool listenSample = false, uint? customSampleSet = null)
+        public Trigger(double startTime, double endTime, TriggerType triggerType, bool listenSample = false, uint? customSampleSet = null)
         {
             StartTime = startTime;
             EndTime = endTime;
@@ -86,7 +86,7 @@ namespace Coosu.Storyboard.Events
             TriggerName = GetTriggerString(triggerType, listenSample, customSampleSet);
         }
 
-        public Trigger(float startTime, float endTime, string triggerName)
+        public Trigger(double startTime, double endTime, string triggerName)
         {
             StartTime = startTime;
             EndTime = endTime;
@@ -149,7 +149,7 @@ namespace Coosu.Storyboard.Events
             return sb.ToString();
         }
 
-        public void AdjustTiming(float offset)
+        public void AdjustTiming(double offset)
         {
             StartTime += offset;
         }

@@ -5,5 +5,5 @@ using Coosu.Storyboard.Events;
 namespace Coosu.Storyboard.Extensibility
 {
     public delegate BasicEvent EventCreationDelegate(EventType e, EasingFunctionBase easing,
-        float startTime, float endTime, List<float> values);
+        double startTime, double endTime, List<double> values);
 }

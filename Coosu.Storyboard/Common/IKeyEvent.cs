@@ -6,22 +6,22 @@ namespace Coosu.Storyboard.Common
 {
     public interface IKeyEvent : IEvent, IScriptable
     {
-        float DefaultValue { get; }
+        double DefaultValue { get; }
         EasingFunctionBase Easing { get; set; }
-        IReadOnlyList<float> Values { get; }
+        IReadOnlyList<double> Values { get; }
 
 #if NET5_0_OR_GREATER
-        Span<float> GetStartsSpan();
-        Span<float> GetEndsSpan();
+        Span<double> GetStartsSpan();
+        Span<double> GetEndsSpan();
 #endif
-        IEnumerable<float> GetStarts();
-        IEnumerable<float> GetEnds();
-        void SetStarts(IEnumerable<float> startValues);
-        void SetEnds(IEnumerable<float> endValues);
+        IEnumerable<double> GetStarts();
+        IEnumerable<double> GetEnds();
+        void SetStarts(IEnumerable<double> startValues);
+        void SetEnds(IEnumerable<double> endValues);
         bool IsHalfFilled { get; }
         bool IsFilled { get; }
-        float GetValue(int index);
-        void SetValue(int index, float value);
+        double GetValue(int index);
+        void SetValue(int index, double value);
         void Fill();
         bool IsStartsEqualsEnds();
     }

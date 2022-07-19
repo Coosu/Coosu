@@ -22,7 +22,7 @@ namespace Coosu.Storyboard
         /// <param name="time">Event start time.</param>
         /// <param name="point">Relative displacement.</param>
         public static void MoveBy(this IEventHost host,
-            float time,
+            double time,
             Vector2 point) =>
             host.AddEventRelative(MoreEventTypes.MoveBy, LinearEase.Instance, time, time, point.X, point.Y);
 
@@ -34,8 +34,8 @@ namespace Coosu.Storyboard
         /// <param name="x">Relative x.</param>
         /// <param name="y">Relative y.</param>
         public static void MoveBy(this IEventHost host,
-            float time,
-            float x, float y) =>
+            double time,
+            double x, double y) =>
             host.AddEventRelative(MoreEventTypes.MoveBy, LinearEase.Instance, time, time, x, y);
 
         /// <summary>
@@ -46,7 +46,7 @@ namespace Coosu.Storyboard
         /// <param name="endTime">Event end time.</param>
         /// <param name="point">Relative displacement.</param>
         public static void MoveBy(this IEventHost host,
-            float startTime, float endTime,
+            double startTime, double endTime,
             Vector2 point) =>
             host.AddEventRelative(MoreEventTypes.MoveBy, LinearEase.Instance, startTime, endTime, point.X, point.Y);
 
@@ -59,8 +59,8 @@ namespace Coosu.Storyboard
         /// <param name="x">Relative x.</param>
         /// <param name="y">Relative y.</param>
         public static void MoveBy(this IEventHost host,
-            float startTime, float endTime,
-            float x, float y) =>
+            double startTime, double endTime,
+            double x, double y) =>
             host.AddEventRelative(MoreEventTypes.MoveBy, LinearEase.Instance, startTime, endTime, x, y);
 
         /// <summary>
@@ -75,7 +75,7 @@ namespace Coosu.Storyboard
         /// <param name="point">Relative displacement.</param>
         public static void MoveBy(this IEventHost host,
             EasingFunctionBase easing,
-            float startTime, float endTime,
+            double startTime, double endTime,
             Vector2 point) =>
             host.AddEventRelative(MoreEventTypes.MoveBy, easing, startTime, endTime, point.X, point.Y);
 
@@ -92,8 +92,8 @@ namespace Coosu.Storyboard
         /// <param name="y">Relative y.</param>
         public static void MoveBy(this IEventHost host,
             EasingFunctionBase easing,
-            float startTime, float endTime,
-            float x, float y) =>
+            double startTime, double endTime,
+            double x, double y) =>
             host.AddEventRelative(MoreEventTypes.MoveBy, easing, startTime, endTime, x, y);
 
         #endregion
@@ -108,8 +108,8 @@ namespace Coosu.Storyboard
         /// <param name="endTime">Event end time.</param>
         /// <param name="opacity">Relative opacity.</param>
         public static void FadeBy(this IEventHost host,
-            float startTime, float endTime,
-            float opacity) =>
+            double startTime, double endTime,
+            double opacity) =>
             host.AddEventRelative(MoreEventTypes.FadeBy, LinearEase.Instance, startTime, endTime, opacity);
 
         /// <summary>
@@ -124,8 +124,8 @@ namespace Coosu.Storyboard
         /// <param name="opacity">Relative opacity.</param>
         public static void FadeBy(this IEventHost host
             , EasingFunctionBase easing,
-            float startTime, float endTime,
-            float opacity) =>
+            double startTime, double endTime,
+            double opacity) =>
             host.AddEventRelative(MoreEventTypes.FadeBy, easing, startTime, endTime, opacity);
 
         #endregion
@@ -140,8 +140,8 @@ namespace Coosu.Storyboard
         /// <param name="endTime">Event end time.</param>
         /// <param name="scale">Relative size.</param>
         public static void ScaleBy(this IEventHost host,
-            float startTime, float endTime,
-            float scale) =>
+            double startTime, double endTime,
+            double scale) =>
             host.AddEventRelative(MoreEventTypes.ScaleBy, LinearEase.Instance, startTime, endTime, scale);
 
         /// <summary>
@@ -156,8 +156,8 @@ namespace Coosu.Storyboard
         /// <param name="scale">Relative size.</param>
         public static void ScaleBy(this IEventHost host,
             EasingFunctionBase easing,
-            float startTime, float endTime,
-            float scale) =>
+            double startTime, double endTime,
+            double scale) =>
             host.AddEventRelative(MoreEventTypes.ScaleBy, easing, startTime, endTime, scale);
 
         #endregion
@@ -172,8 +172,8 @@ namespace Coosu.Storyboard
         /// <param name="endTime">Event end time.</param>
         /// <param name="rotate">Relative rotation.</param>
         public static void RotateBy(this IEventHost host,
-            float startTime, float endTime,
-            float rotate) =>
+            double startTime, double endTime,
+            double rotate) =>
             host.AddEventRelative(MoreEventTypes.RotateBy, LinearEase.Instance, startTime, endTime, rotate);
 
         /// <summary>
@@ -188,8 +188,8 @@ namespace Coosu.Storyboard
         /// <param name="rotate">Relative rotation.</param>
         public static void RotateBy(this IEventHost host,
             EasingFunctionBase easing,
-            float startTime, float endTime,
-            float rotate) =>
+            double startTime, double endTime,
+            double rotate) =>
             host.AddEventRelative(MoreEventTypes.RotateBy, easing, startTime, endTime, rotate);
 
         #endregion
@@ -204,8 +204,8 @@ namespace Coosu.Storyboard
         /// <param name="endTime">Event end time.</param>
         /// <param name="x">Relative x.</param>
         public static void MoveXBy(this IEventHost host,
-            float startTime, float endTime,
-            float x) =>
+            double startTime, double endTime,
+            double x) =>
             host.AddEventRelative(MoreEventTypes.MoveXBy, LinearEase.Instance, startTime, endTime, x);
 
         /// <summary>
@@ -220,8 +220,8 @@ namespace Coosu.Storyboard
         /// <param name="x">Relative x.</param>
         public static void MoveXBy(this IEventHost host,
             EasingFunctionBase easing,
-            float startTime, float endTime,
-            float x) =>
+            double startTime, double endTime,
+            double x) =>
             host.AddEventRelative(MoreEventTypes.MoveXBy, easing, startTime, endTime, x);
 
         #endregion
@@ -236,8 +236,8 @@ namespace Coosu.Storyboard
         /// <param name="endTime">Event end time.</param>
         /// <param name="y">Relative y.</param>
         public static void MoveYBy(this IEventHost host,
-            float startTime, float endTime,
-            float y) =>
+            double startTime, double endTime,
+            double y) =>
             host.AddEventRelative(MoreEventTypes.MoveYBy, LinearEase.Instance, startTime, endTime, y);
 
         /// <summary>
@@ -252,8 +252,8 @@ namespace Coosu.Storyboard
         /// <param name="y">Relative y.</param>
         public static void MoveYBy(this IEventHost host,
             EasingFunctionBase easing,
-            float startTime, float endTime,
-            float y) =>
+            double startTime, double endTime,
+            double y) =>
             host.AddEventRelative(MoreEventTypes.MoveYBy, easing, startTime, endTime, y);
 
         #endregion
@@ -268,7 +268,7 @@ namespace Coosu.Storyboard
         /// <param name="endTime">Event end time.</param>
         /// <param name="color">Relative color. The range of each value is 0-255.</param>
         public static void ColorBy(this IEventHost host,
-            float startTime, float endTime,
+            double startTime, double endTime,
             Vector3 color) =>
             host.AddEventRelative(MoreEventTypes.ColorBy, LinearEase.Instance, startTime, endTime, color.X, color.Y,
                 color.Z);
@@ -283,7 +283,7 @@ namespace Coosu.Storyboard
         /// <param name="g">Relative G. The range of the value is 0-255.</param>
         /// <param name="b">Relative B. The range of the value is 0-255.</param>
         public static void ColorBy(this IEventHost host,
-            float startTime, float endTime,
+            double startTime, double endTime,
             byte r, byte g, byte b) =>
             host.AddEventRelative(MoreEventTypes.VectorBy, LinearEase.Instance, startTime, endTime, r, g, b);
 
@@ -299,7 +299,7 @@ namespace Coosu.Storyboard
         /// <param name="color">Relative color. The range of each value is 0-255.</param>
         public static void ColorBy(this IEventHost host,
             EasingFunctionBase easing,
-            float startTime, float endTime,
+            double startTime, double endTime,
             Vector3 color) =>
             host.AddEventRelative(MoreEventTypes.ColorBy, easing, startTime, endTime, color.X, color.Y, color.Z);
 
@@ -317,7 +317,7 @@ namespace Coosu.Storyboard
         /// <param name="b">Relative B. The range of the value is 0-255.</param>
         public static void ColorBy(this IEventHost host,
             EasingFunctionBase easing,
-            float startTime, float endTime,
+            double startTime, double endTime,
             byte r, byte g, byte b) =>
             host.AddEventRelative(MoreEventTypes.VectorBy, easing, startTime, endTime, r, g, b);
 
@@ -333,7 +333,7 @@ namespace Coosu.Storyboard
         /// <param name="endTime">Event end time.</param>
         /// <param name="vector">Relative vector.</param>
         public static void VectorBy(this IEventHost host,
-            float startTime, float endTime,
+            double startTime, double endTime,
             Vector2 vector) =>
             host.AddEventRelative(MoreEventTypes.VectorBy, LinearEase.Instance, startTime, endTime, vector.X,
                 vector.Y);
@@ -347,8 +347,8 @@ namespace Coosu.Storyboard
         /// <param name="x">Relative x.</param>
         /// <param name="y">Relative y.</param>
         public static void VectorBy(this IEventHost host,
-            float startTime, float endTime,
-            float x, float y) =>
+            double startTime, double endTime,
+            double x, double y) =>
             host.AddEventRelative(MoreEventTypes.VectorBy, LinearEase.Instance, startTime, endTime, x, y);
 
         /// <summary>
@@ -363,7 +363,7 @@ namespace Coosu.Storyboard
         /// <param name="vector">Relative vector.</param>
         public static void VectorBy(this IEventHost host,
             EasingFunctionBase easing,
-            float startTime, float endTime,
+            double startTime, double endTime,
             Vector2 vector) =>
             host.AddEventRelative(MoreEventTypes.VectorBy, easing, startTime, endTime, vector.X, vector.Y);
 
@@ -380,31 +380,31 @@ namespace Coosu.Storyboard
         /// <param name="y">Relative y.</param>
         public static void VectorBy(this IEventHost host,
             EasingFunctionBase easing,
-            float startTime, float endTime,
-            float x, float y) =>
+            double startTime, double endTime,
+            double x, double y) =>
             host.AddEventRelative(MoreEventTypes.VectorBy, easing, startTime, endTime, x, y);
 
         #endregion
 
         private static void AddEventRelative(this IEventHost host, EventType e, EasingFunctionBase easing,
-            float startTime, float endTime,
-            float x)
+            double startTime, double endTime,
+            double x)
         {
-            host.AddEvent(new RelativeEvent(e, easing, startTime, endTime, new List<float>(1) { x }));
+            host.AddEvent(new RelativeEvent(e, easing, startTime, endTime, new List<double>(1) { x }));
         }
 
         private static void AddEventRelative(this IEventHost host, EventType e, EasingFunctionBase easing,
-            float startTime, float endTime,
-            float x, float y)
+            double startTime, double endTime,
+            double x, double y)
         {
-            host.AddEvent(new RelativeEvent(e, easing, startTime, endTime, new List<float>(2) { x, y }));
+            host.AddEvent(new RelativeEvent(e, easing, startTime, endTime, new List<double>(2) { x, y }));
         }
 
         private static void AddEventRelative(this IEventHost host, EventType e, EasingFunctionBase easing,
-            float startTime, float endTime,
-            float x, float y, float z)
+            double startTime, double endTime,
+            double x, double y, double z)
         {
-            host.AddEvent(new RelativeEvent(e, easing, startTime, endTime, new List<float>(3) { x, y, z }));
+            host.AddEvent(new RelativeEvent(e, easing, startTime, endTime, new List<double>(3) { x, y, z }));
         }
     }
 }

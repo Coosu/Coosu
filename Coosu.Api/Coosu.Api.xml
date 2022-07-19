@@ -4,61 +4,31 @@
         <name>Coosu.Api</name>
     </assembly>
     <members>
-        <member name="T:Coosu.Api.HttpClient.HttpClientUtility">
-            <summary>
-            Helper class of HttpClient.
-            To increase the efficiency, please consider to initialize this class infrequently.
-            </summary>
-        </member>
-        <member name="M:Coosu.Api.HttpClient.HttpClientUtility.HttpGet(System.String,System.Collections.Generic.IDictionary{System.String,System.String},System.Collections.Generic.IDictionary{System.String,System.String})">
-            <summary>
-            GET with value-pairs.
-            </summary>
-            <param name="url">Http uri.</param>
-            <param name="args">Parameter dictionary.</param>
-            <param name="argsHeader">Header dictionary.</param>
-            <returns></returns>
-        </member>
-        <member name="M:Coosu.Api.HttpClient.HttpClientUtility.HttpDelete(System.String,System.Collections.Generic.IDictionary{System.String,System.String},System.Collections.Generic.IDictionary{System.String,System.String})">
+        <member name="M:Coosu.Api.HttpClient.HttpClientUtility.HttpDelete``1(System.String,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String},System.Collections.Generic.IReadOnlyDictionary{System.String,System.String})">
             <summary>
             DELETE with value-pairs.
             </summary>
             <param name="url">Http uri.</param>
-            <param name="args">Parameter dictionary.</param>
-            <param name="argsHeader">Header dictionary.</param>
+            <param name="queries">Parameter dictionary.</param>
+            <param name="headers">Header dictionary.</param>
             <returns></returns>
         </member>
-        <member name="M:Coosu.Api.HttpClient.HttpClientUtility.HttpPost(System.String)">
-            <summary>
-            POST with nothing.
-            </summary>
-            <param name="url">Http uri.</param>
-            <returns></returns>
-        </member>
-        <member name="M:Coosu.Api.HttpClient.HttpClientUtility.HttpPostJson(System.String,System.String)">
+        <member name="M:Coosu.Api.HttpClient.HttpClientUtility.HttpPost``1(System.String,System.Object,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String})">
             <summary>
             POST with Json.
             </summary>
             <param name="url">Http uri.</param>
-            <param name="postJson">json string.</param>
+            <param name="obj">object</param>
+            <param name="headers">Header dictionary.</param>
             <returns></returns>
         </member>
-        <member name="M:Coosu.Api.HttpClient.HttpClientUtility.HttpPostJson(System.String,System.Collections.Generic.IDictionary{System.String,System.String},System.Collections.Generic.IDictionary{System.String,System.String})">
+        <member name="M:Coosu.Api.HttpClient.HttpClientUtility.HttpPut``1(System.String,System.Object,System.Collections.Generic.IReadOnlyDictionary{System.String,System.String})">
             <summary>
             POST with Json.
             </summary>
             <param name="url">Http uri.</param>
-            <param name="args">Parameter dictionary.</param>
-            <param name="argsHeader">Header dictionary.</param>
-            <returns></returns>
-        </member>
-        <member name="M:Coosu.Api.HttpClient.HttpClientUtility.HttpPutJson(System.String,System.Collections.Generic.IDictionary{System.String,System.String},System.Collections.Generic.IDictionary{System.String,System.String})">
-            <summary>
-            PUT with Json.
-            </summary>
-            <param name="url">Http uri.</param>
-            <param name="args">Parameter dictionary.</param>
-            <param name="argsHeader">Header dictionary.</param>
+            <param name="obj">object</param>
+            <param name="headers">Header dictionary.</param>
             <returns></returns>
         </member>
         <member name="T:Coosu.Api.V1.Beatmap.BeatmapApprovedState">
@@ -1851,9 +1821,6 @@
             <summary>
             Get URI of the user's PP Plus page.
             </summary>
-        </member>
-        <member name="M:Coosu.Api.V2.AuthorizationClient.Dispose">
-            <inheritdoc />
         </member>
         <member name="T:Coosu.Api.V2.AuthorizationLinkBuilder">
             <summary>
