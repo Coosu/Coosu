@@ -16,6 +16,33 @@ namespace Coosu.Storyboard
     /// </summary>
     public static partial class StorybrewExtensions
     {
+        private class StorybrewLayer : Layer, ISpriteHostDisposable
+        {
+            private readonly StoryboardObjectGenerator _storyboardObjectGenerator;
+            private readonly Action<CompressOptions>? _configureSettings;
+
+            public StorybrewLayer(StoryboardObjectGenerator storyboardObjectGenerator,
+                string name,
+                Action<CompressOptions>? configureSettings) : base(name)
+            {
+                _storyboardObjectGenerator = storyboardObjectGenerator;
+                _configureSettings = configureSettings;
+            }
+
+            public void Dispose()
+            {
+                this.ExecuteBrew(_storyboardObjectGenerator, _configureSettings);
+            }
+        }
+
+        public static ISpriteHostDisposable CreateLayer(this StoryboardObjectGenerator generator,
+            string name = "CoosuDefaultLayer",
+            Action<CompressOptions>? configureSettings = null)
+        {
+            var layer = new StorybrewLayer(generator, name, configureSettings);
+            return layer;
+        }
+
         /// <summary>
         /// Executing Coosu commands and optimizing automatically in storybrew.
         /// </summary>
