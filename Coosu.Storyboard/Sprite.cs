@@ -48,7 +48,7 @@ namespace Coosu.Storyboard
         public IReadOnlyCollection<IKeyEvent> Events
         {
             get => (IReadOnlyCollection<IKeyEvent>)_events;
-            internal set => _events = value as ICollection<IKeyEvent> ?? throw new Exception(
+            set => _events = value as ICollection<IKeyEvent> ?? throw new Exception(
                 $"The collection should be {nameof(ICollection<IKeyEvent>)}");
         }
 
@@ -274,6 +274,14 @@ namespace Coosu.Storyboard
             return removeEvent;
         }
 
+        public void AddEvents(IEnumerable<IKeyEvent> events)
+        {
+            foreach (var keyEvent in events)
+            {
+                AddEvent(keyEvent);
+            }
+        }
+
         public void AddLoop(Loop loop)
         {
             TryEndLoop();
@@ -309,7 +317,7 @@ namespace Coosu.Storyboard
             return removeTrigger;
         }
 
-        public void ClearEvents(IComparer<IKeyEvent>? comparer = null)
+        public void ResetEventCollection(IComparer<IKeyEvent>? comparer)
         {
             var valid = _events.Count > 0;
             foreach (var @event in _events)

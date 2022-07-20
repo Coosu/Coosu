@@ -172,7 +172,7 @@ namespace Coosu.Storyboard.Events
             return removeEvent;
         }
 
-        public void ClearEvents(IComparer<IKeyEvent>? comparer = null)
+        public void ResetEventCollection(IComparer<IKeyEvent>? comparer = null)
         {
             var valid = _events.Count > 0;
             foreach (var @event in _events)

@@ -100,7 +100,7 @@ namespace Coosu.Storyboard.OsbX.SubjectHandlers
             return _events.Remove(@event);
         }
 
-        public void ClearEvents(IComparer<IKeyEvent>? comparer)
+        public void ResetEventCollection(IComparer<IKeyEvent>? comparer)
         {
             throw new NotImplementedException("The camera transform is currently not implemented.");
             _events.Clear();

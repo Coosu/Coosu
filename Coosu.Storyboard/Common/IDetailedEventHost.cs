@@ -9,7 +9,7 @@ namespace Coosu.Storyboard.Common
         IReadOnlyCollection<IKeyEvent> Events { get; }
         void AddEvent(IKeyEvent @event);
         bool RemoveEvent(IKeyEvent @event);
-        void ClearEvents(IComparer<IKeyEvent>? comparer);
+        void ResetEventCollection(IComparer<IKeyEvent>? comparer);
     }
 
     public interface IDetailedEventHost : IScriptable, ICloneable, IEventHost

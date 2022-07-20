@@ -109,7 +109,7 @@ namespace Coosu.Storyboard
             spriteHost.AddSprite(obj);
             return obj;
         }
-        
+
         /// <summary>
         /// Create a storyboard animation.
         /// </summary>

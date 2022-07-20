@@ -91,9 +91,9 @@ namespace Coosu.Storyboard
             return Camera2.RemoveEvent(@event);
         }
 
-        public void ClearEvents(IComparer<IKeyEvent>? comparer = null)
+        public void ResetEventCollection(IComparer<IKeyEvent>? comparer = null)
         {
-            Camera2.ClearEvents(comparer);
+            Camera2.ResetEventCollection(comparer);
         }
 
 

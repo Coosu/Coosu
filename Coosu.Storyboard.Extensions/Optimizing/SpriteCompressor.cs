@@ -269,8 +269,8 @@ namespace Coosu.Storyboard.Extensions.Optimizing
 
             // temporary to object equals
             IReadOnlyCollection<IKeyEvent> collection = new HashSet<IKeyEvent>(sprite.Events);
-            sprite.ClearEvents();
-            foreach (var keyEvent in collection) sprite.AddEvent(keyEvent);
+            sprite.ResetEventCollection(null);
+            sprite.AddEvents(collection);
 
             // relative to absolute
             // todo: performance issue
@@ -282,8 +282,8 @@ namespace Coosu.Storyboard.Extensions.Optimizing
 
             // to compute equals
             collection = new SortedSet<IKeyEvent>(sprite.Events, EventSequenceComparer.Instance);
-            sprite.ClearEvents(EventSequenceComparer.Instance);
-            foreach (var keyEvent in collection) sprite.AddEvent(keyEvent);
+            sprite.ResetEventCollection(EventSequenceComparer.Instance);
+            sprite.AddEvents(collection);
 
             if (sprite.ObjectType == ObjectTypes.Sprite &&
                 Path.GetFileName(sprite.ImagePath) == sprite.ImagePath &&
@@ -303,7 +303,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
         {
             if (obsoleteList.ContainsTimingPoint(out _, host.MinTime(), host.MaxTime()))
             {
-                host.ClearEvents(null);
+                host.ResetEventCollection(null);
                 if (host is Sprite sprite)
                 {
                     sprite.ClearLoops();
