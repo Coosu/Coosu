@@ -30,9 +30,9 @@ namespace Coosu.Storyboard
         public int? RowInSource { get; set; }
         public object Tag { get; set; }
 
-        public LayerType LayerType { get; }
-        public OriginType OriginType { get; }
-        public string ImagePath { get; }
+        public LayerType LayerType { get; set; }
+        public OriginType OriginType { get; set; }
+        public string ImagePath { get; set; }
         /// <inheritdoc />
         public double DefaultX { get; set; }
         /// <inheritdoc />

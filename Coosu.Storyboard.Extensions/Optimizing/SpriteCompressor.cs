@@ -293,6 +293,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                 return true;
             }
 
+            sprite.ImagePath = sprite.ImagePath.Replace('\\', '/');
             return sprite.HasEffectiveTiming();
         }
 
