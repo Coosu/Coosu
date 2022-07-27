@@ -11,7 +11,7 @@ public abstract class Section : SerializeWritableObject, ISection
     {
         var type = GetType();
         var sb = type.GetCustomAttribute<SectionPropertyAttribute>();
-        SectionName = sb != null ? sb.Name : type.Name;
+        SectionName = sb?.Name ?? type.Name;
     }
 
     public abstract void Match(string line);

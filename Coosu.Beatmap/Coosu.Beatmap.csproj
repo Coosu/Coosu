@@ -6,6 +6,7 @@
     <PackageTags>osu, osu!, osugame</PackageTags>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AssemblyName Condition="'$(CI)'!='true'">local.Coosu.Beatmap</AssemblyName>
+    <IsTrimmable>true</IsTrimmable>
   </PropertyGroup>
 
   <ItemGroup>

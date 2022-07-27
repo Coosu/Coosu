@@ -12,7 +12,7 @@ public abstract class KeyValueSection : Section
 {
     private static readonly Dictionary<Type, Dictionary<string, SectionInfo>> TypePropertyInfoCache = new();
 
-    protected readonly Dictionary<string, SectionInfo> PropertyInfos; 
+    protected readonly Dictionary<string, SectionInfo> PropertyInfos;
 
     public KeyValueSection()
     {
@@ -34,9 +34,9 @@ public abstract class KeyValueSection : Section
             {
                 var sectionPropertyAttr = propertyInfo.GetCustomAttribute<SectionPropertyAttribute>();
                 if (sectionPropertyAttr == null) continue;
-                PropertyInfos.Add(sectionPropertyAttr?.Name ?? propertyInfo.Name, new SectionInfo(propertyInfo)
+                PropertyInfos.Add(sectionPropertyAttr.Name ?? propertyInfo.Name, new SectionInfo(propertyInfo)
                 {
-                    UseSpecificFormat = sectionPropertyAttr?.UseSpecificFormat ?? false,
+                    UseSpecificFormat = sectionPropertyAttr.UseSpecificFormat,
                     Attribute = sectionPropertyAttr
                 });
             }
@@ -66,9 +66,7 @@ public abstract class KeyValueSection : Section
     {
         MatchKeyValue(line, out var keySpan, out var valueSpan);
         var key = keySpan.ToString();
-#if !NETCOREAPP3_1_OR_GREATER
 
-#endif
         if (!PropertyInfos.TryGetValue(key, out var sectionInfo))
         {
             UndefinedPairs.Add(key, valueSpan.ToString());
@@ -76,7 +74,7 @@ public abstract class KeyValueSection : Section
         else
         {
             var prop = sectionInfo.PropertyInfo;
-            var propType = prop.GetMethod.ReturnType;
+            var propType = prop.GetMethod!.ReturnType;
             var attr = prop.GetCustomAttribute<SectionConverterAttribute>();
 
             if (attr != null)
@@ -87,7 +85,7 @@ public abstract class KeyValueSection : Section
             else if (propType.BaseType == StaticTypes.Enum)
             {
 #if NET6_0_OR_GREATER
-                    prop.SetValue(this, Enum.Parse(propType, valueSpan));
+                prop.SetValue(this, Enum.Parse(propType, valueSpan));
 #else
                 prop.SetValue(this, Enum.Parse(propType, valueSpan.ToString()));
 #endif
@@ -148,7 +146,7 @@ public abstract class KeyValueSection : Section
                 continue;
             }
 
-            if (prop.GetMethod.ReturnType.BaseType == StaticTypes.Enum && rawObj != null)
+            if (prop.GetMethod!.ReturnType.BaseType == StaticTypes.Enum && rawObj != null)
             {
                 var enumAttr = prop.GetCustomAttribute<SectionEnumAttribute>(false);
                 if (enumAttr != null)
@@ -198,7 +196,7 @@ public abstract class KeyValueSection : Section
         if (index == -1) throw new Exception($"Unknown Key-Value: {line}");
 
         keySpan = line.AsSpan(0, index);
-        if (flagRule.TrimType is TrimType.Key or TrimType.Both)
+        if (flagRule!.TrimType is TrimType.Key or TrimType.Both)
         {
             keySpan = keySpan.Trim();
         }
@@ -210,7 +208,7 @@ public abstract class KeyValueSection : Section
         }
     }
 
-    protected int MatchFlag(string line, out FlagRule flagRule)
+    protected int MatchFlag(string line, out FlagRule? flagRule)
     {
         var index = line.IndexOf(FlagRule.SplitFlag, StringComparison.Ordinal);
         if (index == -1)

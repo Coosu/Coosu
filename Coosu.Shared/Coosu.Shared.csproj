@@ -5,6 +5,7 @@
     <Description>Coosu.Shared is shared library for Coosu projects.</Description>
     <PackageTags>osu, osu!, osugame</PackageTags>
     <AssemblyName Condition="'$(CI)'!='true'">local.Coosu.Shared</AssemblyName>
+    <IsTrimmable>true</IsTrimmable>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

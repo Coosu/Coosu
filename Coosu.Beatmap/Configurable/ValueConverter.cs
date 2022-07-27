@@ -17,7 +17,7 @@ public abstract class ValueConverter<T> : ValueConverter
 
     public sealed override object ReadSection(ReadOnlySpan<char> value, Type targetType)
     {
-        return ReadSection(value);
+        return ReadSection(value)!;
     }
 
     public sealed override void WriteSection(TextWriter textWriter, object value)

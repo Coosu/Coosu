@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Coosu.Beatmap.Extensions;
 using Coosu.Beatmap.Extensions.Playback;
 using Coosu.Beatmap.Internal;
+using Coosu.Beatmap.Sections;
 using Coosu.Beatmap.Sections.GamePlay;
 using Coosu.Beatmap.Sections.HitObject;
 using Coosu.Beatmap.Sections.Timing;
@@ -75,6 +76,10 @@ public sealed class OsuDirectory
     public async Task<List<HitsoundNode>> GetHitsoundNodesAsync(OsuFile osuFile)
     {
         if (_isInitialized == false) throw new Exception("The directory was not initialized");
+        if (osuFile.HitObjects == null) return new List<HitsoundNode>();
+        if (osuFile.TimingPoints == null) return new List<HitsoundNode>();
+        if (osuFile.General == null) return new List<HitsoundNode>();
+
         osuFile.HitObjects.ComputeSlidersByCurrentSettings();
 
         var hitObjects = osuFile.HitObjects.HitObjectList;
@@ -88,15 +93,16 @@ public sealed class OsuDirectory
                 {
                     try
                     {
-                        AddSingleHitObject(osuFile, obj, elements);
+                        AddSingleHitObject(osuFile.General, osuFile.TimingPoints, obj, elements);
                     }
                     catch (Exception e)
                     {
-                        throw new Exception("Error while analyzing hitsound. Object Info: " + obj.ToSerializedString(), e);
+                        throw new Exception(
+                            "Error while analyzing hitsound. Object Info: " + obj.ToSerializedString(), e);
                     }
                 });
 
-            osuFile.Events?.Samples?.AsParallel().ForAll(sampleData =>
+            osuFile.Events?.Samples.AsParallel().ForAll(sampleData =>
             {
                 elements.Add(HitsoundNode.Create(Guid.NewGuid(), sampleData.Offset, sampleData.Volume / 100f, 0,
                     sampleData.Filename, false, PlayablePriority.Sampling));
@@ -106,27 +112,31 @@ public sealed class OsuDirectory
         return elements.OrderBy(k => k.Offset).ToList();
     }
 
-    private void AddSingleHitObject(OsuFile osuFile, RawHitObject hitObject, ConcurrentBag<HitsoundNode> elements)
+    private void AddSingleHitObject(GeneralSection generalSection, TimingSection timingSection,
+        RawHitObject hitObject, ConcurrentBag<HitsoundNode> elements)
     {
-        var ignoreBalance = osuFile.General.Mode == GameMode.Taiko;
+        var ignoreBalance = generalSection.Mode == GameMode.Taiko;
+        var ignoreBase = generalSection.Mode == GameMode.Mania;
 
         if (hitObject.ObjectType != HitObjectType.Slider)
         {
             var itemOffset = hitObject.ObjectType == HitObjectType.Spinner
                 ? hitObject.HoldEnd // spinner
                 : hitObject.Offset; // hold & circle
-            var timingPoint = osuFile.TimingPoints.GetLine(itemOffset);
+            var timingPoint = timingSection.GetLine(itemOffset);
 
             float balance = ignoreBalance ? 0 : GetObjectBalance(hitObject.X);
             float volume = GetObjectVolume(hitObject, timingPoint);
             var tuples = AnalyzeHitsoundFiles(hitObject.Hitsound,
                 hitObject.SampleSet, hitObject.AdditionSet,
-                timingPoint, hitObject, osuFile);
+                timingPoint, hitObject, ignoreBase);
             var guid = Guid.NewGuid();
             foreach (var (filename, useUserSkin, _) in tuples)
             {
                 var element = HitsoundNode.Create(guid, itemOffset, volume, balance, filename, useUserSkin,
-                    hitObject.ObjectType == HitObjectType.Spinner ? PlayablePriority.Secondary : PlayablePriority.Primary);
+                    hitObject.ObjectType == HitObjectType.Spinner
+                        ? PlayablePriority.Secondary
+                        : PlayablePriority.Primary);
                 elements.Add(element);
             }
         }
@@ -139,7 +149,7 @@ public sealed class OsuDirectory
             {
                 var item = sliderEdges[i];
                 var itemOffset = item.Offset;
-                var timingPoint = osuFile.TimingPoints.GetLine(itemOffset);
+                var timingPoint = timingSection.GetLine(itemOffset);
 
                 float balance = ignoreBalance ? 0 : GetObjectBalance(item.Point.X);
                 float volume = GetObjectVolume(hitObject, timingPoint);
@@ -155,7 +165,7 @@ public sealed class OsuDirectory
                     : item.EdgeSample;
                 var tuples = AnalyzeHitsoundFiles(hitsoundType,
                     sample, addition,
-                    timingPoint, hitObject, osuFile);
+                    timingPoint, hitObject, ignoreBase);
                 var guid = Guid.NewGuid();
                 foreach (var (filename, useUserSkin, _) in tuples)
                 {
@@ -170,14 +180,14 @@ public sealed class OsuDirectory
             foreach (var sliderTick in ticks)
             {
                 var itemOffset = sliderTick.Offset;
-                var timingPoint = osuFile.TimingPoints.GetLine(itemOffset);
+                var timingPoint = timingSection.GetLine(itemOffset);
 
                 float balance = ignoreBalance ? 0 : GetObjectBalance(sliderTick.Point.X);
-                float volume = GetObjectVolume(hitObject, timingPoint)/* * 1.25f*/; // ticks x1.25?
+                float volume = GetObjectVolume(hitObject, timingPoint) /* * 1.25f*/; // ticks x1.25?
 
                 var (filename, useUserSkin, _) = AnalyzeHitsoundFiles(HitsoundType.Tick,
                         hitObject.SampleSet, hitObject.AdditionSet,
-                        timingPoint, hitObject, osuFile)
+                        timingPoint, hitObject, ignoreBase)
                     .First();
 
                 var element = HitsoundNode.Create(Guid.NewGuid(), (int)itemOffset, volume, balance, filename,
@@ -191,7 +201,7 @@ public sealed class OsuDirectory
 
                 var startOffset = hitObject.Offset;
                 var endOffset = sliderEdges[sliderEdges.Length - 1].Offset;
-                var timingPoint = osuFile.TimingPoints.GetLine(startOffset);
+                var timingPoint = timingSection.GetLine(startOffset);
 
                 float balance = ignoreBalance ? 0 : GetObjectBalance(hitObject.X);
                 float volume = GetObjectVolume(hitObject, timingPoint);
@@ -200,7 +210,7 @@ public sealed class OsuDirectory
                 var tuples = AnalyzeHitsoundFiles(
                     hitObject.Hitsound & HitsoundType.SlideWhistle | HitsoundType.Slide,
                     hitObject.SampleSet, hitObject.AdditionSet,
-                    timingPoint, hitObject, osuFile);
+                    timingPoint, hitObject, ignoreBase);
                 foreach (var (filename, useUserSkin, hitsoundType) in tuples)
                 {
                     SlideChannel channel;
@@ -217,7 +227,7 @@ public sealed class OsuDirectory
                 }
 
                 // change sample (will optimize if only adjust volume) by timing points
-                var timingsOnSlider = osuFile.TimingPoints.TimingList
+                var timingsOnSlider = timingSection.TimingList
                     .Where(k => k.Offset > startOffset + 0.5 && k.Offset < endOffset)
                     .ToList();
 
@@ -232,7 +242,7 @@ public sealed class OsuDirectory
                         tuples = AnalyzeHitsoundFiles(
                             hitObject.Hitsound & HitsoundType.SlideWhistle | HitsoundType.Slide,
                             hitObject.SampleSet, hitObject.AdditionSet,
-                            timing, hitObject, osuFile);
+                            timing, hitObject, ignoreBase);
                         foreach (var (filename, useUserSkin, hitsoundType) in tuples)
                         {
                             HitsoundNode element;
@@ -302,7 +312,7 @@ public sealed class OsuDirectory
         ObjectSamplesetType itemAddition,
         TimingPoint timingPoint,
         RawHitObject hitObject,
-        OsuFile osuFile)
+        bool ignoreBase)
     {
         if (!string.IsNullOrEmpty(hitObject.FileName))
         {
@@ -335,8 +345,7 @@ public sealed class OsuDirectory
         }
         else
         {
-            var hitsounds = GetHitsounds(itemHitsound, sampleStr, additionStr,
-                osuFile.General.Mode == GameMode.Mania);
+            var hitsounds = GetHitsounds(itemHitsound, sampleStr, additionStr, ignoreBase);
             tuples.AddRange(hitsounds);
         }
 

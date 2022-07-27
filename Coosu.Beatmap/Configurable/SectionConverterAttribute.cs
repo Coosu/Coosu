@@ -19,7 +19,7 @@ public sealed class SectionConverterAttribute : Attribute
         _param = param;
     }
 
-    public SectionConverterAttribute(Type converterType) : this(converterType, null)
+    public SectionConverterAttribute(Type converterType) : this(converterType, Array.Empty<object>())
     {
 
     }
@@ -28,10 +28,10 @@ public sealed class SectionConverterAttribute : Attribute
     {
         if (SharedCreation)
         {
-            return _sharedInstance ??= (ValueConverter)Activator.CreateInstance(_converterType, _param);
+            return _sharedInstance ??= (ValueConverter)Activator.CreateInstance(_converterType, _param)!;
         }
 
-        return (ValueConverter)Activator.CreateInstance(_converterType, _param);
+        return (ValueConverter)Activator.CreateInstance(_converterType, _param)!;
     }
 
 }

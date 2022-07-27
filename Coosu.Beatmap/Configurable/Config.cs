@@ -9,5 +9,5 @@ public abstract class Config
     }
 
     [SectionIgnore]
-    public ReadOptions Options { get; set; }
+    public ReadOptions Options { get; set; } = null!;
 }

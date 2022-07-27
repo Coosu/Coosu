@@ -15,14 +15,14 @@ public class OsuFile : Config
 {
     private const string VerFlag = "osu file format v";
     public int Version { get; set; }
-    public GeneralSection General { get; set; }
-    public EditorSection Editor { get; set; }
-    public MetadataSection Metadata { get; set; }
-    public DifficultySection Difficulty { get; set; }
-    public EventSection Events { get; set; }
-    public TimingSection TimingPoints { get; set; }
+    public GeneralSection? General { get; set; }
+    public EditorSection? Editor { get; set; }
+    public MetadataSection? Metadata { get; set; }
+    public DifficultySection? Difficulty { get; set; }
+    public EventSection? Events { get; set; }
+    public TimingSection? TimingPoints { get; set; }
     public ColorSection? Colours { get; set; }
-    public HitObjectSection HitObjects { get; set; }
+    public HitObjectSection? HitObjects { get; set; }
 
     public static OsuFile CreateEmpty()
     {
@@ -53,7 +53,7 @@ public class OsuFile : Config
         {
             LocalOsuFile localOsuFile;
             osuFile = localOsuFile = ConfigConvert.DeserializeObject<LocalOsuFile>(sr, options);
-            localOsuFile.OriginalPath = fs.Name;
+            localOsuFile.OriginalPath = Path.GetFullPath(fs.Name);
         }
         else
         {
@@ -84,6 +84,7 @@ public class OsuFile : Config
 
     public string SaveToDirectory(string directory, string? difficultyName = null)
     {
+        Metadata ??= new MetadataSection();
         var fileName = this.GetOsuFilename(difficultyName ?? Metadata.Version);
         var path = Path.Combine(directory, fileName);
         WriteToPath(path, difficultyName);
@@ -130,7 +131,14 @@ public class OsuFile : Config
     {
     }
 
-    private string Filename => this.GetOsuFilename(Metadata.Version);
+    private string Filename
+    {
+        get
+        {
+            Metadata ??= new MetadataSection();
+            return this.GetOsuFilename(Metadata.Version);
+        }
+    }
 
     private static string GetActualPath(string path)
     {
@@ -153,18 +161,23 @@ public class OsuFile : Config
         sw.WriteLine(Version);
         sw.WriteLine();
 
+        General ??= new GeneralSection();
         General.AppendSerializedString(sw);
         sw.WriteLine();
 
+        Editor ??= new EditorSection();
         Editor.AppendSerializedString(sw);
         sw.WriteLine();
 
+        Metadata ??= new MetadataSection();
         Metadata.AppendSerializedString(sw, overrideDifficulty);
         sw.WriteLine();
 
+        Difficulty ??= new DifficultySection();
         Difficulty.AppendSerializedString(sw);
         sw.WriteLine();
 
+        Events ??= new EventSection(this);
         Events.AppendSerializedString(sw);
         sw.WriteLine();
 

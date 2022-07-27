@@ -1,14 +1,31 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using Coosu.Beatmap.Sections;
 using Coosu.Shared.IO;
 
 namespace Coosu.Beatmap.Extensions;
 
 public static class OsuFileExtensions
 {
+    public static double MinTime(this OsuFile osuFile)
+    {
+        if (osuFile.HitObjects == null) throw new Exception("HitObjects is null");
+        if (osuFile.TimingPoints == null) throw new Exception("TimingPoints is null");
+        return Math.Min(osuFile.HitObjects.MinTime, osuFile.TimingPoints.MinTime);
+    }
+
+    public static double MaxTime(this OsuFile osuFile)
+    {
+        if (osuFile.HitObjects == null) throw new Exception("HitObjects is null");
+        if (osuFile.TimingPoints == null) throw new Exception("TimingPoints is null");
+        return Math.Max(osuFile.HitObjects.MaxTime, osuFile.TimingPoints.MaxTime);
+    }
+
     public static string GetOsuFilename(this OsuFile osuFile, string? difficultyName)
     {
+        osuFile.Metadata ??= new MetadataSection();
         var sb = new StringBuilder();
         AppendGeneral(osuFile, sb);
 
@@ -38,7 +55,7 @@ public static class OsuFileExtensions
     {
         var osbFile = GetOsbFilename(osuFile);
         var folder = Path.GetDirectoryName(osuFile.OriginalPath);
-        var osbPath = Path.Combine(folder, osbFile);
+        var osbPath = Path.Combine(folder ?? ".", osbFile);
 
         return await HasOsbStoryboard(osbPath);
     }
@@ -53,7 +70,7 @@ public static class OsuFileExtensions
         bool inSbSection = false;
         bool hasInSbSection = false;
 
-        while (!sr.EndOfStream)
+        while (!sr.EndOfStream && line != null)
         {
             if (line.StartsWith("//"))
             {
@@ -133,6 +150,9 @@ public static class OsuFileExtensions
 
     private static void AppendGeneral(OsuFile osuFile, StringBuilder sb)
     {
+        osuFile.Metadata ??= new MetadataSection();
+        osuFile.General ??= new GeneralSection();
+
         if (!string.IsNullOrEmpty(osuFile.Metadata.Artist))
         {
             sb.Append(osuFile.Metadata.Artist);

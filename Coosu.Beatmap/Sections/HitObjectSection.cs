@@ -28,8 +28,8 @@ public sealed class HitObjectSection : Section
 
     public HitObjectSection(OsuFile osuFile)
     {
-        _timingSection = osuFile.TimingPoints;
-        _difficulty = osuFile.Difficulty;
+        _timingSection = osuFile.TimingPoints ??= new TimingSection(osuFile);
+        _difficulty = osuFile.Difficulty ??= new DifficultySection();
     }
 
     public void ComputeSlidersByCurrentSettings()

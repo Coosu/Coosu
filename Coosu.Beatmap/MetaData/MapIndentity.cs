@@ -5,7 +5,7 @@ namespace Coosu.Beatmap.MetaData;
 [DebuggerDisplay("{DebuggerDisplay()}")]
 public readonly struct MapIdentity : IMapIdentifiable
 {
-    private static readonly MapIdentity _default = new();
+    private static readonly MapIdentity BackFieldDefault = new();
 
     public MapIdentity(string folderName, string version, bool inOwnDb) : this()
     {
@@ -19,19 +19,44 @@ public readonly struct MapIdentity : IMapIdentifiable
     public bool InOwnDb { get; }
     public MapIdentity GetIdentity() => this;
 
-    public static ref readonly MapIdentity Default => ref _default;
+    public static ref readonly MapIdentity Default => ref BackFieldDefault;
 
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         if (obj is not MapIdentity mi)
         {
             return false;
         }
 
-        return mi.FolderName == FolderName && mi.Version == Version;
+        return Equals(mi);
     }
 
-    public override int GetHashCode() => base.GetHashCode();
+    public bool Equals(MapIdentity other)
+    {
+        return FolderName == other.FolderName && Version == other.Version && InOwnDb == other.InOwnDb;
+    }
+
+    public override int GetHashCode()
+    {
+        unchecked
+        {
+            var hashCode = FolderName.GetHashCode();
+            hashCode = (hashCode * 397) ^ Version.GetHashCode();
+            hashCode = (hashCode * 397) ^ InOwnDb.GetHashCode();
+            return hashCode;
+        }
+    }
+
+    public static bool operator ==(MapIdentity left, MapIdentity right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(MapIdentity left, MapIdentity right)
+    {
+        return !left.Equals(right);
+    }
+
 
     private string DebuggerDisplay()
     {

@@ -12,7 +12,9 @@ public static class EnumExtensions
             'L' => SliderType.Linear,
             'P' => SliderType.Perfect,
             'B' => SliderType.Bezier,
+#pragma warning disable CS0618
             'C' => SliderType.Catmull,
+#pragma warning restore CS0618
             _ => throw new ArgumentOutOfRangeException(nameof(flag), flag, null)
         };
     }
@@ -24,7 +26,9 @@ public static class EnumExtensions
             SliderType.Linear => 'L',
             SliderType.Perfect => 'P',
             SliderType.Bezier => 'B',
+#pragma warning disable CS0618
             SliderType.Catmull => 'C',
+#pragma warning restore CS0618
             _ => throw new ArgumentOutOfRangeException(nameof(sliderType), sliderType, null)
         };
     }

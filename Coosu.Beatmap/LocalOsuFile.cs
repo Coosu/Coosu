@@ -5,5 +5,5 @@ namespace Coosu.Beatmap;
 public sealed class LocalOsuFile : OsuFile
 {
     [SectionIgnore]
-    public string OriginalPath { get; internal set; }
+    public string? OriginalPath { get; internal set; }
 }

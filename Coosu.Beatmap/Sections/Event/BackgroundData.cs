@@ -6,7 +6,7 @@ namespace Coosu.Beatmap.Sections.Event;
 
 public sealed class BackgroundData : SerializeWritableObject
 {
-    public string Filename { get; set; }
+    public string Filename { get; set; } = "";
     public double X { get; set; }
     public double Y { get; set; }
 

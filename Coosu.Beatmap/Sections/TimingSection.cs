@@ -17,6 +17,7 @@ public sealed class TimingSection : Section
     public TimingSection(OsuFile osuFile)
     {
         _osuFile = osuFile;
+        _osuFile.General ??= new GeneralSection();
     }
 
     public List<TimingPoint> TimingList { get; set; } = new();
@@ -30,7 +31,7 @@ public sealed class TimingSection : Section
         double offset = default;
         double factor = default;
         byte rhythm = default;
-        var timingSampleset = _osuFile.General.SampleSet;
+        var timingSampleset = _osuFile.General!.SampleSet;
         ushort track = default;
         byte volume = (byte)_osuFile.General.SampleVolume;
         bool inherit = default;

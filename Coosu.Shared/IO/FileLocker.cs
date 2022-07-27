@@ -9,12 +9,12 @@ namespace Coosu.Shared.IO
     {
         private readonly string _path;
         private readonly string _lockPath;
-        private readonly FileStream _fs;
+        private readonly FileStream? _fs;
 
         public FileLocker(string path)
         {
             _path = path;
-            _lockPath = Path.Combine(Path.GetDirectoryName(path), Path.GetFileName(path) + ".lock");
+            _lockPath = Path.Combine(Path.GetDirectoryName(path) ?? ".", Path.GetFileName(path) + ".lock");
             var fi = new FileInfo(_lockPath);
             if (fi.Exists && DateTime.Now - fi.CreationTime > TimeSpan.FromSeconds(100))
             {
