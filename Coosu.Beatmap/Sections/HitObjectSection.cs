@@ -206,7 +206,7 @@ public sealed class HitObjectSection : Section
                     break;
                 case 2:
                     // length
-                    pixelLength = ParseHelper.ParseDouble(infoSpan, ValueConvert.EnUsNumberFormatInfo);
+                    pixelLength = ParseHelper.ParseDouble(infoSpan, ParseHelper.EnUsNumberFormat);
                     break;
                 case 3:
                     edgeHitsoundInfo = infoSpan;

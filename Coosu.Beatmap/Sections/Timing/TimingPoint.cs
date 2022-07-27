@@ -4,6 +4,7 @@ using System.IO;
 using Coosu.Beatmap.Configurable;
 using Coosu.Beatmap.Internal;
 using Coosu.Shared;
+using Coosu.Shared.Numerics;
 
 namespace Coosu.Beatmap.Sections.Timing;
 
@@ -58,8 +59,8 @@ public sealed class TimingPoint : SerializeWritableObject
 
     public override string ToString() =>
         string.Format("{0},{1},{2},{3},{4},{5},{6},{7}",
-            Offset.ToString(ValueConvert.EnUsNumberFormatInfo),
-            Factor.ToString(ValueConvert.EnUsNumberFormatInfo),
+            Offset.ToString(ParseHelper.EnUsNumberFormat),
+            Factor.ToString(ParseHelper.EnUsNumberFormat),
             Rhythm,
             (int)TimingSampleset + 1,
             Track,
@@ -69,9 +70,9 @@ public sealed class TimingPoint : SerializeWritableObject
 
     public override void AppendSerializedString(TextWriter textWriter)
     {
-        textWriter.Write(Offset.ToString(ValueConvert.EnUsNumberFormatInfo));
+        textWriter.Write(Offset.ToString(ParseHelper.EnUsNumberFormat));
         textWriter.Write(',');
-        textWriter.Write(Factor.ToString(ValueConvert.EnUsNumberFormatInfo));
+        textWriter.Write(Factor.ToString(ParseHelper.EnUsNumberFormat));
         textWriter.Write(',');
         textWriter.Write(Rhythm);
         textWriter.Write(',');

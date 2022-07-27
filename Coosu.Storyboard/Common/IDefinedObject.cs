@@ -4,6 +4,6 @@
     {
         ObjectType ObjectType { get; }
         int? RowInSource { get; set; }
-        object Tag { get; set; }
+        object? Tag { get; set; }
     }
 }

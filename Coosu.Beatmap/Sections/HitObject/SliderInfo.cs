@@ -4,6 +4,7 @@ using System.Numerics;
 using Coosu.Beatmap.Configurable;
 using Coosu.Beatmap.Internal;
 using Coosu.Shared;
+using Coosu.Shared.Numerics;
 
 namespace Coosu.Beatmap.Sections.HitObject;
 
@@ -28,9 +29,9 @@ public class SliderInfo : SerializeWritableObject
         for (var i = 0; i < ControlPoints.Count; i++)
         {
             var controlPoint = ControlPoints[i];
-            textWriter.Write(controlPoint.X.ToString(ValueConvert.EnUsNumberFormatInfo));
+            textWriter.Write(controlPoint.X.ToString(ParseHelper.EnUsNumberFormat));
             textWriter.Write(':');
-            textWriter.Write(controlPoint.Y.ToString(ValueConvert.EnUsNumberFormatInfo));
+            textWriter.Write(controlPoint.Y.ToString(ParseHelper.EnUsNumberFormat));
             if (i < ControlPoints.Count - 1)
             {
                 textWriter.Write('|');
@@ -40,7 +41,7 @@ public class SliderInfo : SerializeWritableObject
         textWriter.Write(',');
         textWriter.Write(Repeat);
         textWriter.Write(',');
-        textWriter.Write(PixelLength.ToString(ValueConvert.EnUsNumberFormatInfo));
+        textWriter.Write(PixelLength.ToString(ParseHelper.EnUsNumberFormat));
         if (EdgeHitsounds == null)
             return;
 

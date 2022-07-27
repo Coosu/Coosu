@@ -22,14 +22,14 @@ namespace Coosu.Storyboard
             return Flag == other?.Flag;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return obj is EventType other && Equals(other);
         }
 
         public override int GetHashCode()
         {
-            return (Flag != null ? Flag.GetHashCode() : 0);
+            return Flag != null! ? Flag.GetHashCode() : 0;
         }
 
         public static bool operator ==(EventType left, EventType right)
@@ -52,9 +52,9 @@ namespace Coosu.Storyboard
         //    return new EventType(flag);
         //}
 
-        public int CompareTo(EventType other)
+        public int CompareTo(EventType? other)
         {
-            return string.Compare(Flag, other.Flag, StringComparison.Ordinal);
+            return string.Compare(Flag, other?.Flag, StringComparison.Ordinal);
         }
 
         public int CompareTo(object? obj)

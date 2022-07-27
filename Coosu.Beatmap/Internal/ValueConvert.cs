@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using Coosu.Shared.Numerics;
@@ -9,9 +8,6 @@ namespace Coosu.Beatmap.Internal;
 
 internal static class ValueConvert
 {
-    public static readonly NumberFormatInfo EnUsNumberFormatInfo =
-        new CultureInfo("en-US", false).NumberFormat;
-
     private static readonly Dictionary<string, MethodInfo?> MethodCache = new();
 
     public static object? ConvertValue(ReadOnlySpan<char> value, Type propType, bool useSpecificFormat)
@@ -36,14 +32,14 @@ internal static class ValueConvert
         if (propType == StaticTypes.Single)
         {
             var result = ParseHelper.ParseSingle(value,
-                useSpecificFormat ? EnUsNumberFormatInfo : null);
+                useSpecificFormat ? ParseHelper.EnUsNumberFormat : null);
             return result;
         }
 
         if (propType == StaticTypes.Double)
         {
             var result = ParseHelper.ParseDouble(value,
-                useSpecificFormat ? EnUsNumberFormatInfo : null);
+                useSpecificFormat ? ParseHelper.EnUsNumberFormat : null);
             return result;
         }
 

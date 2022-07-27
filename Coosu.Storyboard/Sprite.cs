@@ -28,7 +28,7 @@ namespace Coosu.Storyboard
         public virtual ObjectType ObjectType { get; } = ObjectTypes.Sprite;
 
         public int? RowInSource { get; set; }
-        public object Tag { get; set; }
+        public object? Tag { get; set; }
 
         public LayerType LayerType { get; set; }
         public OriginType OriginType { get; set; }
