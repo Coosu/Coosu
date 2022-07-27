@@ -16,7 +16,7 @@ namespace Coosu.Beatmap.Sections
         /// <summary>
         /// Distance snap multiplier
         /// </summary>
-        [SectionProperty("DistanceSpacing")]
+        [SectionProperty("DistanceSpacing", UseSpecificFormat = true)]
         public double DistanceSpacing { get; set; } = 1;
 
         /// <summary>
@@ -34,7 +34,7 @@ namespace Coosu.Beatmap.Sections
         /// <summary>
         /// Scale factor for the object timeline
         /// </summary>
-        [SectionProperty("TimelineZoom")]
+        [SectionProperty("TimelineZoom", UseSpecificFormat = true)]
         public double TimelineZoom { get; set; } = 1;
 
         protected override FlagRule FlagRule { get; } = FlagRules.ColonSpace;

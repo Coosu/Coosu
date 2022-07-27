@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using Coosu.Beatmap.Configurable;
+using Coosu.Beatmap.Internal;
 using Coosu.Beatmap.Sections.Timing;
 using Coosu.Shared;
 using Coosu.Shared.Numerics;
@@ -41,8 +42,8 @@ namespace Coosu.Beatmap.Sections
                 i++;
                 switch (i)
                 {
-                    case 0: offset = ParseHelper.ParseDouble(span); break;
-                    case 1: factor = ParseHelper.ParseDouble(span); break;
+                    case 0: offset = ParseHelper.ParseDouble(span, ValueConvert.EnUsNumberFormatInfo); break;
+                    case 1: factor = ParseHelper.ParseDouble(span, ValueConvert.EnUsNumberFormatInfo); break;
                     case 2: rhythm = ParseHelper.ParseByte(span); break;
                     case 3: timingSampleset = (TimingSamplesetType)(ParseHelper.ParseByte(span) - 1); break;
                     case 4: track = ParseHelper.ParseUInt16(span); break;

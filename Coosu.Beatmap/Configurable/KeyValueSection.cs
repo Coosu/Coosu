@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using Coosu.Beatmap.Internal;
+using Coosu.Shared;
 
 namespace Coosu.Beatmap.Configurable
 {
@@ -77,14 +78,18 @@ namespace Coosu.Beatmap.Configurable
                 }
                 else
                 {
-                    if (ValueConvert.ConvertValue(valueSpan, propType, out var converted, sectionInfo.UseSpecificFormat))
+                    object? converted;
+                    try
                     {
-                        prop.SetValue(this, converted);
+                        converted = ValueConvert.ConvertValue(valueSpan, propType, sectionInfo.UseSpecificFormat);
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        throw new MissingMethodException($"Can not convert {{{valueSpan.ToString()}}} to type {propType}.");
+                        throw new ValueConvertException(
+                            $"Can not convert {{{key}}} key's value {{{valueSpan.ToString()}}} to type {propType}.", ex);
                     }
+
+                    prop.SetValue(this, converted);
                 }
             }
         }

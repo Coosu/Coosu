@@ -9,96 +9,83 @@ namespace Coosu.Beatmap.Internal
 {
     internal static class ValueConvert
     {
-        public static readonly NumberFormatInfo NumberFormatInfo =
+        public static readonly NumberFormatInfo EnUsNumberFormatInfo =
             new CultureInfo(@"en-US", false).NumberFormat;
 
         private static readonly Dictionary<string, MethodInfo?> MethodCache = new();
 
-        public static bool ConvertValue(ReadOnlySpan<char> value, Type propType, out object? converted,
-            bool useSpecificFormat)
+        public static object? ConvertValue(ReadOnlySpan<char> value, Type propType, bool useSpecificFormat)
         {
             if (propType == StaticTypes.Boolean)
             {
-                var b = ParseHelper.TryParseByte(value, out var result);
-                converted = result == 1;
-                return b;
+                var result = ParseHelper.ParseByte(value);
+                return result == 1;
             }
 
             if (propType == StaticTypes.String)
             {
-                converted = value.ToString();
-                return true;
+                return value.ToString();
             }
 
             if (propType == StaticTypes.Int32)
             {
-                var b = ParseHelper.TryParseInt32(value, out var result);
-                converted = result;
-                return b;
+                var result = ParseHelper.ParseInt32(value);
+                return result;
             }
 
             if (propType == StaticTypes.Single)
             {
-                var b = ParseHelper.TryParseSingle(value, out var result,
-                    !useSpecificFormat ? NumberFormatInfo.CurrentInfo : null);
-                converted = result;
-                return b;
+                var result = ParseHelper.ParseSingle(value,
+                     useSpecificFormat ? EnUsNumberFormatInfo : null);
+                return result;
             }
 
             if (propType == StaticTypes.Double)
             {
-                var b = ParseHelper.TryParseDouble(value, out var result,
-                    !useSpecificFormat ? NumberFormatInfo.CurrentInfo : null);
-                converted = result;
-                return b;
+                var result = ParseHelper.ParseDouble(value,
+                     useSpecificFormat ? EnUsNumberFormatInfo : null);
+                return result;
             }
 
             if (propType == StaticTypes.Byte)
             {
-                var b = ParseHelper.TryParseByte(value, out var result);
-                converted = result;
-                return b;
+                var result = ParseHelper.ParseByte(value);
+                return result;
             }
             if (propType == StaticTypes.Sbyte)
             {
-                var b = ParseHelper.TryParseSByte(value, out var result);
-                converted = result;
-                return b;
+                var result = ParseHelper.ParseSByte(value);
+                return result;
             }
 
             if (propType == StaticTypes.Int16)
             {
-                var b = ParseHelper.TryParseInt16(value, out var result);
-                converted = result;
-                return b;
+                var result = ParseHelper.ParseInt16(value);
+                return result;
             }
 
             if (propType == StaticTypes.UInt16)
             {
-                var b = ParseHelper.TryParseUInt16(value, out var result);
-                converted = result;
-                return b;
+                var result = ParseHelper.ParseUInt16(value);
+                return result;
             }
 
             if (propType == StaticTypes.UInt32)
             {
-                var b = ParseHelper.TryParseUInt32(value, out var result);
-                converted = result;
-                return b;
+                var result = ParseHelper.ParseUInt32(value);
+                return result;
             }
 
             if (propType == StaticTypes.Int64)
             {
-                var b = ParseHelper.TryParseInt64(value, out var result);
-                converted = result;
-                return b;
+                var result = ParseHelper.ParseInt64(value);
+                return result;
             }
 
             if (propType == StaticTypes.UInt64)
             {
-                var b = ParseHelper.TryParseUInt64(value, out var result);
-                converted = result;
-                return b;
+                var result = ParseHelper.ParseUInt64(value);
+                return result;
             }
 
             object arg = value.ToString();
@@ -117,13 +104,12 @@ namespace Coosu.Beatmap.Internal
 
             if (method == default)
             {
-                converted = null;
-                return false;
+                throw new MissingMethodException($"Can not convert {{{value.ToString()}}} to type {propType}. " +
+                                                 $"Target method not found in System.Convert: {methodName}");
             }
 
             object[] p = { arg };
-            converted = method.Invoke(null, p);
-            return true;
+            return method.Invoke(null, p);
         }
     }
 }

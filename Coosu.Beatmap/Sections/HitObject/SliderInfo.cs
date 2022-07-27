@@ -28,9 +28,9 @@ namespace Coosu.Beatmap.Sections.HitObject
             for (var i = 0; i < ControlPoints.Count; i++)
             {
                 var controlPoint = ControlPoints[i];
-                textWriter.Write(controlPoint.X.ToString(ValueConvert.NumberFormatInfo));
+                textWriter.Write(controlPoint.X.ToString(ValueConvert.EnUsNumberFormatInfo));
                 textWriter.Write(':');
-                textWriter.Write(controlPoint.Y.ToString(ValueConvert.NumberFormatInfo));
+                textWriter.Write(controlPoint.Y.ToString(ValueConvert.EnUsNumberFormatInfo));
                 if (i < ControlPoints.Count - 1)
                 {
                     textWriter.Write('|');
@@ -40,7 +40,7 @@ namespace Coosu.Beatmap.Sections.HitObject
             textWriter.Write(',');
             textWriter.Write(Repeat);
             textWriter.Write(',');
-            textWriter.Write(PixelLength.ToString(ValueConvert.NumberFormatInfo));
+            textWriter.Write(PixelLength.ToString(ValueConvert.EnUsNumberFormatInfo));
             if (EdgeHitsounds == null)
                 return;
 

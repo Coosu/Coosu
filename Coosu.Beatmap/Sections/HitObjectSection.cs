@@ -206,7 +206,7 @@ namespace Coosu.Beatmap.Sections
                         break;
                     case 2:
                         // length
-                        pixelLength = ParseHelper.ParseDouble(infoSpan);
+                        pixelLength = ParseHelper.ParseDouble(infoSpan, ValueConvert.EnUsNumberFormatInfo);
                         break;
                     case 3:
                         edgeHitsoundInfo = infoSpan;
