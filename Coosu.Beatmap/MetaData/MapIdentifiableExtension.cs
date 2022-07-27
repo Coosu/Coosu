@@ -1,12 +1,11 @@
 ﻿using System.IO;
 
-namespace Coosu.Beatmap.MetaData
+namespace Coosu.Beatmap.MetaData;
+
+public static class MapIdentifiableExtension
 {
-    public static class MapIdentifiableExtension
+    public static bool IsMapTemporary(this IMapIdentifiable map)
     {
-        public static bool IsMapTemporary(this IMapIdentifiable map)
-        {
-            return Path.IsPathRooted(map.FolderName);
-        }
+        return Path.IsPathRooted(map.FolderName);
     }
 }

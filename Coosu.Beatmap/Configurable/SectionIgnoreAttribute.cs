@@ -1,8 +1,7 @@
 ﻿using System;
 
-namespace Coosu.Beatmap.Configurable
+namespace Coosu.Beatmap.Configurable;
+
+public sealed class SectionIgnoreAttribute : Attribute
 {
-    public sealed class SectionIgnoreAttribute : Attribute
-    {
-    }
 }

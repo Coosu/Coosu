@@ -1,10 +1,9 @@
-﻿namespace Coosu.Beatmap.Sections.HitObject
+﻿namespace Coosu.Beatmap.Sections.HitObject;
+
+public enum HitObjectType : byte
 {
-    public enum HitObjectType : byte
-    {
-        Circle,
-        Slider,
-        Spinner,
-        Hold
-    }
+    Circle,
+    Slider,
+    Spinner,
+    Hold
 }

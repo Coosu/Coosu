@@ -1,10 +1,9 @@
 ﻿using Coosu.Beatmap.Configurable;
 
-namespace Coosu.Beatmap
+namespace Coosu.Beatmap;
+
+public sealed class LocalOsuFile : OsuFile
 {
-    public sealed class LocalOsuFile : OsuFile
-    {
-        [SectionIgnore]
-        public string OriginalPath { get; internal set; }
-    }
+    [SectionIgnore]
+    public string OriginalPath { get; internal set; }
 }

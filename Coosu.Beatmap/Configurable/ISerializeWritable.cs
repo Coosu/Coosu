@@ -1,10 +1,9 @@
 ﻿using System.IO;
 
-namespace Coosu.Beatmap.Configurable
+namespace Coosu.Beatmap.Configurable;
+
+public interface ISerializeWritable
 {
-    public interface ISerializeWritable
-    {
-        string ToSerializedString();
-        void AppendSerializedString(TextWriter textWriter);
-    }
+    string ToSerializedString();
+    void AppendSerializedString(TextWriter textWriter);
 }

@@ -1,14 +1,13 @@
 ﻿using System;
 
-namespace Coosu.Beatmap.Configurable
-{
-    public sealed class SectionBoolAttribute : Attribute
-    {
-        public BoolParseType Type { get; }
+namespace Coosu.Beatmap.Configurable;
 
-        public SectionBoolAttribute(BoolParseType type)
-        {
-            Type = type;
-        }
+public sealed class SectionBoolAttribute : Attribute
+{
+    public BoolParseType Type { get; }
+
+    public SectionBoolAttribute(BoolParseType type)
+    {
+        Type = type;
     }
 }

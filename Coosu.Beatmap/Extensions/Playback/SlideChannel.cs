@@ -1,7 +1,6 @@
-﻿namespace Coosu.Beatmap.Extensions.Playback
+﻿namespace Coosu.Beatmap.Extensions.Playback;
+
+public enum SlideChannel
 {
-    public enum SlideChannel
-    {
-        Normal, Whistle
-    }
+    Normal, Whistle
 }

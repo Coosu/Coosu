@@ -1,11 +1,10 @@
 ﻿using System;
 
-namespace Coosu.Beatmap
+namespace Coosu.Beatmap;
+
+public sealed class RepeatTimingSectionException : Exception
 {
-    public sealed class RepeatTimingSectionException : Exception
+    public RepeatTimingSectionException(string message) : base(message)
     {
-        public RepeatTimingSectionException(string message) : base(message)
-        {
-        }
     }
 }

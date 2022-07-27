@@ -1,6 +1,5 @@
-﻿namespace Coosu.Beatmap.Configurable
+﻿namespace Coosu.Beatmap.Configurable;
+
+public interface ICustomSection : ISection
 {
-    public interface ICustomSection : ISection
-    {
-    }
 }

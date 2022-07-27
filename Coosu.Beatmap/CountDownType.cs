@@ -1,7 +1,6 @@
-﻿namespace Coosu.Beatmap
+﻿namespace Coosu.Beatmap;
+
+public enum CountDownType : byte
 {
-    public enum CountDownType : byte
-    {
-        None, Normal, Half, Double
-    }
+    None, Normal, Half, Double
 }

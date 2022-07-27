@@ -1,10 +1,9 @@
-﻿namespace Coosu.Beatmap.Sections.HitObject
+﻿namespace Coosu.Beatmap.Sections.HitObject;
+
+public enum ObjectSamplesetType : byte
 {
-    public enum ObjectSamplesetType : byte
-    {
-        Auto,
-        Normal,
-        Soft,
-        Drum
-    }
+    Auto,
+    Normal,
+    Soft,
+    Drum
 }

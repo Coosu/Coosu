@@ -1,21 +1,20 @@
 ﻿using Coosu.Beatmap.Configurable;
 
-namespace Coosu.Beatmap
+namespace Coosu.Beatmap;
+
+public sealed class OsuReadOptions : ReadOptions
 {
-    public sealed class OsuReadOptions : ReadOptions
+    public bool StoryboardIgnored { get; private set; }
+    public bool SampleIgnored { get; private set; }
+    public bool AutoCompute { get; private set; } = true;
+
+    public void IgnoreStoryboard()
     {
-        public bool StoryboardIgnored { get; private set; }
-        public bool SampleIgnored { get; private set; }
-        public bool AutoCompute { get; private set; } = true;
+        StoryboardIgnored = true;
+    }
 
-        public void IgnoreStoryboard()
-        {
-            StoryboardIgnored = true;
-        }
-
-        public void IgnoreSample()
-        {
-            SampleIgnored = true;
-        }
+    public void IgnoreSample()
+    {
+        SampleIgnored = true;
     }
 }

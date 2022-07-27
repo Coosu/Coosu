@@ -1,7 +1,6 @@
-﻿namespace Coosu.Beatmap.Configurable
+﻿namespace Coosu.Beatmap.Configurable;
+
+public enum EnumParseOption
 {
-    public enum EnumParseOption
-    {
-        String, Index
-    }
+    String, Index
 }

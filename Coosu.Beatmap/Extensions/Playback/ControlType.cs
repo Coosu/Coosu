@@ -1,11 +1,10 @@
-﻿namespace Coosu.Beatmap.Extensions.Playback
+﻿namespace Coosu.Beatmap.Extensions.Playback;
+
+public enum ControlType
 {
-    public enum ControlType
-    {
-        None,
-        StartSliding,
-        StopSliding,
-        ChangeBalance,
-        ChangeVolume,
-    }
+    None,
+    StartSliding,
+    StopSliding,
+    ChangeBalance,
+    ChangeVolume,
 }

@@ -1,14 +1,13 @@
-﻿namespace Coosu.Beatmap.Configurable
+﻿namespace Coosu.Beatmap.Configurable;
+
+public abstract class Config
 {
-    public abstract class Config
+    public abstract void HandleCustom(string line);
+
+    public virtual void OnDeserialized()
     {
-        public abstract void HandleCustom(string line);
-
-        public virtual void OnDeserialized()
-        {
-        }
-
-        [SectionIgnore]
-        public ReadOptions Options { get; set; }
     }
+
+    [SectionIgnore]
+    public ReadOptions Options { get; set; }
 }

@@ -1,11 +1,10 @@
-﻿namespace Coosu.Beatmap.MetaData
-{
-    public interface IMapIdentifiable
-    {
-        string Version { get; }
-        string FolderName { get; }
-        bool InOwnDb { get; }
+﻿namespace Coosu.Beatmap.MetaData;
 
-        MapIdentity GetIdentity();
-    }
+public interface IMapIdentifiable
+{
+    string Version { get; }
+    string FolderName { get; }
+    bool InOwnDb { get; }
+
+    MapIdentity GetIdentity();
 }

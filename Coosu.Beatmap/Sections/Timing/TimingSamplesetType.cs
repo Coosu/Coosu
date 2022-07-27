@@ -1,10 +1,9 @@
-﻿namespace Coosu.Beatmap.Sections.Timing
+﻿namespace Coosu.Beatmap.Sections.Timing;
+
+public enum TimingSamplesetType : byte
 {
-    public enum TimingSamplesetType : byte
-    {
-        Normal,
-        Soft,
-        Drum,
-        None
-    }
+    Normal,
+    Soft,
+    Drum,
+    None
 }

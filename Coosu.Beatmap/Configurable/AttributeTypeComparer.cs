@@ -1,24 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Coosu.Beatmap.Configurable
+namespace Coosu.Beatmap.Configurable;
+
+public sealed class AttributeTypeComparer : IEqualityComparer<Attribute>
 {
-    public sealed class AttributeTypeComparer : IEqualityComparer<Attribute>
+    public bool Equals(Attribute? x, Attribute? y)
     {
-        public bool Equals(Attribute? x, Attribute? y)
-        {
-            if (x == null && y == null)
-                return true;
-            if (x == null || y == null)
-                return false;
+        if (x == null && y == null)
+            return true;
+        if (x == null || y == null)
+            return false;
 
-            var @equals = x.GetType() == y.GetType();
-            return @equals;
-        }
+        var @equals = x.GetType() == y.GetType();
+        return @equals;
+    }
 
-        public int GetHashCode(Attribute obj)
-        {
-            return obj.GetHashCode();
-        }
+    public int GetHashCode(Attribute obj)
+    {
+        return obj.GetHashCode();
     }
 }

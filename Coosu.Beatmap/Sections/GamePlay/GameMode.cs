@@ -1,7 +1,6 @@
-﻿namespace Coosu.Beatmap.Sections.GamePlay
+﻿namespace Coosu.Beatmap.Sections.GamePlay;
+
+public enum GameMode : byte
 {
-    public enum GameMode : byte
-    {
-        Circle, Taiko, Catch, Mania
-    }
+    Circle, Taiko, Catch, Mania
 }

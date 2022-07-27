@@ -1,11 +1,10 @@
 ﻿using System;
 
-namespace Coosu.Beatmap
+namespace Coosu.Beatmap;
+
+public sealed class BadOsuFormatException : Exception
 {
-    public sealed class BadOsuFormatException : Exception
+    public BadOsuFormatException(string message) : base(message)
     {
-        public BadOsuFormatException(string message) : base(message)
-        {
-        }
     }
 }
