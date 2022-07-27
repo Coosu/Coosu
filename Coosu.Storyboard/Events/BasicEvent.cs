@@ -289,7 +289,7 @@ namespace Coosu.Storyboard.Events
         {
             for (int i = 0; i < EventType.Size; i++)
             {
-                await textWriter.WriteAsync(Values[i].ToEnUsFormatString());
+                await textWriter.WriteStandardizedNumberAsync(Values[i]);
                 if (i != EventType.Size - 1) await textWriter.WriteAsync(',');
             }
         }
@@ -298,7 +298,7 @@ namespace Coosu.Storyboard.Events
         {
             for (int i = 0; i < Values.Count; i++)
             {
-                await textWriter.WriteAsync(Values[i].ToEnUsFormatString());
+                await textWriter.WriteStandardizedNumberAsync(Values[i]);
                 if (i != Values.Count - 1) await textWriter.WriteAsync(',');
             }
         }

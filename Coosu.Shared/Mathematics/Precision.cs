@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 
 namespace Coosu.Shared.Mathematics
 {
@@ -35,6 +36,7 @@ namespace Coosu.Shared.Mathematics
         /// <param name="value2">The value to compare against.</param>
         /// <param name="acceptableDifference">The acceptable difference. Defaults to <see cref="DOUBLE_EPSILON"/>.</param>
         /// <returns>Whether <paramref name="value1"/> is definitely greater than <paramref name="value2"/>.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool DefinitelyBigger(double value1, double value2, double acceptableDifference = DOUBLE_EPSILON) => value1 - acceptableDifference > value2;
 
         /// <summary>
@@ -62,6 +64,7 @@ namespace Coosu.Shared.Mathematics
         /// <param name="value2">The second value.</param>
         /// <param name="acceptableDifference">The acceptable difference. Defaults to <see cref="FLOAT_EPSILON"/>.</param>
         /// <returns>Whether <paramref name="value1"/> and <paramref name="value2"/> are almost equal.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool AlmostEquals(float value1, float value2, float acceptableDifference = FLOAT_EPSILON) => Math.Abs(value1 - value2) <= acceptableDifference;
 
         /// <summary>
@@ -80,6 +83,7 @@ namespace Coosu.Shared.Mathematics
         /// <param name="value2">The second value.</param>
         /// <param name="acceptableDifference">The acceptable difference. Defaults to <see cref="DOUBLE_EPSILON"/>.</param>
         /// <returns>Whether <paramref name="value1"/> and <paramref name="value2"/> are almost equal.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool AlmostEquals(double value1, double value2, double acceptableDifference = DOUBLE_EPSILON) => Math.Abs(value1 - value2) <= acceptableDifference;
 
         /// <summary>

@@ -1,17 +1,19 @@
-﻿using Coosu.Shared.Numerics;
+﻿using System.Runtime.CompilerServices;
+using Coosu.Shared.Numerics;
 
-namespace Coosu.Shared
+namespace Coosu.Shared;
+
+public static class NumericExtensions
 {
-    public static class NumericExtensions
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string ToEnUsFormatString(this float value)
     {
-        public static string ToEnUsFormatString(this float value)
-        {
-            return value.ToString(ParseHelper.EnUsNumberFormat);
-        }
-
-        public static string ToEnUsFormatString(this double value)
-        {
-            return value.ToString(ParseHelper.EnUsNumberFormat);
-        }
+        return value.ToString(ParseHelper.EnUsNumberFormat);
+    }
+        
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string ToEnUsFormatString(this double value)
+    {
+        return value.ToString(ParseHelper.EnUsNumberFormat);
     }
 }

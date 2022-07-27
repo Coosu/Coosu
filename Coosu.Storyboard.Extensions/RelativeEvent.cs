@@ -189,11 +189,11 @@ namespace Coosu.Storyboard.Extensions
             {
                 if (!double.IsNaN(TagValues[i]))
                 {
-                    await textWriter.WriteAsync(TagValues[i].ToEnUsFormatString());
+                    await textWriter.WriteStandardizedNumberAsync(TagValues[i]);
                     await textWriter.WriteAsync('~');
                 }
 
-                await textWriter.WriteAsync(Values[i].ToEnUsFormatString());
+                await textWriter.WriteStandardizedNumberAsync(Values[i]);
                 if (i != EventType.Size - 1) await textWriter.WriteAsync(',');
             }
         }
