@@ -149,9 +149,9 @@ namespace Coosu.Storyboard.Extensions
             var typeStr = ((int?)Easing.TryGetEasingType())?.ToString() ?? "?";
             await writer.WriteAsync(typeStr);
             await writer.WriteAsync(" [");
-            await writer.WriteAsync(Math.Round(StartTime));
+            await writer.WriteStandardizedNumberAsync(Math.Round(StartTime));
             await writer.WriteAsync(",");
-            await writer.WriteAsync(Math.Round(EndTime));
+            await writer.WriteStandardizedNumberAsync(Math.Round(EndTime));
             await writer.WriteAsync("] by [");
             await WriteExtraScriptAsync(writer);
             await writer.WriteAsync(']');
@@ -189,11 +189,11 @@ namespace Coosu.Storyboard.Extensions
             {
                 if (!double.IsNaN(TagValues[i]))
                 {
-                    await textWriter.WriteAsync(TagValues[i].ToIcString());
+                    await textWriter.WriteAsync(TagValues[i].ToEnUsFormatString());
                     await textWriter.WriteAsync('~');
                 }
 
-                await textWriter.WriteAsync(Values[i].ToIcString());
+                await textWriter.WriteAsync(Values[i].ToEnUsFormatString());
                 if (i != EventType.Size - 1) await textWriter.WriteAsync(',');
             }
         }

@@ -33,7 +33,7 @@ public sealed class DoubleSplitConverter : ValueConverter<List<double>>
         for (var i = 0; i < value.Count; i++)
         {
             var d = value[i];
-            textWriter.Write(d.ToIcString());
+            textWriter.Write(d.ToEnUsFormatString());
             if (i < value.Count - 1)
                 textWriter.Write(_splitter);
         }

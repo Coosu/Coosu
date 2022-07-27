@@ -25,7 +25,7 @@ namespace Coosu.Storyboard.Extensibility
             {
                 for (int i = 0; i < size; i++)
                 {
-                    sb.Append(raw.GetValue(i).ToIcString());
+                    sb.Append(raw.GetValue(i).ToEnUsFormatString());
                     if (i != size - 1)
                         sb.Append(',');
                 }
@@ -34,7 +34,7 @@ namespace Coosu.Storyboard.Extensibility
             {
                 for (int i = 0; i < size * 2; i++)
                 {
-                    sb.Append(raw.GetValue(i).ToIcString());
+                    sb.Append(raw.GetValue(i).ToEnUsFormatString());
                     if (i != size - 1)
                         sb.Append(',');
                 }
@@ -42,8 +42,8 @@ namespace Coosu.Storyboard.Extensibility
 
             var e = raw.EventType.Flag;
             var easing = ((int)raw.Easing.GetEasingType()).ToString();
-            var startT = Math.Round(raw.StartTime).ToIcString();
-            var endT = raw.StartTime.Equals(raw.EndTime) ? "" : Math.Round(raw.EndTime).ToIcString();
+            var startT = Math.Round(raw.StartTime).ToEnUsFormatString();
+            var endT = raw.StartTime.Equals(raw.EndTime) ? "" : Math.Round(raw.EndTime).ToEnUsFormatString();
 
             return $"{e},{easing},{startT},{endT},{sb}";
         }

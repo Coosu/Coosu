@@ -6,17 +6,17 @@ namespace Coosu.Shared
 {
     public static class TextWriterExtensions
     {
-        public static async Task WriteAsync(this TextWriter writer, double d)
+        public static async Task WriteStandardizedNumberAsync(this TextWriter writer, double d)
         {
-            await writer.WriteAsync(d.ToIcString());
+            await writer.WriteAsync(d.ToEnUsFormatString());
         }
 
-        public static async Task WriteAsync(this TextWriter writer, float f)
+        public static async Task WriteStandardizedNumberAsync(this TextWriter writer, float f)
         {
-            await writer.WriteAsync(f.ToIcString());
+            await writer.WriteAsync(f.ToEnUsFormatString());
         }
 
-        public static async Task WriteAsync(this TextWriter writer, int i)
+        public static async Task WriteStandardizedNumberAsync(this TextWriter writer, int i)
         {
             await writer.WriteAsync(i.ToString());
         }

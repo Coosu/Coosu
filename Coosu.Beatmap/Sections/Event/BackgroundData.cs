@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using System.IO;
 using Coosu.Beatmap.Configurable;
+using Coosu.Shared.Numerics;
 
 namespace Coosu.Beatmap.Sections.Event;
 
@@ -15,16 +16,16 @@ public sealed class BackgroundData : SerializeWritableObject
             0,
             0,
             Filename,
-            X.ToString(CultureInfo.InvariantCulture),
-            Y.ToString(CultureInfo.InvariantCulture));
+            X.ToString(ParseHelper.EnUsNumberFormat),
+            Y.ToString(ParseHelper.EnUsNumberFormat));
 
     public override void AppendSerializedString(TextWriter textWriter)
     {
         textWriter.Write($"0,");
         textWriter.Write($"0,");
         textWriter.Write($"\"{Filename}\",");
-        textWriter.Write($"{X.ToString(CultureInfo.InvariantCulture)},");
-        textWriter.Write(Y.ToString(CultureInfo.InvariantCulture));
+        textWriter.Write($"{X.ToString(ParseHelper.EnUsNumberFormat)},");
+        textWriter.Write(Y.ToString(ParseHelper.EnUsNumberFormat));
         textWriter.WriteLine();
     }
 }

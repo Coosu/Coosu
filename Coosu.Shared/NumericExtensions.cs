@@ -1,17 +1,17 @@
-﻿using System.Globalization;
+﻿using Coosu.Shared.Numerics;
 
 namespace Coosu.Shared
 {
     public static class NumericExtensions
     {
-        public static string ToIcString(this float value)
+        public static string ToEnUsFormatString(this float value)
         {
-            return value.ToString(CultureInfo.InvariantCulture);
+            return value.ToString(ParseHelper.EnUsNumberFormat);
         }
 
-        public static string ToIcString(this double value)
+        public static string ToEnUsFormatString(this double value)
         {
-            return value.ToString(CultureInfo.InvariantCulture);
+            return value.ToString(ParseHelper.EnUsNumberFormat);
         }
     }
 }

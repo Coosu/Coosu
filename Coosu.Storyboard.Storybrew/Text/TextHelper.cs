@@ -118,8 +118,8 @@ namespace Coosu.Storyboard.Storybrew.Text
             {
                 var b0 = bytes[i];
                 var b1 = bytes[i + 1];
-                sb.Append(b1.ToString("X2", CultureInfo.InvariantCulture));
-                sb.Append(b0.ToString("X2", CultureInfo.InvariantCulture));
+                sb.Append(b1.ToString("X2", ParseHelper.EnUsNumberFormat));
+                sb.Append(b0.ToString("X2", ParseHelper.EnUsNumberFormat));
             }
 
             return sb.ToString();

@@ -66,13 +66,13 @@ namespace Coosu.Storyboard
             await writer.WriteAsync(",\"");
             await writer.WriteAsync(ImagePath);
             await writer.WriteAsync("\",");
-            await writer.WriteAsync((int)DefaultX);
+            await writer.WriteStandardizedNumberAsync((int)DefaultX);
             await writer.WriteAsync(',');
-            await writer.WriteAsync((int)DefaultY);
+            await writer.WriteStandardizedNumberAsync((int)DefaultY);
             await writer.WriteAsync(',');
-            await writer.WriteAsync(FrameCount);
+            await writer.WriteStandardizedNumberAsync(FrameCount);
             await writer.WriteAsync(',');
-            await writer.WriteAsync((int)FrameDelay);
+            await writer.WriteStandardizedNumberAsync((int)FrameDelay);
             await writer.WriteAsync(',');
             await writer.WriteAsync(LoopType);
         }

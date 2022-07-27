@@ -87,9 +87,9 @@ namespace Coosu.Storyboard.Events
         {
             await writer.WriteAsync(EventType.Flag);
             await writer.WriteAsync(',');
-            await writer.WriteAsync(Math.Round(StartTime));
+            await writer.WriteStandardizedNumberAsync(Math.Round(StartTime));
             await writer.WriteAsync(',');
-            await writer.WriteAsync(LoopCount);
+            await writer.WriteStandardizedNumberAsync(LoopCount);
         }
 
         public async Task WriteScriptAsync(TextWriter writer)
