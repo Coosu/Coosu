@@ -10,12 +10,20 @@ namespace Coosu.Beatmap.Configurable;
 
 public abstract class KeyValueSection : Section
 {
-    [SectionIgnore]
-    public Dictionary<string, string> UndefinedPairs { get; } = new();
+    private static readonly Dictionary<Type, Dictionary<string, SectionInfo>> TypePropertyInfoCache = new();
+
+    protected readonly Dictionary<string, SectionInfo> PropertyInfos; 
 
     public KeyValueSection()
     {
         var thisType = GetType();
+        if (TypePropertyInfoCache.TryGetValue(thisType, out var dict))
+        {
+            PropertyInfos = dict;
+            return;
+        }
+
+        PropertyInfos = new Dictionary<string, SectionInfo>();
         var props = thisType.GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
         for (var i = 0; i < props.Length; i++)
         {
@@ -44,7 +52,15 @@ public abstract class KeyValueSection : Section
                 });
             }
         }
+
+        TypePropertyInfoCache.Add(thisType, PropertyInfos);
     }
+
+    [SectionIgnore]
+    public Dictionary<string, string> UndefinedPairs { get; } = new();
+
+    protected virtual FlagRule FlagRule { get; } = FlagRules.Colon;
+    protected virtual IReadOnlyList<FlagRule> FuzzyFlagRules { get; } = FlagRules.FuzzyRules;
 
     public override void Match(string line)
     {
@@ -92,46 +108,6 @@ public abstract class KeyValueSection : Section
                 prop.SetValue(this, converted);
             }
         }
-    }
-
-    protected void MatchKeyValue(string line, out ReadOnlySpan<char> keySpan, out ReadOnlySpan<char> valueSpan)
-    {
-        int index = MatchFlag(line, out var flagRule);
-        if (index == -1) throw new Exception($"Unknown Key-Value: {line}");
-
-        keySpan = line.AsSpan(0, index);
-        if (flagRule.TrimType is TrimType.Key or TrimType.Both)
-        {
-            keySpan = keySpan.Trim();
-        }
-
-        valueSpan = line.AsSpan(index + flagRule.SplitFlag.Length);
-        if (flagRule.TrimType is TrimType.Value or TrimType.Both)
-        {
-            valueSpan = valueSpan.Trim();
-        }
-    }
-
-    protected int MatchFlag(string line, out FlagRule flagRule)
-    {
-        var index = line.IndexOf(FlagRule.SplitFlag, StringComparison.Ordinal);
-        if (index == -1)
-        {
-            flagRule = null;
-            foreach (var rule in FuzzyFlagRules)
-            {
-                index = line.IndexOf(rule.SplitFlag, StringComparison.Ordinal);
-                if (index == -1) continue;
-                flagRule = rule;
-                return index;
-            }
-        }
-        else
-        {
-            flagRule = FlagRule;
-        }
-
-        return index;
     }
 
     public override void AppendSerializedString(TextWriter textWriter)
@@ -216,8 +192,43 @@ public abstract class KeyValueSection : Section
         }
     }
 
-    protected virtual FlagRule FlagRule { get; } = FlagRules.Colon;
-    protected virtual IReadOnlyList<FlagRule> FuzzyFlagRules { get; } = FlagRules.FuzzyRules;
+    protected void MatchKeyValue(string line, out ReadOnlySpan<char> keySpan, out ReadOnlySpan<char> valueSpan)
+    {
+        int index = MatchFlag(line, out var flagRule);
+        if (index == -1) throw new Exception($"Unknown Key-Value: {line}");
 
-    protected readonly Dictionary<string, SectionInfo> PropertyInfos = new();
+        keySpan = line.AsSpan(0, index);
+        if (flagRule.TrimType is TrimType.Key or TrimType.Both)
+        {
+            keySpan = keySpan.Trim();
+        }
+
+        valueSpan = line.AsSpan(index + flagRule.SplitFlag.Length);
+        if (flagRule.TrimType is TrimType.Value or TrimType.Both)
+        {
+            valueSpan = valueSpan.Trim();
+        }
+    }
+
+    protected int MatchFlag(string line, out FlagRule flagRule)
+    {
+        var index = line.IndexOf(FlagRule.SplitFlag, StringComparison.Ordinal);
+        if (index == -1)
+        {
+            flagRule = null;
+            foreach (var rule in FuzzyFlagRules)
+            {
+                index = line.IndexOf(rule.SplitFlag, StringComparison.Ordinal);
+                if (index == -1) continue;
+                flagRule = rule;
+                return index;
+            }
+        }
+        else
+        {
+            flagRule = FlagRule;
+        }
+
+        return index;
+    }
 }
