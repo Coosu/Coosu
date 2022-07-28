@@ -1,42 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
   <PropertyGroup>
-    <TargetFrameworks>net472</TargetFrameworks>
+    <TargetFrameworks>net48</TargetFrameworks>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <Description>Coosu.Storyboard.Advanced helps you to make some effects easily and executing Coosu in Storybrew.</Description>
     <PackageTags>osu, osu!, osugame</PackageTags>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="$(TargetFramework) != 'net472'">
     <UseWpf>true</UseWpf>
   </PropertyGroup>
-
-  <ItemGroup Condition="$(TargetFramework) == 'net472'">
-    <Reference Include="PresentationCore">
-      <HintPath>PresentationCore.dll</HintPath>
-    </Reference>
-    <Reference Include="PresentationFramework">
-      <HintPath>PresentationFramework.dll</HintPath>
-    </Reference>
-    <Reference Include="WindowsBase">
-      <HintPath>WindowsBase.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Xaml">
-      <HintPath>System.Xaml.dll</HintPath>
-    </Reference>
-    <None Remove="Text\TextControl.xaml" />
-    <Page Include="Text\TextControl.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-
-  <ItemGroup Condition="$(TargetFramework) == 'netcoreapp3.1'">
-    <PackageReference Include="System.Drawing.Common" Version="5.0.2" />
-  </ItemGroup>
-
-  <ItemGroup Condition="$(TargetFramework) == 'net5.0-windows'">
-    <PackageReference Include="System.Drawing.Common" Version="5.0.2" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
@@ -45,15 +15,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Coosu.Storyboard.Extensions\Coosu.Storyboard.Extensions.csproj" />
     <ProjectReference Include="..\Libraries\storybrew\common\common.csproj" />
-  </ItemGroup>
-
-  <ItemGroup Condition="$(TargetFramework) == 'net472'">
-    <None Update="*.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="*.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
   <ItemGroup>

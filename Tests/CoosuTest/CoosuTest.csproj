@@ -2,10 +2,10 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net472;net6.0</TargetFrameworks>
+    <TargetFrameworks>net48;net6.0</TargetFrameworks>
   </PropertyGroup>
 
-  <ItemGroup Condition="$(TargetFramework) == net472">
+  <ItemGroup Condition="$(TargetFramework) == net48">
     <Reference Include="System.Net.Http" />
   </ItemGroup>
 

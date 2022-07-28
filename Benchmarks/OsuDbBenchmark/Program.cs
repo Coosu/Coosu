@@ -16,7 +16,7 @@ using OsuParsers.Decoders;
 
 var summary = BenchmarkRunner.Run<OsuDbReadingTask>(/*config*/);
 
-[SimpleJob(RuntimeMoniker.Net472)]
+[SimpleJob(RuntimeMoniker.Net48)]
 [SimpleJob(RuntimeMoniker.Net60/*, baseline: true*/)]
 [MemoryDiagnoser]
 [Orderer(SummaryOrderPolicy.FastestToSlowest)]

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net472;net5.0-Windows</TargetFrameworks>
+    <TargetFrameworks>net48;net6.0-Windows</TargetFrameworks>
     <UseWPF>true</UseWPF>
     <PackageTags>osu, osu!</PackageTags>
   </PropertyGroup>

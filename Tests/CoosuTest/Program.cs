@@ -24,19 +24,19 @@ namespace CoosuTest
         {
             //var osudb = OsuDb.ReadFromFile(@"C:\Users\milkitic\AppData\Local\osu!\osu!.db");
             //var collectiondb = CollectionDb.ReadFromFile(@"C:\Users\milkitic\Documents\Tencent Files\2241521134\FileRecv\collection.db");
-            var scoresdb = ScoresDb.ReadFromFile(@"C:\Users\milkitic\AppData\Local\osu!\scores.db");
-            var ms = new MemoryStream();
-            var f = File.OpenRead(
-                @"D:\GitHub\Osu-Player\OsuPlayer.Wpf\bin\Debug\Songs\739119 3L - Spring of Dreams\3L - Spring of Dreams (Trust) [Lunatic].osu");
-            await f.CopyToAsync(ms);
-            ms.Position = 0;
+            //var scoresdb = ScoresDb.ReadFromFile(@"C:\Users\milkitic\AppData\Local\osu!\scores.db");
+            //var ms = new MemoryStream();
+            //var f = File.OpenRead(
+            //    @"D:\GitHub\Osu-Player\OsuPlayer.Wpf\bin\Debug\Songs\739119 3L - Spring of Dreams\3L - Spring of Dreams (Trust) [Lunatic].osu");
+            //await f.CopyToAsync(ms);
+            //ms.Position = 0;
 
-            var osu = OsuFile.ReadFromStream(ms);
+            //var osu = OsuFile.ReadFromStream(ms);
 
             //var osu = await OsuFile.ReadFromFileAsync(@"E:/Games/osu!\Songs\BmsToOsu/IIDX\29075\P -  (bms2osu) [lv.10].osu");
             var osuDir = new OsuDirectory(
                 @"C:\Users\milkitic\Downloads\859515 K A Z M A S A - Bon Appetit S (Oldskool HappyHardcore Remix) (Short Ver.)");
-            await osuDir.InitializeAsync(@"K A Z M A S A - Bon Appetit S (Oldskool HappyHardcore Remix) (Short Ver.) (BarkingMadDog) [blend s (230 bpm)].osu");
+            await osuDir.InitializeAsync();
             var o = await osuDir.GetHitsoundNodesAsync(osuDir.OsuFiles[0]);
 
             //var osu = await OsuFile.ReadFromFileAsync(@"crack.osu");

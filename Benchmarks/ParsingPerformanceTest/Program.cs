@@ -58,7 +58,7 @@ namespace ParsingPerformanceTest
             //var xp = new CsvExporter(CsvSeparator.CurrentCulture);
             //var job = Job.Default
             //    .WithRuntime(CoreRuntime.Core31)
-            //    .WithRuntime(ClrRuntime.Net472)
+            //    .WithRuntime(ClrRuntime.Net48)
             //    .WithRuntime(CoreRuntime.Core60);
             //var config = DefaultConfig.Instance
             //    .AddJob(job)
