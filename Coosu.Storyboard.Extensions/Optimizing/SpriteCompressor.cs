@@ -489,7 +489,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
         /// <param name="eventList"></param>
         private void RemoveByLogic(IDetailedEventHost host, IEnumerable<BasicEvent> eventList, int count)
         {
-            var groups = eventList.Take(count).GroupBy(k => k.EventType);
+            var groups = eventList.Take(count).Where(k => k is not Parameter).GroupBy(k => k.EventType);
             foreach (var group in groups)
             {
                 EventType type = group.Key;
