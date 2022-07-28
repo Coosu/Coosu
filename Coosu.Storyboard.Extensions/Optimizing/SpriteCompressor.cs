@@ -25,8 +25,6 @@ namespace Coosu.Storyboard.Extensions.Optimizing
         public event AsyncEventHandler<SituationEventArgs>? SituationChanged; //lock
         public event EventHandler<ProgressEventArgs>? ProgressChanged;
 
-        //private int _threadCount = 1;
-
         private ICollection<Sprite> _targetSprites;
 
         private readonly object _runLock = new();
@@ -59,16 +57,6 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             _sourceSprites = layer.SceneObjects;
             Options = compressSettings ?? new CompressOptions();
         }
-
-        //public int ThreadCount
-        //{
-        //    get => _threadCount;
-        //    set
-        //    {
-        //        lock (_runLock) if (IsRunning) throw new Exception();
-        //        _threadCount = value < 1 ? 1 : value;
-        //    }
-        //}
 
         public bool IsRunning { get; private set; }
 
@@ -212,7 +200,6 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             _targetSprites?.Clear();
         }
 
-
         #region Compress Logic
 
         /// <summary>
@@ -279,6 +266,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             var obsoleteList = sprite.ComputeInvisibleRange(out var keyEvents);
             PreOptimize(sprite, obsoleteList, keyEvents);
             NormalOptimize(sprite);
+            ConvertToLoop(sprite);
 
             // to compute equals
             collection = new SortedSet<IKeyEvent>(sprite.Events, EventSequenceComparer.Instance);
@@ -378,6 +366,65 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                 finally
                 {
                     ArrayPool<BasicEvent>.Shared.Return(keyEvents);
+                }
+            }
+        }
+
+        private void ConvertToLoop(Sprite sprite)
+        {
+            var originalStr = sprite.ToScriptString();
+            var originalStrLen = originalStr.Length;
+            var events = sprite.Events
+                .Where(k => k.StartTime > 1000)
+                .OrderBy(k => k.StartTime)
+                .ToArray();
+            if (events.Length > 0)
+            {
+                var start = events[0].StartTime;
+                if (start == 111015)
+                {
+
+                }
+
+                var beforeCount = events
+                    .Sum(k =>
+                    {
+                        if ((int)k.EndTime == (int)k.StartTime)
+                        {
+                            return ((int)k.StartTime).GetDigitCount();
+                        }
+
+                        return ((int)k.StartTime).GetDigitCount() + ((int)k.EndTime).GetDigitCount();
+                    });
+                var afterCount = events
+                    .Sum(k =>
+                    {
+                        if ((int)k.EndTime == (int)k.StartTime)
+                        {
+                            return ((int)(k.StartTime - start)).GetDigitCount() + 1;
+                        }
+
+                        return ((int)(k.StartTime - start)).GetDigitCount() +
+                               ((int)(k.EndTime - start)).GetDigitCount() + 1;
+                    });
+                var reduceCount = beforeCount - afterCount;
+
+                var loopCommand = new Loop(start, 1);
+                var loopStr = loopCommand.ToScriptString();
+                var loopStrLen = loopStr.Length;
+                if (loopStrLen < reduceCount)
+                {
+                    foreach (var keyEvent in events)
+                    {
+                        keyEvent.StartTime -= start;
+                        keyEvent.EndTime -= start;
+                        loopCommand.AddEvent(keyEvent);
+                        sprite.RemoveEvent(keyEvent);
+                    }
+
+                    sprite.AddLoop(loopCommand);
+                    var afterStr = sprite.ToScriptString();
+                    var afterLen = afterStr.Length;
                 }
             }
         }

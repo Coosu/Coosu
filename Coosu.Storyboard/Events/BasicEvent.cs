@@ -41,7 +41,7 @@ namespace Coosu.Storyboard.Events
             get => _endTime;
             set
             {
-                if (Precision.AlmostEquals(_startTime, value)) return;
+                if (Precision.AlmostEquals(_endTime, value)) return;
                 _endTime = value;
                 TimingChanged?.Invoke();
             }

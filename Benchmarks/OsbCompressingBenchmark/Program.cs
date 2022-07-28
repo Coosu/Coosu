@@ -40,7 +40,7 @@ namespace OsbCompressingBenchmark
             osu2.SaveScriptAsync("old.osb").Wait();
             var summary = BenchmarkRunner.Run<CompressingTask>(/*config*/);
         }
-
+        
         [SimpleJob(RuntimeMoniker.Net48)]
         [SimpleJob(RuntimeMoniker.NetCoreApp31)]
         [SimpleJob(RuntimeMoniker.Net60)]
