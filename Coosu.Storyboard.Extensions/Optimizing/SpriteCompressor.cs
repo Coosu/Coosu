@@ -37,17 +37,18 @@ namespace Coosu.Storyboard.Extensions.Optimizing
 
         public Guid Guid { get; } = Guid.NewGuid();
 
-        public SpriteCompressor(ICollection<ISceneObject> sprites, CompressOptions? compressSettings = null)
+        public SpriteCompressor(ICollection<ISceneObject> sprites, Action<CompressOptions>? configureOption = null)
         {
             _targetSprites = sprites
                 .Where(k => k is Sprite)
                 .Cast<Sprite>()
                 .ToList();
             _sourceSprites = sprites;
-            Options = compressSettings ?? new CompressOptions();
+            Options = new CompressOptions();
+            configureOption?.Invoke(Options);
         }
 
-        public SpriteCompressor(Layer layer, CompressOptions? compressSettings = null)
+        public SpriteCompressor(Layer layer,  Action<CompressOptions>? configureOption = null)
         {
             _layer = layer;
             _targetSprites = layer.SceneObjects
@@ -55,7 +56,8 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                 .Cast<Sprite>()
                 .ToList();
             _sourceSprites = layer.SceneObjects;
-            Options = compressSettings ?? new CompressOptions();
+            Options = new CompressOptions();
+            configureOption?.Invoke(Options);
         }
 
         public bool IsRunning { get; private set; }

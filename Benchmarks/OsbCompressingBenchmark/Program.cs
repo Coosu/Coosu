@@ -27,10 +27,7 @@ namespace OsbCompressingBenchmark
 
             var layer = LocalCoosuNs.Storyboard.Layer.ParseFromFileAsync(fi.FullName).Result;
             var compressor = new LocalCoosuNs.Storyboard.Extensions.Optimizing.SpriteCompressor(layer,
-                new LocalCoosuNs.Storyboard.Extensions.Optimizing.CompressOptions()
-                {
-                    ThreadCount = 1
-                });
+                k => k.ThreadCount = 1);
             compressor.CompressAsync().Wait();
             layer.SaveScriptAsync("new.osb").Wait();
 
@@ -40,7 +37,7 @@ namespace OsbCompressingBenchmark
             osu2.SaveScriptAsync("old.osb").Wait();
             var summary = BenchmarkRunner.Run<CompressingTask>(/*config*/);
         }
-        
+
         [SimpleJob(RuntimeMoniker.Net48)]
         [SimpleJob(RuntimeMoniker.NetCoreApp31)]
         [SimpleJob(RuntimeMoniker.Net60)]
@@ -66,10 +63,7 @@ namespace OsbCompressingBenchmark
             public async Task<object?> CoosuLatest_Compress()
             {
                 var compressor = new LocalCoosuNs.Storyboard.Extensions.Optimizing.SpriteCompressor(_osuLocal,
-                    new LocalCoosuNs.Storyboard.Extensions.Optimizing.CompressOptions()
-                    {
-                        ThreadCount = 1
-                    });
+                    k => k.ThreadCount = 1);
                 compressor.CompressAsync().Wait();
                 return null;
             }
@@ -90,10 +84,7 @@ namespace OsbCompressingBenchmark
             {
                 var osuLocal = await LocalCoosuNs.Storyboard.Layer.ParseFromFileAsync(_path);
                 var compressor = new LocalCoosuNs.Storyboard.Extensions.Optimizing.SpriteCompressor(osuLocal,
-                    new LocalCoosuNs.Storyboard.Extensions.Optimizing.CompressOptions()
-                    {
-                        ThreadCount = 1
-                    });
+                    k => k.ThreadCount = 1);
                 await compressor.CompressAsync();
                 return null;
             }

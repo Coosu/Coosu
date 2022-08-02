@@ -5,6 +5,7 @@
     <Description>Coosu.Storyboard is library to read and write osu!storyboard data of .osb file.</Description>
     <PackageTags>osu, osu!, osugame</PackageTags>
     <AssemblyName Condition="'$(CI)'!='true'">local.Coosu.Storyboard</AssemblyName>
+    <IsTrimmable>true</IsTrimmable>
   </PropertyGroup>
 
   <ItemGroup>

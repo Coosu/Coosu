@@ -31,8 +31,8 @@ namespace CoosuUnitTest.Beatmap
         [TestMethod]
         public async Task ReadHitsounds()
         {
-            var folder = @"C:\Users\milkitic\Downloads\18826 Shin Hae Chul - Sticks and Stones";
-            var file = "Shin Hae Chul - Sticks and Stones (Bikko) [Madness].osu";
+            var folder = @"C:\Users\milkitic\Downloads\606833 BlackYooh vs. siromaru - BLACK or WHITE";
+            var file = "BlackYooh vs. siromaru - BLACK or WHITE (Arrival) [Black].osu";
             var osuDir = new OsuDirectory(folder);
             await osuDir.InitializeAsync(file);
 
