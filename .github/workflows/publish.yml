@@ -49,9 +49,6 @@ jobs:
         .\ILMerge\ILMerge.exe .\ci-build\Coosu.Storyboard.Storybrew.dll .\ci-build\Coosu.Shared.dll .\ci-build\Coosu.Storyboard.dll .\ci-build\Coosu.Storyboard.Extensions.dll .\ci-build\System.Buffers.dll .\ci-build\System.Memory.dll .\ci-build\System.Runtime.CompilerServices.Unsafe.dll .\ci-build\Newtonsoft.Json.dll /t:library /out:Coosu.Storyboard.Storybrew.dll
         .\ci-build\CombineXml.ps1 "" ".\ci-build\"
         copy .\ci-build\Coosu.Storyboard.Storybrew-ILMerged.xml ./Coosu.Storyboard.Storybrew.xml
-        copy .\ci-build\Presentation* .
-        copy .\ci-build\WindowsBase* .
-        copy .\ci-build\System.Xaml.dll .
         
     - name: action-minver
       uses: thefringeninja/action-minver@2.0.0-preview1
@@ -64,7 +61,7 @@ jobs:
       if: ${{ success() && startsWith(github.ref, 'refs/tags/') }}
       run: |
         mkdir -p ./ci-7zpack/
-        7z a "./ci-7zpack/Coosu.Storyboard.Storybrew-ILMerged.${{ steps.version.outputs.version }}.7z" "./Coosu.Storyboard.Storybrew.*" "./Presentation*" "./WindowsBase*" "./System.Xaml.dll"
+        7z a "./ci-7zpack/Coosu.Storyboard.Storybrew-ILMerged.${{ steps.version.outputs.version }}.7z" "./Coosu.Storyboard.Storybrew.*"
       
     - name: Create a new GitHub release if a new tag is pushed
       uses: softprops/action-gh-release@v1
