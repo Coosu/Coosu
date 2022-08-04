@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
@@ -10,6 +11,30 @@ namespace CoosuUnitTest.Storyboard
     [TestClass]
     public class ScriptingTest
     {
+        [TestMethod]
+        public void Loop()
+        {
+            var group = new Layer();
+            var sprite = group.CreateSprite("temp");
+            using (var loop = sprite.CreateLoop(12345, 3))
+            {
+                loop.Move(0, 500, 320, 240, 0, 0);
+                loop.Move(500, 1000, 0, 0, 320, 240);
+                sprite.Fade(12345, 12345 + 1000, 0, 1);
+            }
+
+            var sprite2 = group.CreateSprite("temp");
+            sprite2.StartLoop(12345, 3);
+            sprite2.Move(0, 500, 320, 240, 0, 0);
+            sprite2.Move(500, 1000, 0, 0, 320, 240);
+            sprite2.EndLoop();
+            sprite2.Fade(12345, 12345 + 1000, 0, 1);
+
+            var str = sprite.ToScriptString();
+            var str2 = sprite2.ToScriptString();
+            Debug.Assert(str == str2);
+        }
+
         [TestMethod]
         public void CreateElementGroup()
         {
