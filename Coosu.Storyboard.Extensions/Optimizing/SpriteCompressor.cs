@@ -48,7 +48,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             configureOption?.Invoke(Options);
         }
 
-        public SpriteCompressor(Layer layer,  Action<CompressOptions>? configureOption = null)
+        public SpriteCompressor(Layer layer, Action<CompressOptions>? configureOption = null)
         {
             _layer = layer;
             _targetSprites = layer.SceneObjects
@@ -268,7 +268,15 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             var obsoleteList = sprite.ComputeInvisibleRange(out var keyEvents);
             PreOptimize(sprite, obsoleteList, keyEvents);
             NormalOptimize(sprite);
-            ConvertToLoop(sprite);
+            if (Options.ConvertToLoop)
+            {
+                ConvertToLoop(sprite);
+            }
+
+            if (Options.RoundingDecimalPlaces >= 0)
+            {
+                RoundingValues(sprite);
+            }
 
             // to compute equals
             collection = new SortedSet<IKeyEvent>(sprite.Events, EventSequenceComparer.Instance);
@@ -417,6 +425,34 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             }
 
             sprite.AddLoop(loopCommand);
+        }
+
+        private void RoundingValues(Sprite sprite)
+        {
+            var numbers = Options.RoundingDecimalPlaces;
+            foreach (var spriteEvent in sprite.Events.Where(k => k is not Parameter))
+            {
+                spriteEvent.SetStarts(spriteEvent.GetStarts().Select(k => Math.Round(k, numbers)));
+                spriteEvent.SetEnds(spriteEvent.GetEnds().Select(k => Math.Round(k, numbers)));
+            }
+
+            foreach (var loop in sprite.LoopList)
+            {
+                foreach (var spriteEvent in loop.Events.Where(k => k is not Parameter))
+                {
+                    spriteEvent.SetStarts(spriteEvent.GetStarts().Select(k => Math.Round(k, numbers)));
+                    spriteEvent.SetEnds(spriteEvent.GetEnds().Select(k => Math.Round(k, numbers)));
+                }
+            }
+
+            foreach (var trigger in sprite.TriggerList)
+            {
+                foreach (var spriteEvent in trigger.Events.Where(k => k is not Parameter))
+                {
+                    spriteEvent.SetStarts(spriteEvent.GetStarts().Select(k => Math.Round(k, numbers)));
+                    spriteEvent.SetEnds(spriteEvent.GetEnds().Select(k => Math.Round(k, numbers)));
+                }
+            }
         }
 
         /// <summary>

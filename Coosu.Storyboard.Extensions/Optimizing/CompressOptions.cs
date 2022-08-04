@@ -23,5 +23,17 @@ namespace Coosu.Storyboard.Extensions.Optimizing
         /// <para>The default value is 3.</para>
         /// </summary>
         public int? DiscretizingAccuracy { get; set; } = 3;
+
+        /// <summary>
+        /// Specific whether automatically convert large timings to single loop command to reduce file size.
+        /// <para>The default value is true.</para>
+        /// </summary>
+        public bool ConvertToLoop { get; set; } = true;
+
+        /// <summary>
+        /// Specific auto rounding value. A negative value means no rounding.
+        /// <para>The default value is 5.</para>
+        /// </summary>
+        public int RoundingDecimalPlaces { get; set; } = 5;
     }
 }
