@@ -432,16 +432,16 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             var numbers = Options.RoundingDecimalPlaces;
             foreach (var spriteEvent in sprite.Events.Where(k => k is not Parameter))
             {
-                spriteEvent.SetStarts(spriteEvent.GetStarts().Select(k => Math.Round(k, numbers)));
-                spriteEvent.SetEnds(spriteEvent.GetEnds().Select(k => Math.Round(k, numbers)));
+                spriteEvent.SetStarts(spriteEvent.GetStarts().Select(k => Math.Round(k, numbers)).ToArray());
+                spriteEvent.SetEnds(spriteEvent.GetEnds().Select(k => Math.Round(k, numbers)).ToArray());
             }
 
             foreach (var loop in sprite.LoopList)
             {
                 foreach (var spriteEvent in loop.Events.Where(k => k is not Parameter))
                 {
-                    spriteEvent.SetStarts(spriteEvent.GetStarts().Select(k => Math.Round(k, numbers)));
-                    spriteEvent.SetEnds(spriteEvent.GetEnds().Select(k => Math.Round(k, numbers)));
+                    spriteEvent.SetStarts(spriteEvent.GetStarts().Select(k => Math.Round(k, numbers)).ToArray());
+                    spriteEvent.SetEnds(spriteEvent.GetEnds().Select(k => Math.Round(k, numbers)).ToArray());
                 }
             }
 
@@ -449,8 +449,8 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             {
                 foreach (var spriteEvent in trigger.Events.Where(k => k is not Parameter))
                 {
-                    spriteEvent.SetStarts(spriteEvent.GetStarts().Select(k => Math.Round(k, numbers)));
-                    spriteEvent.SetEnds(spriteEvent.GetEnds().Select(k => Math.Round(k, numbers)));
+                    spriteEvent.SetStarts(spriteEvent.GetStarts().Select(k => Math.Round(k, numbers)).ToArray());
+                    spriteEvent.SetEnds(spriteEvent.GetEnds().Select(k => Math.Round(k, numbers)).ToArray());
                 }
             }
         }
