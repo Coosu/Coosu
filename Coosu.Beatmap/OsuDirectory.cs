@@ -340,12 +340,12 @@ public sealed class OsuDirectory
 
         if (hitObject.ObjectType == HitObjectType.Slider && hitObject.SliderInfo!.EdgeHitsounds == null)
         {
-            var hitsounds = GetHitsounds(itemHitsound, sampleStr, additionStr);
+            var hitsounds = GetHitsounds(hitObject, itemHitsound, sampleStr, additionStr);
             tuples.AddRange(hitsounds);
         }
         else
         {
-            var hitsounds = GetHitsounds(itemHitsound, sampleStr, additionStr, ignoreBase);
+            var hitsounds = GetHitsounds(hitObject, itemHitsound, sampleStr, additionStr, ignoreBase);
             tuples.AddRange(hitsounds);
         }
 
@@ -399,7 +399,7 @@ public sealed class OsuDirectory
         return (obj.SampleVolume != 0 ? obj.SampleVolume : timingPoint.Volume) / 100f;
     }
 
-    private static IEnumerable<(string, bool, HitsoundType)> GetHitsounds(HitsoundType type,
+    private static IEnumerable<(string, bool, HitsoundType)> GetHitsounds(RawHitObject rawHitObject, HitsoundType type,
         string? sampleStr, string? additionStr, bool ignoreBase = false)
     {
         if (type == HitsoundType.Tick)
@@ -409,9 +409,14 @@ public sealed class OsuDirectory
         }
 
         if (type.HasFlag(HitsoundType.Slide))
+        {
             yield return ($"{sampleStr}-sliderslide", false, type);
+            if (rawHitObject.Hitsound == HitsoundType.Whistle)
+                yield return ($"{additionStr}-sliderwhistle", false, HitsoundType.SlideWhistle);
+        }
+
         if (type.HasFlag(HitsoundType.SlideWhistle))
-            yield return ($"{additionStr}-sliderwhistle", false, type);
+            yield return ($"{additionStr}-sliderwhistle", false, HitsoundType.SlideWhistle);
 
         if (type.HasFlag(HitsoundType.Slide) || type.HasFlag(HitsoundType.SlideWhistle))
             yield break;
