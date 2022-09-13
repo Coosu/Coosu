@@ -55,6 +55,17 @@ namespace CoosuUnitTest.Storyboard
         }
 
         [TestMethod]
+        public async Task RelativeEvent()
+        {
+            var group = new Layer(0);
+            var sprite = group.CreateSprite("path");
+            sprite.MoveX(0, 2000, 100, 1000);
+            sprite.MoveXBy(EasingType.CircOut, 0, 2000, 300);
+            var compressor = new SpriteCompressor(group);
+            await compressor.CompressAsync();
+        }
+
+        [TestMethod]
         public void CreateElementGroup()
         {
             var group = new Layer(0);

@@ -70,11 +70,13 @@ namespace Coosu.Storyboard.Extensions
 #endif
         public IEnumerable<double> GetStarts()
         {
+            return TagValues;
             throw new NotSupportedException("The relative events have no starts or ends.");
         }
 
         public IEnumerable<double> GetEnds()
         {
+            return Values;
             throw new NotSupportedException("The relative events have no starts or ends.");
         }
 
@@ -180,6 +182,11 @@ namespace Coosu.Storyboard.Extensions
             EndTime = endTime;
             _values = byValues;
             TagValues = new List<double>(_values.Count);
+            for (int i = 0; i < _values.Count; i++)
+            {
+                //TagValues.Add(double.NaN);
+                TagValues.Add(0);
+            }
         }
 
         protected virtual async Task WriteExtraScriptAsync(TextWriter textWriter)
@@ -187,7 +194,7 @@ namespace Coosu.Storyboard.Extensions
             Fill();
             for (int i = 0; i < Values.Count; i++)
             {
-                if (!double.IsNaN(TagValues[i]))
+                if (TagValues.Count > 0 && !double.IsNaN(TagValues[i]))
                 {
                     await textWriter.WriteStandardizedNumberAsync(TagValues[i]);
                     await textWriter.WriteAsync('~');
