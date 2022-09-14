@@ -257,6 +257,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             }
 
             // temporary to object equals
+            sprite.TryEndLoop();
             IReadOnlyCollection<IKeyEvent> collection = new HashSet<IKeyEvent>(sprite.Events);
             sprite.ResetEventCollection(null);
             sprite.AddEvents(collection);

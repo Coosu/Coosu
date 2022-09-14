@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -57,12 +58,26 @@ namespace CoosuUnitTest.Storyboard
         [TestMethod]
         public async Task RelativeEvent()
         {
-            var group = new Layer(0);
-            var sprite = group.CreateSprite("path");
-            sprite.MoveX(0, 2000, 100, 1000);
-            sprite.MoveXBy(EasingType.CircOut, 0, 2000, 300);
-            var compressor = new SpriteCompressor(group);
+            var layer = new Layer(0);
+
+
+            var sprite = layer.CreateSprite("path");
+            sprite.Scale(10000, 0.5);
+            sprite.Scale(10400, 0.6);
+            sprite.Scale(10500, 0.75);
+            sprite.MoveX(10000, 10500, 100, 1000);
+            sprite.MoveX(10500, 11000, 1000, 2000);
+            sprite.Fade(10000, 0);
+            sprite.Fade(10500, 1);
+            sprite.Rotate(10000, 11000, 0, Math.PI);
+
+            Console.WriteLine("Before compressing");
+            Console.WriteLine(sprite.ToScriptString());
+
+            var compressor = new SpriteCompressor(layer);
             await compressor.CompressAsync();
+            Console.WriteLine("After compressing");
+            Console.WriteLine(sprite.ToScriptString());
         }
 
         [TestMethod]
