@@ -683,8 +683,8 @@ namespace Coosu.Storyboard.Extensions.Computing
                                 {
                                     for (int i = 0; i < basicEvent.EventType.Size; i++)
                                     {
-                                        basicEvent.SetStartsValue(i, basicEvent.GetStartsValue(i) + @event.GetEndsValue(i)); // offset
-                                        basicEvent.SetEndsValue(i, basicEvent.GetEndsValue(i) + @event.GetEndsValue(i));
+                                        basicEvent.SetStartsValue(i, basicEvent.GetStartsValue(i) + @event.GetValue(i)); // offset
+                                        basicEvent.SetEndsValue(i, basicEvent.GetEndsValue(i) + @event.GetValue(i));
                                     }
                                 }
                             }
