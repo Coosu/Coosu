@@ -192,13 +192,14 @@ namespace Coosu.Storyboard
             var parsingContext = new ParsingContext(layer);
 
             string? line = textReader.ReadLine();
-            bool isInEvent = false, isInVariable = false;
+            bool isInEvent = true, isInVariable = false;
             while (line != null)
             {
                 parsingContext.CurrentRow++;
                 if (line.StartsWith("[Variables]", StringComparison.Ordinal))
                 {
                     isInVariable = true;
+                    isInEvent = false;
                 }
                 else if (line.StartsWith("[Events]", StringComparison.Ordinal))
                 {
