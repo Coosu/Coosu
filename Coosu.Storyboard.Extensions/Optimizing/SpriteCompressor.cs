@@ -383,10 +383,25 @@ namespace Coosu.Storyboard.Extensions.Optimizing
 
         private void ConvertToLoop(Sprite sprite)
         {
-            var events = sprite.Events
+            IEnumerable<IKeyEvent> enumerable = sprite.Events
                 .Where(k => k.StartTime > 1000)
-                .OrderBy(k => k.StartTime)
-                .ToArray();
+                .OrderBy(k => k.StartTime);
+
+            if (sprite.LoopList.Count > 0)
+            {
+                var loops =
+                    new HashSet<EventType>(sprite.LoopList.SelectMany(k => k.Events.Select(o => o.EventType)));
+                enumerable = enumerable.Where(k => !loops.Contains(k.EventType));
+            }
+
+            if (sprite.TriggerList.Count > 0)
+            {
+                var triggers =
+                    new HashSet<EventType>(sprite.TriggerList.SelectMany(k => k.Events.Select(o => o.EventType)));
+                enumerable = enumerable.Where(k => !triggers.Contains(k.EventType));
+            }
+
+            var events = enumerable.ToArray();
             if (events.Length <= 1) return;
             var start = events[0].StartTime;
 
