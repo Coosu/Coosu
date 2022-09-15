@@ -56,6 +56,7 @@ public static class KeyEventExtensions
     {
         return obsoleteList.ContainsTimingPoint(out range, e.StartTime, e.EndTime);
     }
+
     public static bool SuccessiveTo(this IKeyEvent previous, IKeyEvent next)
     {
 #if NET5_0_OR_GREATER

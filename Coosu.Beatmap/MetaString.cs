@@ -33,7 +33,6 @@ public readonly struct MetaString
 
     public override string ToString() => string.IsNullOrEmpty(Unicode) ? Origin : Unicode!;
 
-
     public static string GetUnicode(string origin, string? unicode)
     {
         return string.IsNullOrEmpty(unicode)

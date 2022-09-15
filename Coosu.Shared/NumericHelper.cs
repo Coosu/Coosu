@@ -22,6 +22,7 @@ public static class NumericHelper
             .Concat(new[] { float.MaxValue })
             .Min();
     }
+
     public static double GetMaxValue(params IEnumerable<double>[] floatLists)
     {
         return floatLists

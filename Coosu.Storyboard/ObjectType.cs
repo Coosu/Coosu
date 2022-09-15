@@ -7,7 +7,82 @@ namespace Coosu.Storyboard;
 [DebuggerDisplay("Name = {DebuggerDisplay}")]
 public sealed class ObjectType : IEquatable<ObjectType>, IComparable<ObjectType>, IComparable
 {
+    public readonly int Flag;
+
+    public ObjectType(int flag)
+    {
+        Flag = flag;
+    }
+
     private string? DebuggerDisplay => ObjectType.GetString(this);
+
+    public int CompareTo(object? obj)
+    {
+        if (ReferenceEquals(null, obj)) return 1;
+        return obj is ObjectType other
+            ? CompareTo(other)
+            : throw new ArgumentException($"Object must be of type {nameof(ObjectType)}");
+    }
+
+    public int CompareTo(ObjectType other)
+    {
+        return Flag.CompareTo(other.Flag);
+    }
+
+    public bool Equals(ObjectType? other)
+    {
+        return Flag == other?.Flag;
+    }
+
+    public override bool Equals(object obj)
+    {
+        return obj is ObjectType other && Equals(other);
+    }
+
+    public override int GetHashCode()
+    {
+        return Flag;
+    }
+
+    public static bool operator ==(ObjectType left, ObjectType right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ObjectType left, ObjectType right)
+    {
+        return !left.Equals(right);
+    }
+
+    public static bool operator <(ObjectType left, ObjectType right)
+    {
+        return left.CompareTo(right) < 0;
+    }
+
+    public static bool operator >(ObjectType left, ObjectType right)
+    {
+        return left.CompareTo(right) > 0;
+    }
+
+    public static bool operator <=(ObjectType left, ObjectType right)
+    {
+        return left.CompareTo(right) <= 0;
+    }
+
+    public static bool operator >=(ObjectType left, ObjectType right)
+    {
+        return left.CompareTo(right) >= 0;
+    }
+
+    public static implicit operator int(ObjectType type)
+    {
+        return type.Flag;
+    }
+
+    public static implicit operator ObjectType(int flag)
+    {
+        return new ObjectType(flag);
+    }
 
     #region static members
 
@@ -49,79 +124,4 @@ public sealed class ObjectType : IEquatable<ObjectType>, IComparable<ObjectType>
     }
 
     #endregion
-
-    public readonly int Flag;
-
-    public ObjectType(int flag)
-    {
-        Flag = flag;
-    }
-
-    public bool Equals(ObjectType? other)
-    {
-        return Flag == other?.Flag;
-    }
-
-    public override bool Equals(object obj)
-    {
-        return obj is ObjectType other && Equals(other);
-    }
-
-    public override int GetHashCode()
-    {
-        return Flag;
-    }
-
-    public static bool operator ==(ObjectType left, ObjectType right)
-    {
-        return left.Equals(right);
-    }
-
-    public static bool operator !=(ObjectType left, ObjectType right)
-    {
-        return !left.Equals(right);
-    }
-
-    public int CompareTo(ObjectType other)
-    {
-        return Flag.CompareTo(other.Flag);
-    }
-
-    public int CompareTo(object? obj)
-    {
-        if (ReferenceEquals(null, obj)) return 1;
-        return obj is ObjectType other
-            ? CompareTo(other)
-            : throw new ArgumentException($"Object must be of type {nameof(ObjectType)}");
-    }
-
-    public static bool operator <(ObjectType left, ObjectType right)
-    {
-        return left.CompareTo(right) < 0;
-    }
-
-    public static bool operator >(ObjectType left, ObjectType right)
-    {
-        return left.CompareTo(right) > 0;
-    }
-
-    public static bool operator <=(ObjectType left, ObjectType right)
-    {
-        return left.CompareTo(right) <= 0;
-    }
-
-    public static bool operator >=(ObjectType left, ObjectType right)
-    {
-        return left.CompareTo(right) >= 0;
-    }
-
-    public static implicit operator int(ObjectType type)
-    {
-        return type.Flag;
-    }
-
-    public static implicit operator ObjectType(int flag)
-    {
-        return new ObjectType(flag);
-    }
 }

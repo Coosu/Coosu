@@ -20,6 +20,7 @@ public static class ScriptableExtensions
         scriptable.WriteScriptAsync(sw).Wait();
         return sw.ToString();
     }
+
     public static async Task<string> GetHeaderStringAsync(this IScriptable scriptable)
     {
         using var sw = new StringWriter();

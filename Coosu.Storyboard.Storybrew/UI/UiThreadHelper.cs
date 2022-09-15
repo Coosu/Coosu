@@ -12,6 +12,11 @@ public static class UiThreadHelper
     private static readonly ReaderWriterLockSlim UiThreadCheckLock = new();
     private static readonly TaskCompletionSource<bool> WaitComplete = new();
 
+    public static void Shutdown()
+    {
+        Application?.Dispatcher.Invoke(() => Application?.Shutdown());
+    }
+
     internal static void EnsureUiThreadAlive()
     {
         try
@@ -52,10 +57,5 @@ public static class UiThreadHelper
         _uiThread.Start();
         WaitComplete.Task.Wait();
         UiThreadCheckLock.ExitWriteLock();
-    }
-
-    public static void Shutdown()
-    {
-        Application?.Dispatcher.Invoke(() => Application?.Shutdown());
     }
 }

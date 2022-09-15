@@ -12,6 +12,8 @@ namespace Coosu.Storyboard.Extensions.Computing;
 
 public static class EventHostExtensions
 {
+    private const int AlgorithmSwitchThreshold = 30;
+
     public static void Expand(this IDetailedEventHost host)
     {
         if (host is Sprite sprite)
@@ -148,7 +150,6 @@ public static class EventHostExtensions
         }
     }
 
-    private const int AlgorithmSwitchThreshold = 30;
     public static int GetMaxTimeCount(this IDetailedEventHost eventHost)
     {
         var maxTime = eventHost.MaxTime();

@@ -8,8 +8,8 @@ namespace Coosu.Storyboard.Internal;
 
 internal class LoopTriggerCreationWrapper : IDisposableEventHost
 {
-    private readonly Sprite _sprite;
     private readonly Loop? _loop;
+    private readonly Sprite _sprite;
     private readonly Trigger? _trigger;
 
     public LoopTriggerCreationWrapper(Sprite sprite, Loop loop)

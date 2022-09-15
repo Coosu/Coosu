@@ -7,6 +7,7 @@ public struct Anchor<T>
         X = x;
         Y = y;
     }
+
     public T X { get; set; }
     public T Y { get; set; }
 }

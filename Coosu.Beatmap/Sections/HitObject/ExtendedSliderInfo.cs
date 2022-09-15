@@ -23,6 +23,24 @@ public sealed class ExtendedSliderInfo : SliderInfo
     }
 
     /// <summary>
+    /// Get current beat duration for this slider
+    /// <para>
+    /// <b>Note: </b>This is a computed value that can't be updated after timing changes until calling <see cref="UpdateComputedValues"/>
+    /// </para>
+    /// </summary>
+    [SectionIgnore]
+    public double CurrentBeatDuration { get; private set; }
+
+    /// <summary>
+    /// Get the total duration
+    /// <para>
+    /// <b>Note: </b>This is a computed value that can't be updated after timing changes until calling <see cref="UpdateComputedValues"/>
+    /// </para>
+    /// </summary>
+    [SectionIgnore]
+    public double CurrentDuration { get; private set; }
+
+    /// <summary>
     /// Get the slider's end time.
     /// <para>
     /// <b>Note: </b>This is a computed value that can't be updated after timing changes until calling <see cref="UpdateComputedValues"/>
@@ -39,24 +57,6 @@ public sealed class ExtendedSliderInfo : SliderInfo
     /// </summary>
     [SectionIgnore]
     public double CurrentSingleDuration { get; private set; }
-
-    /// <summary>
-    /// Get the total duration
-    /// <para>
-    /// <b>Note: </b>This is a computed value that can't be updated after timing changes until calling <see cref="UpdateComputedValues"/>
-    /// </para>
-    /// </summary>
-    [SectionIgnore]
-    public double CurrentDuration { get; private set; }
-
-    /// <summary>
-    /// Get current beat duration for this slider
-    /// <para>
-    /// <b>Note: </b>This is a computed value that can't be updated after timing changes until calling <see cref="UpdateComputedValues"/>
-    /// </para>
-    /// </summary>
-    [SectionIgnore]
-    public double CurrentBeatDuration { get; private set; }
 
     /// <summary>
     /// Get current slider multiplier for this slider

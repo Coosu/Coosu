@@ -11,14 +11,15 @@ public class TimeRange
 {
     private readonly List<TimingPoint> _timingPoints = new();
     private List<RangeValue<double>>? _timingList;
-    public List<RangeValue<double>> TimingList => _timingList ??= GetTimingList();
-
-    public double MinStartTime => TimingList.First().StartTime;
-    public double MinEndTime => TimingList.First().EndTime;
-    public double MaxStartTime => TimingList.Last().StartTime;
-    public double MaxEndTime => TimingList.Last().EndTime;
 
     public int Count => TimingList.Count;
+
+    public double MaxEndTime => TimingList.Last().EndTime;
+    public double MaxStartTime => TimingList.Last().StartTime;
+    public double MinEndTime => TimingList.First().EndTime;
+    public double MinStartTime => TimingList.First().StartTime;
+
+    public List<RangeValue<double>> TimingList => _timingList ??= GetTimingList();
 
     public void Add(double startTime, double endTime)
     {
@@ -26,40 +27,6 @@ public class TimeRange
         _timingPoints.AddSorted(new TimingPoint(startTime, true), TimingPointComparer.Instance);
         _timingPoints.AddSorted(new TimingPoint(endTime, false), TimingPointComparer.Instance);
         _timingList = null;
-    }
-
-    private List<RangeValue<double>> GetTimingList()
-    {
-        var list = new List<RangeValue<double>>();
-        double? tmpStart = null, tmpEnd = null;
-        for (var i = 0; i < _timingPoints.Count; i++)
-        {
-            var timingPoint = _timingPoints[i];
-            if (tmpStart == null && tmpEnd == null)
-            {
-                if (timingPoint.IsStart)
-                {
-                    tmpStart = timingPoint.Timing;
-                }
-            }
-            else if (tmpEnd == null)
-            {
-                if (!timingPoint.IsStart && i != _timingPoints.Count - 1 &&
-                    _timingPoints[i + 1].IsStart &&
-                    !Precision.AlmostEquals(timingPoint.Timing, _timingPoints[i + 1].Timing)
-                    ||
-                    !timingPoint.IsStart &&
-                    i == _timingPoints.Count - 1)
-                {
-                    tmpEnd = timingPoint.Timing;
-                    list.Add(new RangeValue<double>(tmpStart!.Value, tmpEnd.Value));
-                    tmpStart = null;
-                    tmpEnd = null;
-                }
-            }
-        }
-
-        return list;
     }
 
     public bool ContainsTimingPoint(double time, out RangeValue<double> patterned,
@@ -121,5 +88,39 @@ public class TimeRange
         return TimingList.Any()
             ? string.Join(",", TimingList.Select(k => $"[{k.StartTime},{k.EndTime}]"))
             : "{empty}";
+    }
+
+    private List<RangeValue<double>> GetTimingList()
+    {
+        var list = new List<RangeValue<double>>();
+        double? tmpStart = null, tmpEnd = null;
+        for (var i = 0; i < _timingPoints.Count; i++)
+        {
+            var timingPoint = _timingPoints[i];
+            if (tmpStart == null && tmpEnd == null)
+            {
+                if (timingPoint.IsStart)
+                {
+                    tmpStart = timingPoint.Timing;
+                }
+            }
+            else if (tmpEnd == null)
+            {
+                if (!timingPoint.IsStart && i != _timingPoints.Count - 1 &&
+                    _timingPoints[i + 1].IsStart &&
+                    !Precision.AlmostEquals(timingPoint.Timing, _timingPoints[i + 1].Timing)
+                    ||
+                    !timingPoint.IsStart &&
+                    i == _timingPoints.Count - 1)
+                {
+                    tmpEnd = timingPoint.Timing;
+                    list.Add(new RangeValue<double>(tmpStart!.Value, tmpEnd.Value));
+                    tmpStart = null;
+                    tmpEnd = null;
+                }
+            }
+        }
+
+        return list;
     }
 }

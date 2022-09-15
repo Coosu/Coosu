@@ -11,12 +11,13 @@ namespace Coosu.Storyboard;
 
 public sealed class SpriteGroup : ISceneObject, ISpriteHost
 {
+    private ICollection<IKeyEvent> _events = new SortedSet<IKeyEvent>(EventSequenceComparer.Instance);
+
     static SpriteGroup()
     {
         ObjectType.SignType(10, "SpriteGroup");
     }
 
-    private ICollection<IKeyEvent> _events = new SortedSet<IKeyEvent>(EventSequenceComparer.Instance);
     public SpriteGroup()
     {
     }
@@ -27,6 +28,13 @@ public sealed class SpriteGroup : ISceneObject, ISpriteHost
         Camera2.DefaultY = defaultY;
         Camera2.DefaultZ = defaultZ;
         Camera2.OriginType = origin;
+    }
+
+    public IReadOnlyCollection<IKeyEvent> Events
+    {
+        get => (IReadOnlyCollection<IKeyEvent>)_events;
+        internal set => _events = value as ICollection<IKeyEvent> ?? throw new Exception(
+            $"The collection should be {nameof(ICollection<IKeyEvent>)}");
     }
 
     public ObjectType ObjectType { get; } = 10;
@@ -57,27 +65,23 @@ public sealed class SpriteGroup : ISceneObject, ISpriteHost
         NumericHelper.GetMaxValue(
             Events.Select(k => k.EndTime)
         );
+
     public double MinTime() =>
         NumericHelper.GetMinValue(
             Events.Select(k => k.StartTime)
         );
+
     public double MaxStartTime() =>
         NumericHelper.GetMaxValue(
             Events.Select(k => k.StartTime)
         );
+
     public double MinEndTime() =>
         NumericHelper.GetMinValue(
             Events.Select(k => k.EndTime)
         );
 
     public bool EnableGroupedSerialization { get; set; }
-
-    public IReadOnlyCollection<IKeyEvent> Events
-    {
-        get => (IReadOnlyCollection<IKeyEvent>)_events;
-        internal set => _events = value as ICollection<IKeyEvent> ?? throw new Exception(
-            $"The collection should be {nameof(ICollection<IKeyEvent>)}");
-    }
 
     IReadOnlyCollection<IKeyEvent> IEventHost.Events => Events;
 
@@ -128,6 +132,7 @@ public sealed class SpriteGroup : ISceneObject, ISpriteHost
     #region ISpriteHost
 
     public Camera2 Camera2 { get; private set; } = new();
+
     public void AddSprite(Sprite sprite)
     {
         Sprites.Add(sprite);

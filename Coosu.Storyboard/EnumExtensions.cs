@@ -7,6 +7,23 @@ public static class EnumExtensions
     private const string S_LoopForever = "LoopForever";
     private const string S_LoopOnce = "LoopOnce";
 
+    private const string S_Background = "Background";
+    private const string S_Fail = "Fail";
+    private const string S_Pass = "Pass";
+    private const string S_Foreground = "Foreground";
+    private const string S_Overlay = "Overlay";
+
+    private const string S_TopLeft = "TopLeft";
+    private const string S_TopCentre = "TopCentre";
+    private const string S_TopRight = "TopRight";
+    private const string S_CentreLeft = "CentreLeft";
+    private const string S_Centre = "Centre";
+    private const string S_CentreRight = "CentreRight";
+    private const string S_BottomLeft = "BottomLeft";
+    private const string S_BottomCentre = "BottomCentre";
+    private const string S_BottomRight = "BottomRight";
+    private const string S_Custom = "Custom";
+
     public static LoopType ToLoopType(this ReadOnlySpan<char> loopType)
     {
 #if NET6_0_OR_GREATER
@@ -22,12 +39,6 @@ public static class EnumExtensions
         throw new ArgumentOutOfRangeException(nameof(loopType), loopType.ToString(), null);
 #endif
     }
-
-    private const string S_Background = "Background";
-    private const string S_Fail = "Fail";
-    private const string S_Pass = "Pass";
-    private const string S_Foreground = "Foreground";
-    private const string S_Overlay = "Overlay";
 
     public static LayerType ToLayerType(this ReadOnlySpan<char> layerType)
     {
@@ -50,17 +61,6 @@ public static class EnumExtensions
         throw new ArgumentOutOfRangeException(nameof(layerType), layerType.ToString(), null);
 #endif
     }
-
-    private const string S_TopLeft = "TopLeft";
-    private const string S_TopCentre = "TopCentre";
-    private const string S_TopRight = "TopRight";
-    private const string S_CentreLeft = "CentreLeft";
-    private const string S_Centre = "Centre";
-    private const string S_CentreRight = "CentreRight";
-    private const string S_BottomLeft = "BottomLeft";
-    private const string S_BottomCentre = "BottomCentre";
-    private const string S_BottomRight = "BottomRight";
-    private const string S_Custom = "Custom";
 
     public static OriginType ToOriginType(this ReadOnlySpan<char> originType)
     {

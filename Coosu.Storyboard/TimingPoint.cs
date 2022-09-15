@@ -10,8 +10,9 @@ public sealed class TimingPoint : IComparable<TimingPoint>
         IsStart = isStart;
     }
 
-    public double Timing { get; set; }
     public bool IsStart { get; set; }
+    public double Timing { get; set; }
+
     public int CompareTo(TimingPoint other)
     {
         var val = Timing.CompareTo(other.Timing);

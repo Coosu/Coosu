@@ -5,7 +5,10 @@ namespace Coosu.Storyboard.Extensibility;
 
 public abstract class SubjectHandler<T> : ISubjectParsingHandler<T> where T : ISceneObject
 {
+    private readonly Dictionary<string, IActionParsingHandler> _actionHandlerDic = new();
+
     public abstract string Flag { get; }
+
     ISceneObject ISubjectParsingHandler.Deserialize(string[] split)
     {
         return Deserialize(split);
@@ -30,16 +33,14 @@ public abstract class SubjectHandler<T> : ISubjectParsingHandler<T> where T : IS
 
     public abstract T Deserialize(string[] split);
 
-    public IParsingHandler RegisterAction(IActionParsingHandler handler)
-    {
-        _actionHandlerDic.Add(handler.Flag, handler);
-        return handler;
-    }
-
     public IActionParsingHandler? GetActionHandler(string magicWord)
     {
         return _actionHandlerDic.ContainsKey(magicWord) ? _actionHandlerDic[magicWord] : null;
     }
 
-    private readonly Dictionary<string, IActionParsingHandler> _actionHandlerDic = new();
+    public IParsingHandler RegisterAction(IActionParsingHandler handler)
+    {
+        _actionHandlerDic.Add(handler.Flag, handler);
+        return handler;
+    }
 }

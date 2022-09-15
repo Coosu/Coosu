@@ -17,11 +17,13 @@ public static class ScriptHelper
             .ThenBy(k => k.EventType.Index)
             .GroupBy(k => k.EventType);
         foreach (var grouping in groupedEvents)
-        foreach (IKeyEvent e in grouping)
         {
-            await writer.WriteAsync(indent);
-            await e.WriteScriptAsync(writer);
-            await writer.WriteLineAsync();
+            foreach (IKeyEvent e in grouping)
+            {
+                await writer.WriteAsync(indent);
+                await e.WriteScriptAsync(writer);
+                await writer.WriteLineAsync();
+            }
         }
     }
 

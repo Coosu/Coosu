@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Numerics;
-using Coosu.Shared.Numerics;
 using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Easing;
 using Coosu.Storyboard.Extensions;
@@ -9,7 +8,7 @@ using Coosu.Storyboard.Extensions;
 namespace Coosu.Storyboard;
 
 /// <summary>
-/// Extension methods for <see cref="host"/>.
+/// Extension methods for <see cref="IEventHost"/>.
 /// This includes relative events.
 /// </summary>
 public static class SpriteRelativeEventExtensions

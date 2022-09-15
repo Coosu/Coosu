@@ -18,16 +18,17 @@ namespace Coosu.Beatmap;
 
 public sealed class OsuDirectory
 {
-    private readonly string _directory;
     private readonly HitsoundFileCache _cache = new();
+    private readonly string _directory;
     private bool _isInitialized;
-    public IReadOnlyList<OsuFile> OsuFiles { get; private set; } = Array.Empty<OsuFile>();
-    public IReadOnlyCollection<string> WaveFiles { get; private set; } = Array.Empty<string>();
 
     public OsuDirectory(string directory)
     {
         _directory = new DirectoryInfo(directory).FullName;
     }
+
+    public IReadOnlyList<OsuFile> OsuFiles { get; private set; } = Array.Empty<OsuFile>();
+    public IReadOnlyCollection<string> WaveFiles { get; private set; } = Array.Empty<string>();
 
     public async Task InitializeAsync(string? specificOsuFilename = null, bool ignoreWaveFiles = false)
     {

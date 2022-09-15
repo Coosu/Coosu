@@ -9,6 +9,6 @@ public class ProcessErrorEventArgs : StoryboardEventArgs
         SourceSprite = sourceSprite;
     }
 
-    public IDetailedEventHost SourceSprite { get; set; }
     public override bool Continue { get; set; } = false;
+    public IDetailedEventHost SourceSprite { get; set; }
 }

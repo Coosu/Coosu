@@ -5,11 +5,11 @@ namespace Coosu.Beatmap.Extensions;
 
 public class HitsoundFileCache
 {
-    private readonly ConcurrentDictionary<string, (string filename, bool useUserSkin)> _pathCache = new();
-
     public const string WavExtension = ".wav";
     public const string OggExtension = ".ogg";
     public const string Mp3Extension = ".mp3";
+
+    private readonly ConcurrentDictionary<string, (string filename, bool useUserSkin)> _pathCache = new();
 
     public static string[] SupportExtensions { get; } = { WavExtension, Mp3Extension, OggExtension };
 

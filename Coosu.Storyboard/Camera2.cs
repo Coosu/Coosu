@@ -11,6 +11,15 @@ public class Camera2 : IEventHost, ICameraUsable, ICloneable
 {
     private ICollection<IKeyEvent> _events = new SortedSet<IKeyEvent>(EventSequenceComparer.Instance);
 
+    public IReadOnlyCollection<IKeyEvent> Events
+    {
+        get => (IReadOnlyCollection<IKeyEvent>)_events;
+        internal set => _events = value as ICollection<IKeyEvent> ?? throw new Exception(
+            $"The collection should be {nameof(ICollection<IKeyEvent>)}");
+    }
+
+    public OriginType OriginType { get; set; } = OriginType.Centre;
+
     /// <inheritdoc />
     public string CameraIdentifier { get; set; } = Guid.NewGuid().ToString();
 
@@ -23,17 +32,21 @@ public class Camera2 : IEventHost, ICameraUsable, ICloneable
     /// <inheritdoc />
     public double DefaultZ { get; set; } = 1;
 
-    public OriginType OriginType { get; set; } = OriginType.Centre;
-
-    public IReadOnlyCollection<IKeyEvent> Events
+    public object Clone()
     {
-        get => (IReadOnlyCollection<IKeyEvent>)_events;
-        internal set => _events = value as ICollection<IKeyEvent> ?? throw new Exception(
-            $"The collection should be {nameof(ICollection<IKeyEvent>)}");
+        return new Camera2
+        {
+            CameraIdentifier = CameraIdentifier,
+            DefaultX = DefaultX,
+            DefaultY = DefaultY,
+            DefaultZ = DefaultZ,
+            OriginType = OriginType,
+            Events = Events.Select(k => k.Clone()).Cast<IKeyEvent>().ToList()
+        };
     }
 
     IReadOnlyCollection<IKeyEvent> IEventHost.Events => Events;
-        
+
     public void AddEvent(IKeyEvent @event)
     {
         throw new NotImplementedException("The camera transform is currently not implemented.");
@@ -56,16 +69,6 @@ public class Camera2 : IEventHost, ICameraUsable, ICloneable
             _events = new SortedSet<IKeyEvent>(comparer);
     }
 
-    public State GetCameraState(double time)
-    {
-        return new State();
-    }
-
-    public State GetObjectState(double time, State oldState)
-    {
-        return oldState;
-    }
-
     public async Task WriteHeaderAsync(TextWriter writer)
     {
     }
@@ -74,16 +77,13 @@ public class Camera2 : IEventHost, ICameraUsable, ICloneable
     {
     }
 
-    public object Clone()
+    public State GetCameraState(double time)
     {
-        return new Camera2
-        {
-            CameraIdentifier = CameraIdentifier,
-            DefaultX = DefaultX,
-            DefaultY = DefaultY,
-            DefaultZ = DefaultZ,
-            OriginType = OriginType,
-            Events = Events.Select(k => k.Clone()).Cast<IKeyEvent>().ToList()
-        };
+        return new State();
+    }
+
+    public State GetObjectState(double time, State oldState)
+    {
+        return oldState;
     }
 }

@@ -14,6 +14,11 @@ namespace Coosu.Beatmap;
 public class OsuFile : Config
 {
     private const string VerFlag = "osu file format v";
+
+    protected OsuFile()
+    {
+    }
+
     public int Version { get; set; }
     public GeneralSection? General { get; set; }
     public EditorSection? Editor { get; set; }
@@ -23,6 +28,15 @@ public class OsuFile : Config
     public TimingSection? TimingPoints { get; set; }
     public ColorSection? Colours { get; set; }
     public HitObjectSection? HitObjects { get; set; }
+
+    private string Filename
+    {
+        get
+        {
+            Metadata ??= new MetadataSection();
+            return this.GetOsuFilename(Metadata.Version);
+        }
+    }
 
     public static OsuFile CreateEmpty()
     {
@@ -124,19 +138,6 @@ public class OsuFile : Config
         else
         {
             throw new BadOsuFormatException("Invalid header declaration: " + line);
-        }
-    }
-
-    protected OsuFile()
-    {
-    }
-
-    private string Filename
-    {
-        get
-        {
-            Metadata ??= new MetadataSection();
-            return this.GetOsuFilename(Metadata.Version);
         }
     }
 

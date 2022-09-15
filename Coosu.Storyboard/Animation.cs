@@ -7,12 +7,6 @@ namespace Coosu.Storyboard;
 
 public sealed class Animation : Sprite
 {
-    public override ObjectType ObjectType { get; } = ObjectTypes.Animation;
-
-    public int FrameCount { get; set; }
-    public double FrameDelay { get; set; }
-    public LoopType LoopType { get; set; }
-
     /// <summary>
     /// Create a storyboard element by dynamic images.
     /// </summary>
@@ -55,6 +49,11 @@ public sealed class Animation : Sprite
         FrameDelay = frameDelay;
         LoopType = loopType.ToLoopType();
     }
+
+    public int FrameCount { get; set; }
+    public double FrameDelay { get; set; }
+    public LoopType LoopType { get; set; }
+    public override ObjectType ObjectType { get; } = ObjectTypes.Animation;
 
     public override async Task WriteHeaderAsync(TextWriter writer)
     {
