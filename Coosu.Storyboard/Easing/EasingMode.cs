@@ -1,9 +1,8 @@
-﻿namespace Coosu.Storyboard.Easing
+﻿namespace Coosu.Storyboard.Easing;
+
+public enum EasingMode : byte
 {
-    public enum EasingMode : byte
-    {
-        EaseIn,
-        EaseOut,
-        EaseInOut,
-    }
+    EaseIn,
+    EaseOut,
+    EaseInOut,
 }

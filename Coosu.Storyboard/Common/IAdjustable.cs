@@ -1,6 +1,5 @@
-﻿namespace Coosu.Storyboard.Common
+﻿namespace Coosu.Storyboard.Common;
+
+public interface IAdjustable : ITimingAdjustable, IPositionAdjustable
 {
-    public interface IAdjustable : ITimingAdjustable, IPositionAdjustable
-    {
-    }
 }

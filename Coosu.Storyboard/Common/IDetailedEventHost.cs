@@ -2,23 +2,22 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Coosu.Storyboard.Common
+namespace Coosu.Storyboard.Common;
+
+public interface IEventHost : IScriptable
 {
-    public interface IEventHost : IScriptable
-    {
-        IReadOnlyCollection<IKeyEvent> Events { get; }
-        void AddEvent(IKeyEvent @event);
-        bool RemoveEvent(IKeyEvent @event);
-        void ResetEventCollection(IComparer<IKeyEvent>? comparer);
-    }
+    IReadOnlyCollection<IKeyEvent> Events { get; }
+    void AddEvent(IKeyEvent @event);
+    bool RemoveEvent(IKeyEvent @event);
+    void ResetEventCollection(IComparer<IKeyEvent>? comparer);
+}
 
-    public interface IDetailedEventHost : IScriptable, ICloneable, IEventHost
-    {
-        double MaxTime();
-        double MinTime();
-        double MaxStartTime();
-        double MinEndTime();
+public interface IDetailedEventHost : IScriptable, ICloneable, IEventHost
+{
+    double MaxTime();
+    double MinTime();
+    double MaxStartTime();
+    double MinEndTime();
 
-        bool EnableGroupedSerialization { get; set; }
-    }
+    bool EnableGroupedSerialization { get; set; }
 }

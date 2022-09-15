@@ -1,12 +1,11 @@
-﻿namespace Coosu.Api.V2
+﻿namespace Coosu.Api.V2;
+
+public enum UserBeatmapType
 {
-    public enum UserBeatmapType
-    {
-        Favourite,
-        Graveyard,
-        Loved,
-        MostPlayed,
-        RankedAndApproved,
-        Unranked,
-    }
+    Favourite,
+    Graveyard,
+    Loved,
+    MostPlayed,
+    RankedAndApproved,
+    Unranked,
 }

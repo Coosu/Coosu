@@ -1,7 +1,6 @@
-﻿namespace Coosu.Storyboard.Storybrew
+﻿namespace Coosu.Storyboard.Storybrew;
+
+public enum OptionType
 {
-    public enum OptionType
-    {
-        None, With, Only
-    }
+    None, With, Only
 }

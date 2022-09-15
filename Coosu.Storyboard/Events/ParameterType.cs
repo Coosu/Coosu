@@ -1,7 +1,6 @@
-﻿namespace Coosu.Storyboard.Events
+﻿namespace Coosu.Storyboard.Events;
+
+public enum ParameterType : byte
 {
-    public enum ParameterType : byte
-    {
-        Horizontal, Vertical, Additive
-    }
+    Horizontal, Vertical, Additive
 }

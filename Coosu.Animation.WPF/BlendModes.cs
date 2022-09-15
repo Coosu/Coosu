@@ -1,8 +1,7 @@
-﻿namespace Coosu.Animation.WPF
+﻿namespace Coosu.Animation.WPF;
+
+public enum BlendModes
 {
-    public enum BlendModes
-    {
-        Normal,
-        Multiply,
-    }
+    Normal,
+    Multiply,
 }

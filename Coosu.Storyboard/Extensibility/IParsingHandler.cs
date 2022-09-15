@@ -1,15 +1,14 @@
-﻿namespace Coosu.Storyboard.Extensibility
-{
-    public interface IParsingHandler
-    {
-        string Flag { get; }
-        object Deserialize(string[] split);
-        string Serialize(object raw);
-    }
+﻿namespace Coosu.Storyboard.Extensibility;
 
-    public interface IParsingHandler<T> : IParsingHandler
-    {
-        new T Deserialize(string[] split);
-        string Serialize(T raw);
-    }
+public interface IParsingHandler
+{
+    string Flag { get; }
+    object Deserialize(string[] split);
+    string Serialize(object raw);
+}
+
+public interface IParsingHandler<T> : IParsingHandler
+{
+    new T Deserialize(string[] split);
+    string Serialize(T raw);
 }

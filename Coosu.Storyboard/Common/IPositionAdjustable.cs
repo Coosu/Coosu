@@ -1,7 +1,6 @@
-﻿namespace Coosu.Storyboard.Common
+﻿namespace Coosu.Storyboard.Common;
+
+public interface IPositionAdjustable
 {
-    public interface IPositionAdjustable
-    {
-        void AdjustPosition(double x, double y);
-    }
+    void AdjustPosition(double x, double y);
 }

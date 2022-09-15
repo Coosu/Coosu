@@ -1,9 +1,8 @@
-﻿namespace Coosu.Storyboard.Common
+﻿namespace Coosu.Storyboard.Common;
+
+public interface IDefinedObject
 {
-    public interface IDefinedObject
-    {
-        ObjectType ObjectType { get; }
-        int? RowInSource { get; set; }
-        object? Tag { get; set; }
-    }
+    ObjectType ObjectType { get; }
+    int? RowInSource { get; set; }
+    object? Tag { get; set; }
 }

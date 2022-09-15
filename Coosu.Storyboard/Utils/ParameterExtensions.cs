@@ -2,41 +2,40 @@
 using Coosu.Storyboard.Events;
 
 // ReSharper disable once CheckNamespace
-namespace Coosu.Storyboard
+namespace Coosu.Storyboard;
+
+public static class ParameterExtensions
 {
-    public static class ParameterExtensions
+    public static string ToShortString(this ParameterType pType)
     {
-        public static string ToShortString(this ParameterType pType)
+        return pType switch
         {
-            return pType switch
-            {
-                ParameterType.Horizontal => "H",
-                ParameterType.Vertical => "V",
-                ParameterType.Additive => "A",
-                _ => throw new ArgumentOutOfRangeException(nameof(pType), pType, null)
-            };
-        }
+            ParameterType.Horizontal => "H",
+            ParameterType.Vertical => "V",
+            ParameterType.Additive => "A",
+            _ => throw new ArgumentOutOfRangeException(nameof(pType), pType, null)
+        };
+    }
 
-        public static ParameterType ToParameterEnum(this char str)
+    public static ParameterType ToParameterEnum(this char str)
+    {
+        return str switch
         {
-            return str switch
-            {
-                'H' => ParameterType.Horizontal,
-                'V' => ParameterType.Vertical,
-                'A' => ParameterType.Additive,
-                _ => throw new ArgumentOutOfRangeException(nameof(str), str, null)
-            };
-        }
+            'H' => ParameterType.Horizontal,
+            'V' => ParameterType.Vertical,
+            'A' => ParameterType.Additive,
+            _ => throw new ArgumentOutOfRangeException(nameof(str), str, null)
+        };
+    }
 
-        public static ParameterType ToParameterEnum(this string str)
+    public static ParameterType ToParameterEnum(this string str)
+    {
+        return str switch
         {
-            return str switch
-            {
-                "H" => ParameterType.Horizontal,
-                "V" => ParameterType.Vertical,
-                "A" => ParameterType.Additive,
-                _ => throw new ArgumentOutOfRangeException(nameof(str), str, null)
-            };
-        }
+            "H" => ParameterType.Horizontal,
+            "V" => ParameterType.Vertical,
+            "A" => ParameterType.Additive,
+            _ => throw new ArgumentOutOfRangeException(nameof(str), str, null)
+        };
     }
 }

@@ -1,7 +1,6 @@
-﻿namespace Coosu.Shared
+﻿namespace Coosu.Shared;
+
+public sealed class SpanSplitArgs
 {
-    public sealed class SpanSplitArgs
-    {
-        public bool Canceled { get; set; }
-    }
+    public bool Canceled { get; set; }
 }

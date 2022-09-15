@@ -1,7 +1,6 @@
-﻿namespace Coosu.Api.V2.RequestModels
+﻿namespace Coosu.Api.V2.RequestModels;
+
+public enum BeatmapsetSearchSort
 {
-    public enum BeatmapsetSearchSort
-    {
-        Artist, Creator, Difficulty, Favourites, Nominations, Plays, Ranked, Rating, Relevance, Title, Updated
-    }
+    Artist, Creator, Difficulty, Favourites, Nominations, Plays, Ranked, Rating, Relevance, Title, Updated
 }

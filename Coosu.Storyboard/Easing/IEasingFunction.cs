@@ -1,10 +1,9 @@
-﻿namespace Coosu.Storyboard.Easing
+﻿namespace Coosu.Storyboard.Easing;
+
+public interface IEasingFunction
 {
-    public interface IEasingFunction
-    {
-        double Ease(double normalizedTime);
-        string GetDescription();
-        EasingType GetEasingType();
-        EasingType? TryGetEasingType();
-    }
+    double Ease(double normalizedTime);
+    string GetDescription();
+    EasingType GetEasingType();
+    EasingType? TryGetEasingType();
 }

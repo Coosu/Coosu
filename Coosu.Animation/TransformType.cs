@@ -1,9 +1,8 @@
-﻿namespace Coosu.Animation
+﻿namespace Coosu.Animation;
+
+public enum TransformType
 {
-    public enum TransformType
-    {
-        Fade, Rotate, Move, ScaleVec, Color, Blend, Flip,
-        MoveX,
-        MoveY
-    }
+    Fade, Rotate, Move, ScaleVec, Color, Blend, Flip,
+    MoveX,
+    MoveY
 }

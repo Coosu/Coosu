@@ -2,42 +2,41 @@
 using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Easing;
 
-namespace Coosu.Storyboard.Events
+namespace Coosu.Storyboard.Events;
+
+public sealed class MoveX : BasicEvent, IPositionAdjustable
 {
-    public sealed class MoveX : BasicEvent, IPositionAdjustable
+    public override EventType EventType => EventTypes.MoveX;
+
+    public double StartX
     {
-        public override EventType EventType => EventTypes.MoveX;
+        get => GetValue(0);
+        set => SetValue(0, value);
+    }
 
-        public double StartX
-        {
-            get => GetValue(0);
-            set => SetValue(0, value);
-        }
+    public double EndX
+    {
+        get => GetValue(1);
+        set => SetValue(1, value);
+    }
 
-        public double EndX
-        {
-            get => GetValue(1);
-            set => SetValue(1, value);
-        }
+    //public MoveX(EasingFunctionBase easing, double startTime, double endTime, double x1, double x2) :
+    //    base(easing, startTime, endTime, new[] { x1 }, new[] { x2 })
+    //{
+    //}
 
-        //public MoveX(EasingFunctionBase easing, double startTime, double endTime, double x1, double x2) :
-        //    base(easing, startTime, endTime, new[] { x1 }, new[] { x2 })
-        //{
-        //}
+    public MoveX(EasingFunctionBase easing, double startTime, double endTime, List<double> values)
+        : base(easing, startTime, endTime, values)
+    {
+    }
 
-        public MoveX(EasingFunctionBase easing, double startTime, double endTime, List<double> values)
-            : base(easing, startTime, endTime, values)
-        {
-        }
+    public MoveX()
+    {
+    }
 
-        public MoveX()
-        {
-        }
-
-        public void AdjustPosition(double x, double y)
-        {
-            StartX += x;
-            EndX += x;
-        }
+    public void AdjustPosition(double x, double y)
+    {
+        StartX += x;
+        EndX += x;
     }
 }

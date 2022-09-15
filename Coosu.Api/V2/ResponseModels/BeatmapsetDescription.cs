@@ -2,11 +2,10 @@
 using JsonConverterAttribute = System.Text.Json.Serialization.JsonConverterAttribute;
 using JsonIgnoreAttribute = System.Text.Json.Serialization.JsonIgnoreAttribute;
 
-namespace Coosu.Api.V2.ResponseModels
+namespace Coosu.Api.V2.ResponseModels;
+
+public partial class BeatmapsetDescription
 {
-    public partial class BeatmapsetDescription
-    {
-        [JsonProperty("description")]
-        public string DescriptionDescription { get; set; }
-    }
+    [JsonProperty("description")]
+    public string DescriptionDescription { get; set; }
 }

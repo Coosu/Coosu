@@ -1,6 +1,5 @@
-﻿namespace Coosu.Storyboard.Common
+﻿namespace Coosu.Storyboard.Common;
+
+public interface ISceneObject : ICameraUsable, IDefinedObject, IDetailedEventHost
 {
-    public interface ISceneObject : ICameraUsable, IDefinedObject, IDetailedEventHost
-    {
-    }
 }

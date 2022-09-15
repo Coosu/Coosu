@@ -1,7 +1,6 @@
-﻿namespace Coosu.Animation
+﻿namespace Coosu.Animation;
+
+public enum FlipMode
 {
-    public enum FlipMode
-    {
-        FlipX,FlipY
-    }
+    FlipX,FlipY
 }

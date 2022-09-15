@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Coosu.Storyboard.Events
-{
-    [Flags]
+namespace Coosu.Storyboard.Events;
+
+[Flags]
 #pragma warning disable format
 // @formatter:off
     public enum TriggerType : byte
@@ -19,4 +19,3 @@ namespace Coosu.Storyboard.Events
     }
 // @formatter:on
 #pragma warning restore format
-}

@@ -2,14 +2,13 @@
 using JsonConverterAttribute = System.Text.Json.Serialization.JsonConverterAttribute;
 using JsonIgnoreAttribute = System.Text.Json.Serialization.JsonIgnoreAttribute;
 
-namespace Coosu.Api.V2.ResponseModels
-{
-    public partial class Page
-    {
-        [JsonProperty("html")]
-        public string Html { get; set; }
+namespace Coosu.Api.V2.ResponseModels;
 
-        [JsonProperty("raw")]
-        public string Raw { get; set; }
-    }
+public partial class Page
+{
+    [JsonProperty("html")]
+    public string Html { get; set; }
+
+    [JsonProperty("raw")]
+    public string Raw { get; set; }
 }

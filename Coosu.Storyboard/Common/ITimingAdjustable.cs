@@ -1,7 +1,6 @@
-﻿namespace Coosu.Storyboard.Common
+﻿namespace Coosu.Storyboard.Common;
+
+public interface ITimingAdjustable
 {
-    public interface ITimingAdjustable
-    {
-        void AdjustTiming(double offset);
-    }
+    void AdjustTiming(double offset);
 }

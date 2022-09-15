@@ -10,7 +10,7 @@ public static class NumericExtensions
     {
         return value.ToString(ParseHelper.EnUsNumberFormat);
     }
-        
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string ToEnUsFormatString(this double value)
     {

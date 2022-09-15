@@ -9,52 +9,52 @@ using Coosu.Shared.Mathematics;
 using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Easing;
 
-namespace Coosu.Storyboard.Extensions
+namespace Coosu.Storyboard.Extensions;
+
+[DebuggerDisplay("Expression = {DebuggerDisplay}")]
+public class RelativeEvent : IKeyEvent
 {
-    [DebuggerDisplay("Expression = {DebuggerDisplay}")]
-    public class RelativeEvent : IKeyEvent
+    public event Action? TimingChanged;
+
+    private List<double> _values;
+    private double _startTime;
+    private double _endTime;
+    private string DebuggerDisplay => this.GetHeaderString();
+    public EventType EventType { get; }
+
+    public EasingFunctionBase Easing { get; set; } = LinearEase.Instance;
+
+    public double StartTime
     {
-        public event Action? TimingChanged;
-
-        private List<double> _values;
-        private double _startTime;
-        private double _endTime;
-        private string DebuggerDisplay => this.GetHeaderString();
-        public EventType EventType { get; }
-
-        public EasingFunctionBase Easing { get; set; } = LinearEase.Instance;
-
-        public double StartTime
+        get => _startTime;
+        set
         {
-            get => _startTime;
-            set
-            {
-                if (Precision.AlmostEquals(_startTime, value)) return;
-                _startTime = value;
-                TimingChanged?.Invoke();
-            }
+            if (Precision.AlmostEquals(_startTime, value)) return;
+            _startTime = value;
+            TimingChanged?.Invoke();
         }
+    }
 
-        public double EndTime
+    public double EndTime
+    {
+        get => _endTime;
+        set
         {
-            get => _endTime;
-            set
-            {
-                if (Precision.AlmostEquals(_startTime, value)) return;
-                _endTime = value;
-                TimingChanged?.Invoke();
-            }
+            if (Precision.AlmostEquals(_startTime, value)) return;
+            _endTime = value;
+            TimingChanged?.Invoke();
         }
+    }
 
-        public virtual double DefaultValue => 0;
+    public virtual double DefaultValue => 0;
 
-        internal List<double> TagValues { get; set; }
+    internal List<double> TagValues { get; set; }
 
-        public IReadOnlyList<double> Values
-        {
-            get => _values;
-            internal set => _values = (List<double>)value;
-        }
+    public IReadOnlyList<double> Values
+    {
+        get => _values;
+        internal set => _values = (List<double>)value;
+    }
 
 
 #if NET5_0_OR_GREATER
@@ -68,191 +68,190 @@ namespace Coosu.Storyboard.Extensions
             throw new NotSupportedException("The relative events have no starts or ends.");
         }
 #endif
-        public IEnumerable<double> GetStarts()
+    public IEnumerable<double> GetStarts()
+    {
+        return TagValues;
+        throw new NotSupportedException("The relative events have no starts or ends.");
+    }
+
+    public IEnumerable<double> GetEnds()
+    {
+        return Values;
+        throw new NotSupportedException("The relative events have no starts or ends.");
+    }
+
+    public void SetStarts(IEnumerable<double> startValues)
+    {
+        TagValues = startValues is List<double> startValueList ? startValueList : startValues.ToList();
+        if (TagValues.Count != EventType.Size) throw new ArgumentException();
+    }
+
+    public void SetEnds(IEnumerable<double> endValues)
+    {
+        Values = endValues is List<double> endValuesList ? endValuesList : endValues.ToList();
+        if (Values.Count != EventType.Size) throw new ArgumentException();
+    }
+
+    public virtual bool IsHalfFilled => false;
+    public virtual bool IsFilled => Values.Count == EventType.Size;
+
+    public virtual double GetValue(int index)
+    {
+        if (index >= EventType.Size)
+            throw new ArgumentOutOfRangeException(nameof(index), index,
+                $"Incorrect parameter index for {EventType.Flag}");
+        if (index < 0)
+            throw new ArgumentOutOfRangeException(nameof(index), index,
+                $"Incorrect parameter index for {EventType.Flag}");
+
+        return GetValueImpl(index);
+    }
+
+    public virtual void SetValue(int index, double value)
+    {
+        if (index >= EventType.Size)
+            throw new ArgumentOutOfRangeException(nameof(index), index,
+                $"Incorrect parameter index for {EventType.Flag}");
+        if (index < 0)
+            throw new ArgumentOutOfRangeException(nameof(index), index,
+                $"Incorrect parameter index for {EventType.Flag}");
+
+        SetValueImpl(index, value);
+    }
+
+    public virtual void Fill()
+    {
+        Fill(EventType.Size);
+    }
+
+    public virtual bool IsStartsEqualsEnds()
+    {
+        Fill();
+
+        for (var i = 0; i < Values.Count; i++)
         {
-            return TagValues;
-            throw new NotSupportedException("The relative events have no starts or ends.");
+            var value = Values[i];
+            if (value != 0) return false;
         }
 
-        public IEnumerable<double> GetEnds()
+        return true;
+    }
+
+    public void AdjustTiming(double offset)
+    {
+        StartTime += offset;
+        EndTime += offset;
+    }
+
+    public async Task WriteHeaderAsync(TextWriter writer)
+    {
+        //await writer.WriteAsync("(Relative) " + EventType.Flag.TrimEnd('c'));
+        await writer.WriteAsync(EventType.Flag);
+        await writer.WriteAsync(',');
+        var typeStr = ((int?)Easing.TryGetEasingType())?.ToString() ?? "?";
+        await writer.WriteAsync(typeStr);
+        await writer.WriteAsync(" [");
+        await writer.WriteStandardizedNumberAsync(Math.Round(StartTime));
+        await writer.WriteAsync(",");
+        await writer.WriteStandardizedNumberAsync(Math.Round(EndTime));
+        await writer.WriteAsync("] by [");
+        await WriteExtraScriptAsync(writer);
+        await writer.WriteAsync(']');
+    }
+
+    public virtual async Task WriteScriptAsync(TextWriter writer) =>
+        await WriteHeaderAsync(writer);
+
+    public RelativeEvent()
+    {
+        _values = new List<double>();
+    }
+
+    public RelativeEvent(EventType eventType)
+    {
+        EventType = eventType;
+        _values = new List<double>();
+        TagValues = new List<double>();
+    }
+
+    public RelativeEvent(EventType eventType, EasingFunctionBase easing, double startTime, double endTime, List<double> byValues)
+    {
+        EventType = eventType;
+        Easing = easing;
+        StartTime = startTime;
+        EndTime = endTime;
+        _values = byValues;
+        TagValues = new List<double>(_values.Count);
+        for (int i = 0; i < _values.Count; i++)
         {
-            return Values;
-            throw new NotSupportedException("The relative events have no starts or ends.");
+            //TagValues.Add(double.NaN);
+            TagValues.Add(0);
         }
+    }
 
-        public void SetStarts(IEnumerable<double> startValues)
+    protected virtual async Task WriteExtraScriptAsync(TextWriter textWriter)
+    {
+        Fill();
+        for (int i = 0; i < Values.Count; i++)
         {
-            TagValues = startValues is List<double> startValueList ? startValueList : startValues.ToList();
-            if (TagValues.Count != EventType.Size) throw new ArgumentException();
-        }
-
-        public void SetEnds(IEnumerable<double> endValues)
-        {
-            Values = endValues is List<double> endValuesList ? endValuesList : endValues.ToList();
-            if (Values.Count != EventType.Size) throw new ArgumentException();
-        }
-
-        public virtual bool IsHalfFilled => false;
-        public virtual bool IsFilled => Values.Count == EventType.Size;
-
-        public virtual double GetValue(int index)
-        {
-            if (index >= EventType.Size)
-                throw new ArgumentOutOfRangeException(nameof(index), index,
-                    $"Incorrect parameter index for {EventType.Flag}");
-            if (index < 0)
-                throw new ArgumentOutOfRangeException(nameof(index), index,
-                    $"Incorrect parameter index for {EventType.Flag}");
-
-            return GetValueImpl(index);
-        }
-
-        public virtual void SetValue(int index, double value)
-        {
-            if (index >= EventType.Size)
-                throw new ArgumentOutOfRangeException(nameof(index), index,
-                    $"Incorrect parameter index for {EventType.Flag}");
-            if (index < 0)
-                throw new ArgumentOutOfRangeException(nameof(index), index,
-                    $"Incorrect parameter index for {EventType.Flag}");
-
-            SetValueImpl(index, value);
-        }
-
-        public virtual void Fill()
-        {
-            Fill(EventType.Size);
-        }
-
-        public virtual bool IsStartsEqualsEnds()
-        {
-            Fill();
-
-            for (var i = 0; i < Values.Count; i++)
+            if (TagValues.Count > 0 && !double.IsNaN(TagValues[i]))
             {
-                var value = Values[i];
-                if (value != 0) return false;
+                await textWriter.WriteStandardizedNumberAsync(TagValues[i]);
+                await textWriter.WriteAsync('~');
             }
 
-            return true;
+            await textWriter.WriteStandardizedNumberAsync(Values[i]);
+            if (i != EventType.Size - 1) await textWriter.WriteAsync(',');
         }
+    }
 
-        public void AdjustTiming(double offset)
+    protected void Fill(int count)
+    {
+        if (count <= _values.Count) return;
+        var index = count - 1;
+        var size = EventType.Size;
+        if (index < size)
         {
-            StartTime += offset;
-            EndTime += offset;
-        }
-
-        public async Task WriteHeaderAsync(TextWriter writer)
-        {
-            //await writer.WriteAsync("(Relative) " + EventType.Flag.TrimEnd('c'));
-            await writer.WriteAsync(EventType.Flag);
-            await writer.WriteAsync(',');
-            var typeStr = ((int?)Easing.TryGetEasingType())?.ToString() ?? "?";
-            await writer.WriteAsync(typeStr);
-            await writer.WriteAsync(" [");
-            await writer.WriteStandardizedNumberAsync(Math.Round(StartTime));
-            await writer.WriteAsync(",");
-            await writer.WriteStandardizedNumberAsync(Math.Round(EndTime));
-            await writer.WriteAsync("] by [");
-            await WriteExtraScriptAsync(writer);
-            await writer.WriteAsync(']');
-        }
-
-        public virtual async Task WriteScriptAsync(TextWriter writer) =>
-            await WriteHeaderAsync(writer);
-
-        public RelativeEvent()
-        {
-            _values = new List<double>();
-        }
-
-        public RelativeEvent(EventType eventType)
-        {
-            EventType = eventType;
-            _values = new List<double>();
-            TagValues = new List<double>();
-        }
-
-        public RelativeEvent(EventType eventType, EasingFunctionBase easing, double startTime, double endTime, List<double> byValues)
-        {
-            EventType = eventType;
-            Easing = easing;
-            StartTime = startTime;
-            EndTime = endTime;
-            _values = byValues;
-            TagValues = new List<double>(_values.Count);
-            for (int i = 0; i < _values.Count; i++)
+            _values.Capacity = size;
+            TagValues.Capacity = size;
+            while (_values.Count < size)
             {
-                //TagValues.Add(double.NaN);
-                TagValues.Add(0);
+                _values.Add(DefaultValue);
+            }
+
+            while (TagValues.Count < size)
+            {
+                _values.Add(double.NaN);
             }
         }
-
-        protected virtual async Task WriteExtraScriptAsync(TextWriter textWriter)
+        else
         {
-            Fill();
-            for (int i = 0; i < Values.Count; i++)
+            while (index > _values.Count - 1)
             {
-                if (TagValues.Count > 0 && !double.IsNaN(TagValues[i]))
-                {
-                    await textWriter.WriteStandardizedNumberAsync(TagValues[i]);
-                    await textWriter.WriteAsync('~');
-                }
+                _values.Add(DefaultValue);
+            }
 
-                await textWriter.WriteStandardizedNumberAsync(Values[i]);
-                if (i != EventType.Size - 1) await textWriter.WriteAsync(',');
+            while (index > TagValues.Count - 1)
+            {
+                _values.Add(double.NaN);
             }
         }
+    }
 
-        protected void Fill(int count)
-        {
-            if (count <= _values.Count) return;
-            var index = count - 1;
-            var size = EventType.Size;
-            if (index < size)
-            {
-                _values.Capacity = size;
-                TagValues.Capacity = size;
-                while (_values.Count < size)
-                {
-                    _values.Add(DefaultValue);
-                }
+    protected double GetValueImpl(int index)
+    {
+        Fill(index + 1);
+        return _values[index];
+    }
 
-                while (TagValues.Count < size)
-                {
-                    _values.Add(double.NaN);
-                }
-            }
-            else
-            {
-                while (index > _values.Count - 1)
-                {
-                    _values.Add(DefaultValue);
-                }
+    protected void SetValueImpl(int index, double value)
+    {
+        Fill(index + 1);
+        _values[index] = value;
+    }
 
-                while (index > TagValues.Count - 1)
-                {
-                    _values.Add(double.NaN);
-                }
-            }
-        }
-
-        protected double GetValueImpl(int index)
-        {
-            Fill(index + 1);
-            return _values[index];
-        }
-
-        protected void SetValueImpl(int index, double value)
-        {
-            Fill(index + 1);
-            _values[index] = value;
-        }
-
-        public object Clone()
-        {
-            return new RelativeEvent(EventType, Easing, StartTime, EndTime, Values.CloneAsList());
-        }
+    public object Clone()
+    {
+        return new RelativeEvent(EventType, Easing, StartTime, EndTime, Values.CloneAsList());
     }
 }

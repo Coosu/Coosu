@@ -2,17 +2,16 @@
 using JsonConverterAttribute = System.Text.Json.Serialization.JsonConverterAttribute;
 using JsonIgnoreAttribute = System.Text.Json.Serialization.JsonIgnoreAttribute;
 
-namespace Coosu.Api.V2.ResponseModels
+namespace Coosu.Api.V2.ResponseModels;
+
+public partial class UserCover
 {
-    public partial class UserCover
-    {
-        [JsonProperty("custom_url")]
-        public string CustomUrl { get; set; }
+    [JsonProperty("custom_url")]
+    public string CustomUrl { get; set; }
 
-        [JsonProperty("url")]
-        public string Url { get; set; }
+    [JsonProperty("url")]
+    public string Url { get; set; }
 
-        [JsonProperty("id")]
-        public object? Id { get; set; } // nullable for custom
-    }
+    [JsonProperty("id")]
+    public object? Id { get; set; } // nullable for custom
 }

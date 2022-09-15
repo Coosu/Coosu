@@ -2,14 +2,13 @@
 using JsonConverterAttribute = System.Text.Json.Serialization.JsonConverterAttribute;
 using JsonIgnoreAttribute = System.Text.Json.Serialization.JsonIgnoreAttribute;
 
-namespace Coosu.Api.V2.ResponseModels
-{
-    public partial class Level
-    {
-        [JsonProperty("current")]
-        public int Current { get; set; }
+namespace Coosu.Api.V2.ResponseModels;
 
-        [JsonProperty("progress")]
-        public int Progress { get; set; }
-    }
+public partial class Level
+{
+    [JsonProperty("current")]
+    public int Current { get; set; }
+
+    [JsonProperty("progress")]
+    public int Progress { get; set; }
 }
