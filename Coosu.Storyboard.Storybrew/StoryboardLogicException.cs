@@ -9,6 +9,7 @@ public class StoryboardLogicException : Exception
     public StoryboardLogicException()
     {
     }
+
     public StoryboardLogicException(string? message) : base(message)
     {
     }
