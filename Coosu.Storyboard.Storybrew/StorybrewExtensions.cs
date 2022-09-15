@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Coosu.Storyboard.Common;
+using Coosu.Storyboard.Extensions;
 using Coosu.Storyboard.Extensions.Optimizing;
 using Coosu.Storyboard.Storybrew;
 using Coosu.Storyboard.Storybrew.UI;
@@ -68,7 +69,12 @@ namespace Coosu.Storyboard
             DelayExecuteContexts(layer, brewObjectGenerator);
 
             var brewLayer = brewObjectGenerator.GetLayer(layer.Name);
-            void EventHandler(object _, ProcessErrorEventArgs e) => throw new Exception(e.Message);
+            Exception? ex = null;
+            void EventHandler(object _, ProcessErrorEventArgs e)
+            {
+                ex = new StoryboardLogicException(e.Message);
+                e.Continue = false;
+            }
 
             var compressor = new SpriteCompressor(layer);
             configureSettings?.Invoke(compressor.Options);
@@ -76,6 +82,9 @@ namespace Coosu.Storyboard
             compressor.ErrorOccured += EventHandler;
             compressor.CompressAsync().Wait();
             compressor.ErrorOccured -= EventHandler;
+
+            if (ex != null) throw ex;
+
             if (layer.SceneObjects.Count == 0) return;
 
             layer.WriteScriptAsync(Console.Out).Wait();

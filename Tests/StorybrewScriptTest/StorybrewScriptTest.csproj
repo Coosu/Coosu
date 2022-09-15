@@ -5,6 +5,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net48</TargetFramework>
     <DisableImplicitNamespaceImports>true</DisableImplicitNamespaceImports>
+    <LangVersion>10</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

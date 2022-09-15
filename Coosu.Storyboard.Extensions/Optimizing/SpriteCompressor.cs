@@ -140,7 +140,7 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                 object indexLock = new();
                 int index = 0;
                 int total = _targetSprites.Count;
-                var mrs = new ManualResetEventSlim(true);
+                using var mrs = new ManualResetEventSlim(true);
                 try
                 {
                     _targetSprites
@@ -150,11 +150,14 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                         .ForAll(sprite =>
                         {
                             if (ErrorOccured != null)
+                            {
                                 mrs.Wait();
+                            }
 
                             var preserve = InnerCompress(mrs, sprite, possibleBgs);
                             if (!preserve) uselessSprites.Add(sprite);
                             if (ProgressChanged != null)
+                            {
                                 lock (indexLock)
                                 {
                                     index++;
@@ -164,16 +167,13 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                                         TotalCount = total
                                     });
                                 }
+                            }
                         });
                     return false;
                 }
                 catch (OperationCanceledException)
                 {
                     return true;
-                }
-                finally
-                {
-                    mrs.Dispose();
                 }
             }, TaskCreationOptions.LongRunning);
         }
@@ -230,9 +230,10 @@ namespace Coosu.Storyboard.Extensions.Optimizing
             {
                 if (errorList.Count > 0)
                 {
+                    var lineMessage = sprite.RowInSource == null ? "" : $"{sprite.RowInSource} - ";
                     var arg = new ProcessErrorEventArgs(sprite)
                     {
-                        Message = $"{sprite.RowInSource} - Examine failed. Found {errorList.Count} error(s):\r\n" +
+                        Message = $"{lineMessage}Examine failed. Found {errorList.Count} error(s):\r\n" +
                                   string.Join("\r\n", errorList)
                     };
 
@@ -244,8 +245,14 @@ namespace Coosu.Storyboard.Extensions.Optimizing
                         }
 
                         mrs.Reset();
-                        ErrorOccured?.Invoke(sprite, arg);
-                        mrs.Set();
+                        try
+                        {
+                            ErrorOccured?.Invoke(sprite, arg);
+                        }
+                        finally
+                        {
+                            mrs.Set();
+                        }
                     }
 
                     if (!arg.Continue)
