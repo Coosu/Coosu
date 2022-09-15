@@ -5,7 +5,9 @@ using System.Linq;
 using System.Text;
 using Coosu.Beatmap.Configurable;
 using Coosu.Beatmap.Sections.Event;
+using Coosu.Shared;
 using Coosu.Shared.Mathematics;
+using Coosu.Shared.Numerics;
 
 namespace Coosu.Beatmap.Sections;
 
@@ -56,7 +58,7 @@ public sealed class EventSection : Section
                 case SectionSbSamples:
                     if (!_options.StoryboardIgnored)
                     {
-                        StoryboardText = _sbInfo.ToString();
+                        StoryboardText = _sbInfo.ToString().TrimEnd('\r', '\n');
                         _sbInfo.Clear();
                     }
 
@@ -82,49 +84,95 @@ public sealed class EventSection : Section
             {
                 case SectionBgVideo:
                     // https://osu.ppy.sh/help/wiki/osu!_File_Formats/Osu_(file_format)#videos
-                    // todo: split issue
-                    if (line.StartsWith("Video,") || line.StartsWith("1,"))
+                    if (line.StartsWith("Video,", StringComparison.Ordinal) ||
+                        line.StartsWith("1,", StringComparison.Ordinal))
                     {
-                        var infos = line.Split(',');
-                        VideoInfo = new VideoData { Offset = double.Parse(infos[1]), Filename = infos[2].Trim('"') };
+                        double offset = default;
+                        string filename = "";
+
+                        int i = -1;
+                        foreach (var span in line.SpanSplit(','))
+                        {
+                            i++;
+                            switch (i)
+                            {
+                                case 1: offset = ParseHelper.ParseDouble(span); break;
+                                case 2: filename = span.Trim('"').ToString(); break;
+                            }
+                        }
+
+                        VideoInfo = new VideoData { Offset = offset, Filename = filename };
                     }
                     else
                     {
-                        var infos = line.Split(',');
-                        double x = 0, y = 0;
-                        if (infos.Length > 3)
+                        double x = 0;
+                        double y = 0;
+                        string filename = "";
+
+                        int i = -1;
+                        foreach (var span in line.SpanSplit(','))
                         {
-                            x = double.Parse(infos[3]);
-                            y = double.Parse(infos[4]);
+                            i++;
+                            switch (i)
+                            {
+                                case 2: filename = span.Trim('"').ToString(); break;
+                                case 3: x = ParseHelper.ParseDouble(span); break;
+                                case 4: y = ParseHelper.ParseDouble(span); break;
+                            }
                         }
 
-                        BackgroundInfo = new BackgroundData
-                        {
-                            Filename = infos[2].Trim('"'),
-                            X = x,
-                            Y = y
-                        };
+                        BackgroundInfo = new BackgroundData { Filename = filename, X = x, Y = y };
                     }
                     break;
                 case SectionBreak:
-                {
-                    var infos = line.Split(',');
-                    Breaks.Add(new RangeValue<int>(int.Parse(infos[1]), int.Parse(infos[2])));
-                }
+                    {
+                        int startTime = default;
+                        int endTime = default;
+
+                        int i = -1;
+                        foreach (var span in line.SpanSplit(','))
+                        {
+                            i++;
+                            switch (i)
+                            {
+                                case 1: startTime = ParseHelper.ParseInt32(span); break;
+                                case 2: endTime = ParseHelper.ParseInt32(span); break;
+                            }
+                        }
+
+                        Breaks.Add(new RangeValue<int>(startTime, endTime));
+                    }
                     break;
                 case SectionSbSamples:
-                    if (!_options.SampleIgnored)
-                        if (line.StartsWith("Sample,") || line.StartsWith("5,"))
+                    if (!_options.SampleIgnored && (line.StartsWith("Sample,", StringComparison.Ordinal) ||
+                                                    line.StartsWith("5,", StringComparison.Ordinal)))
+                    {
+                        int offset = default;
+                        byte magicalInt = default;
+                        string filename = "";
+                        byte volume = default;
+
+                        int i = -1;
+                        foreach (var span in line.SpanSplit(','))
                         {
-                            var infos = line.Split(',');
-                            Samples.Add(new StoryboardSampleData
+                            i++;
+                            switch (i)
                             {
-                                Offset = int.Parse(infos[1]),
-                                MagicalInt = byte.Parse(infos[2]),
-                                Filename = infos[3].Trim('"'),
-                                Volume = infos.Length > 4 ? byte.Parse(infos[4]) : default,
-                            });
+                                case 1: offset = ParseHelper.ParseInt32(span); break;
+                                case 2: magicalInt = ParseHelper.ParseByte(span); break;
+                                case 3: filename = span.Trim('"').ToString(); break;
+                                case 4: volume = ParseHelper.ParseByte(span); break;
+                            }
                         }
+
+                        Samples.Add(new StoryboardSampleData
+                        {
+                            Offset = offset,
+                            MagicalInt = magicalInt,
+                            Filename = filename,
+                            Volume = volume,
+                        });
+                    }
                     break;
                 case SectionStoryboard:
                     if (!_options.StoryboardIgnored) _sbInfo.AppendLine(line);
@@ -138,17 +186,23 @@ public sealed class EventSection : Section
 
     public override void AppendSerializedString(TextWriter textWriter)
     {
-        textWriter.WriteLine($"[{SectionName}]");
+        textWriter.Write('[');
+        textWriter.Write(SectionName);
+        textWriter.WriteLine(']');
+
         textWriter.WriteLine(SectionBgVideo);
         VideoInfo?.AppendSerializedString(textWriter);
         BackgroundInfo?.AppendSerializedString(textWriter);
         textWriter.WriteLine(SectionBreak);
         foreach (var range in Breaks)
         {
-            textWriter.WriteLine($"2,{range.StartTime},{range.EndTime}");
+            textWriter.Write("2,");
+            textWriter.Write(range.StartTime);
+            textWriter.Write(',');
+            textWriter.WriteLine(range.EndTime);
         }
 
-        textWriter.WriteLine(StoryboardText?.TrimEnd('\r', '\n'));
+        if (StoryboardText != null) textWriter.WriteLine(StoryboardText);
         textWriter.WriteLine(SectionSbSamples);
         var validSampleList = Samples.Where(k => k.Volume > 0);
         foreach (var sampleData in validSampleList)
@@ -159,8 +213,8 @@ public sealed class EventSection : Section
 
         foreach (var pair in _unknownSection)
         {
-            textWriter.WriteLine($"{pair.Key}\r\n" +
-                                 $"{pair.Value.ToString().TrimEnd('\r', '\n')}");
+            textWriter.WriteLine(pair.Key);
+            textWriter.WriteLine(pair.Value.ToString().TrimEnd('\r', '\n'));
         }
     }
 }

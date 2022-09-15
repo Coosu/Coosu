@@ -10,14 +10,10 @@ public sealed class StoryboardSampleData : SerializeWritableObject
     public string Filename { get; set; } = "";
     public byte Volume { get; set; }
 
-    public override string ToString() => $"Sample,{Offset},{MagicalInt},{Filename},{Volume}";
+    public override string ToString() => $"Sample,{Offset},{MagicalInt},\"{Filename}\",{Volume}";
 
     public override void AppendSerializedString(TextWriter textWriter)
     {
-        textWriter.Write($"Sample,");
-        textWriter.Write($"{Offset},");
-        textWriter.Write($"{MagicalInt},");
-        textWriter.Write($"\"{Filename}\",");
-        textWriter.Write(Volume);
+        textWriter.Write("Sample," + Offset + "," + MagicalInt + ",\"" + Filename + "\"," + Volume);
     }
 }

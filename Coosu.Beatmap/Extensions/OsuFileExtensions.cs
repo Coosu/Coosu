@@ -72,9 +72,9 @@ public static class OsuFileExtensions
 
         while (!sr.EndOfStream && line != null)
         {
-            if (line.StartsWith("//"))
+            if (line.StartsWith("//", StringComparison.Ordinal))
             {
-                if (line.StartsWith("//Storyboard Layer"))
+                if (line.StartsWith("//Storyboard Layer", StringComparison.Ordinal))
                 {
                     inSbSection = true;
                     hasInSbSection = true;
@@ -109,7 +109,8 @@ public static class OsuFileExtensions
         {
             if (line == null) break;
 
-            if (line.StartsWith("[") && line.EndsWith("]"))
+            if (line.StartsWith("[", StringComparison.Ordinal) &&
+                line.EndsWith("]", StringComparison.Ordinal))
             {
                 if (line == "[Events]")
                 {
@@ -123,9 +124,9 @@ public static class OsuFileExtensions
             }
             else if (inEventsSection)
             {
-                if (line.StartsWith("//"))
+                if (line.StartsWith("//", StringComparison.Ordinal))
                 {
-                    if (line.StartsWith("//Storyboard Layer"))
+                    if (line.StartsWith("//Storyboard Layer", StringComparison.Ordinal))
                     {
                         inSbSection = true;
                         hasInSbSection = true;

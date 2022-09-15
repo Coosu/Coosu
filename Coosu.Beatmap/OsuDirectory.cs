@@ -404,35 +404,35 @@ public sealed class OsuDirectory
     {
         if (type == HitsoundType.Tick)
         {
-            yield return ($"{additionStr}-slidertick", false, type);
+            yield return (additionStr + "-slidertick", false, type);
             yield break;
         }
 
         if (type.HasFlag(HitsoundType.Slide))
         {
-            yield return ($"{sampleStr}-sliderslide", false, type);
+            yield return (sampleStr + "-sliderslide", false, type);
             if (rawHitObject.Hitsound == HitsoundType.Whistle)
-                yield return ($"{additionStr}-sliderwhistle", false, HitsoundType.SlideWhistle);
+                yield return (additionStr + "-sliderwhistle", false, HitsoundType.SlideWhistle);
         }
 
         if (type.HasFlag(HitsoundType.SlideWhistle))
-            yield return ($"{additionStr}-sliderwhistle", false, HitsoundType.SlideWhistle);
+            yield return (additionStr + "-sliderwhistle", false, HitsoundType.SlideWhistle);
 
         if (type.HasFlag(HitsoundType.Slide) || type.HasFlag(HitsoundType.SlideWhistle))
             yield break;
 
         if (type.HasFlag(HitsoundType.Whistle))
-            yield return ($"{additionStr}-hitwhistle", false, type);
+            yield return (additionStr + "-hitwhistle", false, type);
         if (type.HasFlag(HitsoundType.Clap))
-            yield return ($"{additionStr}-hitclap", false, type);
+            yield return (additionStr + "-hitclap", false, type);
         if (type.HasFlag(HitsoundType.Finish))
-            yield return ($"{additionStr}-hitfinish", false, type);
+            yield return (additionStr + "-hitfinish", false, type);
 
         if (ignoreBase && type != 0)
             yield break;
 
         if (type.HasFlag(HitsoundType.Normal) ||
             (type & HitsoundType.Normal) == 0)
-            yield return ($"{sampleStr}-hitnormal", false, type);
+            yield return (sampleStr + "-hitnormal", false, type);
     }
 }

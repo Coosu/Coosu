@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Windows.Controls;
 using Coosu.Shared.Numerics;
 using Coosu.Storyboard.Storybrew.Text;
@@ -16,7 +17,7 @@ namespace Coosu.Storyboard
                 //.WithDegreeOfParallelism(1)
                 .ForAll(layerTag =>
                 {
-                    if (layerTag.Key.StartsWith("text:"))
+                    if (layerTag.Key.StartsWith("text:", StringComparison.Ordinal))
                     {
                         DelayExecuteText((TextContext)layerTag.Value, brewObjectGenerator);
                     }

@@ -144,7 +144,7 @@ public class OsuFile : Config
     {
 #if NETFRAMEWORK && NET462_OR_GREATER
         var targetPath = System.IO.Path.IsPathRooted(path)
-            ? (path?.StartsWith(@"\\?\") == true
+            ? (path?.StartsWith(@"\\?\", StringComparison.Ordinal) == true
                 ? path
                 : @"\\?\" + path)
             : path;

@@ -21,11 +21,8 @@ public sealed class BackgroundData : SerializeWritableObject
 
     public override void AppendSerializedString(TextWriter textWriter)
     {
-        textWriter.Write($"0,");
-        textWriter.Write($"0,");
-        textWriter.Write($"\"{Filename}\",");
-        textWriter.Write($"{X.ToString(ParseHelper.EnUsNumberFormat)},");
-        textWriter.Write(Y.ToString(ParseHelper.EnUsNumberFormat));
-        textWriter.WriteLine();
+        textWriter.WriteLine("0,0,\"" + Filename + "\"," +
+                             X.ToString(ParseHelper.EnUsNumberFormat) + "," +
+                             Y.ToString(ParseHelper.EnUsNumberFormat));
     }
 }

@@ -13,9 +13,6 @@ public sealed class VideoData : SerializeWritableObject
 
     public override void AppendSerializedString(TextWriter textWriter)
     {
-        textWriter.Write($"Video,");
-        textWriter.Write($"{Offset.ToEnUsFormatString()},");
-        textWriter.Write($"\"{Filename}\"");
-        textWriter.WriteLine();
+        textWriter.WriteLine("Video," + Offset.ToEnUsFormatString() + ",\"" + Filename + "\"");
     }
 }
