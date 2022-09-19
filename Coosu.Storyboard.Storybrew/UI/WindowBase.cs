@@ -18,6 +18,7 @@ public class WindowBase : Window
         Focusable = false;
         Visibility = Visibility.Hidden;
         Opacity = 0;
+        ShowActivated = false;
     }
 
     public bool IsShown { get; private set; }
