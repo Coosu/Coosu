@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BenchmarkDotNet" Version="0.13.1" />
+    <PackageReference Include="BenchmarkDotNet" Version="0.13.2" />
     <PackageReference Include="HoLLy.osu.DatabaseReader" Version="3.0.0" />
     <PackageReference Include="OsuParsers" Version="1.7.1" />
   </ItemGroup>
