@@ -3,7 +3,7 @@
   <PropertyGroup>
     <UseWpf>true</UseWpf>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net48</TargetFramework>
+    <TargetFramework>net6.0-windows</TargetFramework>
     <DisableImplicitNamespaceImports>true</DisableImplicitNamespaceImports>
     <LangVersion>10</LangVersion>
   </PropertyGroup>
