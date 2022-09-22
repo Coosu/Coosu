@@ -1,31 +1,20 @@
 ﻿#nullable enable
-extern alias localbuild;
-
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Numerics;
 using System.Reflection;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
-using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Running;
-using localbuild::Coosu.Beatmap.Configurable;
+using Coosu.Beatmap;
+using Coosu.Beatmap.Configurable;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using OsuParsers.Beatmaps;
-using OsuParsers.Decoders;
-using LocalCoosuNs = localbuild::Coosu;
-using NugetCoosuNs = Coosu;
 
 namespace WritingOsuBenchmark;
 
@@ -63,7 +52,7 @@ public class Program
         if (!fi.Exists)
             throw new FileNotFoundException("Test file does not exists: " + fi.FullName);
         Environment.SetEnvironmentVariable("test_osu_path", fi.FullName);
-        var osu = LocalCoosuNs.Beatmap.OsuFile.ReadFromFileAsync(fi.FullName).Result;
+        var osu = OsuFile.ReadFromFileAsync(fi.FullName).Result;
         osu.Save("new.osu");
         using (var file = File.CreateText(@"new.json"))
         {
@@ -84,8 +73,8 @@ public class Program
 
         //return;
 
-        var osu2 = NugetCoosuNs.Beatmap.OsuFile.ReadFromFileAsync(fi.FullName).Result;
-        osu2.WriteOsuFile("old.osu");
+        var osu2 = OsuFile.ReadFromFileAsync(fi.FullName).Result;
+        osu2.Save("old.osu");
 
         var summary = BenchmarkRunner.Run<WritingTask>(/*config*/);
     }
@@ -99,8 +88,7 @@ public class Program
     public class WritingTask
     {
         private readonly string _path;
-        private readonly LocalCoosuNs.Beatmap.LocalOsuFile _latest;
-        private readonly NugetCoosuNs.Beatmap.LocalOsuFile _nuget;
+        private readonly LocalOsuFile _latest;
         private readonly Beatmap _osuParsers;
         private readonly JsonSerializer _serializer;
 
@@ -109,8 +97,7 @@ public class Program
             var path = Environment.GetEnvironmentVariable("test_osu_path");
             _path = path;
             Console.WriteLine(_path);
-            _latest = LocalCoosuNs.Beatmap.OsuFile.ReadFromFileAsync(_path).Result;
-            _nuget = NugetCoosuNs.Beatmap.OsuFile.ReadFromFileAsync(_path).Result;
+            _latest = OsuFile.ReadFromFileAsync(_path).Result;
             _osuParsers = OsuParsers.Decoders.BeatmapDecoder.Decode(_path);
             _serializer = new JsonSerializer
             {
@@ -139,13 +126,6 @@ public class Program
         public async Task<object?> OsuParsers_Write()
         {
             _osuParsers.Save("OsuParsers_Write.txt");
-            return null;
-        }
-
-        [Benchmark]
-        public async Task<object?> CoosuV2_1_0_Write()
-        {
-            _nuget.WriteOsuFile("CoosuV2_1_0_Write.txt");
             return null;
         }
     }

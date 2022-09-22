@@ -1,8 +1,6 @@
 # Coosu.Storyboard
 Use Coosu.Storyboard (osu!storyboard coding Library) to code and generate SBC(.osb code)
 
-Support using in StoryBrew and use ExecuteBrew().
-
 ## Performance improvement
 
 Since version v2.1.1, the library's performance was optimized. 

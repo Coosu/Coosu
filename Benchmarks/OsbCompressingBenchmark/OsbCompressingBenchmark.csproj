@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -8,12 +8,11 @@
 
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.13.1" />
-    <PackageReference Include="Coosu.Storyboard.Extensions" Version="2.1.1-beta.6" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Coosu.Storyboard.Extensions\Coosu.Storyboard.Extensions.csproj" Aliases="localbuild" />
-    <ProjectReference Include="..\..\Coosu.Storyboard\Coosu.Storyboard.csproj" Aliases="localbuild" />
+    <ProjectReference Include="..\..\Coosu.Storyboard.Extensions\Coosu.Storyboard.Extensions.csproj" />
+    <ProjectReference Include="..\..\Coosu.Storyboard\Coosu.Storyboard.csproj" />
   </ItemGroup>
 
   <ItemGroup>

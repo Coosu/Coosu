@@ -1,24 +1,14 @@
 ﻿#nullable enable
-extern alias localbuild;
-
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
-using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Running;
+using Coosu.Beatmap;
 using OsuParsers.Decoders;
-using LocalCoosuNs = localbuild::Coosu;
-using NugetCoosuNs = Coosu;
 
 namespace ParsingPerformanceTest;
 
@@ -31,10 +21,8 @@ class Program
         if (!fi.Exists)
             throw new FileNotFoundException("Test file does not exists: " + fi.FullName);
         Environment.SetEnvironmentVariable("test_osu_path", fi.FullName);
-        var osu = LocalCoosuNs.Beatmap.OsuFile.ReadFromFileAsync(fi.FullName).Result;
+        var osu = OsuFile.ReadFromFileAsync(fi.FullName).Result;
         osu.Save("new.osu");
-        var osu2 = NugetCoosuNs.Beatmap.OsuFile.ReadFromFileAsync(fi.FullName).Result;
-        osu2.WriteOsuFile("old.osu");
         //var arr = new bool[15000]
         //    .AsParallel()
         //    .WithDegreeOfParallelism(Environment.ProcessorCount)
@@ -95,7 +83,7 @@ public class ReadingTask
     [Benchmark(Baseline = true)]
     public async Task<object?> CoosuLatest_Beatmap()
     {
-        var osu = await LocalCoosuNs.Beatmap.OsuFile.ReadFromFileAsync(_path);
+        var osu = await OsuFile.ReadFromFileAsync(_path);
         return osu;
     }
 
@@ -103,14 +91,6 @@ public class ReadingTask
     public async Task<object?> OsuParsers_Beatmap()
     {
         var osu = BeatmapDecoder.Decode(_path);
-        return osu;
-    }
-
-    [Benchmark]
-    public async Task<object?> CoosuV2_1_0_Beatmap()
-    {
-        var osu = await NugetCoosuNs.Beatmap.OsuFile.ReadFromFileAsync(_path);
-        if (!osu.ReadSuccess) throw osu.ReadException;
         return osu;
     }
 }

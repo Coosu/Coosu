@@ -8,13 +8,12 @@
 
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.13.1" />
-    <PackageReference Include="Coosu.Beatmap" Version="2.1.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="OsuParsers" Version="1.7.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Coosu.Beatmap\Coosu.Beatmap.csproj" Aliases="localbuild" />
+    <ProjectReference Include="..\..\Coosu.Beatmap\Coosu.Beatmap.csproj" />
   </ItemGroup>
 
   <ItemGroup>

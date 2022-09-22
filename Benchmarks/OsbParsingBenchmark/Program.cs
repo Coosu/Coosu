@@ -1,18 +1,13 @@
 ﻿#nullable enable
-extern alias localbuild;
-
 using System;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Running;
-using localbuild::Coosu.Storyboard;
+using Coosu.Storyboard;
 using OsuParsers.Decoders;
-using LocalCoosuNs = localbuild::Coosu;
-using NugetCoosuNs = Coosu;
 
 namespace OsbParsingBenchmark;
 
@@ -28,7 +23,7 @@ public class Program
             throw new FileNotFoundException("Test file does not exists: " + fi.FullName);
         Environment.SetEnvironmentVariable("test_osb_path", fi.FullName);
         //Generate();
-        var osu = LocalCoosuNs.Storyboard.Layer.ParseFromFileAsync(fi.FullName).Result;
+        var osu = Layer.ParseFromFileAsync(fi.FullName).Result;
         //var i = 0;
         //var obj = new object();
         //Enumerable.Range(0, 100).AsParallel().ForAll((a) =>
@@ -68,7 +63,7 @@ public class Program
         [Benchmark(Baseline = true)]
         public async Task<object?> CoosuLatest_Storyboard()
         {
-            var osu = await LocalCoosuNs.Storyboard.Layer.ParseFromFileAsync(_path);
+            var osu = await Layer.ParseFromFileAsync(_path);
             return osu;
         }
 
@@ -76,13 +71,6 @@ public class Program
         public async Task<object?> OsuParsers_Storyboard()
         {
             var osu = StoryboardDecoder.Decode(_path);
-            return osu;
-        }
-
-        [Benchmark]
-        public async Task<object?> CoosuOld_Storyboard()
-        {
-            var osu = await NugetCoosuNs.Storyboard.Layer.ParseFromFileAsync(_path);
             return osu;
         }
     }

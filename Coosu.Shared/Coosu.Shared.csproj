@@ -4,7 +4,6 @@
 	  <TargetFrameworks>netstandard2.0;net48;netcoreapp3.1;net5.0;net6.0</TargetFrameworks>
     <Description>Coosu.Shared is shared library for Coosu projects.</Description>
     <PackageTags>osu, osu!, osugame</PackageTags>
-    <AssemblyName Condition="'$(CI)'!='true'">local.Coosu.Shared</AssemblyName>
     <IsTrimmable>true</IsTrimmable>
   </PropertyGroup>
 

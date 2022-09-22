@@ -8,12 +8,11 @@
 
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.13.1" />
-    <PackageReference Include="Coosu.Storyboard" Version="2.1.1-beta.6" />
     <PackageReference Include="OsuParsers" Version="1.7.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Coosu.Storyboard\Coosu.Storyboard.csproj" Aliases="localbuild" />
+    <ProjectReference Include="..\..\Coosu.Storyboard\Coosu.Storyboard.csproj" />
   </ItemGroup>
 
   <ItemGroup>
