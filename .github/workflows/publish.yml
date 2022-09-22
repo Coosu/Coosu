@@ -29,12 +29,14 @@ jobs:
         dotnet build Coosu.Shared --configuration Release -p:CI=true
         dotnet build Coosu.Storyboard --configuration Release -p:CI=true
         dotnet build Coosu.Storyboard.Extensions --configuration Release -p:CI=true
+        dotnet build Coosu.Storyboard.Storybrew --configuration Release -p:CI=true
         dotnet build Coosu.Storyboard.OsbX --configuration Release -p:CI=true
         dotnet build Coosu.Beatmap --configuration Release -p:CI=true
         dotnet build Coosu.Api --configuration Release -p:CI=true
         dotnet pack Coosu.Shared --configuration Release --output ci-pack -p:CI=true
         dotnet pack Coosu.Storyboard --configuration Release --output ci-pack -p:CI=true
         dotnet pack Coosu.Storyboard.Extensions --configuration Release --output ci-pack -p:CI=true
+        dotnet pack Coosu.Storyboard.Storybrew --configuration Release --output ci-pack -p:CI=true
         dotnet pack Coosu.Storyboard.OsbX --configuration Release --output ci-pack -p:CI=true
         dotnet pack Coosu.Beatmap --configuration Release --output ci-pack -p:CI=true
         dotnet pack Coosu.Api --configuration Release --output ci-pack -p:CI=true
@@ -60,6 +62,7 @@ jobs:
           ./ci-pack/Coosu.Shared.${{ steps.version.outputs.version }}.nupkg
           ./ci-pack/Coosu.Storyboard.${{ steps.version.outputs.version }}.nupkg
           ./ci-pack/Coosu.Storyboard.Extensions.${{ steps.version.outputs.version }}.nupkg
+          ./ci-pack/Coosu.Storyboard.Storybrew.${{ steps.version.outputs.version }}.nupkg
           ./ci-pack/Coosu.Storyboard.OsbX.${{ steps.version.outputs.version }}.nupkg
           ./ci-pack/Coosu.Beatmap.${{ steps.version.outputs.version }}.nupkg
           ./ci-pack/Coosu.Api.${{ steps.version.outputs.version }}.nupkg
@@ -71,6 +74,7 @@ jobs:
         dotnet nuget push "./ci-pack/Coosu.Shared.${{ steps.version.outputs.version }}.nupkg"  --api-key ${{secrets.MILKI_COOSU_TOKEN}} --source "github"
         dotnet nuget push "./ci-pack/Coosu.Storyboard.${{ steps.version.outputs.version }}.nupkg"  --api-key ${{secrets.MILKI_COOSU_TOKEN}} --source "github"
         dotnet nuget push "./ci-pack/Coosu.Storyboard.Extensions.${{ steps.version.outputs.version }}.nupkg"  --api-key ${{secrets.MILKI_COOSU_TOKEN}} --source "github"
+        dotnet nuget push "./ci-pack/Coosu.Storyboard.Storybrew.${{ steps.version.outputs.version }}.nupkg"  --api-key ${{secrets.MILKI_COOSU_TOKEN}} --source "github"
         dotnet nuget push "./ci-pack/Coosu.Storyboard.OsbX.${{ steps.version.outputs.version }}.nupkg"  --api-key ${{secrets.MILKI_COOSU_TOKEN}} --source "github"
         dotnet nuget push "./ci-pack/Coosu.Beatmap.${{ steps.version.outputs.version }}.nupkg"  --api-key ${{secrets.MILKI_COOSU_TOKEN}} --source "github"
         dotnet nuget push "./ci-pack/Coosu.Api.${{ steps.version.outputs.version }}.nupkg"  --api-key ${{secrets.MILKI_COOSU_TOKEN}} --source "github"
@@ -110,6 +114,16 @@ jobs:
       continue-on-error: true
       with:
         PROJECT_FILE_PATH: Coosu.Storyboard.Extensions/Coosu.Storyboard.Extensions.csproj
+        VERSION_STATIC: ${{ steps.version.outputs.version }}
+        NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+        GITHUB_USER: Milkitic
+        TAG_COMMIT: false
+
+    - name: Nuget Publish Coosu.Storyboard.Storybrew
+      uses: Rebel028/publish-nuget@v2.7.0
+      continue-on-error: true
+      with:
+        PROJECT_FILE_PATH: Coosu.Storyboard.Storybrew/Coosu.Storyboard.Storybrew.csproj
         VERSION_STATIC: ${{ steps.version.outputs.version }}
         NUGET_KEY: ${{secrets.NUGET_API_KEY}}
         GITHUB_USER: Milkitic
