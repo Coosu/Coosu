@@ -1,4 +1,0 @@
-[submodule "Libraries/storybrew"]
-	path = Libraries/storybrew
-	url = https://github.com/Coosu/storybrew.git
-	branch = master
