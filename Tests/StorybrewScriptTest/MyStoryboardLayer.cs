@@ -1,4 +1,4 @@
-﻿using OpenTK;
+﻿using OpenTK.Mathematics;
 using StorybrewCommon.Storyboarding;
 using StorybrewEditor.Storyboarding;
 
@@ -55,6 +55,6 @@ internal class MyStoryboardLayer : StoryboardLayer
 
     public override void Discard(StoryboardObject storyboardObject)
     {
-            
+
     }
 }

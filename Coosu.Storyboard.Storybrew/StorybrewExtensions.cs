@@ -5,6 +5,7 @@ using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Extensions.Optimizing;
 using Coosu.Storyboard.Storybrew;
 using Coosu.Storyboard.Storybrew.UI;
+using OpenTK.Mathematics;
 using StorybrewCommon.Scripting;
 using StorybrewCommon.Storyboarding;
 
@@ -101,12 +102,12 @@ public static partial class StorybrewExtensions
                 (int)animation.FrameDelay,
                 StorybrewInteropHelper.ConvertLoopType(animation.LoopType),
                 StorybrewInteropHelper.ConvertOrigin(animation.OriginType),
-                new OpenTK.Vector2((float)animation.DefaultX,
+                new Vector2((float)animation.DefaultX,
                     (float)animation.DefaultY));
         else
             brewObj = brewLayer.CreateSprite(sprite.ImagePath,
                 StorybrewInteropHelper.ConvertOrigin(sprite.OriginType),
-                new OpenTK.Vector2((float)sprite.DefaultX, (float)sprite.DefaultY)
+                new Vector2((float)sprite.DefaultX, (float)sprite.DefaultY)
             );
 
         InnerExecuteBrew(sprite, brewObj);
