@@ -372,8 +372,10 @@ public static class EventHostExtensions
                     j++;
                     try
                     {
+#if DEBUG
                         Console.WriteLine();
                         Console.WriteLine("Step " + j + ": " + @event.GetHeaderString());
+#endif
                         var allThisTypeStandardEvents = sprite
                             .Events
                             .Where(k => k is BasicEvent &&
