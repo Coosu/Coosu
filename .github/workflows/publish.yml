@@ -22,10 +22,13 @@ jobs:
       with:
         dotnet-version: 6.0.x
       
-    - name: dotnet pack
-      run: |
+    - name: dotnet build
         dotnet nuget add source --username Milkitic --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/Milkitic/index.json"     
         dotnet build --configuration Release
+     
+    - name: dotnet pack
+      run: |
+        dotnet pack --no-build Coosu.Database --configuration Release --output ci-pack
         dotnet pack --no-build Coosu.Shared --configuration Release --output ci-pack
         dotnet pack --no-build Coosu.Storyboard --configuration Release --output ci-pack
         dotnet pack --no-build Coosu.Storyboard.Extensions --configuration Release --output ci-pack
