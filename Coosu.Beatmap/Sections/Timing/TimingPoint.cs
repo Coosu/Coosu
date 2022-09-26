@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Globalization;
 using System.IO;
 using Coosu.Beatmap.Configurable;
-using Coosu.Beatmap.Internal;
-using Coosu.Shared;
 using Coosu.Shared.Numerics;
 
 namespace Coosu.Beatmap.Sections.Timing;
@@ -84,6 +81,6 @@ public sealed class TimingPoint : SerializeWritableObject
         textWriter.Write(',');
         textWriter.Write(IsInherit ? '0' : '1');
         textWriter.Write(',');
-        textWriter.Write(IsKiai ? '1' : '0');
+        textWriter.Write((int)Effects);
     }
 }
