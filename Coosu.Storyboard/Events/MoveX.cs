@@ -20,11 +20,6 @@ public sealed class MoveX : BasicEvent, IPositionAdjustable
         set => SetValue(1, value);
     }
 
-    //public MoveX(EasingFunctionBase easing, double startTime, double endTime, double x1, double x2) :
-    //    base(easing, startTime, endTime, new[] { x1 }, new[] { x2 })
-    //{
-    //}
-
     public MoveX(EasingFunctionBase easing, double startTime, double endTime, List<double> values)
         : base(easing, startTime, endTime, values)
     {

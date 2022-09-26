@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using Coosu.Beatmap.Configurable;
 using Coosu.Shared;
 using Coosu.Shared.Numerics;
@@ -35,7 +34,9 @@ public sealed class DoubleSplitConverter : ValueConverter<List<double>>
             var d = value[i];
             textWriter.WriteStandardizedNumber(d);
             if (i < value.Count - 1)
+            {
                 textWriter.Write(_splitter);
+            }
         }
     }
 }
@@ -67,7 +68,9 @@ public sealed class Int32SplitConverter : ValueConverter<List<int>>
             var d = value[i];
             textWriter.Write(d);
             if (i < value.Count - 1)
+            {
                 textWriter.Write(_splitter);
+            }
         }
     }
 }
@@ -94,13 +97,14 @@ public sealed class SplitConverter : ValueConverter<List<string>>
 
     public override void WriteSection(TextWriter textWriter, List<string> value)
     {
-        var sb = new StringBuilder();
         for (var i = 0; i < value.Count; i++)
         {
             var d = value[i];
             textWriter.Write(d);
             if (i < value.Count - 1)
+            {
                 textWriter.Write(_splitter);
+            }
         }
     }
 }

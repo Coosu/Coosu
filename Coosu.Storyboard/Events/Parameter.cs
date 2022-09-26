@@ -48,12 +48,6 @@ public sealed class Parameter : BasicEvent
         await writer.WriteAsync(Type.ToShortString());
     }
 
-    //public Parameter(double startTime, double endTime, ParameterType type) :
-    //    base(EasingType.Linear.ToEasingFunction(), startTime, endTime,
-    //        new double[] { (int)type }, new double[] { (int)type })
-    //{
-    //}
-
     public Parameter(double startTime, double endTime, List<double> values) :
         base(EasingType.Linear.ToEasingFunction(), startTime, endTime, values)
     {

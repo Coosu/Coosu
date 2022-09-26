@@ -32,12 +32,6 @@ public sealed class Move : BasicEvent, IPositionAdjustable
         set => SetValue(3, value);
     }
 
-    //public Move(EasingFunctionBase easing, double startTime, double endTime, double x1, double y1, double x2, double y2) :
-    //    base(easing, startTime, endTime, new[] { x1, y1 }, new[] { x2, y2 })
-    //{
-
-    //}
-
     public Move(EasingFunctionBase easing, double startTime, double endTime, List<double> values)
         : base(easing, startTime, endTime, values)
     {

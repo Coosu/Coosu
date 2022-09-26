@@ -20,11 +20,6 @@ public sealed class MoveY : BasicEvent, IPositionAdjustable
         set => SetValue(1, value);
     }
 
-    //public MoveY(EasingFunctionBase easing, double startTime, double endTime, double y1, double y2) :
-    //    base(easing, startTime, endTime, new[] { y1 }, new[] { y2 })
-    //{
-    //}
-
     public MoveY(EasingFunctionBase easing, double startTime, double endTime, List<double> values)
         : base(easing, startTime, endTime, values)
     {

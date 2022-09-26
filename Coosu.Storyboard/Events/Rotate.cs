@@ -19,11 +19,6 @@ public sealed class Rotate : BasicEvent
         set => SetValue(1, value);
     }
 
-    //public Rotate(EasingFunctionBase easing, double startTime, double endTime, double r1, double r2) :
-    //    base(easing, startTime, endTime, new[] { r1 }, new[] { r2 })
-    //{
-    //}
-
     public Rotate(EasingFunctionBase easing, double startTime, double endTime, List<double> values)
         : base(easing, startTime, endTime, values)
     {

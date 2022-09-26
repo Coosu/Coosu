@@ -43,7 +43,9 @@ public class SliderInfo : SerializeWritableObject
         textWriter.Write(',');
         textWriter.Write(PixelLength.ToString(ParseHelper.EnUsNumberFormat));
         if (EdgeHitsounds == null)
+        {
             return;
+        }
 
         textWriter.Write(',');
         for (var i = 0; i < EdgeHitsounds.Length; i++)
@@ -57,7 +59,9 @@ public class SliderInfo : SerializeWritableObject
         }
 
         if (EdgeSamples == null || EdgeAdditions == null)
+        {
             return;
+        }
 
         textWriter.Write(',');
         for (var i = 0; i < EdgeSamples.Length; i++)

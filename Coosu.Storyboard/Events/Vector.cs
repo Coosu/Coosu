@@ -32,11 +32,6 @@ public sealed class Vector : BasicEvent
         set => SetValue(3, value);
     }
 
-    //public Vector(EasingFunctionBase easing, double startTime, double endTime, double vx1, double vy1, double vx2, double vy2) :
-    //    base(easing, startTime, endTime, new[] { vx1, vy1 }, new[] { vx2, vy2 })
-    //{
-    //}
-
     public Vector(EasingFunctionBase easing, double startTime, double endTime, List<double> values)
         : base(easing, startTime, endTime, values)
     {
