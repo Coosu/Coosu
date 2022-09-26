@@ -46,18 +46,13 @@ public sealed class RawHitObject : SerializeWritableObject
     }
 
     public HitsoundType Hitsound { get; set; }
-    public ExtendedSliderInfo? SliderInfo { get; set; }
     public int HoldEnd { get; set; }
-
     public ObjectSamplesetType SampleSet { get; set; }
-
     public ObjectSamplesetType AdditionSet { get; set; }
-
     public ushort CustomIndex { get; set; }
-
     public byte SampleVolume { get; set; }
-
     public string? FileName { get; set; }
+    public ExtendedSliderInfo? SliderInfo { get; set; }
 
     internal void SetExtras(ReadOnlySpan<char> extraInfo)
     {

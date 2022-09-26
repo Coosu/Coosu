@@ -41,7 +41,7 @@ public static class ScriptHelper
         }
         else
         {
-            foreach (IKeyEvent e in events.OrderBy(k => k, EventSequenceComparer.Instance))
+            foreach (IKeyEvent e in events.OrderBy(k => k,EventSequenceComparer.Instance))
             {
                 await writer.WriteAsync(indent);
                 await e.WriteScriptAsync(writer);
