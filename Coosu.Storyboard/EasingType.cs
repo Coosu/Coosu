@@ -4,7 +4,7 @@
 /// osu!storyboard built-in easing types
 /// <para><seealso href="https://osu.ppy.sh/wiki/Storyboard_Scripting/Commands"/></para>
 /// </summary>
-public enum EasingType
+public enum EasingType : byte
 {
     /// <summary>
     /// No easing.

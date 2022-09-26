@@ -7,10 +7,12 @@ namespace Coosu.Storyboard.Easing;
 [DebuggerDisplay("{DebuggerDisplay}")]
 public abstract class EasingFunctionBase : IEasingFunction
 {
-    private string DebuggerDisplay => GetDescription();
+    private static readonly Type EasingTypeT = typeof(EasingType);
 
     public EasingMode EasingMode { get; set; }
     internal bool ThrowIfChangeProperty { get; set; } = false;
+    private string DebuggerDisplay => GetDescription();
+
     public double Ease(double normalizedTime)
     {
         return EasingMode switch
@@ -43,9 +45,8 @@ public abstract class EasingFunctionBase : IEasingFunction
 
         return easingType.Value;
     }
-    public abstract EasingType? TryGetEasingType();
 
-    protected abstract double EaseInCore(double normalizedTime);
+    public abstract EasingType? TryGetEasingType();
 
     public static implicit operator EasingFunctionBase(EasingType easing)
     {
@@ -55,14 +56,15 @@ public abstract class EasingFunctionBase : IEasingFunction
 
     public static implicit operator EasingFunctionBase(int easingIndex)
     {
-        if (!Enum.IsDefined(EasingTypeT, easingIndex))
+        var index = (byte)easingIndex;
+        if (!Enum.IsDefined(EasingTypeT, index))
             throw new ArgumentOutOfRangeException(nameof(easingIndex), easingIndex, null);
-        var easing = (EasingType)easingIndex;
+        var easing = (EasingType)index;
         var easingFunction = easing.ToEasingFunction();
         return easingFunction;
     }
 
-    private static readonly Type EasingTypeT = typeof(EasingType);
+    protected abstract double EaseInCore(double normalizedTime);
 }
 
 public static class EasingFunctionExtensions
