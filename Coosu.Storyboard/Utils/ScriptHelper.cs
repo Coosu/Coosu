@@ -30,14 +30,23 @@ public static class ScriptHelper
     public static async Task WriteSequentialEventAsync(TextWriter writer, IEnumerable<IKeyEvent> events, int index)
     {
         var indent = new string(' ', index);
-        foreach (IKeyEvent e in events
-                     .OrderBy(k => k.StartTime)
-                     .ThenBy(k => k.EndTime)
-                     .ThenBy(k => k.EventType.Index))
+        if (events is SortedSet<IKeyEvent> sortedSet)
         {
-            await writer.WriteAsync(indent);
-            await e.WriteScriptAsync(writer);
-            await writer.WriteLineAsync();
+            foreach (var e in sortedSet)
+            {
+                await writer.WriteAsync(indent);
+                await e.WriteScriptAsync(writer);
+                await writer.WriteLineAsync();
+            }
+        }
+        else
+        {
+            foreach (IKeyEvent e in events.OrderBy(k => k, EventSequenceComparer.Instance))
+            {
+                await writer.WriteAsync(indent);
+                await e.WriteScriptAsync(writer);
+                await writer.WriteLineAsync();
+            }
         }
     }
 
