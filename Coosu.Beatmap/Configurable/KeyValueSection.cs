@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -10,56 +11,23 @@ namespace Coosu.Beatmap.Configurable;
 
 public abstract class KeyValueSection : Section
 {
-    private static readonly Dictionary<Type, Dictionary<string, SectionInfo>> TypePropertyInfoCache = new();
+    private static readonly ConcurrentDictionary<Type, Dictionary<string, SectionInfo>> TypePropertyInfoCache = new();
 
     protected readonly Dictionary<string, SectionInfo> PropertyInfos;
 
     public KeyValueSection()
     {
         var thisType = GetType();
-        if (TypePropertyInfoCache.TryGetValue(thisType, out var dict))
-        {
-            PropertyInfos = dict;
-            return;
-        }
-
-        PropertyInfos = new Dictionary<string, SectionInfo>();
-        var props = thisType.GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
-        for (var i = 0; i < props.Length; i++)
-        {
-            var propertyInfo = props[i];
-            if (propertyInfo.SetMethod == null) continue;
-            var isPublic = propertyInfo.SetMethod.IsPublic;
-            if (!isPublic)
-            {
-                var sectionPropertyAttr = propertyInfo.GetCustomAttribute<SectionPropertyAttribute>();
-                if (sectionPropertyAttr == null) continue;
-                PropertyInfos.Add(sectionPropertyAttr.Name ?? propertyInfo.Name, new SectionInfo(propertyInfo)
-                {
-                    UseSpecificFormat = sectionPropertyAttr.UseSpecificFormat,
-                    Attribute = sectionPropertyAttr
-                });
-            }
-            else
-            {
-                var sectionIgnoreAttr = propertyInfo.GetCustomAttribute<SectionIgnoreAttribute>();
-                if (sectionIgnoreAttr != null) continue;
-                var sectionPropertyAttr = propertyInfo.GetCustomAttribute<SectionPropertyAttribute>();
-                PropertyInfos.Add(sectionPropertyAttr?.Name ?? propertyInfo.Name, new SectionInfo(propertyInfo)
-                {
-                    UseSpecificFormat = sectionPropertyAttr?.UseSpecificFormat ?? false,
-                    Attribute = sectionPropertyAttr,
-                });
-            }
-        }
-
-        TypePropertyInfoCache.Add(thisType, PropertyInfos);
+        PropertyInfos = TypePropertyInfoCache.GetOrAdd(thisType, AddTypeSectionInfo);
     }
 
     [SectionIgnore]
     public Dictionary<string, string> UndefinedPairs { get; } = new();
 
+    [SectionIgnore]
     protected virtual FlagRule FlagRule { get; } = FlagRules.Colon;
+
+    [SectionIgnore]
     protected virtual IReadOnlyList<FlagRule> FuzzyFlagRules { get; } = FlagRules.FuzzyRules;
 
     public override void Match(string line)
@@ -110,83 +78,15 @@ public abstract class KeyValueSection : Section
 
     public override void AppendSerializedString(TextWriter textWriter)
     {
-        textWriter.Write("[");
+        textWriter.Write('[');
         textWriter.Write(SectionName);
-        textWriter.WriteLine("]");
+        textWriter.WriteLine(']');
 
         foreach (var kvp in PropertyInfos)
         {
             var name = kvp.Key;
             var sectionInfo = kvp.Value;
-            var prop = sectionInfo.PropertyInfo;
-
-            string? value = null;
-            var rawObj = prop.GetValue(this);
-            if (sectionInfo.Attribute?.Default != null)
-            {
-                if (sectionInfo.Attribute.Default is SectionPropertyAttribute.DefaultValue)
-                {
-                    if (rawObj == default) continue;
-                    if (rawObj is ICollection { Count: 0 }) continue;
-                }
-
-                if (sectionInfo.Attribute.Default.GetHashCode() == rawObj?.GetHashCode())
-                    continue;
-            }
-
-            var attr = prop.GetCustomAttribute<SectionConverterAttribute>(false);
-            if (attr != null)
-            {
-                var converter = attr.GetConverter();
-
-                textWriter.Write(name);
-                textWriter.Write(FlagRule.SplitFlag);
-                if (rawObj != null) converter.WriteSection(textWriter, rawObj);
-                textWriter.WriteLine();
-                continue;
-            }
-
-            if (prop.GetMethod!.ReturnType.BaseType == StaticTypes.Enum && rawObj != null)
-            {
-                var enumAttr = prop.GetCustomAttribute<SectionEnumAttribute>(false);
-                if (enumAttr != null)
-                {
-                    switch (enumAttr.Option)
-                    {
-                        case EnumParseOption.Index:
-                            var type = Enum.GetUnderlyingType(rawObj.GetType());
-                            value = Convert.ChangeType(rawObj, type).ToString();
-                            break;
-                        case EnumParseOption.String:
-                            value = rawObj.ToString();
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException();
-                    }
-                }
-            }
-            else if (prop.GetMethod.ReturnType == StaticTypes.Boolean && rawObj != null)
-            {
-                var boolAttr = prop.GetCustomAttribute<SectionBoolAttribute>(false);
-                if (boolAttr != null)
-                {
-                    value = boolAttr.Type switch
-                    {
-                        BoolParseType.ZeroOne => Convert.ToInt32(rawObj).ToString(),
-                        BoolParseType.String => rawObj.ToString(),
-                        _ => throw new ArgumentOutOfRangeException()
-                    };
-                }
-            }
-
-            if (value == null && rawObj != null)
-            {
-                value = rawObj.ToString();
-            }
-
-            textWriter.Write(name);
-            textWriter.Write(FlagRule.SplitFlag);
-            textWriter.WriteLine(value);
+            AppendPair(textWriter, sectionInfo, name);
         }
     }
 
@@ -228,5 +128,113 @@ public abstract class KeyValueSection : Section
         }
 
         return index;
+    }
+
+    private void AppendPair(TextWriter textWriter, SectionInfo sectionInfo, string name)
+    {
+        var prop = sectionInfo.PropertyInfo;
+
+        string? value = null;
+        var rawObj = prop.GetValue(this);
+        if (sectionInfo.Attribute?.Default != null)
+        {
+            if (sectionInfo.Attribute.Default is SectionPropertyAttribute.DefaultValue)
+            {
+                if (rawObj == default) return;
+                if (rawObj is ICollection { Count: 0 }) return;
+            }
+
+            if (sectionInfo.Attribute.Default.GetHashCode() == rawObj?.GetHashCode())
+                return;
+        }
+
+        var attr = prop.GetCustomAttribute<SectionConverterAttribute>(false);
+        if (attr != null)
+        {
+            var converter = attr.GetConverter();
+
+            textWriter.Write(name);
+            textWriter.Write(FlagRule.SplitFlag);
+            if (rawObj != null) converter.WriteSection(textWriter, rawObj);
+            textWriter.WriteLine();
+            return;
+        }
+
+        if (prop.GetMethod!.ReturnType.BaseType == StaticTypes.Enum && rawObj != null)
+        {
+            var enumAttr = prop.GetCustomAttribute<SectionEnumAttribute>(false);
+            if (enumAttr != null)
+            {
+                switch (enumAttr.Option)
+                {
+                    case EnumParseOption.Index:
+                        var type = Enum.GetUnderlyingType(rawObj.GetType());
+                        value = Convert.ChangeType(rawObj, type).ToString();
+                        break;
+                    case EnumParseOption.String:
+                        value = rawObj.ToString();
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+        }
+        else if (prop.GetMethod.ReturnType == StaticTypes.Boolean && rawObj != null)
+        {
+            var boolAttr = prop.GetCustomAttribute<SectionBoolAttribute>(false);
+            if (boolAttr != null)
+            {
+                value = boolAttr.Type switch
+                {
+                    BoolParseType.ZeroOne => Convert.ToInt32(rawObj).ToString(),
+                    BoolParseType.String => rawObj.ToString(),
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+            }
+        }
+
+        if (value == null && rawObj != null)
+        {
+            value = rawObj.ToString();
+        }
+
+        textWriter.Write(name);
+        textWriter.Write(FlagRule.SplitFlag);
+        textWriter.WriteLine(value);
+    }
+
+    private static Dictionary<string, SectionInfo> AddTypeSectionInfo(Type type)
+    {
+        var propertyInfos = new Dictionary<string, SectionInfo>();
+        var props = type.GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
+        for (var i = 0; i < props.Length; i++)
+        {
+            var propertyInfo = props[i];
+            if (propertyInfo.SetMethod == null) continue;
+            var isPublic = propertyInfo.SetMethod.IsPublic;
+            if (!isPublic)
+            {
+                var sectionPropertyAttr = propertyInfo.GetCustomAttribute<SectionPropertyAttribute>();
+                if (sectionPropertyAttr == null) continue;
+                propertyInfos.Add(sectionPropertyAttr.Name ?? propertyInfo.Name, new SectionInfo(propertyInfo)
+                {
+                    UseSpecificFormat = sectionPropertyAttr.UseSpecificFormat,
+                    Attribute = sectionPropertyAttr
+                });
+            }
+            else
+            {
+                var sectionIgnoreAttr = propertyInfo.GetCustomAttribute<SectionIgnoreAttribute>();
+                if (sectionIgnoreAttr != null) continue;
+                var sectionPropertyAttr = propertyInfo.GetCustomAttribute<SectionPropertyAttribute>();
+                propertyInfos.Add(sectionPropertyAttr?.Name ?? propertyInfo.Name, new SectionInfo(propertyInfo)
+                {
+                    UseSpecificFormat = sectionPropertyAttr?.UseSpecificFormat ?? false,
+                    Attribute = sectionPropertyAttr,
+                });
+            }
+        }
+
+        return propertyInfos;
     }
 }
