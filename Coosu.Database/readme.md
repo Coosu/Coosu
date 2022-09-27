@@ -1,8 +1,6 @@
 # Coosu.Database
 A library for reading osu database.
 
-**Currently support osu!.db only**
-
 ## Basic Usage
 ```cs
 using System;
