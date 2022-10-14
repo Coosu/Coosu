@@ -86,7 +86,8 @@ public sealed class RawHitObject : SerializeWritableObject
         if (ObjectType == HitObjectType.Slider && SliderInfo != null)
         {
             SliderInfo.AppendSerializedString(textWriter);
-            if (SampleSet == 0 && AdditionSet == 0 && CustomIndex == 0 && SampleVolume == 0 &&
+            if (SliderInfo.EdgeHitsounds == null &&
+                SampleSet == 0 && AdditionSet == 0 && CustomIndex == 0 && SampleVolume == 0 &&
                 string.IsNullOrEmpty(FileName))
             {
                 return;
