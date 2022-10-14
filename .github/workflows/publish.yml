@@ -62,16 +62,16 @@ jobs:
           ./ci-pack/Coosu.Beatmap.${{ steps.version.outputs.version }}.nupkg
           ./ci-pack/Coosu.Api.${{ steps.version.outputs.version }}.nupkg
 
-    - name: Push Github Package
-      if: ${{ success() }}
-      run: |
-        dotnet nuget push "./ci-pack/Coosu.Database.${{ steps.version.outputs.version }}.nupkg"  --api-key ${{secrets.MILKI_COOSU_TOKEN}} --source "github"
-        dotnet nuget push "./ci-pack/Coosu.Shared.${{ steps.version.outputs.version }}.nupkg"  --api-key ${{secrets.MILKI_COOSU_TOKEN}} --source "github"
-        dotnet nuget push "./ci-pack/Coosu.Storyboard.${{ steps.version.outputs.version }}.nupkg"  --api-key ${{secrets.MILKI_COOSU_TOKEN}} --source "github"
-        dotnet nuget push "./ci-pack/Coosu.Storyboard.Extensions.${{ steps.version.outputs.version }}.nupkg"  --api-key ${{secrets.MILKI_COOSU_TOKEN}} --source "github"
-        dotnet nuget push "./ci-pack/Coosu.Storyboard.OsbX.${{ steps.version.outputs.version }}.nupkg"  --api-key ${{secrets.MILKI_COOSU_TOKEN}} --source "github"
-        dotnet nuget push "./ci-pack/Coosu.Beatmap.${{ steps.version.outputs.version }}.nupkg"  --api-key ${{secrets.MILKI_COOSU_TOKEN}} --source "github"
-        dotnet nuget push "./ci-pack/Coosu.Api.${{ steps.version.outputs.version }}.nupkg"  --api-key ${{secrets.MILKI_COOSU_TOKEN}} --source "github"
+    # - name: Push Github Package
+    #   if: ${{ success() }}
+    #   run: |
+    #     dotnet nuget push "./ci-pack/Coosu.Database.${{ steps.version.outputs.version }}.nupkg"  --api-key ${{secrets.MILKI_COOSU_TOKEN}} --source "github"
+    #     dotnet nuget push "./ci-pack/Coosu.Shared.${{ steps.version.outputs.version }}.nupkg"  --api-key ${{secrets.MILKI_COOSU_TOKEN}} --source "github"
+    #     dotnet nuget push "./ci-pack/Coosu.Storyboard.${{ steps.version.outputs.version }}.nupkg"  --api-key ${{secrets.MILKI_COOSU_TOKEN}} --source "github"
+    #     dotnet nuget push "./ci-pack/Coosu.Storyboard.Extensions.${{ steps.version.outputs.version }}.nupkg"  --api-key ${{secrets.MILKI_COOSU_TOKEN}} --source "github"
+    #     dotnet nuget push "./ci-pack/Coosu.Storyboard.OsbX.${{ steps.version.outputs.version }}.nupkg"  --api-key ${{secrets.MILKI_COOSU_TOKEN}} --source "github"
+    #     dotnet nuget push "./ci-pack/Coosu.Beatmap.${{ steps.version.outputs.version }}.nupkg"  --api-key ${{secrets.MILKI_COOSU_TOKEN}} --source "github"
+    #     dotnet nuget push "./ci-pack/Coosu.Api.${{ steps.version.outputs.version }}.nupkg"  --api-key ${{secrets.MILKI_COOSU_TOKEN}} --source "github"
 
     - name: Push Nuget Package
       if: ${{ success() }}
