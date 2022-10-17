@@ -23,9 +23,9 @@ public static class EnumExtensions
     {
         return sliderType switch
         {
-            SliderType.Linear  => 'L',
+            SliderType.Linear => 'L',
             SliderType.Perfect => 'P',
-            SliderType.Bezier  => 'B',
+            SliderType.Bezier => 'B',
 #pragma warning disable CS0618
             SliderType.Catmull => 'C',
 #pragma warning restore CS0618

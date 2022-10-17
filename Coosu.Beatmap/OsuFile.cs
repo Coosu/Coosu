@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Coosu.Beatmap.Configurable;
-using Coosu.Beatmap.Extensions;
 using Coosu.Beatmap.Sections;
 using Coosu.Beatmap.Sections.Event;
 using Coosu.Beatmap.Sections.Timing;

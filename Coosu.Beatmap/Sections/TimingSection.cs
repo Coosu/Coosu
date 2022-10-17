@@ -2,7 +2,6 @@
 using System.IO;
 using System.Linq;
 using Coosu.Beatmap.Configurable;
-using Coosu.Beatmap.Internal;
 using Coosu.Beatmap.Sections.Timing;
 using Coosu.Shared;
 using Coosu.Shared.Numerics;

@@ -8,13 +8,11 @@ using System.Threading.Tasks;
 using Coosu.Beatmap;
 using Coosu.Beatmap.Sections.HitObject;
 using Coosu.Database;
-using Coosu.Database.Internal;
 using Coosu.Database.Serialization;
 using Coosu.Storyboard;
 using Coosu.Storyboard.Easing;
 using Coosu.Storyboard.Extensions.Computing;
 using Coosu.Storyboard.Extensions.Optimizing;
-using Newtonsoft.Json;
 
 namespace CoosuTest;
 

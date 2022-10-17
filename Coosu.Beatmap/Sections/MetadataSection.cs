@@ -30,7 +30,7 @@ public sealed class MetadataSection : KeyValueSection
     [SectionProperty("ArtistUnicode")]
     public string? ArtistUnicode { get; set; }
 
-    [SectionProperty("Creator")] 
+    [SectionProperty("Creator")]
     public string? Creator { get; set; }
 
     [SectionProperty("Version")]
@@ -43,9 +43,9 @@ public sealed class MetadataSection : KeyValueSection
     [SectionConverter(typeof(SplitConverter), ' ')]
     public List<string> TagList { get; set; } = new();
 
-    [SectionProperty("BeatmapID")] 
+    [SectionProperty("BeatmapID")]
     public int BeatmapId { get; set; } = -1;
-    [SectionProperty("BeatmapSetID")] 
+    [SectionProperty("BeatmapSetID")]
     public int BeatmapSetId { get; set; } = -1;
 
     [SectionIgnore]

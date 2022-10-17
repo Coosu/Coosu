@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using System.IO;
+﻿using System.IO;
 using Coosu.Beatmap.Configurable;
 using Coosu.Shared.Numerics;
 

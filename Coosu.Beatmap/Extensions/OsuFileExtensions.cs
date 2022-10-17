@@ -5,7 +5,8 @@ using System.Threading.Tasks;
 using Coosu.Beatmap.Sections;
 using Coosu.Shared.IO;
 
-namespace Coosu.Beatmap.Extensions;
+// ReSharper disable once CheckNamespace
+namespace Coosu.Beatmap;
 
 public static class OsuFileExtensions
 {
