@@ -78,24 +78,3 @@ public class SliderInfo : SerializeWritableObject
         }
     }
 }
-
-public sealed class SliderEdge
-{
-    public double Offset { get; set; }
-    public Vector2 Point { get; set; }
-    public HitsoundType EdgeHitsound { get; set; }
-    public ObjectSamplesetType EdgeSample { get; set; }
-    public ObjectSamplesetType EdgeAddition { get; set; }
-}
-
-public readonly struct SliderTick
-{
-    public SliderTick(double offset, in Vector2 point)
-    {
-        Offset = offset;
-        Point = point;
-    }
-
-    public double Offset { get; }
-    public Vector2 Point { get; }
-}

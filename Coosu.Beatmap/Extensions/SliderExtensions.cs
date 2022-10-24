@@ -11,23 +11,24 @@ namespace Coosu.Beatmap;
 
 public static class SliderExtensions
 {
+    public static IEnumerable<SliderEdge> EnumerateEdges(this ExtendedSliderInfo sliderInfo)
+    {
+        for (var i = 0; i < sliderInfo.Repeat + 1; i++)
+        {
+            yield return new SliderEdge
+            (
+                offset: sliderInfo.StartTime + sliderInfo.CurrentSingleDuration * i,
+                point: i % 2 == 0 ? sliderInfo.StartPoint : sliderInfo.EndPoint,
+                edgeHitsound: sliderInfo.EdgeHitsounds?[i] ?? 0,
+                edgeSample: sliderInfo.EdgeSamples?[i] ?? ObjectSamplesetType.Auto,
+                edgeAddition: sliderInfo.EdgeAdditions?[i] ?? ObjectSamplesetType.Auto
+            );
+        }
+    }
+
     public static SliderEdge[] GetEdges(this ExtendedSliderInfo sliderInfo)
     {
-        var edges = new SliderEdge[sliderInfo.Repeat + 1];
-
-        for (var i = 0; i < edges.Length; i++)
-        {
-            edges[i] = new SliderEdge
-            {
-                Offset = sliderInfo.StartTime + sliderInfo.CurrentSingleDuration * i,
-                Point = i % 2 == 0 ? sliderInfo.StartPoint : sliderInfo.EndPoint,
-                EdgeHitsound = sliderInfo.EdgeHitsounds?[i] ?? HitsoundType.Normal,
-                EdgeSample = sliderInfo.EdgeSamples?[i] ?? ObjectSamplesetType.Auto,
-                EdgeAddition = sliderInfo.EdgeAdditions?[i] ?? ObjectSamplesetType.Auto
-            };
-        }
-
-        return edges;
+        return EnumerateEdges(sliderInfo).ToArray();
     }
 
     public static SliderTick[] GetSliderTicks(this ExtendedSliderInfo sliderInfo)
