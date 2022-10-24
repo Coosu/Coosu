@@ -1,0 +1,12 @@
+﻿v2.3.12:
+  Date: 2022/8/5
+  Notes:
+  - '[+] Now application will notify with messagebox if crashed'
+  - '[+] Add `LowPassSampleProvider` to behave like osu!lazer (EnableMusicFunctions=true)'
+  - '[+] Use new `FadeInOutSampleProvider` to make fading smooth (EnableMusicFunctions=true)'
+  - '[~] Fix crash while playing with `None` after playing maps with `DT`'
+  - '[~] Use new `SmartWaveReader` to read file headers instead of extensions. Hitsounds or music of some beatmap now can be loaded correctly (s/197085) (s/1602552)'
+  - '[~] Code quality improvement & minor fixes'
+  Issues:
+  - Beatmap offset & online offset will be ignored while music related functions is enabled
+  - Sometimes hitsounds can be muted while hitting objects

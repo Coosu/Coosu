@@ -86,8 +86,8 @@ public class SpriteCompressor : IDisposable
                     .ToList();
         }
 
-        var uselessSprites = new ConcurrentBag<Sprite>();
-        var possibleBgs = new ConcurrentBag<Sprite>();
+        var uselessSprites = new ConcurrentQueue<Sprite>();
+        var possibleBgs = new ConcurrentQueue<Sprite>();
 
         var isCancel = await RunPTask(uselessSprites, possibleBgs);
 
@@ -133,7 +133,7 @@ public class SpriteCompressor : IDisposable
         return true;
     }
 
-    private Task<bool> RunPTask(ConcurrentBag<Sprite> uselessSprites, ConcurrentBag<Sprite> possibleBgs)
+    private Task<bool> RunPTask(ConcurrentQueue<Sprite> uselessSprites, ConcurrentQueue<Sprite> possibleBgs)
     {
         return Task.Factory.StartNew(() =>
         {
@@ -155,7 +155,7 @@ public class SpriteCompressor : IDisposable
                         }
 
                         var preserve = InnerCompress(mrs, sprite, possibleBgs);
-                        if (!preserve) uselessSprites.Add(sprite);
+                        if (!preserve) uselessSprites.Enqueue(sprite);
                         if (ProgressChanged != null)
                         {
                             lock (indexLock)
@@ -211,7 +211,7 @@ public class SpriteCompressor : IDisposable
     /// <param name="sprite"></param>
     /// <param name="possibleBgs"></param>
     /// <returns>determine if preserve the object.</returns>
-    private bool InnerCompress(ManualResetEventSlim mrs, Sprite sprite, ConcurrentBag<Sprite> possibleBgs)
+    private bool InnerCompress(ManualResetEventSlim mrs, Sprite sprite, ConcurrentQueue<Sprite> possibleBgs)
     {
         // 每个类型压缩从后往前
         // 0.标准化
@@ -295,7 +295,7 @@ public class SpriteCompressor : IDisposable
             Path.GetFileName(sprite.ImagePath) == sprite.ImagePath &&
             sprite.LayerType == LayerType.Background)
         {
-            possibleBgs.Add(sprite);
+            possibleBgs.Enqueue(sprite);
             return true;
         }
 

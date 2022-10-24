@@ -84,7 +84,7 @@ public sealed class OsuDirectory
         osuFile.HitObjects.ComputeSlidersByCurrentSettings();
 
         var hitObjects = osuFile.HitObjects.HitObjectList;
-        var elements = new ConcurrentBag<HitsoundNode>();
+        var elements = new ConcurrentQueue<HitsoundNode>();
         await Task.Run(() =>
         {
             hitObjects
@@ -105,7 +105,7 @@ public sealed class OsuDirectory
 
             osuFile.Events?.Samples.AsParallel().ForAll(sampleData =>
             {
-                elements.Add(HitsoundNode.Create(Guid.NewGuid(), sampleData.Offset, sampleData.Volume / 100f, 0,
+                elements.Enqueue(HitsoundNode.Create(Guid.NewGuid(), sampleData.Offset, sampleData.Volume / 100f, 0,
                     sampleData.Filename, false, PlayablePriority.Sampling));
             });
         }).ConfigureAwait(false);
@@ -114,7 +114,7 @@ public sealed class OsuDirectory
     }
 
     private void AddSingleHitObject(GeneralSection generalSection, TimingSection timingSection,
-        RawHitObject hitObject, ConcurrentBag<HitsoundNode> elements)
+        RawHitObject hitObject, ConcurrentQueue<HitsoundNode> elements)
     {
         var ignoreBalance = generalSection.Mode == GameMode.Taiko;
         var ignoreBase = generalSection.Mode == GameMode.Mania;
@@ -138,7 +138,7 @@ public sealed class OsuDirectory
                     hitObject.ObjectType == HitObjectType.Spinner
                         ? PlayablePriority.Secondary
                         : PlayablePriority.Primary);
-                elements.Add(element);
+                elements.Enqueue(element);
             }
         }
         else // sliders
@@ -172,7 +172,7 @@ public sealed class OsuDirectory
                 {
                     var element = HitsoundNode.Create(guid, (int)itemOffset, volume, balance, filename, useUserSkin,
                         i == 0 ? PlayablePriority.Primary : PlayablePriority.Secondary);
-                    elements.Add(element);
+                    elements.Enqueue(element);
                 }
             }
 
@@ -193,7 +193,7 @@ public sealed class OsuDirectory
 
                 var element = HitsoundNode.Create(Guid.NewGuid(), (int)itemOffset, volume, balance, filename,
                     useUserSkin, PlayablePriority.Effects);
-                elements.Add(element);
+                elements.Enqueue(element);
             }
 
             // sliding
@@ -287,7 +287,7 @@ public sealed class OsuDirectory
                 slideElements.Add(stopElement2);
                 foreach (var slideElement in slideElements)
                 {
-                    elements.Add(slideElement);
+                    elements.Enqueue(slideElement);
                 }
             }
 
@@ -302,7 +302,7 @@ public sealed class OsuDirectory
                 .Select(k => HitsoundNode.CreateLoopBalanceSignal((int)k.offset, k.balance));
             foreach (var balanceElement in all)
             {
-                elements.Add(balanceElement);
+                elements.Enqueue(balanceElement);
             }
         }
     }
