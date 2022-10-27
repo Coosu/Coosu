@@ -4,12 +4,12 @@ namespace Coosu.Beatmap.Sections.HitObject;
 
 public sealed class ExtendedSliderInfo : SliderInfo
 {
-    public ExtendedSliderInfo()
+    public ExtendedSliderInfo(RawHitObject baseObject) : base(baseObject)
     {
 
     }
 
-    public ExtendedSliderInfo(SliderInfo sliderInfo)
+    public ExtendedSliderInfo(SliderInfo sliderInfo, RawHitObject baseObject) : base(baseObject)
     {
         SliderType = sliderInfo.SliderType;
         ControlPoints = sliderInfo.ControlPoints;

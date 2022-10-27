@@ -5,13 +5,15 @@ namespace Coosu.Beatmap.Sections.HitObject;
 public readonly struct SliderEdge
 {
     public SliderEdge(double offset, Vector2 point,
-        HitsoundType edgeHitsound, ObjectSamplesetType edgeSample, ObjectSamplesetType edgeAddition)
+        HitsoundType edgeHitsound, ObjectSamplesetType edgeSample, ObjectSamplesetType edgeAddition,
+        bool isHitsoundDefined)
     {
         Offset = offset;
         Point = point;
         EdgeHitsound = edgeHitsound;
         EdgeSample = edgeSample;
         EdgeAddition = edgeAddition;
+        IsHitsoundDefined = isHitsoundDefined;
     }
 
     public double Offset { get; }
@@ -19,4 +21,5 @@ public readonly struct SliderEdge
     public HitsoundType EdgeHitsound { get; }
     public ObjectSamplesetType EdgeSample { get; }
     public ObjectSamplesetType EdgeAddition { get; }
+    public bool IsHitsoundDefined { get; }
 }

@@ -10,6 +10,11 @@ namespace Coosu.Beatmap.Sections.HitObject;
 
 public class SliderInfo : SerializeWritableObject
 {
+    public SliderInfo(RawHitObject baseObject)
+    {
+        BaseObject = baseObject;
+    }
+
     public SliderType SliderType { get; set; }
     public IReadOnlyList<Vector2> ControlPoints { get; set; } = EmptyArray<Vector2>.Value;
     public int Repeat { get; set; }
@@ -22,6 +27,9 @@ public class SliderInfo : SerializeWritableObject
     public Vector2 EndPoint => ControlPoints[ControlPoints.Count - 1];
 
     public int StartTime { get; set; }
+
+    public RawHitObject BaseObject { get; }
+
     public override void AppendSerializedString(TextWriter textWriter)
     {
         textWriter.Write(SliderType.ToSliderFlag());
@@ -42,36 +50,26 @@ public class SliderInfo : SerializeWritableObject
         textWriter.Write(Repeat);
         textWriter.Write(',');
         textWriter.Write(PixelLength.ToString(ParseHelper.EnUsNumberFormat));
-        if (EdgeHitsounds == null)
-        {
-            return;
-        }
-
         textWriter.Write(',');
-        for (var i = 0; i < EdgeHitsounds.Length; i++)
+        for (var i = 0; i < Repeat + 1; i++)
         {
-            var edgeHitsound = EdgeHitsounds[i];
+            var edgeHitsound = EdgeHitsounds?[i] ?? BaseObject.Hitsound;
             textWriter.Write((byte)edgeHitsound);
-            if (i < EdgeHitsounds.Length - 1)
+            if (i < Repeat)
             {
                 textWriter.Write('|');
             }
         }
 
-        if (EdgeSamples == null || EdgeAdditions == null)
-        {
-            return;
-        }
-
         textWriter.Write(',');
-        for (var i = 0; i < EdgeSamples.Length; i++)
+        for (var i = 0; i < Repeat + 1; i++)
         {
-            var edgeSample = EdgeSamples[i];
-            var edgeAddition = EdgeAdditions[i];
+            var edgeSample = EdgeSamples?[i] ?? BaseObject.SampleSet;
+            var edgeAddition = EdgeAdditions?[i] ?? BaseObject.AdditionSet;
             textWriter.Write((byte)edgeSample);
             textWriter.Write(':');
             textWriter.Write((byte)edgeAddition);
-            if (i < EdgeSamples.Length - 1)
+            if (i < Repeat)
             {
                 textWriter.Write('|');
             }

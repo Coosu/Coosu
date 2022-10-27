@@ -314,7 +314,7 @@ public sealed class HitObjectSection : Section
             hitObject.SetExtras(extraInfo);
         }
 
-        hitObject.SliderInfo = new ExtendedSliderInfo
+        hitObject.SliderInfo = new ExtendedSliderInfo(hitObject)
         {
             StartPoint = new Vector2(hitObject.X, hitObject.Y),
             StartTime = hitObject.Offset,

@@ -19,9 +19,10 @@ public static class SliderExtensions
             (
                 offset: sliderInfo.StartTime + sliderInfo.CurrentSingleDuration * i,
                 point: i % 2 == 0 ? sliderInfo.StartPoint : sliderInfo.EndPoint,
-                edgeHitsound: sliderInfo.EdgeHitsounds?[i] ?? 0,
-                edgeSample: sliderInfo.EdgeSamples?[i] ?? ObjectSamplesetType.Auto,
-                edgeAddition: sliderInfo.EdgeAdditions?[i] ?? ObjectSamplesetType.Auto
+                edgeHitsound: sliderInfo.EdgeHitsounds?[i] ?? sliderInfo.BaseObject.Hitsound,
+                edgeSample: sliderInfo.EdgeSamples?[i] ?? sliderInfo.BaseObject.SampleSet,
+                edgeAddition: sliderInfo.EdgeAdditions?[i] ?? sliderInfo.BaseObject.AdditionSet,
+                isHitsoundDefined: sliderInfo.EdgeHitsounds == null
             );
         }
     }
