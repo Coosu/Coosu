@@ -5,6 +5,7 @@
     <Description>Coosu.Shared is shared library for Coosu projects.</Description>
     <PackageTags>osu, osu!, osugame</PackageTags>
     <IsTrimmable>true</IsTrimmable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

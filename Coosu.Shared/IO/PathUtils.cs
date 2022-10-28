@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace Coosu.Shared.IO;
 
@@ -11,11 +11,12 @@ public static class PathUtils
     {
         if (source == null) throw new ArgumentNullException(nameof(source));
 
-        var allInvalid = Path.GetInvalidFileNameChars().Union(Path.GetInvalidPathChars());
-        var sb = new StringBuilder(source);
-        foreach (var c in allInvalid)
+        var allInvalid = new HashSet<char>(Path.GetInvalidFileNameChars().Union(Path.GetInvalidPathChars()));
+        Span<char> span = stackalloc char[192];
+        var sb = new ValueStringBuilder(span);
+        foreach (var c in source.Where(c => !allInvalid.Contains(c)))
         {
-            sb.Replace(c, '_');
+            sb.Append(c);
         }
 
         return sb.ToString();
