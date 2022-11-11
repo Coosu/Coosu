@@ -27,7 +27,7 @@ public static class EnumExtensions
     public static LoopType ToLoopType(this ReadOnlySpan<char> loopType)
     {
 #if NET6_0_OR_GREATER
-            return Enum.Parse<LoopType>(loopType);
+        return Enum.Parse<LoopType>(loopType);
 #else
         if (loopType.Length == 1 && loopType[0] <= '9' && loopType[0] >= '0')
             return (LoopType)byte.Parse(loopType.ToString());
@@ -43,7 +43,7 @@ public static class EnumExtensions
     public static LayerType ToLayerType(this ReadOnlySpan<char> layerType)
     {
 #if NET6_0_OR_GREATER
-            return Enum.Parse<LayerType>(layerType);
+        return Enum.Parse<LayerType>(layerType);
 #else
         if (layerType.Length == 1 && layerType[0] <= '9' && layerType[0] >= '0')
             return (LayerType)byte.Parse(layerType.ToString());
@@ -65,7 +65,7 @@ public static class EnumExtensions
     public static OriginType ToOriginType(this ReadOnlySpan<char> originType)
     {
 #if NET6_0_OR_GREATER
-            return Enum.Parse<OriginType>(originType);
+        return Enum.Parse<OriginType>(originType);
 #else
         if (originType.Length == 1 && originType[0] <= '9' && originType[0] >= '0')
             return (OriginType)byte.Parse(originType.ToString());

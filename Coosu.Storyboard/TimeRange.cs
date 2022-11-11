@@ -9,7 +9,7 @@ namespace Coosu.Storyboard;
 
 public class TimeRange
 {
-    private readonly List<TimingPoint> _timingPoints = new();
+    private readonly List<TimeOffset> _timingPoints = new();
     private List<RangeValue<double>>? _timingList;
 
     public int Count => TimingList.Count;
@@ -24,8 +24,8 @@ public class TimeRange
     public void Add(double startTime, double endTime)
     {
         if (startTime.Equals(endTime)) return;
-        _timingPoints.AddSorted(new TimingPoint(startTime, true), TimingPointComparer.Instance);
-        _timingPoints.AddSorted(new TimingPoint(endTime, false), TimingPointComparer.Instance);
+        _timingPoints.AddSorted(new TimeOffset(startTime, true), TimingPointComparer.Instance);
+        _timingPoints.AddSorted(new TimeOffset(endTime, false), TimingPointComparer.Instance);
         _timingList = null;
     }
 

@@ -9,7 +9,7 @@ namespace Coosu.Storyboard;
 public static class SpriteBasicEventExtensions
 {
     // Move
-    public static void Move(this IEventHost host, double startTime, Vector2D point) =>
+    public static void Move(this IEventHost host, double startTime, in Vector2D point) =>
         host.AddEvent(EventTypes.Move, LinearEase.Instance, startTime, startTime, point.X, point.Y, point.X, point.Y);
     public static void Move(this IEventHost host, double startTime, double x, double y) =>
         host.AddEvent(EventTypes.Move, LinearEase.Instance, startTime, startTime, x, y, x, y);
@@ -17,7 +17,7 @@ public static class SpriteBasicEventExtensions
         host.AddEvent(EventTypes.Move, LinearEase.Instance, startTime, endTime, x, y, x, y);
     public static void Move(this IEventHost host, double startTime, double endTime, double x1, double y1, double x2, double y2) =>
         host.AddEvent(EventTypes.Move, LinearEase.Instance, startTime, endTime, x1, y1, x2, y2);
-    public static void Move(this IEventHost host, double startTime, double endTime, Vector2D startPoint, Vector2D endPoint) =>
+    public static void Move(this IEventHost host, double startTime, double endTime, in Vector2D startPoint, in Vector2D endPoint) =>
         host.AddEvent(EventTypes.Move, LinearEase.Instance, startTime, endTime, startPoint.X, startPoint.Y, endPoint.X, endPoint.Y);
     /// <summary>
     /// 
@@ -29,7 +29,7 @@ public static class SpriteBasicEventExtensions
     /// <param name="endTime"></param>
     /// <param name="startPoint"></param>
     /// <param name="endPoint"></param>
-    public static void Move(this IEventHost host, EasingFunctionBase easing, double startTime, double endTime, Vector2D startPoint, Vector2D endPoint) =>
+    public static void Move(this IEventHost host, EasingFunctionBase easing, double startTime, double endTime, in Vector2D startPoint, Vector2D endPoint) =>
         host.AddEvent(EventTypes.Move, easing, startTime, endTime, startPoint.X, startPoint.Y, endPoint.X, endPoint.Y);
     /// <summary>
     /// 
@@ -153,7 +153,7 @@ public static class SpriteBasicEventExtensions
     /// </summary>
     /// <param name="startTime"></param>
     /// <param name="color">Fixed rgb value. The range of each value is 0-255.</param>
-    public static void Color(this IEventHost host, double startTime, Vector3D color) =>
+    public static void Color(this IEventHost host, double startTime, in Vector3D color) =>
         host.AddEvent(EventTypes.Color, LinearEase.Instance, startTime, startTime, color.X, color.Y, color.Z, color.X, color.Y, color.Z);
     /// <summary>
     /// Color by rgb values.
@@ -161,7 +161,7 @@ public static class SpriteBasicEventExtensions
     /// <param name="startTime"></param>
     /// <param name="endTime"></param>
     /// <param name="color">Fixed rgb value. The range of each value is 0-255.</param>
-    public static void Color(this IEventHost host, double startTime, double endTime, Vector3D color) =>
+    public static void Color(this IEventHost host, double startTime, double endTime, in Vector3D color) =>
         host.AddEvent(EventTypes.Color, LinearEase.Instance, startTime, endTime, color.X, color.Y, color.Z, color.X, color.Y, color.Z);
     /// <summary>
     /// Color by rgb values.
@@ -170,7 +170,7 @@ public static class SpriteBasicEventExtensions
     /// <param name="endTime"></param>
     /// <param name="color1">Start rgb value. The range of each value is 0-255.</param>
     /// <param name="color2">End rgb value. The range of each value is 0-255.</param>
-    public static void Color(this IEventHost host, double startTime, double endTime, Vector3D color1, Vector3D color2) =>
+    public static void Color(this IEventHost host, double startTime, double endTime, in Vector3D color1, in Vector3D color2) =>
         host.AddEvent(EventTypes.Color, LinearEase.Instance, startTime, endTime, color1.X, color1.Y, color1.Z, color2.X, color2.Y, color2.Z);
     /// <summary>
     /// Color by rgb values.
@@ -253,13 +253,13 @@ public static class SpriteBasicEventExtensions
     #endregion
 
     // Vector
-    public static void Vector(this IEventHost host, double startTime, Vector2D vector) =>
+    public static void Vector(this IEventHost host, double startTime, in Vector2D vector) =>
         host.AddEvent(EventTypes.Vector, LinearEase.Instance, startTime, startTime, vector.X, vector.Y, vector.X, vector.Y);
     public static void Vector(this IEventHost host, double startTime, double w, double h) =>
         host.AddEvent(EventTypes.Vector, LinearEase.Instance, startTime, startTime, w, h, w, h);
     public static void Vector(this IEventHost host, double startTime, double endTime, double w, double h) =>
         host.AddEvent(EventTypes.Vector, LinearEase.Instance, startTime, endTime, w, h, w, h);
-    public static void Vector(this IEventHost host, double startTime, double endTime, Vector2D startZoom, Vector2D endZoom) =>
+    public static void Vector(this IEventHost host, double startTime, double endTime, in Vector2D startZoom, in Vector2D endZoom) =>
         host.AddEvent(EventTypes.Vector, LinearEase.Instance, startTime, endTime, startZoom.X, startZoom.Y, endZoom.X, endZoom.Y);
     /// <summary>
     /// 
@@ -271,7 +271,7 @@ public static class SpriteBasicEventExtensions
     /// <param name="endTime"></param>
     /// <param name="startZoom"></param>
     /// <param name="endZoom"></param>
-    public static void Vector(this IEventHost host, EasingFunctionBase easing, double startTime, double endTime, Vector2D startZoom, Vector2D endZoom) =>
+    public static void Vector(this IEventHost host, EasingFunctionBase easing, double startTime, double endTime, in Vector2D startZoom, Vector2D endZoom) =>
         host.AddEvent(EventTypes.Vector, easing, startTime, endTime, startZoom.X, startZoom.Y, endZoom.X, endZoom.Y);
     public static void Vector(this IEventHost host, double startTime, double endTime, double w1, double h1, double w2, double h2) =>
         host.AddEvent(EventTypes.Vector, LinearEase.Instance, startTime, endTime, w1, h1, w2, h2);

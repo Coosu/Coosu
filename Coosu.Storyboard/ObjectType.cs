@@ -5,7 +5,7 @@ using System.Diagnostics;
 namespace Coosu.Storyboard;
 
 [DebuggerDisplay("Name = {DebuggerDisplay}")]
-public sealed class ObjectType : IEquatable<ObjectType>, IComparable<ObjectType>, IComparable
+public readonly struct ObjectType : IEquatable<ObjectType>, IComparable<ObjectType>, IComparable
 {
     public readonly int Flag;
 
@@ -29,9 +29,9 @@ public sealed class ObjectType : IEquatable<ObjectType>, IComparable<ObjectType>
         return Flag.CompareTo(other.Flag);
     }
 
-    public bool Equals(ObjectType? other)
+    public bool Equals(ObjectType other)
     {
-        return Flag == other?.Flag;
+        return Flag == other.Flag;
     }
 
     public override bool Equals(object obj)

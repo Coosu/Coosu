@@ -1,6 +1,6 @@
 ﻿namespace Coosu.Shared.Numerics;
 
-public struct Vector3D
+public readonly struct Vector3D
 {
     public Vector3D(double x, double y, double z)
     {
@@ -9,7 +9,7 @@ public struct Vector3D
         Z = z;
     }
 
-    public double X;
-    public double Y;
-    public double Z;
+    public readonly double X;
+    public readonly double Y;
+    public readonly double Z;
 }

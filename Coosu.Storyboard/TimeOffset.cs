@@ -2,18 +2,18 @@
 
 namespace Coosu.Storyboard;
 
-public sealed class TimingPoint : IComparable<TimingPoint>
+public readonly struct TimeOffset : IComparable<TimeOffset>
 {
-    public TimingPoint(double timing, bool isStart)
+    public TimeOffset(double timing, bool isStart)
     {
         Timing = timing;
         IsStart = isStart;
     }
 
-    public bool IsStart { get; set; }
-    public double Timing { get; set; }
+    public bool IsStart { get; }
+    public double Timing { get; }
 
-    public int CompareTo(TimingPoint other)
+    public int CompareTo(TimeOffset other)
     {
         var val = Timing.CompareTo(other.Timing);
         if (val != 0)

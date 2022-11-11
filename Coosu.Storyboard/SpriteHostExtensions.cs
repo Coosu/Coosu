@@ -82,7 +82,7 @@ public static class SpriteHostExtensions
         string filePath,
         LayerType layerType,
         OriginType originType,
-        Vector2D defaultLocation)
+        in Vector2D defaultLocation)
     {
         var obj = new Sprite(layerType, originType, filePath, defaultLocation.X, defaultLocation.Y);
         spriteHost.AddSprite(obj);

@@ -5,7 +5,7 @@ using Coosu.Beatmap.Sections.HitObject;
 
 namespace Coosu.Beatmap.Internal;
 
-internal class StaticTypes
+internal static class StaticTypes
 {
     public static readonly Type ObjectSamplesetType = typeof(ObjectSamplesetType);
     public static readonly Type Section = typeof(Section);

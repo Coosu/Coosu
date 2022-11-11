@@ -461,8 +461,8 @@ public class Layer : ISpriteHost, IAdjustable
         ReadOnlySpan<char> rawParams,
         string identifier, byte easing, int startTime, int endTime)
     {
-        EventType? eventType = EventTypes.GetValue(identifier);
-        if (eventType is null)
+        EventType eventType = EventTypes.GetValue(identifier);
+        if (eventType == EventType.Empty)
         {
             throw new Exception($"Unknown event: \"{identifier}\"");
         }

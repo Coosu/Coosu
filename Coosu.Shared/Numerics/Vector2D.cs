@@ -1,6 +1,6 @@
 ﻿namespace Coosu.Shared.Numerics;
 
-public struct Vector2D
+public readonly struct Vector2D
 {
     public Vector2D(double x, double y)
     {
@@ -8,6 +8,6 @@ public struct Vector2D
         Y = y;
     }
 
-    public double X;
-    public double Y;
+    public readonly double X;
+    public readonly double Y;
 }

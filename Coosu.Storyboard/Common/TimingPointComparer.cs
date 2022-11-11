@@ -2,15 +2,15 @@
 
 namespace Coosu.Storyboard.Common;
 
-public class TimingPointComparer : IComparer<TimingPoint>
+public class TimingPointComparer : IComparer<TimeOffset>
 {
     private TimingPointComparer()
     {
     }
 
-    public static IComparer<TimingPoint> Instance { get; } = new TimingPointComparer();
+    public static IComparer<TimeOffset> Instance { get; } = new TimingPointComparer();
 
-    public int Compare(TimingPoint x, TimingPoint y)
+    public int Compare(TimeOffset x, TimeOffset y)
     {
         var val = x.Timing.CompareTo(y.Timing);
         if (val != 0)

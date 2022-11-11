@@ -4,7 +4,7 @@ using System.Diagnostics;
 namespace Coosu.Storyboard;
 
 [DebuggerDisplay("Flag = {Flag}")]
-public sealed class EventType : IEquatable<EventType>, IComparable<EventType>, IComparable
+public readonly struct EventType : IEquatable<EventType>, IComparable<EventType>, IComparable
 {
     public readonly string Flag;
     public readonly int Index;
@@ -17,20 +17,22 @@ public sealed class EventType : IEquatable<EventType>, IComparable<EventType>, I
         Index = index;
     }
 
+    public static EventType Empty { get; } = new EventType();
+
     public int CompareTo(object? obj)
     {
         if (ReferenceEquals(null, obj)) return 1;
         return obj is EventType other ? CompareTo(other) : throw new ArgumentException($"Object must be of type {nameof(EventType)}");
     }
 
-    public int CompareTo(EventType? other)
+    public int CompareTo(EventType other)
     {
-        return string.Compare(Flag, other?.Flag, StringComparison.Ordinal);
+        return string.Compare(Flag, other.Flag, StringComparison.Ordinal);
     }
 
-    public bool Equals(EventType? other)
+    public bool Equals(EventType other)
     {
-        return Flag == other?.Flag;
+        return Flag == other.Flag;
     }
 
     public override bool Equals(object? obj)

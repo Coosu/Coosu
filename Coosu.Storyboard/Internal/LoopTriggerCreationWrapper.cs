@@ -6,7 +6,7 @@ using Coosu.Storyboard.Events;
 
 namespace Coosu.Storyboard.Internal;
 
-internal class LoopTriggerCreationWrapper : IDisposableEventHost
+internal class LoopTriggerCreationWrapper : IEventHostDisposable
 {
     private readonly Loop? _loop;
     private readonly Sprite _sprite;
