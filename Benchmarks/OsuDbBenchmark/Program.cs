@@ -18,6 +18,7 @@ var summary = BenchmarkRunner.Run<OsuDbReadingTask>(/*config*/);
 
 [SimpleJob(RuntimeMoniker.Net48)]
 [SimpleJob(RuntimeMoniker.Net60/*, baseline: true*/)]
+[SimpleJob(RuntimeMoniker.Net70)]
 [MemoryDiagnoser]
 [Orderer(SummaryOrderPolicy.FastestToSlowest)]
 public class OsuDbReadingTask
