@@ -32,9 +32,8 @@ class Program
         //var osu = OsuFile.ReadFromStream(ms);
 
         //var osu = await OsuFile.ReadFromFileAsync(@"E:/Games/osu!\Songs\BmsToOsu/IIDX\29075\P -  (bms2osu) [lv.10].osu");
-        var osuDir = new OsuDirectory(
-            @"C:\Users\milkitic\Downloads\859515 K A Z M A S A - Bon Appetit S (Oldskool HappyHardcore Remix) (Short Ver.)");
-        await osuDir.InitializeAsync();
+        var osuDir = new OsuDirectory(@"C:\Users\milkitic\AppData\Local\osu!\Songs\cYsmix_triangles");
+        await osuDir.InitializeAsync("cYsmix - triangles (yf_bmp) [Tt's Normal].osu");
         var o = await osuDir.GetHitsoundNodesAsync(osuDir.OsuFiles[0]);
 
         //var osu = await OsuFile.ReadFromFileAsync(@"crack.osu");

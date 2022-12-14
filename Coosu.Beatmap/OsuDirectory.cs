@@ -144,8 +144,9 @@ public sealed class OsuDirectory
         else // sliders
         {
             // edges
-            bool forceUseSlide = hitObject.SliderInfo!.EdgeHitsounds == null;
-            var sliderEdges = hitObject.SliderInfo.GetEdges();
+            var sliderInfo = hitObject.SliderInfo!;
+            bool forceUseSlide = sliderInfo.EdgeHitsounds == null;
+            var sliderEdges = sliderInfo.GetEdges();
             for (var i = 0; i < sliderEdges.Length; i++)
             {
                 var item = sliderEdges[i];
@@ -177,10 +178,17 @@ public sealed class OsuDirectory
             }
 
             // ticks
-            var ticks = hitObject.SliderInfo.GetSliderTicks();
+            var ticks = sliderInfo.GetSliderTicks();
             foreach (var sliderTick in ticks)
             {
                 var itemOffset = sliderTick.Offset;
+
+                var edgeOffset = (itemOffset - sliderInfo.StartTime) / sliderInfo.CurrentSingleDuration;
+                if (Math.Abs(Math.Round(edgeOffset, 0) - edgeOffset) <= 0.01)
+                {
+                    continue;
+                }
+
                 var timingPoint = timingSection.GetLine(itemOffset);
 
                 float balance = ignoreBalance ? 0 : GetObjectBalance(sliderTick.Point.X);
@@ -292,7 +300,7 @@ public sealed class OsuDirectory
             }
 
             // change balance while sliding (not supported in original game)
-            var trails = hitObject.SliderInfo.GetSliderSlides();
+            var trails = sliderInfo.GetSliderSlides();
             var all = trails
                 .Select(k => new
                 {
