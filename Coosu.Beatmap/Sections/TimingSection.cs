@@ -45,7 +45,9 @@ public sealed class TimingSection : Section
                 case 0: offset = ParseHelper.ParseDouble(span, ParseHelper.EnUsNumberFormat); break;
                 case 1: factor = ParseHelper.ParseDouble(span, ParseHelper.EnUsNumberFormat); break;
                 case 2: rhythm = ParseHelper.ParseByte(span); break;
-                case 3: timingSampleset = (TimingSamplesetType)(ParseHelper.ParseByte(span) - 1); break;
+                case 3:
+                    var b = ParseHelper.ParseByte(span);
+                    timingSampleset = (TimingSamplesetType)(b == 0 ? 0 : b - 1); break;
                 case 4: track = ParseHelper.ParseUInt16(span); break;
                 case 5: volume = ParseHelper.ParseByte(span); break;
                 case 6: inherit = ParseHelper.ParseByte(span) == 0; break;

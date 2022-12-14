@@ -103,6 +103,10 @@ public sealed class EventSection : Section
 
                         VideoInfo = new VideoData { Offset = offset, Filename = filename };
                     }
+                    else if (line.StartsWith("_") || line.StartsWith(" "))
+                    {
+                        break;
+                    }
                     else
                     {
                         double x = 0;
