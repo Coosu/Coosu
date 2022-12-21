@@ -79,6 +79,9 @@ public sealed class ExtendedSliderInfo : SliderInfo
     public void UpdateComputedValues(double lastRedFactor, double lastLineMultiple,
         double diffSliderMultiplier, float diffTickRate)
     {
+        if (diffSliderMultiplier == 0) diffSliderMultiplier = 1;
+        if (lastLineMultiple == 0) lastLineMultiple = double.PositiveInfinity;
+
         CurrentBeatDuration = lastRedFactor;
         CurrentSliderMultiplier = diffSliderMultiplier * lastLineMultiple;
         CurrentTickRate = diffTickRate;
