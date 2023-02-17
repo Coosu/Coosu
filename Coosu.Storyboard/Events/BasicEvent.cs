@@ -51,7 +51,7 @@ public abstract class BasicEvent : IKeyEvent
     public IReadOnlyList<double> Values
     {
         get => _values;
-        internal set => _values = (List<double>)value;
+        internal set => _values = value is List<double> list ? list : value.ToList();
     }
 
 #if NET5_0_OR_GREATER

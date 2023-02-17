@@ -33,7 +33,7 @@ public class Camera25Handler : SubjectHandler<Camera25Object>
         if (split.Length < 1) throw new ArgumentOutOfRangeException();
 
         //var type = ObjectTypeManager.Parse(split[0]);
-        string cameraIdentifier = Guid.Empty.ToString();
+        string cameraIdentifier = "default";
         if (split.Length >= 2)
         {
             cameraIdentifier = split[1];

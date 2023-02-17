@@ -6,7 +6,7 @@ namespace Coosu.Storyboard.OsbX.Actions;
 
 public sealed class MoveZ : BasicEvent
 {
-    public override EventType EventType => EventTypes.MoveY;
+    public override EventType EventType { get; } = new("MZ", 1, 11);
 
     public double StartZ
     {

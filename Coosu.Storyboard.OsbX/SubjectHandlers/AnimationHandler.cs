@@ -28,7 +28,7 @@ public class AnimationHandler : SubjectHandler<Animation>
 
     public override Animation Deserialize(string[] split)
     {
-        if (split.Length is not (8 or 9 or 12)) throw new ArgumentOutOfRangeException();
+        if (split.Length is not (8 or 9 or 11 or 12)) throw new ArgumentOutOfRangeException();
 
         var type = ObjectType.Parse(split[0]);
         var layerType = (LayerType)Enum.Parse(typeof(LayerType), split[1]);
@@ -43,11 +43,15 @@ public class AnimationHandler : SubjectHandler<Animation>
             : LoopType.LoopForever;
 
         double defaultZ = 1;
-        string cameraIdentifier = Guid.Empty.ToString();
-        if (split.Length == 11)
+        string cameraIdentifier = "default";
+        if (split.Length >= 11)
         {
             cameraIdentifier = split[9];
-            defaultZ = int.TryParse(split[10], out var result) ? result : 1;
+            defaultZ = double.TryParse(split[10], out var result) ? result : 1d;
+        }
+
+        if (split.Length >= 12)
+        {
             var absolute = int.Parse(split[11]) != 0;
             if (absolute)
             {

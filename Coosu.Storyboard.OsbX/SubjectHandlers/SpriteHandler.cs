@@ -29,7 +29,7 @@ public class SpriteHandler : SubjectHandler<Sprite>
 
     public override Sprite Deserialize(string[] split)
     {
-        if (split.Length is not (6 or 9)) throw new ArgumentOutOfRangeException();
+        if (split.Length is not (6 or 8 or 9)) throw new ArgumentOutOfRangeException();
 
         var type = ObjectType.Parse(split[0]);
         var layerType = (LayerType)Enum.Parse(typeof(LayerType), split[1]);
@@ -39,11 +39,16 @@ public class SpriteHandler : SubjectHandler<Sprite>
         var defY = double.Parse(split[5]);
 
         double defaultZ = 1;
-        string cameraIdentifier = Guid.Empty.ToString();
-        if (split.Length == 9)
+        string cameraIdentifier = "default";
+        if (split.Length >= 8)
         {
             cameraIdentifier = split[6];
             defaultZ = double.TryParse(split[7], out var result) ? result : 1f;
+
+        }
+
+        if (split.Length >= 9)
+        {
             var absolute = int.Parse(split[8]) != 0;
             if (absolute)
             {

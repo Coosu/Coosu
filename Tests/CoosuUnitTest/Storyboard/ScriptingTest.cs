@@ -2,17 +2,49 @@ using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Coosu.Storyboard;
 using Coosu.Storyboard.Extensions.Optimizing;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Coosu.Storyboard.OsbX;
+using Xunit;
+using Xunit.Abstractions;
 
 namespace CoosuUnitTest.Storyboard;
 
-[TestClass]
 public class ScriptingTest
 {
-    [TestMethod]
+    private readonly ITestOutputHelper _testOutputHelper;
+
+    public ScriptingTest(ITestOutputHelper testOutputHelper)
+    {
+        _testOutputHelper = testOutputHelper;
+    }
+
+    [Fact]
+    public async Task OsbX()
+    {
+        var osbX = """
+            Camera25
+             MX,0,0,2000,100,3000
+             MY,0,1,3000,500,2000
+             MZ,0,1,3000,1,2
+            Sprite,Background,Centre,"BG.jpg",320,240,default,0.165345
+             F,0,329600,342725,1
+             M,1,329600,342933,320,380,320,280
+             S,1,329600,342933,1.118877,1
+            Animation,Background,Centre,"BG.jpg",320,240,2,30,LoopForever,default,1.12354
+             F,0,329600,342725,1
+             M,1,329600,342933,320,380,320,280
+             S,1,329600,342933,1.118877,1
+            """;
+        using var stringReader = new StringReader(osbX);
+        var scene = await OsbxConvert.DeserializeObjectAsync(stringReader);
+
+        var objs = scene.Layers.Values.First().SceneObjects;
+    }
+    
+    [Fact]
     public async Task Loop()
     {
         var group = new Layer();
@@ -54,8 +86,8 @@ public class ScriptingTest
         var str4 = sprite2.ToScriptString();
         Debug.Assert(str3 == str4);
     }
-
-    [TestMethod]
+    
+    [Fact]
     public async Task RelativeEvent()
     {
         var layer = new Layer(0);
@@ -71,38 +103,38 @@ public class ScriptingTest
         sprite.Fade(10500, 1);
         sprite.Rotate(10000, 11000, 0, Math.PI);
 
-        Console.WriteLine("Before compressing");
-        Console.WriteLine(sprite.ToScriptString());
+        _testOutputHelper.WriteLine("Before compressing");
+        _testOutputHelper.WriteLine(sprite.ToScriptString());
 
         var compressor = new SpriteCompressor(layer);
         await compressor.CompressAsync();
-        Console.WriteLine("After compressing");
-        Console.WriteLine(sprite.ToScriptString());
+        _testOutputHelper.WriteLine("After compressing");
+        _testOutputHelper.WriteLine(sprite.ToScriptString());
     }
-
-    [TestMethod]
+    
+    [Fact]
     public void CreateElementGroup()
     {
         var group = new Layer(0);
     }
-
-    [TestMethod]
+    
+    [Fact]
     public void CreateSpriteFromGroup()
     {
         var group = new Layer(0);
         group.CreateSprite("");
-        Assert.AreEqual(1, group.SceneObjects.Count);
+        Assert.Equal(1, group.SceneObjects.Count);
     }
-
-    [TestMethod]
+    
+    [Fact]
     public void Parse()
     {
         CultureInfo.CurrentCulture = new CultureInfo("ru-RU");
         Layer.ParseFromFile(
             @"C:\Users\milkitic\Documents\Tencent Files\2241521134\FileRecv\cYsmix_-_triangles\cYsmix - triangles (yf_bmp).osb");
     }
-
-    [TestMethod]
+    
+    [Fact]
     public async Task Compress()
     {
         var path = @"C:\Users\milkitic\Downloads\406217 Chata - enn\Chata - enn (EvilElvis).osb";

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,8 +10,10 @@ using Coosu.Storyboard.Utils;
 
 namespace Coosu.Storyboard.OsbX;
 
+[DebuggerDisplay("Header = {DebuggerDisplay}")]
 public class Camera25Object : ISceneObject, IDefinedObject
 {
+    private string DebuggerDisplay => this.GetHeaderString();
     private ICollection<IKeyEvent> _events = new SortedSet<IKeyEvent>(EventSequenceComparer.Instance);
     public ObjectType ObjectType { get; } = 99;
     public int? RowInSource { get; set; }

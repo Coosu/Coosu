@@ -8,15 +8,14 @@ using Coosu.Api.V2.ResponseModels;
 using Coosu.Beatmap;
 using Coosu.Beatmap.Extensions.Playback;
 using Microsoft.Extensions.Configuration;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace CoosuUnitTest.Beatmap;
 
-[TestClass]
 public class BeatmapTest
 {
 
-    [TestMethod]
+    [Fact]
     public async Task ReadAndWrite()
     {
         //var folder = @"C:\Users\milkitic\Desktop\1002455 supercell - Giniro Hikousen  (Ttm bootleg Edit)";
@@ -28,7 +27,7 @@ public class BeatmapTest
         osuFile.SaveToDirectory(folder, osuFile.Metadata.Version + " (TEST)");
     }
 
-    [TestMethod]
+    [Fact]
     public async Task ReadHitsounds()
     {
         var folder = @"C:\Users\milkitic\Downloads\606833 BlackYooh vs. siromaru - BLACK or WHITE";

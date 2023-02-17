@@ -61,7 +61,7 @@ public abstract class BasicTimelineHandler<T> : ActionHandler<T> where T : Basic
         var startTime = double.Parse(split[2]);
         var endTime = string.IsNullOrWhiteSpace(split[3]) ? startTime : double.Parse(split[3]);
 
-        var value = new List<double>(ParameterDimension * 2);
+        var value = new double[ParameterDimension * 2];
         if (paramLength == ParameterDimension)
         {
             int j = 4;

@@ -4,11 +4,10 @@ using Coosu.Api.V2;
 using Coosu.Api.V2.RequestModels;
 using Coosu.Api.V2.ResponseModels;
 using Microsoft.Extensions.Configuration;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace CoosuUnitTest.Api;
 
-[TestClass]
 public class ApiTest
 {
     private readonly int _clientId;
@@ -34,7 +33,7 @@ public class ApiTest
         _client = new OsuClientV2(_publicToken, clientOptions);
     }
 
-    [TestMethod]
+    [Fact]
     public async Task SearchBeatmapset()
     {
         var v2 = new OsuClientV2(_publicToken);
@@ -50,14 +49,14 @@ public class ApiTest
         });
     }
 
-    [TestMethod]
+    [Fact]
     public async Task SearchUser()
     {
         var v2 = new OsuClientV2(_publicToken);
         var beatmaps = await v2.User.GetUser("1243669", GameMode.Osu);
     }
 
-    [TestMethod]
+    [Fact]
     public async Task GetUserScores()
     {
         var v2 = new OsuClientV2(_publicToken);
