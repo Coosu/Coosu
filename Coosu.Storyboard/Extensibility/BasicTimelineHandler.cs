@@ -11,7 +11,7 @@ public abstract class BasicTimelineHandler<T> : ActionHandler<T> where T : Basic
 {
     public override string Serialize(T raw)
     {
-        if (!raw.IsHalfFilled && !raw.IsFilled)
+        if (raw is { IsHalfFilled: false, IsFilled: false })
         {
             throw new Exception("The starting parameter's count should equal to the ending parameter's count");
         }

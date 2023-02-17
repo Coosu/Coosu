@@ -14,7 +14,7 @@ public static class OsbxConvert
     {
         HandlerRegister.RegisterSubject(new SpriteHandler());
         HandlerRegister.RegisterSubject(new AnimationHandler());
-        HandlerRegister.RegisterSubject(new Camera2Handler());
+        HandlerRegister.RegisterSubject(new Camera25Handler());
     }
 
     public static async Task<string> SerializeObjectAsync(Scene manager)

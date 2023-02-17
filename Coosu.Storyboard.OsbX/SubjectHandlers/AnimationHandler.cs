@@ -11,6 +11,7 @@ public class AnimationHandler : SubjectHandler<Animation>
         RegisterAction(HandlerRegister.GetActionHandlerInstance<MoveActionHandler>());
         RegisterAction(HandlerRegister.GetActionHandlerInstance<MoveXActionHandler>());
         RegisterAction(HandlerRegister.GetActionHandlerInstance<MoveYActionHandler>());
+        RegisterAction(HandlerRegister.GetActionHandlerInstance<MoveZActionHandler>());
         RegisterAction(HandlerRegister.GetActionHandlerInstance<FadeActionHandler>());
         RegisterAction(HandlerRegister.GetActionHandlerInstance<ScaleActionHandler>());
         RegisterAction(HandlerRegister.GetActionHandlerInstance<RotateActionHandler>());
@@ -59,6 +60,5 @@ public class AnimationHandler : SubjectHandler<Animation>
             DefaultZ = defaultZ,
             CameraIdentifier = cameraIdentifier
         };
-
     }
 }
