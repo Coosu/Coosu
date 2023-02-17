@@ -43,7 +43,7 @@ public class SpriteHandler : SubjectHandler<Sprite>
         if (split.Length >= 8)
         {
             cameraIdentifier = split[6];
-            defaultZ = double.TryParse(split[7], out var result) ? result : 1f;
+            defaultZ = double.TryParse(split[7], out var result) ? result : 1d;
 
         }
 
