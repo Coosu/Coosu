@@ -1,18 +1,19 @@
-﻿using Coosu.Storyboard.Events;
+﻿using Coosu.Shared;
+using Coosu.Storyboard.Common;
 
 namespace Coosu.Storyboard.Extensibility;
 
-public abstract class ActionHandler<T> : IActionParsingHandler<T> where T : BasicEvent
+public abstract class ActionHandler<T> : IActionParsingHandler<T> where T : IEvent
 {
     public abstract string Flag { get; }
     public abstract int ParameterDimension { get; }
 
-    BasicEvent IActionParsingHandler.Deserialize(string[] split)
+    IEvent IActionParsingHandler.Deserialize(ref ValueListBuilder<string> split)
     {
-        return Deserialize(split);
+        return Deserialize(ref split);
     }
 
-    string IActionParsingHandler.Serialize(BasicEvent raw)
+    string IActionParsingHandler.Serialize(IEvent raw)
     {
         return Serialize((T)raw);
     }
@@ -22,11 +23,11 @@ public abstract class ActionHandler<T> : IActionParsingHandler<T> where T : Basi
         return Serialize((T)raw);
     }
 
-    object IParsingHandler.Deserialize(string[] split)
+    object IParsingHandler.Deserialize(ref ValueListBuilder<string> split)
     {
-        return Deserialize(split);
+        return Deserialize(ref split);
     }
 
-    public abstract T Deserialize(string[] split);
+    public abstract T Deserialize(ref ValueListBuilder<string> split);
     public abstract string Serialize(T raw);
 }

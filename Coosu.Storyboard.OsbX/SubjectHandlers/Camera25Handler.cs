@@ -1,4 +1,5 @@
 ﻿using System;
+using Coosu.Shared;
 using Coosu.Storyboard.Extensibility;
 using Coosu.Storyboard.OsbX.ActionHandlers;
 
@@ -28,7 +29,7 @@ public class Camera25Handler : SubjectHandler<Camera25Object>
         return $"{Flag},{raw.CameraIdentifier}";
     }
 
-    public override Camera25Object Deserialize(string[] split)
+    public override Camera25Object Deserialize(ref ValueListBuilder<string> split)
     {
         if (split.Length < 1) throw new ArgumentOutOfRangeException();
 

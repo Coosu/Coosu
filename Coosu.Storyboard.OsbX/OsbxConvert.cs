@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Buffers;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using Coosu.Shared;
 using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Extensibility;
 using Coosu.Storyboard.OsbX.SubjectHandlers;
@@ -94,13 +96,13 @@ public static class OsbxConvert
 
     public static async Task<Scene> DeserializeObjectAsync(TextReader reader)
     {
-        ISubjectParsingHandler lastSubjectHandler = null;
-        IDetailedEventHost lastSubject = null;
-        //int lastDeep = 0;
-        var line = await reader.ReadLineAsync();
-        int l = 0;
+        ISubjectParsingHandler? lastSubjectHandler = null;
+        IDetailedEventHost? lastSubject = null;
 
-        var em = new Scene();
+        var line = await reader.ReadLineAsync();
+        int lineIndex = 0;
+
+        var scene = new Scene();
 
         while (line != null)
         {
@@ -110,133 +112,100 @@ public static class OsbxConvert
             }
             else
             {
-                var split = line.Split(',');
-                var mahou = split[0].TrimStart();
-                var deep = split[0].Length - mahou.Length;
-                if (deep == 0)
+                HandleLine(scene, lineIndex, line, ref lastSubject, ref lastSubjectHandler);
+            }
+
+            line = await reader.ReadLineAsync();
+            lineIndex++;
+        }
+
+        return scene;
+    }
+
+    private static void HandleLine(Scene scene, int lineIndex, string line,
+        ref IDetailedEventHost? lastSubject, ref ISubjectParsingHandler? lastSubjectHandler)
+    {
+        var array = ArrayPool<string>.Shared.Rent(16);
+        var split = new ValueListBuilder<string>(array);
+        try
+        {
+            var enumerator = line.SpanSplit(',');
+            foreach (var span in enumerator)
+            {
+                split.Append(span.ToString());
+            }
+            
+            var flagString = split[0].TrimStart();
+            var deep = split[0].Length - flagString.Length;
+            if (deep == 0)
+            {
+                var handler = HandlerRegister.GetSubjectHandler(flagString);
+                if (handler == null && int.TryParse(flagString, out var flag))
                 {
-                    var handler = HandlerRegister.GetSubjectHandler(mahou);
-                    if (handler == null && int.TryParse(mahou, out var flag))
-                    {
-                        var magicWord = ObjectType.GetString(flag);
-                        if (magicWord != null) handler = HandlerRegister.GetSubjectHandler(magicWord);
-                    }
-
-                    if (handler != null)
-                    {
-                        try
-                        {
-                            var sprite = handler.Deserialize(split);
-                            var eg = em.GetOrAddLayer(sprite.CameraIdentifier);
-                            eg.AddObject(sprite);
-
-                            lastSubject = sprite;
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine($"Error while parsing subject. L {l}: `{line}`\r\n{ex}");
-                            lastSubject = null;
-                            handler = null;
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Cannot find subject handler. L {l}: `{line}`");
-                    }
-
-                    lastSubjectHandler = handler;
+                    var magicWord = ObjectType.GetString(flag);
+                    if (magicWord != null) handler = HandlerRegister.GetSubjectHandler(magicWord);
                 }
-                else if (deep == 1)
+
+                if (handler != null)
                 {
-                    if (lastSubjectHandler != null)
+                    try
                     {
-                        var actHandler = lastSubjectHandler.GetActionHandler(mahou);
-                        if (actHandler != null)
-                        {
-                            try
-                            {
-                                var action = actHandler.Deserialize(split);
-                                lastSubject.ApplyAction(action);
-                            }
-                            catch (Exception ex)
-                            {
-                                Console.WriteLine($"Error while parsing action. L {l}: `{line}`\r\n{ex}");
-                            }
-                        }
-                        else
-                        {
-                            Console.WriteLine($"Cannot find action handler. L {l}: `{line}`");
-                        }
+                        var sprite = handler.Deserialize(ref split);
+                        var eg = scene.GetOrAddLayer(sprite.CameraIdentifier);
+                        eg.AddObject(sprite);
+
+                        lastSubject = sprite;
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        Console.WriteLine($"Current subject is null, skipped. L {l}: `{line}`");
+                        Console.WriteLine($"Error while parsing subject. L {lineIndex}: `{line}`\r\n{ex}");
+                        lastSubject = null;
+                        handler = null;
                     }
                 }
                 else
                 {
-                    Console.WriteLine($"Unknown deep {deep}. L {l}: `{line}`");
+                    Console.WriteLine($"Cannot find subject handler. L {lineIndex}: `{line}`");
+                }
+
+                lastSubjectHandler = handler;
+            }
+            else if (deep == 1)
+            {
+                if (lastSubjectHandler != null)
+                {
+                    var actHandler = lastSubjectHandler.GetActionHandler(flagString);
+                    if (actHandler != null)
+                    {
+                        try
+                        {
+                            var action = actHandler.Deserialize(ref split);
+                            lastSubject.ApplyAction(action);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error while parsing action. L {lineIndex}: `{line}`\r\n{ex}");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Cannot find action handler. L {lineIndex}: `{line}`");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"Current subject is null, skipped. L {lineIndex}: `{line}`");
                 }
             }
+            else
+            {
+                Console.WriteLine($"Unknown deep {deep}. L {lineIndex}: `{line}`");
+            }
 
-            //var deepMinus = deep - lastDeep;
-
-            //lastDeep = deep;
-            //if (deepMinus < 0)
-            //{
-            //    while (expression)
-            //    {
-            //        stack.pop;
-            //    }
-            //}
-
-
-            line = await reader.ReadLineAsync();
-            l++;
         }
-
-        return em;
-        //var count = Environment.ProcessorCount - 1;
-        //var locks = new SemaphoreSlim(count, count);
-        //var strLock = new object();
-
-        //bool isFinished = false;
-        //var str = await reader.ReadLineAsync();
-        //if (str != null)
-        //{
-
-        //}
-
-        //while (true)
-        //{
-        //    lock (strLock)
-        //    {
-        //        if (isFinished) break;
-        //    }
-
-        //    var inStr = await reader.ReadLineAsync();
-
-        //    if (inStr == null)
-        //    {
-        //        lock (strLock)
-        //        {
-        //            isFinished = true;
-        //        }
-        //    }
-        //    else
-        //    {
-
-        //    }
-        //}
-
-        //while (locks.CurrentCount != count)
-        //{
-        //    await Task.Delay(1);
-        //}
+        finally
+        {
+            split.Dispose();
+        }
     }
-
-    //public static ElementGroup DeserializeObject(string str)
-    //{
-
-    //}
 }

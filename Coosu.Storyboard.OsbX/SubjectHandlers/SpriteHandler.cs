@@ -1,4 +1,5 @@
 ﻿using System;
+using Coosu.Shared;
 using Coosu.Storyboard.Extensibility;
 using Coosu.Storyboard.OsbX.ActionHandlers;
 
@@ -16,6 +17,7 @@ public class SpriteHandler : SubjectHandler<Sprite>
         RegisterAction(HandlerRegister.GetActionHandlerInstance<ScaleActionHandler>());
         RegisterAction(HandlerRegister.GetActionHandlerInstance<RotateActionHandler>());
         RegisterAction(HandlerRegister.GetActionHandlerInstance<VectorActionHandler>());
+        RegisterAction(HandlerRegister.GetActionHandlerInstance<ColorActionHandler>());
         RegisterAction(HandlerRegister.GetActionHandlerInstance<OriginActionHandler>());
     }
 
@@ -24,12 +26,12 @@ public class SpriteHandler : SubjectHandler<Sprite>
     //Sprite,0,Centre,"",320,240
     public override string Serialize(Sprite raw)
     {
-        return $"{Flag},{raw.LayerType},{raw.OriginType},\"{raw.ImagePath}\",{raw.DefaultX},{raw.DefaultY},{raw.CameraIdentifier},{raw.DefaultZ},0";
+        return $"{Flag},{raw.LayerType},{raw.OriginType},\"{raw.ImagePath}\",{raw.DefaultX},{raw.DefaultY},{raw.DefaultZ},{raw.CameraIdentifier}";
     }
 
-    public override Sprite Deserialize(string[] split)
+    public override Sprite Deserialize(ref ValueListBuilder<string> split)
     {
-        if (split.Length is not (6 or 8 or 9)) throw new ArgumentOutOfRangeException();
+        if (split.Length is not (6 or 8)) throw new ArgumentOutOfRangeException();
 
         var type = ObjectType.Parse(split[0]);
         var layerType = (LayerType)Enum.Parse(typeof(LayerType), split[1]);
@@ -38,22 +40,16 @@ public class SpriteHandler : SubjectHandler<Sprite>
         var defX = double.Parse(split[4]);
         var defY = double.Parse(split[5]);
 
-        double defaultZ = 1;
-        string cameraIdentifier = "default";
-        if (split.Length >= 8)
+        var defaultZ = 1d;
+        if (split.Length >= 7)
         {
-            cameraIdentifier = split[6];
-            defaultZ = double.TryParse(split[7], out var result) ? result : 1d;
-
+            defaultZ = double.TryParse(split[6], out var result) ? result : 1d;
         }
 
-        if (split.Length >= 9)
+        var cameraIdentifier = "default";
+        if (split.Length >= 8)
         {
-            var absolute = int.Parse(split[8]) != 0;
-            if (absolute)
-            {
-                throw new NotImplementedException("Absolute mode currently is not supported.");
-            }
+            cameraIdentifier = split[7];
         }
 
         return new Sprite(layerType, origin, path, defX, defY)
@@ -61,6 +57,5 @@ public class SpriteHandler : SubjectHandler<Sprite>
             DefaultZ = defaultZ,
             CameraIdentifier = cameraIdentifier
         };
-
     }
 }

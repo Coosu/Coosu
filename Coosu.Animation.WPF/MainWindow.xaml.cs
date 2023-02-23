@@ -87,8 +87,7 @@ public partial class MainWindow : Window
         //});
 
         //_list.Add(ele);
-        var file =
-            @"D:\Games\osu!\Songs\161089 Tamura Yukari - MERRY MERRY MERRY MENU Ne!\Tamura Yukari - MERRY MERRY MERRY MENU... Ne! (moonlightleaf).osb";
+        var file = @"E:\其他文件\osu!\Songs\1841885 cYsmix - triangles\cYsmix - triangles (yf_bmp).osb";
         var folder = System.IO.Path.GetDirectoryName(file);
         _group = _canvasHost.CreateStoryboardGroup();
         //var folder = @"D:\Games\osu!\Songs\ok";

@@ -28,5 +28,5 @@ public sealed class MoveZ : BasicEvent
     public MoveZ()
     {
     }
-    
+
 }

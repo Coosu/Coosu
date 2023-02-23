@@ -9,7 +9,6 @@ using Coosu.Shared.Mathematics;
 using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Easing;
 using Coosu.Storyboard.Extensibility;
-using Coosu.Storyboard.Utils;
 
 namespace Coosu.Storyboard.Events;
 
@@ -55,25 +54,25 @@ public abstract class BasicEvent : IKeyEvent
     }
 
 #if NET5_0_OR_GREATER
-        public Span<double> GetStartsSpan()
-        {
-            Fill();
-            var size = EventType.Size;
-            var span = System.Runtime.InteropServices.CollectionsMarshal
-                .AsSpan(_values)
-                .Slice(0, size);
-            return span;
-        }
+    public Span<double> GetStartsSpan()
+    {
+        Fill();
+        var size = EventType.Size;
+        var span = System.Runtime.InteropServices.CollectionsMarshal
+            .AsSpan(_values)
+            .Slice(0, size);
+        return span;
+    }
 
-        public Span<double> GetEndsSpan()
-        {
-            Fill();
-            var size = EventType.Size;
-            var span = System.Runtime.InteropServices.CollectionsMarshal
-                .AsSpan(_values)
-                .Slice(size, size);
-            return span;
-        }
+    public Span<double> GetEndsSpan()
+    {
+        Fill();
+        var size = EventType.Size;
+        var span = System.Runtime.InteropServices.CollectionsMarshal
+            .AsSpan(_values)
+            .Slice(size, size);
+        return span;
+    }
 #endif
     public IEnumerable<double> GetStarts()
     {
@@ -172,17 +171,17 @@ public abstract class BasicEvent : IKeyEvent
         if (IsHalfFilled) return true;
         Fill();
 #if NET5_0_OR_GREATER
-            var endsSpan = GetEndsSpan();
-            var startsSpan = GetStartsSpan();
-            for (var i = 0; i < endsSpan.Length; i++)
-            {
-                var e = endsSpan[i];
-                var s = startsSpan[i];
-                if (!Precision.AlmostEquals((double)s, e))
-                    return false;
-            }
+        var endsSpan = GetEndsSpan();
+        var startsSpan = GetStartsSpan();
+        for (var i = 0; i < endsSpan.Length; i++)
+        {
+            var e = endsSpan[i];
+            var s = startsSpan[i];
+            if (!Precision.AlmostEquals((double)s, e))
+                return false;
+        }
 
-            return true;
+        return true;
 #else
         var size = EventType.Size;
         for (var i = 0; i < Values.Count / 2; i++)

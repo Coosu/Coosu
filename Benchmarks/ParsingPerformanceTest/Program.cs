@@ -72,7 +72,9 @@ class Program
 public class ReadingTask
 {
     private readonly string _path;
-
+    private double _value1 = 0.5;
+    private double _value2 = 2.0;
+    private double _value3 = 21235.12351236;
     public ReadingTask()
     {
         var path = Environment.GetEnvironmentVariable("test_osu_path");
@@ -81,16 +83,24 @@ public class ReadingTask
     }
 
     [Benchmark(Baseline = true)]
-    public async Task<object?> CoosuLatest_Beatmap()
+    public double Multiple()
     {
-        var osu = await OsuFile.ReadFromFileAsync(_path);
-        return osu;
+        //var osu = await OsuFile.ReadFromFileAsync(_path);
+        //return osu;
+        return _value3 * _value1;
     }
 
     [Benchmark]
-    public async Task<object?> OsuParsers_Beatmap()
+    public double Divide()
     {
-        var osu = BeatmapDecoder.Decode(_path);
-        return osu;
+        return _value3 / _value2;
+    }
+
+    [Benchmark]
+    public double Const()
+    {
+        const double _value2 = 2.0;
+        const double _value3 = 21235.12351236;
+        return _value3 / _value2;
     }
 }

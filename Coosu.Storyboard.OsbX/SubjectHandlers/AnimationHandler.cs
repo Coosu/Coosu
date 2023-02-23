@@ -1,4 +1,5 @@
 ﻿using System;
+using Coosu.Shared;
 using Coosu.Storyboard.Extensibility;
 using Coosu.Storyboard.OsbX.ActionHandlers;
 
@@ -16,19 +17,20 @@ public class AnimationHandler : SubjectHandler<Animation>
         RegisterAction(HandlerRegister.GetActionHandlerInstance<ScaleActionHandler>());
         RegisterAction(HandlerRegister.GetActionHandlerInstance<RotateActionHandler>());
         RegisterAction(HandlerRegister.GetActionHandlerInstance<VectorActionHandler>());
+        RegisterAction(HandlerRegister.GetActionHandlerInstance<ColorActionHandler>());
         RegisterAction(HandlerRegister.GetActionHandlerInstance<OriginActionHandler>());
     }
 
     public override string Flag => "Animation";
     public override string Serialize(Animation raw)
     {
-        return string.Format("{0},{1},{2},\"{3}\",{4},{5},{6},{7},{8},{9},{10},{11}", Flag, raw.LayerType, raw.OriginType, raw.ImagePath,
-            raw.DefaultX, raw.DefaultY, raw.FrameCount, raw.FrameDelay, raw.LoopType, raw.CameraIdentifier, raw.DefaultZ, 0);
+        return string.Format("{0},{1},{2},\"{3}\",{4},{5},{6},{7},{8},{9},{10}", Flag, raw.LayerType, raw.OriginType, raw.ImagePath,
+            raw.DefaultX, raw.DefaultY, raw.FrameCount, raw.FrameDelay, raw.LoopType, raw.DefaultZ, raw.CameraIdentifier);
     }
 
-    public override Animation Deserialize(string[] split)
+    public override Animation Deserialize(ref ValueListBuilder<string> split)
     {
-        if (split.Length is not (8 or 9 or 11 or 12)) throw new ArgumentOutOfRangeException();
+        if (split.Length is not (8 or 9 or 11)) throw new ArgumentOutOfRangeException();
 
         var type = ObjectType.Parse(split[0]);
         var layerType = (LayerType)Enum.Parse(typeof(LayerType), split[1]);
@@ -42,21 +44,16 @@ public class AnimationHandler : SubjectHandler<Animation>
             ? (LoopType)Enum.Parse(typeof(LoopType), split[8])
             : LoopType.LoopForever;
 
-        double defaultZ = 1;
-        string cameraIdentifier = "default";
-        if (split.Length >= 11)
+        var defaultZ = 1d;
+        if (split.Length >= 10)
         {
-            cameraIdentifier = split[9];
-            defaultZ = double.TryParse(split[10], out var result) ? result : 1d;
+            defaultZ = double.TryParse(split[9], out var result) ? result : 1d;
         }
 
-        if (split.Length >= 12)
+        var cameraIdentifier = "default";
+        if (split.Length >= 11)
         {
-            var absolute = int.Parse(split[11]) != 0;
-            if (absolute)
-            {
-                throw new NotImplementedException("Absolute mode currently is not supported.");
-            }
+            cameraIdentifier = split[10];
         }
 
         return new Animation(layerType, origin, path, defX, defY, frameCount, frameDelay, loopType)

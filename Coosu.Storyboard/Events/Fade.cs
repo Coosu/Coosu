@@ -19,7 +19,7 @@ public sealed class Fade : BasicEvent
         get => GetValue(1);
         set => SetValue(1, value);
     }
-    
+
     public Fade(EasingFunctionBase easing, double startTime, double endTime, List<double> values)
         : base(easing, startTime, endTime, values)
     {

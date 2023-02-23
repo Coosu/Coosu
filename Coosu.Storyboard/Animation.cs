@@ -38,10 +38,10 @@ public sealed class Animation : Sprite
     /// <param name="frameCount">Set frame count.</param>
     /// <param name="frameDelay">Set frame rate (frame delay).</param>
     /// <param name="loopType">Set loop type.</param>
-    public Animation(ReadOnlySpan<char> layer, 
+    public Animation(ReadOnlySpan<char> layer,
         ReadOnlySpan<char> origin,
         ReadOnlySpan<char> imagePath,
-        double defaultX, double defaultY, 
+        double defaultX, double defaultY,
         int frameCount, double frameDelay, ReadOnlySpan<char> loopType)
         : base(layer, origin, imagePath, defaultX, defaultY)
     {

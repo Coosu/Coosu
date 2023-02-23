@@ -1,13 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Coosu.Shared;
+using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Easing;
 using Coosu.Storyboard.Events;
 
 namespace Coosu.Storyboard.Extensibility;
 
-public abstract class BasicTimelineHandler<T> : ActionHandler<T> where T : BasicEvent, new()
+public abstract class BasicTimelineHandler<T> : ActionHandler<T> where T : IKeyEvent, new()
 {
     public override string Serialize(T raw)
     {
@@ -48,7 +49,7 @@ public abstract class BasicTimelineHandler<T> : ActionHandler<T> where T : Basic
         return $"{e},{easing},{startT},{endT},{sb}";
     }
 
-    public override T Deserialize(string[] split)
+    public override T Deserialize(ref ValueListBuilder<string> split)
     {
         var paramLength = split.Length - 4;
 
@@ -61,14 +62,14 @@ public abstract class BasicTimelineHandler<T> : ActionHandler<T> where T : Basic
         var startTime = double.Parse(split[2]);
         var endTime = string.IsNullOrWhiteSpace(split[3]) ? startTime : double.Parse(split[3]);
 
-        var value = new double[ParameterDimension * 2];
+        var values = new double[ParameterDimension * 2];
         if (paramLength == ParameterDimension)
         {
             int j = 4;
             for (int i = 0; i < ParameterDimension; i++, j++)
             {
-                value[i] = double.Parse(split[j]);
-                value[i + ParameterDimension] = double.Parse(split[j]);
+                values[i] = double.Parse(split[j]);
+                values[i + ParameterDimension] = double.Parse(split[j]);
             }
         }
         else if (paramLength == ParameterDimension * 2)
@@ -76,16 +77,22 @@ public abstract class BasicTimelineHandler<T> : ActionHandler<T> where T : Basic
             int j = 4;
             for (int i = 0; i < ParameterDimension * 2; i++, j++)
             {
-                value[i] = double.Parse(split[j]);
+                values[i] = double.Parse(split[j]);
             }
         }
 
-        return new T
+        var keyEvent = new T
         {
             Easing = easing.ToEasingFunction(),
             StartTime = startTime,
             EndTime = endTime,
-            Values = value
         };
+        if (keyEvent is BasicEvent be)
+        {
+            be.Values = values;
+        }
+        //keyEvent.SetStarts(value.Take(ParameterDimension));
+        //keyEvent.SetEnds(value.Skip(ParameterDimension));
+        return keyEvent;
     }
 }

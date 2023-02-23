@@ -11,8 +11,8 @@ public interface IKeyEvent : IEvent, IScriptable
     IReadOnlyList<double> Values { get; }
 
 #if NET5_0_OR_GREATER
-        Span<double> GetStartsSpan();
-        Span<double> GetEndsSpan();
+    Span<double> GetStartsSpan();
+    Span<double> GetEndsSpan();
 #endif
     IEnumerable<double> GetStarts();
     IEnumerable<double> GetEnds();

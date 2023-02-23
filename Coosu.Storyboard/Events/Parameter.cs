@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Coosu.Storyboard.Easing;
-using Coosu.Storyboard.Utils;
 
 namespace Coosu.Storyboard.Events;
 

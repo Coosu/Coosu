@@ -12,8 +12,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="shader\*.ps" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Coosu.Animation\Coosu.Animation.csproj" />
     <ProjectReference Include="..\Coosu.Storyboard\Coosu.Storyboard.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="shader\*.ps" />
   </ItemGroup>
 
 </Project>

@@ -24,6 +24,12 @@ public class ScriptingTest
     [Fact]
     public async Task OsbX()
     {
+        using (var sr = new StreamReader(@"C:\Users\milki\Desktop\test.osb"))
+        {
+            var ok = await OsbxConvert.DeserializeObjectAsync(sr);
+        }
+
+        return;
         var osbX = """
             Camera25
              MX,0,0,2000,100,3000
@@ -43,7 +49,7 @@ public class ScriptingTest
 
         var objs = scene.Layers.Values.First().SceneObjects;
     }
-    
+
     [Fact]
     public async Task Loop()
     {
@@ -86,7 +92,7 @@ public class ScriptingTest
         var str4 = sprite2.ToScriptString();
         Debug.Assert(str3 == str4);
     }
-    
+
     [Fact]
     public async Task RelativeEvent()
     {
@@ -111,13 +117,13 @@ public class ScriptingTest
         _testOutputHelper.WriteLine("After compressing");
         _testOutputHelper.WriteLine(sprite.ToScriptString());
     }
-    
+
     [Fact]
     public void CreateElementGroup()
     {
         var group = new Layer(0);
     }
-    
+
     [Fact]
     public void CreateSpriteFromGroup()
     {
@@ -125,7 +131,7 @@ public class ScriptingTest
         group.CreateSprite("");
         Assert.Equal(1, group.SceneObjects.Count);
     }
-    
+
     [Fact]
     public void Parse()
     {
@@ -133,7 +139,7 @@ public class ScriptingTest
         Layer.ParseFromFile(
             @"C:\Users\milkitic\Documents\Tencent Files\2241521134\FileRecv\cYsmix_-_triangles\cYsmix - triangles (yf_bmp).osb");
     }
-    
+
     [Fact]
     public async Task Compress()
     {

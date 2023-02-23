@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Coosu.Shared;
 using Coosu.Storyboard.Common;
 
 namespace Coosu.Storyboard.Extensibility;
@@ -9,14 +10,14 @@ public abstract class SubjectHandler<T> : ISubjectParsingHandler<T> where T : IS
 
     public abstract string Flag { get; }
 
-    ISceneObject ISubjectParsingHandler.Deserialize(string[] split)
+    ISceneObject ISubjectParsingHandler.Deserialize(ref ValueListBuilder<string> split)
     {
-        return Deserialize(split);
+        return Deserialize(ref split);
     }
 
-    object IParsingHandler.Deserialize(string[] split)
+    object IParsingHandler.Deserialize(ref ValueListBuilder<string> split)
     {
-        return Deserialize(split);
+        return Deserialize(ref split);
     }
 
     string ISubjectParsingHandler.Serialize(ISceneObject raw)
@@ -31,7 +32,7 @@ public abstract class SubjectHandler<T> : ISubjectParsingHandler<T> where T : IS
 
     public abstract string Serialize(T raw);
 
-    public abstract T Deserialize(string[] split);
+    public abstract T Deserialize(ref ValueListBuilder<string> split);
 
     public IActionParsingHandler? GetActionHandler(string magicWord)
     {
