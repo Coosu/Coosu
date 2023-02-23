@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Buffers;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -86,11 +87,6 @@ public static class OsbxConvert
             }
         }
 
-        //else
-        //{
-        //    Console.WriteLine($"Unknown type of EventContainer: `{sceneObject.ToOsbString()}`");
-        //}
-
         return sb.ToString().TrimEnd('\n', '\r');
     }
 
@@ -104,7 +100,6 @@ public static class OsbxConvert
         int lineIndex = 0;
 
         var scene = new Scene();
-
         while (line != null)
         {
             if (line.StartsWith("//") || line.StartsWith("[") && line.EndsWith("]"))
@@ -124,7 +119,8 @@ public static class OsbxConvert
     }
 
     private static void HandleLine(Scene scene, int lineIndex, string line,
-        ref IDetailedEventHost? lastSubject, ref IDetailedEventHost? lastSubSubject, ref ISubjectParsingHandler? lastSubjectHandler)
+        ref IDetailedEventHost? lastSubject, ref IDetailedEventHost? lastSubSubject,
+        ref ISubjectParsingHandler? lastSubjectHandler)
     {
         var array = ArrayPool<string>.Shared.Rent(16);
         var split = new ValueListBuilder<string>(array);
