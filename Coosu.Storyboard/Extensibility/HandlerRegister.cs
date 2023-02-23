@@ -15,9 +15,10 @@ public static class HandlerRegister
         return handler;
     }
 
-    public static ISubjectParsingHandler? GetSubjectHandler(string flagString)
+    public static ISubjectParsingHandler? GetSubjectHandler(string? flagString)
     {
-        return SubjectHandlerDic.ContainsKey(flagString) ? SubjectHandlerDic[flagString] : null;
+        var hasValue = SubjectHandlerDic.TryGetValue(flagString, out var value);
+        return hasValue ? value : null;
     }
 
     public static void RegisterEventTransformation(EventType eventType, EventCreationDelegate @delegate)
@@ -27,16 +28,17 @@ public static class HandlerRegister
 
     public static EventCreationDelegate? GetEventTransformation(EventType eventType)
     {
-        if (EventTransformationDictionary.ContainsKey(eventType))
-            return EventTransformationDictionary[eventType];
-        return null;
+        var hasValue = EventTransformationDictionary.TryGetValue(eventType, out var value);
+        return hasValue ? value : null;
     }
 
     public static T GetActionHandlerInstance<T>() where T : IActionParsingHandler, new()
     {
         var type = typeof(T);
-        if (ActionHandlerInstances.ContainsKey(type))
-            return (T)ActionHandlerInstances[type];
+        if (ActionHandlerInstances.TryGetValue(type, out var value))
+        {
+            return (T)value;
+        }
 
         var inst = new T();
         ActionHandlerInstances.Add(type, inst);

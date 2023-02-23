@@ -34,7 +34,7 @@ public readonly struct ObjectType : IEquatable<ObjectType>, IComparable<ObjectTy
         return Flag == other.Flag;
     }
 
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         return obj is ObjectType other && Equals(other);
     }
@@ -110,12 +110,14 @@ public readonly struct ObjectType : IEquatable<ObjectType>, IComparable<ObjectTy
 
     public static ObjectType Parse(string s)
     {
-        return DictionaryStore.ContainsKey(s) ? DictionaryStore[s] : int.Parse(s);
+        var hasValue = DictionaryStore.TryGetValue(s, out var objectType);
+        return hasValue ? objectType : int.Parse(s);
     }
 
     public static string? GetString(ObjectType type)
     {
-        return BackDictionaryStore.ContainsKey(type) ? BackDictionaryStore[type] : null;
+        var hasValue = BackDictionaryStore.TryGetValue(type, out var str);
+        return hasValue ? str : null;
     }
 
     public static bool Contains(string name)

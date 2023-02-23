@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Buffers;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -102,7 +101,8 @@ public static class OsbxConvert
         var scene = new Scene();
         while (line != null)
         {
-            if (line.StartsWith("//") || line.StartsWith("[") && line.EndsWith("]"))
+            if (line.StartsWith("//", StringComparison.Ordinal) || 
+                line.StartsWith("[", StringComparison.Ordinal) && line.EndsWith("]", StringComparison.Ordinal))
             {
 
             }
@@ -142,7 +142,7 @@ public static class OsbxConvert
                     flagString = ObjectType.GetString(flag);
                     if (flagString != null) handler = HandlerRegister.GetSubjectHandler(flagString);
                 }
-                
+
                 lastSubjectHandler = handler;
                 if (handler == null)
                 {

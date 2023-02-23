@@ -36,7 +36,8 @@ public abstract class SubjectHandler<T> : ISubjectParsingHandler<T> where T : IS
 
     public IActionParsingHandler? GetActionHandler(string flagString)
     {
-        return _actionHandlerDic.ContainsKey(flagString) ? _actionHandlerDic[flagString] : null;
+        var hasValue = _actionHandlerDic.TryGetValue(flagString, out var value);
+        return hasValue ? value : null;
     }
 
     public IParsingHandler RegisterAction(IActionParsingHandler handler)
