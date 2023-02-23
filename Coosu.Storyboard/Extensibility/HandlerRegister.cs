@@ -15,9 +15,9 @@ public static class HandlerRegister
         return handler;
     }
 
-    public static ISubjectParsingHandler? GetSubjectHandler(string magicWord)
+    public static ISubjectParsingHandler? GetSubjectHandler(string flagString)
     {
-        return SubjectHandlerDic.ContainsKey(magicWord) ? SubjectHandlerDic[magicWord] : null;
+        return SubjectHandlerDic.ContainsKey(flagString) ? SubjectHandlerDic[flagString] : null;
     }
 
     public static void RegisterEventTransformation(EventType eventType, EventCreationDelegate @delegate)

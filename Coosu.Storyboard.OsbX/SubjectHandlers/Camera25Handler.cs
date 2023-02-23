@@ -20,6 +20,7 @@ public class Camera25Handler : SubjectHandler<Camera25Object>
         RegisterAction(HandlerRegister.GetActionHandlerInstance<MoveZActionHandler>());
         RegisterAction(HandlerRegister.GetActionHandlerInstance<RotateActionHandler>());
         RegisterAction(HandlerRegister.GetActionHandlerInstance<OriginActionHandler>());
+        RegisterAction(HandlerRegister.GetActionHandlerInstance<LoopActionHandler>());
     }
 
     public override string Flag => "Camera25";

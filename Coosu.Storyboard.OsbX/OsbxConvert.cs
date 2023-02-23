@@ -98,6 +98,7 @@ public static class OsbxConvert
     {
         ISubjectParsingHandler? lastSubjectHandler = null;
         IDetailedEventHost? lastSubject = null;
+        IDetailedEventHost? lastSubSubject = null;
 
         var line = await reader.ReadLineAsync();
         int lineIndex = 0;
@@ -112,7 +113,7 @@ public static class OsbxConvert
             }
             else
             {
-                HandleLine(scene, lineIndex, line, ref lastSubject, ref lastSubjectHandler);
+                HandleLine(scene, lineIndex, line, ref lastSubject, ref lastSubSubject, ref lastSubjectHandler);
             }
 
             line = await reader.ReadLineAsync();
@@ -123,7 +124,7 @@ public static class OsbxConvert
     }
 
     private static void HandleLine(Scene scene, int lineIndex, string line,
-        ref IDetailedEventHost? lastSubject, ref ISubjectParsingHandler? lastSubjectHandler)
+        ref IDetailedEventHost? lastSubject, ref IDetailedEventHost? lastSubSubject, ref ISubjectParsingHandler? lastSubjectHandler)
     {
         var array = ArrayPool<string>.Shared.Rent(16);
         var split = new ValueListBuilder<string>(array);
@@ -134,7 +135,7 @@ public static class OsbxConvert
             {
                 split.Append(span.ToString());
             }
-            
+
             var flagString = split[0].TrimStart();
             var deep = split[0].Length - flagString.Length;
             if (deep == 0)
@@ -142,66 +143,86 @@ public static class OsbxConvert
                 var handler = HandlerRegister.GetSubjectHandler(flagString);
                 if (handler == null && int.TryParse(flagString, out var flag))
                 {
-                    var magicWord = ObjectType.GetString(flag);
-                    if (magicWord != null) handler = HandlerRegister.GetSubjectHandler(magicWord);
+                    flagString = ObjectType.GetString(flag);
+                    if (flagString != null) handler = HandlerRegister.GetSubjectHandler(flagString);
                 }
-
-                if (handler != null)
-                {
-                    try
-                    {
-                        var sprite = handler.Deserialize(ref split);
-                        var eg = scene.GetOrAddLayer(sprite.CameraIdentifier);
-                        eg.AddObject(sprite);
-
-                        lastSubject = sprite;
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Error while parsing subject. L {lineIndex}: `{line}`\r\n{ex}");
-                        lastSubject = null;
-                        handler = null;
-                    }
-                }
-                else
+                
+                lastSubjectHandler = handler;
+                if (handler == null)
                 {
                     Console.WriteLine($"Cannot find subject handler. L {lineIndex}: `{line}`");
+                    return;
                 }
 
-                lastSubjectHandler = handler;
-            }
-            else if (deep == 1)
-            {
-                if (lastSubjectHandler != null)
+                try
                 {
-                    var actHandler = lastSubjectHandler.GetActionHandler(flagString);
-                    if (actHandler != null)
-                    {
-                        try
-                        {
-                            var action = actHandler.Deserialize(ref split);
-                            lastSubject.ApplyAction(action);
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine($"Error while parsing action. L {lineIndex}: `{line}`\r\n{ex}");
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Cannot find action handler. L {lineIndex}: `{line}`");
-                    }
+                    var sprite = handler.Deserialize(ref split);
+                    var eg = scene.GetOrAddLayer(sprite.CameraIdentifier);
+                    eg.AddObject(sprite);
+
+                    lastSubject = sprite;
                 }
-                else
+                catch (Exception ex)
                 {
-                    Console.WriteLine($"Current subject is null, skipped. L {lineIndex}: `{line}`");
+                    Console.WriteLine($"Error while parsing subject. L {lineIndex}: `{line}`\r\n{ex}");
+                    lastSubject = null;
+                    lastSubjectHandler = null;
                 }
             }
             else
             {
-                Console.WriteLine($"Unknown deep {deep}. L {lineIndex}: `{line}`");
-            }
+                if (lastSubjectHandler == null)
+                {
+                    Console.WriteLine($"Current subject is null, skipped. L {lineIndex}: `{line}`");
+                    return;
+                }
 
+                var actHandler = lastSubjectHandler.GetActionHandler(flagString);
+                if (actHandler == null)
+                {
+                    Console.WriteLine($"Cannot find action handler. L {lineIndex}: `{line}`");
+                    return;
+                }
+
+                try
+                {
+                    var action = actHandler.Deserialize(ref split);
+                    IDetailedEventHost? eventHost;
+                    if (deep == 1)
+                    {
+                        lastSubSubject = null;
+                        eventHost = lastSubject;
+                    }
+                    else if (deep == 2)
+                    {
+                        if (lastSubSubject == null)
+                        {
+                            Console.WriteLine($"Deep is {deep} but no host event. L {lineIndex}: `{line}`");
+                            return;
+                        }
+                        else
+                        {
+                            eventHost = lastSubSubject;
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Unknown deep {deep}. L {lineIndex}: `{line}`");
+                        return;
+                    }
+
+                    eventHost?.ApplyAction(action);
+
+                    if (action is IDetailedEventHost detailedEventHost)
+                    {
+                        lastSubSubject = detailedEventHost;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error while parsing action. L {lineIndex}: `{line}`\r\n{ex}");
+                }
+            }
         }
         finally
         {

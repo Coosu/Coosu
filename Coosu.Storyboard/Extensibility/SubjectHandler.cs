@@ -34,9 +34,9 @@ public abstract class SubjectHandler<T> : ISubjectParsingHandler<T> where T : IS
 
     public abstract T Deserialize(ref ValueListBuilder<string> split);
 
-    public IActionParsingHandler? GetActionHandler(string magicWord)
+    public IActionParsingHandler? GetActionHandler(string flagString)
     {
-        return _actionHandlerDic.ContainsKey(magicWord) ? _actionHandlerDic[magicWord] : null;
+        return _actionHandlerDic.ContainsKey(flagString) ? _actionHandlerDic[flagString] : null;
     }
 
     public IParsingHandler RegisterAction(IActionParsingHandler handler)

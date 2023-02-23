@@ -1,5 +1,6 @@
 ﻿using System;
 using Coosu.Storyboard.Common;
+using Coosu.Storyboard.Events;
 
 namespace Coosu.Storyboard.OsbX;
 
@@ -15,6 +16,10 @@ public static class EventHostExtension
         if (basicEvent is IKeyEvent keyEvent)
         {
             host.AddEvent(keyEvent);
+        }
+        else if (host is Sprite sprite && basicEvent is Loop loop)
+        {
+            sprite.AddLoop(loop);
         }
         else
         {

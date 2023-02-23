@@ -19,6 +19,7 @@ public class AnimationHandler : SubjectHandler<Animation>
         RegisterAction(HandlerRegister.GetActionHandlerInstance<VectorActionHandler>());
         RegisterAction(HandlerRegister.GetActionHandlerInstance<ColorActionHandler>());
         RegisterAction(HandlerRegister.GetActionHandlerInstance<OriginActionHandler>());
+        RegisterAction(HandlerRegister.GetActionHandlerInstance<LoopActionHandler>());
     }
 
     public override string Flag => "Animation";

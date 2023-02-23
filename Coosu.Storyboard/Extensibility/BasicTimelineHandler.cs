@@ -52,7 +52,6 @@ public abstract class BasicTimelineHandler<T> : ActionHandler<T> where T : IKeyE
     public override T Deserialize(ref ValueListBuilder<string> split)
     {
         var paramLength = split.Length - 4;
-
         if (paramLength != ParameterDimension && paramLength != ParameterDimension * 2)
         {
             throw new ArgumentOutOfRangeException();
@@ -91,8 +90,7 @@ public abstract class BasicTimelineHandler<T> : ActionHandler<T> where T : IKeyE
         {
             be.Values = values;
         }
-        //keyEvent.SetStarts(value.Take(ParameterDimension));
-        //keyEvent.SetEnds(value.Skip(ParameterDimension));
+
         return keyEvent;
     }
 }
