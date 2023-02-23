@@ -29,5 +29,5 @@ public abstract class ActionHandler<T> : IActionParsingHandler<T> where T : IEve
     }
 
     public abstract T Deserialize(ref ValueListBuilder<string> split);
-    public abstract string Serialize(T raw);
+    public abstract string Serialize(T e);
 }

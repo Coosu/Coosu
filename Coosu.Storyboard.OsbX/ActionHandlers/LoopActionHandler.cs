@@ -16,8 +16,8 @@ public class LoopActionHandler : ActionHandler<Loop>
         return new Loop(startTime, loopTimes);
     }
 
-    public override string Serialize(Loop raw)
+    public override string Serialize(Loop loop)
     {
-        throw new System.NotImplementedException();
+        return $"L,{loop.StartTime},{loop.LoopCount}";
     }
 }

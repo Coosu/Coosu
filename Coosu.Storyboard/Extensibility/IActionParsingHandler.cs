@@ -13,5 +13,5 @@ public interface IActionParsingHandler : IParsingHandler
 public interface IActionParsingHandler<T> : IActionParsingHandler where T : IEvent
 {
     new T Deserialize(ref ValueListBuilder<string> split);
-    string Serialize(T raw);
+    string Serialize(T e);
 }

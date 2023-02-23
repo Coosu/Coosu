@@ -10,23 +10,23 @@ namespace Coosu.Storyboard.Extensibility;
 
 public abstract class BasicTimelineHandler<T> : ActionHandler<T> where T : IKeyEvent, new()
 {
-    public override string Serialize(T raw)
+    public override string Serialize(T e)
     {
-        if (raw is { IsHalfFilled: false, IsFilled: false })
+        if (e is { IsHalfFilled: false, IsFilled: false })
         {
             throw new Exception("The starting parameter's count should equal to the ending parameter's count");
         }
 
-        raw.Fill();
-        var sequenceEqual = raw.IsStartsEqualsEnds();
-        var size = raw.EventType.Size;
+        e.Fill();
+        var sequenceEqual = e.IsStartsEqualsEnds();
+        var size = e.EventType.Size;
 
         var sb = new StringBuilder();
         if (sequenceEqual)
         {
             for (int i = 0; i < size; i++)
             {
-                sb.Append(raw.GetValue(i).ToEnUsFormatString());
+                sb.Append(e.GetValue(i).ToEnUsFormatString());
                 if (i != size - 1)
                     sb.Append(',');
             }
@@ -35,18 +35,18 @@ public abstract class BasicTimelineHandler<T> : ActionHandler<T> where T : IKeyE
         {
             for (int i = 0; i < size * 2; i++)
             {
-                sb.Append(raw.GetValue(i).ToEnUsFormatString());
+                sb.Append(e.GetValue(i).ToEnUsFormatString());
                 if (i != size - 1)
                     sb.Append(',');
             }
         }
 
-        var e = raw.EventType.Flag;
-        var easing = ((int)raw.Easing.GetEasingType()).ToString();
-        var startT = Math.Round(raw.StartTime).ToEnUsFormatString();
-        var endT = raw.StartTime.Equals(raw.EndTime) ? "" : Math.Round(raw.EndTime).ToEnUsFormatString();
+        var flag = e.EventType.Flag;
+        var easing = ((int)e.Easing.GetEasingType()).ToString();
+        var startT = Math.Round(e.StartTime).ToEnUsFormatString();
+        var endT = e.StartTime.Equals(e.EndTime) ? "" : Math.Round(e.EndTime).ToEnUsFormatString();
 
-        return $"{e},{easing},{startT},{endT},{sb}";
+        return $"{flag},{easing},{startT},{endT},{sb}";
     }
 
     public override T Deserialize(ref ValueListBuilder<string> split)

@@ -19,7 +19,9 @@ public class SpriteHandler : SubjectHandler<Sprite>
         RegisterAction(HandlerRegister.GetActionHandlerInstance<VectorActionHandler>());
         RegisterAction(HandlerRegister.GetActionHandlerInstance<ColorActionHandler>());
         RegisterAction(HandlerRegister.GetActionHandlerInstance<OriginActionHandler>());
+
         RegisterAction(HandlerRegister.GetActionHandlerInstance<LoopActionHandler>());
+        RegisterAction(HandlerRegister.GetActionHandlerInstance<TriggerActionHandler>());
     }
 
     public override string Flag => "Sprite";
