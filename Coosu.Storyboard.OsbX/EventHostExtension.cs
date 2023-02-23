@@ -17,9 +17,21 @@ public static class EventHostExtension
         {
             host.AddEvent(keyEvent);
         }
-        else if (host is Sprite sprite && basicEvent is Loop loop)
+        else if (host is Sprite sprite)
         {
-            sprite.AddLoop(loop);
+            if (basicEvent is Loop loop)
+            {
+                sprite.AddLoop(loop);
+            }
+            else if (basicEvent is Trigger trigger)
+            {
+                sprite.AddTrigger(trigger);
+            }
+            else
+            {
+                throw new NotSupportedException(
+                    $"Child {basicEvent.GetType().FullName} is not supported for host {host.GetType().FullName}");
+            }
         }
         else
         {
