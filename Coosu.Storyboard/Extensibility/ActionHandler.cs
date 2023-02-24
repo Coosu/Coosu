@@ -6,7 +6,6 @@ namespace Coosu.Storyboard.Extensibility;
 public abstract class ActionHandler<T> : IActionParsingHandler<T> where T : IEvent
 {
     public abstract string Flag { get; }
-    public abstract int ParameterDimension { get; }
 
     IEvent IActionParsingHandler.Deserialize(ref ValueListBuilder<string> split)
     {

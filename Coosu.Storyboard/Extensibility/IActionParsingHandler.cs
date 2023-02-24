@@ -5,7 +5,6 @@ namespace Coosu.Storyboard.Extensibility;
 
 public interface IActionParsingHandler : IParsingHandler
 {
-    int ParameterDimension { get; }
     new IEvent Deserialize(ref ValueListBuilder<string> split);
     string Serialize(IEvent raw);
 }

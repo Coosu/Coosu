@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using Coosu.Shared;
 using Coosu.Storyboard.Extensibility;
 using Coosu.Storyboard.OsbX.ActionHandlers;
@@ -19,16 +20,36 @@ public class AnimationHandler : SubjectHandler<Animation>
         RegisterAction(HandlerRegister.GetActionHandlerInstance<VectorActionHandler>());
         RegisterAction(HandlerRegister.GetActionHandlerInstance<ColorActionHandler>());
         RegisterAction(HandlerRegister.GetActionHandlerInstance<OriginActionHandler>());
+        RegisterAction(HandlerRegister.GetActionHandlerInstance<ParameterActionHandler>());
 
         RegisterAction(HandlerRegister.GetActionHandlerInstance<LoopActionHandler>());
         RegisterAction(HandlerRegister.GetActionHandlerInstance<TriggerActionHandler>());
     }
 
     public override string Flag => "Animation";
-    public override string Serialize(Animation raw)
+
+    public override string Serialize(Animation animation)
     {
-        return string.Format("{0},{1},{2},\"{3}\",{4},{5},{6},{7},{8},{9},{10}", Flag, raw.LayerType, raw.OriginType, raw.ImagePath,
-            raw.DefaultX, raw.DefaultY, raw.FrameCount, raw.FrameDelay, raw.LoopType, raw.DefaultZ, raw.CameraIdentifier);
+        var header = string.Format("{0},{1},{2},\"{3}\",{4},{5},{6},{7},{8},{9},{10}", Flag, animation.LayerType, animation.OriginType, animation.ImagePath,
+            animation.DefaultX, animation.DefaultY, animation.FrameCount, animation.FrameDelay, animation.LoopType, animation.DefaultZ, animation.CameraIdentifier);
+        if (animation.LoopList.Count == 0 && animation.TriggerList.Count == 0)
+        {
+            return header;
+        }
+
+        using var sw = new StringWriter();
+        sw.WriteLine(header);
+        foreach (var loop in animation.LoopList)
+        {
+            loop.WriteScriptAsync(sw).Wait();
+        }
+
+        foreach (var trigger in animation.TriggerList)
+        {
+            trigger.WriteScriptAsync(sw).Wait();
+        }
+
+        return sw.ToString().TrimEnd('\r', '\n');
     }
 
     public override Animation Deserialize(ref ValueListBuilder<string> split)

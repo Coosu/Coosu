@@ -7,7 +7,6 @@ namespace Coosu.Storyboard.OsbX.ActionHandlers;
 public class TriggerActionHandler : ActionHandler<Trigger>
 {
     public override string Flag => "T";
-    public override int ParameterDimension { get; } = 0;
 
     public override Trigger Deserialize(ref ValueListBuilder<string> split)
     {

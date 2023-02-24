@@ -7,7 +7,6 @@ namespace Coosu.Storyboard.OsbX.ActionHandlers;
 public class LoopActionHandler : ActionHandler<Loop>
 {
     public override string Flag => "L";
-    public override int ParameterDimension { get; } = 0;
 
     public override Loop Deserialize(ref ValueListBuilder<string> split)
     {

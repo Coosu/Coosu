@@ -19,10 +19,10 @@ public static class OsbxConvert
         HandlerRegister.RegisterSubject(new Camera25Handler());
     }
 
-    public static async Task<string> SerializeObjectAsync(Scene manager)
+    public static async Task<string> SerializeObjectAsync(Scene scene)
     {
         var sb = new StringBuilder();
-        foreach (var @group in manager.Layers.Values)
+        foreach (var @group in scene.Layers.Values)
         {
             var result = await SerializeObjectAsync(group);
             sb.AppendLine(result);
@@ -31,10 +31,10 @@ public static class OsbxConvert
         return sb.ToString().TrimEnd('\n', '\r'); ;
     }
 
-    public static async Task<string> SerializeObjectAsync(Layer group)
+    public static async Task<string> SerializeObjectAsync(Layer layer)
     {
         var sb = new StringBuilder();
-        foreach (var sceneObject in group.SceneObjects)
+        foreach (var sceneObject in layer.SceneObjects)
         {
             var result = await SerializeObjectAsync(sceneObject);
             sb.AppendLine(result);
@@ -43,15 +43,14 @@ public static class OsbxConvert
         return sb.ToString().TrimEnd('\n', '\r'); ;
     }
 
-    public static async Task<string> SerializeObjectAsync(ISceneObject sceneObject)
+    public static Task<string> SerializeObjectAsync(ISceneObject sceneObject)
     {
         var sb = new StringBuilder();
         var subjectHandler = HandlerRegister.GetSubjectHandler(ObjectType.GetString(sceneObject.ObjectType));
         if (subjectHandler == null)
         {
-            Console.WriteLine(
+            throw new Exception(
                 $"Cannot find subject handler for `{ObjectType.GetString(sceneObject.ObjectType)}`: Skipped.");
-            return "";
         }
 
         try
@@ -61,9 +60,8 @@ public static class OsbxConvert
         }
         catch (Exception ex)
         {
-            Console.WriteLine(
+            throw new Exception(
                 $"Error while serializing element: `{ObjectType.GetString(sceneObject.ObjectType)}`\r\n{ex}");
-            return "";
         }
 
         foreach (var keyEvent in sceneObject.Events)
@@ -71,8 +69,7 @@ public static class OsbxConvert
             var actionHandler = subjectHandler.GetActionHandler(keyEvent.EventType.Flag);
             if (actionHandler == null)
             {
-                Console.WriteLine($"Cannot find action handler for `{keyEvent.EventType.Flag}`: Skipped.");
-                continue;
+                throw new Exception($"Cannot find action handler for `{keyEvent.EventType.Flag}`: Skipped.");
             }
 
             try
@@ -82,11 +79,12 @@ public static class OsbxConvert
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error while serializing action: `{keyEvent.EventType.Flag}`\r\n{ex}");
+                throw new Exception($"Error while serializing action: `{keyEvent.EventType.Flag}`\r\n{ex}");
             }
         }
 
-        return sb.ToString().TrimEnd('\n', '\r');
+        var osb = sb.ToString().TrimEnd('\n', '\r');
+        return Task.FromResult(osb);
     }
 
     public static async Task<Scene> DeserializeObjectAsync(TextReader reader)
@@ -101,7 +99,7 @@ public static class OsbxConvert
         var scene = new Scene();
         while (line != null)
         {
-            if (line.StartsWith("//", StringComparison.Ordinal) || 
+            if (line.StartsWith("//", StringComparison.Ordinal) ||
                 line.StartsWith("[", StringComparison.Ordinal) && line.EndsWith("]", StringComparison.Ordinal))
             {
 
@@ -146,8 +144,7 @@ public static class OsbxConvert
                 lastSubjectHandler = handler;
                 if (handler == null)
                 {
-                    Console.WriteLine($"Cannot find subject handler. L {lineIndex}: `{line}`");
-                    return;
+                    throw new Exception($"Cannot find subject handler. L {lineIndex}: `{line}`");
                 }
 
                 try
@@ -160,24 +157,22 @@ public static class OsbxConvert
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error while parsing subject. L {lineIndex}: `{line}`\r\n{ex}");
                     lastSubject = null;
                     lastSubjectHandler = null;
+                    throw new Exception($"Error while parsing subject. L {lineIndex}: `{line}`\r\n{ex}");
                 }
             }
             else
             {
                 if (lastSubjectHandler == null)
                 {
-                    Console.WriteLine($"Current subject is null, skipped. L {lineIndex}: `{line}`");
-                    return;
+                    throw new Exception($"Current subject is null, skipped. L {lineIndex}: `{line}`");
                 }
 
                 var actHandler = lastSubjectHandler.GetActionHandler(flagString);
                 if (actHandler == null)
                 {
-                    Console.WriteLine($"Cannot find action handler. L {lineIndex}: `{line}`");
-                    return;
+                    throw new Exception($"Cannot find action handler. L {lineIndex}: `{line}`");
                 }
 
                 try
@@ -193,8 +188,7 @@ public static class OsbxConvert
                     {
                         if (lastSubSubject == null)
                         {
-                            Console.WriteLine($"Deep is {deep} but no host event. L {lineIndex}: `{line}`");
-                            return;
+                            throw new Exception($"Deep is {deep} but no host event. L {lineIndex}: `{line}`");
                         }
                         else
                         {
@@ -203,8 +197,7 @@ public static class OsbxConvert
                     }
                     else
                     {
-                        Console.WriteLine($"Unknown deep {deep}. L {lineIndex}: `{line}`");
-                        return;
+                        throw new Exception($"Unknown deep {deep}. L {lineIndex}: `{line}`");
                     }
 
                     eventHost?.ApplyAction(action);
@@ -216,7 +209,7 @@ public static class OsbxConvert
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error while parsing action. L {lineIndex}: `{line}`\r\n{ex}");
+                    throw new Exception($"Error while parsing action. L {lineIndex}: `{line}`\r\n{ex}");
                 }
             }
         }

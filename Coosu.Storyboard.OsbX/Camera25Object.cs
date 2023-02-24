@@ -23,7 +23,6 @@ public class Camera25Object : ISceneObject, IDefinedObject
     public double DefaultZ { get; set; } = 1;
     public string CameraIdentifier { get; set; }
     public List<Loop> LoopList { get; } = new();
-    public List<Trigger> TriggerList { get; } = new();
     public double MaxTime() => Events.Count > 0 ? Events.Max(k => k.EndTime) : 0;
     public double MinTime() => Events.Count > 0 ? Events.Min(k => k.StartTime) : 0;
     public double MaxStartTime() => Events.Count > 0 ? Events.Max(k => k.StartTime) : 0;

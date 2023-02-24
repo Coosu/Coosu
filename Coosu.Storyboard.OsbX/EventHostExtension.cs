@@ -17,6 +17,18 @@ public static class EventHostExtension
         {
             host.AddEvent(keyEvent);
         }
+        else if (host is Camera25Object camera25Object)
+        {
+            if (basicEvent is Loop loop)
+            {
+                camera25Object.LoopList.Add(loop);
+            }
+            else
+            {
+                throw new NotSupportedException(
+                    $"Child {basicEvent.GetType().FullName} is not supported for host {host.GetType().FullName}");
+            }
+        }
         else if (host is Sprite sprite)
         {
             if (basicEvent is Loop loop)

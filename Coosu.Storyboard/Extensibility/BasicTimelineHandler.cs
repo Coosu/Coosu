@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Linq;
-using System.Text;
 using Coosu.Shared;
 using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Easing;
@@ -10,6 +8,7 @@ namespace Coosu.Storyboard.Extensibility;
 
 public abstract class BasicTimelineHandler<T> : ActionHandler<T> where T : IKeyEvent, new()
 {
+    public abstract int ParameterDimension { get; }
     public override string Serialize(T e)
     {
         if (e is { IsHalfFilled: false, IsFilled: false })
@@ -21,23 +20,28 @@ public abstract class BasicTimelineHandler<T> : ActionHandler<T> where T : IKeyE
         var sequenceEqual = e.IsStartsEqualsEnds();
         var size = e.EventType.Size;
 
-        var sb = new StringBuilder();
+        var vsb = new ValueStringBuilder(stackalloc char[64]);
         if (sequenceEqual)
         {
             for (int i = 0; i < size; i++)
             {
-                sb.Append(e.GetValue(i).ToEnUsFormatString());
+                vsb.Append(e.GetValue(i).ToEnUsFormatString());
                 if (i != size - 1)
-                    sb.Append(',');
+                {
+                    vsb.Append(',');
+                }
             }
         }
         else
         {
-            for (int i = 0; i < size * 2; i++)
+            var dSize = size * 2;
+            for (int i = 0; i < dSize; i++)
             {
-                sb.Append(e.GetValue(i).ToEnUsFormatString());
-                if (i != size - 1)
-                    sb.Append(',');
+                vsb.Append(e.GetValue(i).ToEnUsFormatString());
+                if (i != dSize - 1)
+                {
+                    vsb.Append(',');
+                }
             }
         }
 
@@ -46,7 +50,7 @@ public abstract class BasicTimelineHandler<T> : ActionHandler<T> where T : IKeyE
         var startT = Math.Round(e.StartTime).ToEnUsFormatString();
         var endT = e.StartTime.Equals(e.EndTime) ? "" : Math.Round(e.EndTime).ToEnUsFormatString();
 
-        return $"{flag},{easing},{startT},{endT},{sb}";
+        return $"{flag},{easing},{startT},{endT},{vsb.ToString()}";
     }
 
     public override T Deserialize(ref ValueListBuilder<string> split)
@@ -54,7 +58,7 @@ public abstract class BasicTimelineHandler<T> : ActionHandler<T> where T : IKeyE
         var paramLength = split.Length - 4;
         if (paramLength != ParameterDimension && paramLength != ParameterDimension * 2)
         {
-            throw new ArgumentOutOfRangeException();
+            throw new ArgumentException("Wrong parameter definition");
         }
 
         var easing = EasingConvert.ToEasing(split[1]);

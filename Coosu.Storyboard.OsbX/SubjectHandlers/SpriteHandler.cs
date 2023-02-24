@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using Coosu.Shared;
 using Coosu.Storyboard.Extensibility;
 using Coosu.Storyboard.OsbX.ActionHandlers;
@@ -19,6 +20,7 @@ public class SpriteHandler : SubjectHandler<Sprite>
         RegisterAction(HandlerRegister.GetActionHandlerInstance<VectorActionHandler>());
         RegisterAction(HandlerRegister.GetActionHandlerInstance<ColorActionHandler>());
         RegisterAction(HandlerRegister.GetActionHandlerInstance<OriginActionHandler>());
+        RegisterAction(HandlerRegister.GetActionHandlerInstance<ParameterActionHandler>());
 
         RegisterAction(HandlerRegister.GetActionHandlerInstance<LoopActionHandler>());
         RegisterAction(HandlerRegister.GetActionHandlerInstance<TriggerActionHandler>());
@@ -27,9 +29,27 @@ public class SpriteHandler : SubjectHandler<Sprite>
     public override string Flag => "Sprite";
 
     //Sprite,0,Centre,"",320,240
-    public override string Serialize(Sprite raw)
+    public override string Serialize(Sprite sprite)
     {
-        return $"{Flag},{raw.LayerType},{raw.OriginType},\"{raw.ImagePath}\",{raw.DefaultX},{raw.DefaultY},{raw.DefaultZ},{raw.CameraIdentifier}";
+        var header = $"{Flag},{sprite.LayerType},{sprite.OriginType},\"{sprite.ImagePath}\",{sprite.DefaultX},{sprite.DefaultY},{sprite.DefaultZ},{sprite.CameraIdentifier}";
+        if (sprite.LoopList.Count == 0 && sprite.TriggerList.Count == 0)
+        {
+            return header;
+        }
+
+        using var sw = new StringWriter();
+        sw.WriteLine(header);
+        foreach (var loop in sprite.LoopList)
+        {
+            loop.WriteScriptAsync(sw).Wait();
+        }
+
+        foreach (var trigger in sprite.TriggerList)
+        {
+            trigger.WriteScriptAsync(sw).Wait();
+        }
+
+        return sw.ToString().TrimEnd('\r', '\n');
     }
 
     public override Sprite Deserialize(ref ValueListBuilder<string> split)
