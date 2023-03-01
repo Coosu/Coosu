@@ -54,7 +54,7 @@ public class AnimationHandler : SubjectHandler<Animation>
 
     public override Animation Deserialize(ref ValueListBuilder<string> split)
     {
-        if (split.Length is not (8 or 9 or 11)) throw new ArgumentOutOfRangeException();
+        if (split.Length is not (8 or 9 or 10 or 11)) throw new ArgumentOutOfRangeException();
 
         var type = ObjectType.Parse(split[0]);
         var layerType = (LayerType)Enum.Parse(typeof(LayerType), split[1]);

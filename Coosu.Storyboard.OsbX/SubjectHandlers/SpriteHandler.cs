@@ -54,7 +54,7 @@ public class SpriteHandler : SubjectHandler<Sprite>
 
     public override Sprite Deserialize(ref ValueListBuilder<string> split)
     {
-        if (split.Length is not (6 or 8)) throw new ArgumentOutOfRangeException();
+        if (split.Length is not (6 or 7 or 8)) throw new ArgumentOutOfRangeException();
 
         var type = ObjectType.Parse(split[0]);
         var layerType = (LayerType)Enum.Parse(typeof(LayerType), split[1]);
