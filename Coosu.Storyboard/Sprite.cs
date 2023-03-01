@@ -71,7 +71,7 @@ public class Sprite : ISceneObject
     {
         if (_cachedMaxTime != null) return _cachedMaxTime.Value;
         if (Events.Count == 0 && LoopList.Count == 0 && TriggerList.Count == 0)
-            return double.NaN;
+            return double.MinValue;
 
         var max = Events.Count == 0 ? double.MinValue : Events.Max(k => k.EndTime);
         var loopMax = LoopList.Count == 0 ? double.MinValue : LoopList.Max(k => k.OuterMaxTime());
@@ -86,7 +86,7 @@ public class Sprite : ISceneObject
     {
         if (_cachedMinTime != null) return _cachedMinTime.Value;
         if (Events.Count == 0 && LoopList.Count == 0 && TriggerList.Count == 0)
-            return double.NaN;
+            return double.MaxValue;
 
         var min = Events.Count == 0 ? double.MaxValue : Events.Min(k => k.StartTime);
         var loopMin = LoopList.Count == 0 ? double.MaxValue : LoopList.Min(k => k.OuterMinTime());
@@ -101,7 +101,7 @@ public class Sprite : ISceneObject
     {
         if (_cachedMaxStartTime != null) return _cachedMaxStartTime.Value;
         if (Events.Count == 0 && LoopList.Count == 0 && TriggerList.Count == 0)
-            return double.NaN;
+            return double.MinValue;
 
         var max = Events.Count == 0 ? double.MinValue : Events.Max(k => k.StartTime);
         var loopMax = LoopList.Count == 0 ? double.MinValue : LoopList.Max(k => k.OuterMinTime());
@@ -116,7 +116,7 @@ public class Sprite : ISceneObject
     {
         if (_cachedMinEndTime != null) return _cachedMinEndTime.Value;
         if (Events.Count == 0 && LoopList.Count == 0 && TriggerList.Count == 0)
-            return double.NaN;
+            return double.MaxValue;
 
         var min = Events.Count == 0 ? double.MaxValue : Events.Min(k => k.EndTime);
         var loopMin = LoopList.Count == 0 ? double.MaxValue : LoopList.Min(k => k.OuterMaxTime());
