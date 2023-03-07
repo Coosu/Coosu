@@ -30,6 +30,7 @@ public class Layer : ISpriteHost, IAdjustable
     {
         Camera2.DefaultZ = 1;
         Name = name;
+        Camera2.CameraIdentifier = name;
     }
 
     /// <summary>
@@ -41,6 +42,7 @@ public class Layer : ISpriteHost, IAdjustable
     {
         Camera2.DefaultZ = defaultZ;
         Name = name;
+        Camera2.CameraIdentifier = name;
     }
 
     /// <summary>

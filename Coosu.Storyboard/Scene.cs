@@ -21,16 +21,44 @@ public class Scene : IScriptable, IAdjustable
         return Layers.ContainsKey(cameraId);
     }
 
-    public Layer GetOrAddLayer(string cameraId)
+    public Layer GetOrAddFixedForegroundLayer(string cameraId)
+    {
+        return GetOrAddLayer("foreground_" + cameraId);
+    }
+
+    public Layer GetOrAddFixedBackgroundLayer(string cameraId)
+    {
+        return GetOrAddLayer("background_" + cameraId);
+    }
+
+    public Layer GetOrAddLayer(string cameraId, double defaultZ = 1)
     {
         if (ContainsLayer(cameraId))
             return Layers[cameraId];
-        return CreateLayer(cameraId);
+        return CreateLayer(cameraId, defaultZ);
     }
 
-    public Layer CreateLayer(string cameraId)
+    public Layer CreateFixedForegroundLayer(string cameraId)
     {
-        var elementGroup = new Layer(cameraId);
+        return CreateLayer("foreground_" + cameraId);
+    }
+
+    public Layer CreateFixedBackgroundLayer(string cameraId)
+    {
+        return CreateLayer("background_" + cameraId);
+    }
+
+    public Layer CreateLayer(string cameraId, double defaultZ = 1)
+    {
+        var elementGroup = new Layer(cameraId)
+        {
+            Camera2 =
+            {
+                CameraIdentifier = cameraId,
+                DefaultZ = defaultZ
+            }
+        };
+
         Layers.Add(cameraId, elementGroup);
         return elementGroup;
     }

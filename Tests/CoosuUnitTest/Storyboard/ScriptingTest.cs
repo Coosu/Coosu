@@ -24,6 +24,22 @@ public class ScriptingTest
     [Fact]
     public async Task OsbX()
     {
+        var sceneTest = new Scene();
+        var layer = sceneTest.CreateLayer("default", 1.5);
+        var sprite = layer.CreateSprite("ok.jbg");
+        using (var loop = sprite.CreateLoop(0, 7))
+        {
+            loop.MoveZ(12345, 54321, 114, 514);
+        }
+        var layer2 = sceneTest.CreateFixedBackgroundLayer("default");
+        var sprite2 = layer2.CreateSprite("ok.jbg");
+        using (var loop = sprite2.CreateLoop(0, 7))
+        {
+            loop.MoveZ(12345, 54321, 114, 514);
+        }
+
+        var result = await OsbxConvert.SerializeObjectAsync(sceneTest);
+
         using (var sr = new StreamReader(@"C:\Users\milki\Desktop\test.osb"))
         {
             var ok = await OsbxConvert.DeserializeObjectAsync(sr);
@@ -133,6 +149,16 @@ public class ScriptingTest
         await compressor.CompressAsync();
         _testOutputHelper.WriteLine("After compressing");
         _testOutputHelper.WriteLine(sprite.ToScriptString());
+    }
+
+    [Fact]
+    public async Task Parse2()
+    {
+        var path = @"E:\其他文件\osu!\Songs\1841885 cYsmix - triangles\cYsmix - triangles (yf_bmp).osb";
+
+        using var reader = new StreamReader(path);
+        var scene = await OsbxConvert.DeserializeObjectAsync(reader);
+        var osbXMinTime = scene.Layers.Select(k => k.Value.MinTime()).Min();
     }
 
     [Fact]

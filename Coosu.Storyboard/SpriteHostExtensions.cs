@@ -15,6 +15,8 @@ public static class SpriteHostExtensions
         string filePath)
     {
         var obj = new Sprite(LayerType.Foreground, OriginType.Centre, filePath, 320, 240);
+        obj.CameraIdentifier = spriteHost.Camera2.CameraIdentifier;
+        obj.DefaultZ = spriteHost.Camera2.DefaultZ;
         spriteHost.AddSprite(obj);
         return obj;
     }
@@ -31,6 +33,8 @@ public static class SpriteHostExtensions
         OriginType originType)
     {
         var obj = new Sprite(LayerType.Foreground, originType, filePath, 320, 240);
+        obj.CameraIdentifier = spriteHost.Camera2.CameraIdentifier;
+        obj.DefaultZ = spriteHost.Camera2.DefaultZ;
         spriteHost.AddSprite(obj);
         return obj;
     }
@@ -47,6 +51,8 @@ public static class SpriteHostExtensions
         LayerType layerType)
     {
         var obj = new Sprite(layerType, OriginType.Centre, filePath, 320, 240);
+        obj.CameraIdentifier = spriteHost.Camera2.CameraIdentifier;
+        obj.DefaultZ = spriteHost.Camera2.DefaultZ;
         spriteHost.AddSprite(obj);
         return obj;
     }
@@ -65,6 +71,8 @@ public static class SpriteHostExtensions
         OriginType originType)
     {
         var obj = new Sprite(layerType, originType, filePath, 320, 240);
+        obj.CameraIdentifier = spriteHost.Camera2.CameraIdentifier;
+        obj.DefaultZ = spriteHost.Camera2.DefaultZ;
         spriteHost.AddSprite(obj);
         return obj;
     }
@@ -85,6 +93,8 @@ public static class SpriteHostExtensions
         in Vector2D defaultLocation)
     {
         var obj = new Sprite(layerType, originType, filePath, defaultLocation.X, defaultLocation.Y);
+        obj.CameraIdentifier = spriteHost.Camera2.CameraIdentifier;
+        obj.DefaultZ = spriteHost.Camera2.DefaultZ;
         spriteHost.AddSprite(obj);
         return obj;
     }
@@ -106,6 +116,8 @@ public static class SpriteHostExtensions
         double defaultX, double defaultY)
     {
         var obj = new Sprite(layerType, originType, filePath, defaultX, defaultY);
+        obj.CameraIdentifier = spriteHost.Camera2.CameraIdentifier;
+        obj.DefaultZ = spriteHost.Camera2.DefaultZ;
         spriteHost.AddSprite(obj);
         return obj;
     }
@@ -140,6 +152,8 @@ public static class SpriteHostExtensions
             frameDelay,
             loopType
         );
+        obj.CameraIdentifier = spriteHost.Camera2.CameraIdentifier;
+        obj.DefaultZ = spriteHost.Camera2.DefaultZ;
         spriteHost.AddSprite(obj);
         return obj;
     }
@@ -174,6 +188,8 @@ public static class SpriteHostExtensions
             frameDelay,
             loopType
         );
+        obj.CameraIdentifier = spriteHost.Camera2.CameraIdentifier;
+        obj.DefaultZ = spriteHost.Camera2.DefaultZ;
         spriteHost.AddSprite(obj);
         return obj;
     }
