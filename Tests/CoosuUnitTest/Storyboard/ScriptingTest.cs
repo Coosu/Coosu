@@ -3,8 +3,10 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Threading.Tasks;
 using Coosu.Storyboard;
+using Coosu.Storyboard.Easing;
 using Coosu.Storyboard.Extensions.Optimizing;
 using Coosu.Storyboard.OsbX;
 using Xunit;
@@ -25,18 +27,47 @@ public class ScriptingTest
     public async Task OsbX()
     {
         var sceneTest = new Scene();
-        var layer = sceneTest.CreateLayer("default", 1.5);
-        var sprite = layer.CreateSprite("ok.jbg");
-        using (var loop = sprite.CreateLoop(0, 7))
+
+        var count = 30;
+        for (int i = 0; i < count; i++)
         {
-            loop.MoveZ(12345, 54321, 114, 514);
+            var z = i * 1;
+            //var startTime = QuarticEase.InstanceInOut.Ease(i / (double)count) * 6000 - 500;
+
+            var x = 320 + Math.Sin(i / ((double)count / 2) * Math.PI * 2) * 50;
+
+            var layer = sceneTest.GetOrAddLayer("LAYER_" + z, z);
+            var sprite = layer.CreateSprite("try.png");
+            sprite.MoveX(0, 20000, x);
+            //sprite.MoveY(startTime, startTime + 500, -500, 240);
+            //sprite.Fade(startTime, startTime + 500, 0, 1);
         }
-        var layer2 = sceneTest.CreateFixedBackgroundLayer("default");
-        var sprite2 = layer2.CreateSprite("ok.jbg");
-        using (var loop = sprite2.CreateLoop(0, 7))
-        {
-            loop.MoveZ(12345, 54321, 114, 514);
-        }
+        //for (int j = 0; j < 1000; j++)
+        //{
+        //    var layerZ = Random.Shared.NextDouble() * count;
+        //    var layer = sceneTest.GetOrAddLayer("LAYER_" + (int)(layerZ * 20), layerZ);
+        //    var sprite = layer.CreateSprite("agrass.png");
+
+        //    var x = Random.Shared.Next(-107 - 1500, 747 + 1500);
+        //    var y = 990 + Random.Shared.Next(-50, 50);
+        //    var scaleX = Random.Shared.NextDouble() * 0.5 + 2;
+        //    var scaleY = scaleX + Random.Shared.NextDouble() * 1 - 0.5;
+        //    var rotate = Random.Shared.NextDouble() * 1 - 0.5;
+
+        //    sprite.Fade(0, 20000, 1);
+        //    sprite.MoveX(0, x);
+        //    sprite.MoveY(0, y);
+        //    sprite.Vector(0, scaleX, scaleY);
+        //    sprite.Rotate(0,rotate);
+        //}
+
+        var camera25Object = sceneTest.GetOrCreateCamera25Control();
+
+        camera25Object.MoveX(5, 0, 2000, -1000, 0);
+        camera25Object.MoveY(1, 0, 3460, 100, -700);
+        camera25Object.MoveY(11, 3460, 6000, -700, 1500);
+        camera25Object.MoveZ(11, 0, 6000, 0, -25.5);
+        camera25Object.Rotate(11, 0, 4000, -0.5, 0.25);
 
         var result = await OsbxConvert.SerializeObjectAsync(sceneTest);
 
