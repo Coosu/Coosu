@@ -25,7 +25,10 @@ public static class OsbxConvert
         foreach (var @group in scene.Layers.Values)
         {
             var result = await SerializeObjectAsync(group);
-            sb.AppendLine(result);
+            if (!string.IsNullOrEmpty(result))
+            {
+                sb.AppendLine(result);
+            }
         }
 
         return sb.ToString().TrimEnd('\n', '\r'); ;
@@ -120,6 +123,8 @@ public static class OsbxConvert
         ref IDetailedEventHost? lastSubject, ref IDetailedEventHost? lastSubSubject,
         ref ISubjectParsingHandler? lastSubjectHandler)
     {
+        if (string.IsNullOrWhiteSpace(line)) return;
+
         var array = ArrayPool<string>.Shared.Rent(16);
         var split = new ValueListBuilder<string>(array);
         try
@@ -212,6 +217,10 @@ public static class OsbxConvert
                     throw new Exception($"Error while parsing action. L {lineIndex}: `{line}`\r\n{ex}");
                 }
             }
+        }
+        catch (Exception e)
+        {
+
         }
         finally
         {

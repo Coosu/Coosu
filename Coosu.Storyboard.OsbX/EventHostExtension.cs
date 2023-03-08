@@ -17,33 +17,13 @@ public static class EventHostExtension
         {
             host.AddEvent(keyEvent);
         }
-        else if (host is Camera25Object camera25Object)
+        else if (host is ILoopHost loopHost && basicEvent is Loop loop)
         {
-            if (basicEvent is Loop loop)
-            {
-                camera25Object.LoopList.Add(loop);
-            }
-            else
-            {
-                throw new NotSupportedException(
-                    $"Child {basicEvent.GetType().FullName} is not supported for host {host.GetType().FullName}");
-            }
+            loopHost.AddLoop(loop);
         }
-        else if (host is Sprite sprite)
+        else if (host is ITriggerHost triggerHost && basicEvent is Trigger trigger)
         {
-            if (basicEvent is Loop loop)
-            {
-                sprite.AddLoop(loop);
-            }
-            else if (basicEvent is Trigger trigger)
-            {
-                sprite.AddTrigger(trigger);
-            }
-            else
-            {
-                throw new NotSupportedException(
-                    $"Child {basicEvent.GetType().FullName} is not supported for host {host.GetType().FullName}");
-            }
+            triggerHost.AddTrigger(trigger);
         }
         else
         {

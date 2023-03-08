@@ -16,38 +16,36 @@ public static class EventHostExtensions
 
     public static void Expand(this IDetailedEventHost host)
     {
-        if (host is Sprite sprite)
+        if (host is ITriggerHost { TriggerList.Count: > 0 } sprite)
         {
-            if (sprite.TriggerList.Count > 0)
-            {
-                foreach (var t in sprite.TriggerList)
-                    t.Expand();
-            }
+            foreach (var t in sprite.TriggerList)
+                t.Expand();
+            sprite.ClearTriggers();
+        }
 
-            if (sprite.LoopList.Count > 0)
+        if (host is ILoopHost { LoopList.Count: > 0 } loopHost)
+        {
+            foreach (var loop in loopHost.LoopList)
             {
-                foreach (var loop in sprite.LoopList)
+                loop.Expand();
+                var loopCount = loop.LoopCount;
+                var startTime = loop.StartTime;
+                for (int count = 0; count < loopCount; count++)
                 {
-                    loop.Expand();
-                    var loopCount = loop.LoopCount;
-                    var startTime = loop.StartTime;
-                    for (int count = 0; count < loopCount; count++)
+                    var fixedStartTime = startTime + (count * loop.MaxTime());
+                    foreach (var e in loop.Events)
                     {
-                        var fixedStartTime = startTime + (count * loop.MaxTime());
-                        foreach (var e in loop.Events)
-                        {
-                            sprite.AddEvent(
-                                BasicEvent.Create(e.EventType,
-                                    e.Easing,
-                                    fixedStartTime + e.StartTime, fixedStartTime + e.EndTime,
-                                    e.Values.CloneAsList())
-                            );
-                        }
+                        host.AddEvent(
+                            BasicEvent.Create(e.EventType,
+                                e.Easing,
+                                fixedStartTime + e.StartTime, fixedStartTime + e.EndTime,
+                                e.Values.CloneAsList())
+                        );
                     }
                 }
-
-                sprite.ClearLoops();
             }
+
+            loopHost.ClearLoops();
         }
 
         var events = host.Events
@@ -154,39 +152,36 @@ public static class EventHostExtensions
     {
         var maxTime = eventHost.MaxTime();
         int sum = 0;
-        if (eventHost is Sprite sprite)
+        if (eventHost is ILoopHost { LoopList.Count: > 0 } loopHost)
         {
-            if (sprite.LoopList.Count > 0)
+            if (loopHost.LoopList.Count < AlgorithmSwitchThreshold)
             {
-                if (sprite.LoopList.Count < AlgorithmSwitchThreshold)
+                sum += loopHost.LoopList.Count(k => k.OuterMaxTime().Equals(maxTime));
+            }
+            else
+            {
+                var orderBy2 = loopHost.LoopList.OrderByDescending(k => k.OuterMaxTime());
+                foreach (var keyEvent in orderBy2)
                 {
-                    sum += sprite.LoopList.Count(k => k.OuterMaxTime().Equals(maxTime));
-                }
-                else
-                {
-                    var orderBy2 = sprite.LoopList.OrderByDescending(k => k.OuterMaxTime());
-                    foreach (var keyEvent in orderBy2)
-                    {
-                        if (keyEvent.OuterMaxTime() >= maxTime) sum++;
-                        else break;
-                    }
+                    if (keyEvent.OuterMaxTime() >= maxTime) sum++;
+                    else break;
                 }
             }
+        }
 
-            if (sprite.TriggerList.Count > 0)
+        if (eventHost is ITriggerHost { TriggerList.Count: > 0 } triggerHost)
+        {
+            if (triggerHost.TriggerList.Count < AlgorithmSwitchThreshold)
             {
-                if (sprite.TriggerList.Count < AlgorithmSwitchThreshold)
+                sum += triggerHost.TriggerList.Count(k => k.MaxTime().Equals(maxTime));
+            }
+            else
+            {
+                var orderBy3 = triggerHost.TriggerList.OrderByDescending(k => k.MaxTime());
+                foreach (var keyEvent in orderBy3)
                 {
-                    sum += sprite.TriggerList.Count(k => k.MaxTime().Equals(maxTime));
-                }
-                else
-                {
-                    var orderBy3 = sprite.TriggerList.OrderByDescending(k => k.MaxTime());
-                    foreach (var keyEvent in orderBy3)
-                    {
-                        if (keyEvent.MaxTime() >= maxTime) sum++;
-                        else break;
-                    }
+                    if (keyEvent.MaxTime() >= maxTime) sum++;
+                    else break;
                 }
             }
         }
@@ -212,39 +207,36 @@ public static class EventHostExtensions
     {
         var minTime = eventHost.MinTime();
         int sum = 0;
-        if (eventHost is Sprite sprite)
+        if (eventHost is ILoopHost { LoopList.Count: > 0 } loopHost)
         {
-            if (sprite.LoopList.Count > 0)
+            if (loopHost.LoopList.Count < AlgorithmSwitchThreshold)
             {
-                if (sprite.LoopList.Count < AlgorithmSwitchThreshold)
+                sum += loopHost.LoopList.Count(k => k.OuterMinTime().Equals(minTime));
+            }
+            else
+            {
+                var orderBy2 = loopHost.LoopList.OrderBy(k => k.OuterMinTime());
+                foreach (var keyEvent in orderBy2)
                 {
-                    sum += sprite.LoopList.Count(k => k.OuterMinTime().Equals(minTime));
-                }
-                else
-                {
-                    var orderBy2 = sprite.LoopList.OrderBy(k => k.OuterMinTime());
-                    foreach (var keyEvent in orderBy2)
-                    {
-                        if (keyEvent.OuterMinTime() <= minTime) sum++;
-                        else break;
-                    }
+                    if (keyEvent.OuterMinTime() <= minTime) sum++;
+                    else break;
                 }
             }
+        }
 
-            if (sprite.TriggerList.Count > 0)
+        if (eventHost is ITriggerHost { TriggerList.Count: > 0 } triggerHost)
+        {
+            if (triggerHost.TriggerList.Count < AlgorithmSwitchThreshold)
             {
-                if (sprite.TriggerList.Count < AlgorithmSwitchThreshold)
+                sum += triggerHost.TriggerList.Count(k => k.MinTime().Equals(minTime));
+            }
+            else
+            {
+                var orderBy3 = triggerHost.TriggerList.OrderBy(k => k.MinTime());
+                foreach (var keyEvent in orderBy3)
                 {
-                    sum += sprite.TriggerList.Count(k => k.MinTime().Equals(minTime));
-                }
-                else
-                {
-                    var orderBy3 = sprite.TriggerList.OrderBy(k => k.MinTime());
-                    foreach (var keyEvent in orderBy3)
-                    {
-                        if (keyEvent.MinTime() <= minTime) sum++;
-                        else break;
-                    }
+                    if (keyEvent.MinTime() <= minTime) sum++;
+                    else break;
                 }
             }
         }
@@ -363,7 +355,7 @@ public static class EventHostExtensions
                          .Where(k => k is RelativeEvent)
                          .Cast<RelativeEvent>()
                          .GroupBy(k => k.EventType))
-                // todo: discretize and compute all at once to improve performance
+            // todo: discretize and compute all at once to improve performance
             {
                 var targetStdType = EventTypes.GetValue(grouping.Key.Index - 100);
                 int j = 0;

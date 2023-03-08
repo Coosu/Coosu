@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -7,6 +8,7 @@ using System.Reflection.Emit;
 using System.Threading.Tasks;
 using Coosu.Storyboard;
 using Coosu.Storyboard.Easing;
+using Coosu.Storyboard.Events;
 using Coosu.Storyboard.Extensions.Optimizing;
 using Coosu.Storyboard.OsbX;
 using Xunit;
@@ -27,21 +29,87 @@ public class ScriptingTest
     public async Task OsbX()
     {
         var sceneTest = new Scene();
+        var time = 20000d;
+        var count = 2000;
+        var maxZ = 5d;
+        var list = new List<Sprite>();
+        //for (int i = 0; i < count; i++)
+        //{
+        //    var startTime = (i / (double)count) * time - 300;
+        //    var z = (i / (double)count) * maxZ + 1;
+        //    var x = 320 + Math.Sin(i / 1000d * 2 * Math.PI) * 200;
+        //    var y = 370;
+        //    var layer = sceneTest.GetOrAddLayer("LAYER_" + z, z);
+        //    var sprite = GetCachedSprite("firefly2.png", startTime, layer, list);
+        //    sprite.MoveZ(startTime, startTime + 300, z, z - 0.1);
+        //    sprite.Fade(2, startTime, startTime + 300, 1, 0);
+        //    //sprite.MoveZ(startTime, startTime + 1000, z);
+        //    var d = 30;
+        //    sprite.MoveX(startTime, startTime + 300, x, x + Random.Shared.Next(-d, d));
+        //    sprite.MoveY(startTime, startTime + 300, y, y + Random.Shared.Next(-d, d));
+        //    sprite.Scale(startTime, 0.75);
+        //}
 
-        var count = 30;
-        for (int i = 0; i < count; i++)
+        //count = 1000;
+        //for (int i = 0; i < count; i++)
+        //{
+        //    var startTime = (i / (double)count) * time - 10000;
+        //    var z = (i / (double)count) * maxZ + 1;
+        //    var x = 320 + Random.Shared.Next(-1000, 1000);
+        //    var y = 240 + Random.Shared.Next(-1000, 1000);
+        //    var layer = sceneTest.GetOrAddLayer("LAYER123_" + z, z);
+        //    var sprite = layer.CreateSprite("waht.png");
+        //    sprite.MoveZ(startTime, startTime + 30000, z, z);
+        //    sprite.Fade(7, startTime, startTime + 5000, 0, 1);
+        //    sprite.MoveX(startTime, x);
+        //    sprite.MoveY(startTime, y);
+        //    //sprite.Color(startTime, Random.Shared.Next(0,256),Random.Shared.Next(0,256),Random.Shared.Next(0,256));
+        //    sprite.Scale(startTime, Random.Shared.NextDouble() + 0.5 * 4.5);
+        //}
+
+        var camera25Object = sceneTest.GetOrCreateCamera25Control();
+        camera25Object.MoveZ(0, 0, time, 0, -maxZ);
+        using (var loop = camera25Object.CreateLoop(0, 10))
         {
-            var z = i * 1;
-            //var startTime = QuarticEase.InstanceInOut.Ease(i / (double)count) * 6000 - 500;
-
-            var x = 320 + Math.Sin(i / ((double)count / 2) * Math.PI * 2) * 50;
-
-            var layer = sceneTest.GetOrAddLayer("LAYER_" + z, z);
-            var sprite = layer.CreateSprite("try.png");
-            sprite.MoveX(0, 20000, x);
-            //sprite.MoveY(startTime, startTime + 500, -500, 240);
-            //sprite.Fade(startTime, startTime + 500, 0, 1);
+            loop.MoveX(5, 0, 1143, 100, -100);
+            loop.MoveX(5, 1143, 2286, -100, 100);
         }
+
+        using (var loop = camera25Object.CreateLoop(0, 10))
+        {
+            loop.MoveX(5, 0, 2000, 50, -200);
+            loop.MoveX(5, 2000, 4000, -200, 50);
+        }
+
+        var result = await OsbxConvert.SerializeObjectAsync(sceneTest);
+
+        return;
+        //var count = 30;
+        //for (int i = 0; i < count; i++)
+        //{
+        //    var z = i * 1;
+        //    //var startTime = QuarticEase.InstanceInOut.Ease(i / (double)count) * 6000 - 500;
+
+        //    var x = 320 + Math.Sin(i / ((double)count / 2) * Math.PI * 2) * 50;
+
+        //    var layer = sceneTest.GetOrAddLayer("LAYER_" + z, z);
+        //    Animation sprite;
+        //    if (Random.Shared.NextDouble() > 0.5)
+        //    {
+        //        sprite = layer.CreateAnimation("frame.png", LayerType.Background, OriginType.Centre, 320, 240, 100, 16,LoopType.LoopForever);
+        //        sprite.Scale(0, 10);
+        //    }
+        //    else
+        //    {
+        //        sprite = layer.CreateAnimation("f.png", LayerType.Background, OriginType.Centre, 320, 240, 123, 15,LoopType.LoopForever);
+        //        sprite.Scale(0, 3);
+        //    }
+
+        //    sprite.MoveX(0, 20000, x);
+        //     //sprite.MoveY(startTime, startTime + 500, -500, 240);
+        //    //sprite.Fade(startTime, startTime + 500, 0, 1);
+        //}
+
         //for (int j = 0; j < 1000; j++)
         //{
         //    var layerZ = Random.Shared.NextDouble() * count;
@@ -61,15 +129,15 @@ public class ScriptingTest
         //    sprite.Rotate(0,rotate);
         //}
 
-        var camera25Object = sceneTest.GetOrCreateCamera25Control();
+        //var camera25Object = sceneTest.GetOrCreateCamera25Control();
 
-        camera25Object.MoveX(5, 0, 2000, -1000, 0);
-        camera25Object.MoveY(1, 0, 3460, 100, -700);
-        camera25Object.MoveY(11, 3460, 6000, -700, 1500);
-        camera25Object.MoveZ(11, 0, 6000, 0, -25.5);
-        camera25Object.Rotate(11, 0, 4000, -0.5, 0.25);
+        //camera25Object.MoveX(5, 0, 2000, -1000, 0);
+        //camera25Object.MoveY(1, 0, 3460, 100, -700);
+        //camera25Object.MoveY(11, 3460, 6000, -700, 1500);
+        //camera25Object.MoveZ(11, 0, 6000, 0, -25.5);
+        //camera25Object.Rotate(11, 0, 4000, -0.5, 0.25);
 
-        var result = await OsbxConvert.SerializeObjectAsync(sceneTest);
+        //var result = await OsbxConvert.SerializeObjectAsync(sceneTest);
 
         using (var sr = new StreamReader(@"C:\Users\milki\Desktop\test.osb"))
         {
@@ -112,6 +180,19 @@ public class ScriptingTest
 
         var objs = scene.Layers.Values.First().SceneObjects;
         var osbx = await OsbxConvert.SerializeObjectAsync(scene);
+    }
+
+    private Sprite GetCachedSprite(string imagePath, double startTime, Layer layer, List<Sprite> list)
+    {
+        var sprite = list.FirstOrDefault(k => k.MaxTime() < startTime && k.ImagePath == imagePath);
+        if (sprite == null)
+        {
+            var cachedSprite = layer.CreateSprite(imagePath);
+            list.Add(cachedSprite);
+            return cachedSprite;
+        }
+
+        return sprite;
     }
 
     [Fact]

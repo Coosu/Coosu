@@ -9,10 +9,10 @@ namespace Coosu.Storyboard.Extensions.Computing;
 
 public static class BasicEventExtensions
 {
-    public static bool EqualsInitialPosition(this Move move, Sprite sprite)
+    public static bool EqualsInitialPosition(this Move move, ICameraUsable cameraUsable)
     {
-        return move.StartX.Equals(sprite.DefaultX) &&
-               move.StartY.Equals(sprite.DefaultY);
+        return move.StartX.Equals(cameraUsable.DefaultX) &&
+               move.StartY.Equals(cameraUsable.DefaultY);
     }
 
     public static List<double> ComputeFrame(this BasicEvent e, double currentTime, int? accuracy)

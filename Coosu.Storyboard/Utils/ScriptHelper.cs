@@ -60,19 +60,22 @@ public static class ScriptHelper
 
     public static async Task WriteElementEventsAsync(TextWriter writer, ISceneObject sceneObject, bool group)
     {
-        var sprite = sceneObject as Sprite;
-        if (sprite?.LoopList != null)
-            foreach (var loop in sprite.LoopList)
+        if (sceneObject is ILoopHost loopHost)
+        {
+            foreach (var loop in loopHost.LoopList)
                 await WriteSubEventHostAsync(writer, loop, @group);
+        }
 
         if (group)
             await WriteGroupedEventAsync(writer, sceneObject.Events, 1);
         else
             await WriteSequentialEventAsync(writer, sceneObject.Events, 1);
 
-        if (sprite?.TriggerList != null)
-            foreach (var trigger in sprite.TriggerList)
+        if (sceneObject is ITriggerHost triggerHost)
+        {
+            foreach (var trigger in triggerHost.TriggerList)
                 await WriteSubEventHostAsync(writer, trigger, @group);
+        }
     }
 
     public static async Task WriteSubEventHostAsync(TextWriter writer, ISubEventHost subEventHost, bool group)

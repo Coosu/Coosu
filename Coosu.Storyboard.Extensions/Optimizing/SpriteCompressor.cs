@@ -311,32 +311,41 @@ public class SpriteCompressor : IDisposable
         if (obsoleteList.ContainsTimingPoint(out _, host.MinTime(), host.MaxTime()))
         {
             host.ResetEventCollection(null);
-            if (host is Sprite sprite)
+            if (host is ILoopHost loopHost)
             {
-                sprite.ClearLoops();
-                sprite.ClearTriggers();
+                loopHost.ClearLoops();
+            }
+
+            if (host is ITriggerHost triggerHost)
+            {
+                triggerHost.ClearTriggers();
             }
 
             return;
         }
 
-        if (host is Sprite ele)
+        if (host is ILoopHost loopHost1)
         {
-            for (var i = 0; i < ele.LoopList.Count; i++)
+            for (var i = 0; i < loopHost1.LoopList.Count; i++)
             {
-                var item = ele.LoopList[i];
+                var item = loopHost1.LoopList[i];
                 PreOptimize(item, obsoleteList, keyEvents);
             }
+        }
 
-            for (var i = 0; i < ele.TriggerList.Count; i++)
+        if (host is ITriggerHost triggerHost1)
+        {
+            for (var i = 0; i < triggerHost1.TriggerList.Count; i++)
             {
-                var item = ele.TriggerList[i];
+                var item = triggerHost1.TriggerList[i];
                 PreOptimize(item, obsoleteList, keyEvents);
             }
         }
 
         if (host.Events.Count > 0)
+        {
             RemoveByInvisibleList(host, obsoleteList, keyEvents);
+        }
 
         foreach (var hostEvent in host.Events)
         {
@@ -357,17 +366,20 @@ public class SpriteCompressor : IDisposable
     /// </summary>
     private void NormalOptimize(IDetailedEventHost host)
     {
-        if (host is Sprite ele)
+        if (host is ILoopHost loopHost)
         {
-            for (var i = 0; i < ele.LoopList.Count; i++)
+            for (var i = 0; i < loopHost.LoopList.Count; i++)
             {
-                var item = ele.LoopList[i];
+                var item = loopHost.LoopList[i];
                 NormalOptimize(item);
             }
+        }
 
-            for (var i = 0; i < ele.TriggerList.Count; i++)
+        if (host is ITriggerHost triggerHost)
+        {
+            for (var i = 0; i < triggerHost.TriggerList.Count; i++)
             {
-                var item = ele.TriggerList[i];
+                var item = triggerHost.TriggerList[i];
                 NormalOptimize(item);
             }
         }
@@ -595,11 +607,20 @@ public class SpriteCompressor : IDisposable
             while (index >= 0)
             {
                 BasicEvent nowE = list[index];
-                if (host is Sprite ele &&
-                    ele.TriggerList.Count > 0 &&
-                    ele.TriggerList.Any(k => nowE.EndTime >= k.StartTime && nowE.StartTime <= k.EndTime) &&
-                    ele.LoopList.Count > 0 &&
-                    ele.LoopList.Any(k => nowE.EndTime >= k.StartTime && nowE.StartTime <= k.EndTime))
+                bool exception = false;
+                if (host is ILoopHost lh)
+                {
+                    exception = lh.LoopList.Count > 0 &&
+                                lh.LoopList.Any(k => nowE.EndTime >= k.StartTime && nowE.StartTime <= k.EndTime);
+                }
+
+                if (host is ITriggerHost th)
+                {
+                    exception = exception && th.TriggerList.Count > 0 &&
+                                th.TriggerList.Any(k => nowE.EndTime >= k.StartTime && nowE.StartTime <= k.EndTime);
+                }
+
+                if (exception)
                 {
                     index--;
                     continue;
@@ -642,7 +663,7 @@ public class SpriteCompressor : IDisposable
                     }
                     // 当 此event为move，param固定，且唯一时
                     else if (type == EventTypes.Move
-                             && host is Sprite sprite)
+                             && host is ICameraUsable cameraUsable)
                     {
                         if (list.Count == 1 && nowE.IsStartsEqualsEnds()
                                             && nowE.IsTimeInRange(host)
@@ -655,14 +676,14 @@ public class SpriteCompressor : IDisposable
                                     SituationType.MoveSingleIsStaticToRemoveAndChangeInitial,
                                     () =>
                                     {
-                                        sprite.DefaultX = move.StartX;
-                                        sprite.DefaultY = move.StartY;
+                                        cameraUsable.DefaultX = move.StartX;
+                                        cameraUsable.DefaultY = move.StartY;
 
                                         RemoveEvent(host, list, nowE, ref count);
                                     },
                                     nowE);
                             }
-                            else if (move.EqualsInitialPosition(sprite))
+                            else if (move.EqualsInitialPosition(cameraUsable))
                             {
                                 RaiseSituationEvent(host, SituationType.MoveSingleEqualsInitialToRemove,
                                     () => { RemoveEvent(host, list, nowE, ref count); },
@@ -670,13 +691,13 @@ public class SpriteCompressor : IDisposable
                             }
                             else
                             {
-                                if (sprite.DefaultX != 0 || sprite.DefaultY != 0)
+                                if (cameraUsable.DefaultX != 0 || cameraUsable.DefaultY != 0)
                                 {
                                     RaiseSituationEvent(host, SituationType.InitialToZero,
                                         () =>
                                         {
-                                            sprite.DefaultX = 0;
-                                            sprite.DefaultY = 0;
+                                            cameraUsable.DefaultX = 0;
+                                            cameraUsable.DefaultY = 0;
                                         },
                                         nowE);
                                 }
@@ -684,13 +705,13 @@ public class SpriteCompressor : IDisposable
                         }
                         else
                         {
-                            if (sprite.DefaultX != 0 || sprite.DefaultY != 0)
+                            if (cameraUsable.DefaultX != 0 || cameraUsable.DefaultY != 0)
                             {
                                 RaiseSituationEvent(host, SituationType.InitialToZero,
                                     () =>
                                     {
-                                        sprite.DefaultX = 0;
-                                        sprite.DefaultY = 0;
+                                        cameraUsable.DefaultX = 0;
+                                        cameraUsable.DefaultY = 0;
                                     },
                                     nowE);
                             }

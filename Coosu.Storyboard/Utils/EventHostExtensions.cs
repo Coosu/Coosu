@@ -13,12 +13,15 @@ public static class EventHostExtensions
             iso.DefaultX += offsetX;
             iso.DefaultY += offsetY;
 
-            if (iso is Sprite sprite)
+            if (iso is ILoopHost loopHost)
             {
-                foreach (var loop in sprite.LoopList)
+                foreach (var loop in loopHost.LoopList)
                     loop.Adjust(offsetX, offsetY, offsetTiming);
+            }
 
-                foreach (var trigger in sprite.TriggerList)
+            if (iso is ITriggerHost triggerHost)
+            {
+                foreach (var trigger in triggerHost.TriggerList)
                     trigger.Adjust(offsetX, offsetY, offsetTiming);
             }
         }

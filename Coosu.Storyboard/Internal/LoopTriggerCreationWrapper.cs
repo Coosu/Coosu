@@ -9,18 +9,20 @@ namespace Coosu.Storyboard.Internal;
 internal class LoopTriggerCreationWrapper : IEventHostDisposable
 {
     private readonly Loop? _loop;
-    private readonly Sprite _sprite;
     private readonly Trigger? _trigger;
 
-    public LoopTriggerCreationWrapper(Sprite sprite, Loop loop)
+    private readonly ILoopHost? _loopHost;
+    private readonly ITriggerHost? _triggerHost;
+
+    public LoopTriggerCreationWrapper(ILoopHost loopHost, Loop loop)
     {
-        _sprite = sprite;
+        _loopHost = loopHost;
         _loop = loop;
     }
 
-    public LoopTriggerCreationWrapper(Sprite sprite, Trigger trigger)
+    public LoopTriggerCreationWrapper(ITriggerHost triggerHost, Trigger trigger)
     {
-        _sprite = sprite;
+        _triggerHost = triggerHost;
         _trigger = trigger;
     }
 
@@ -35,11 +37,11 @@ internal class LoopTriggerCreationWrapper : IEventHostDisposable
     {
         if (_loop is not null)
         {
-            _sprite.AddLoop(_loop);
+            _loopHost!.AddLoop(_loop);
         }
         else
         {
-            _sprite.AddTrigger(_trigger!);
+            _triggerHost!.AddTrigger(_trigger!);
         }
     }
 

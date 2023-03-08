@@ -11,7 +11,7 @@ using Coosu.Storyboard.Utils;
 namespace Coosu.Storyboard.OsbX;
 
 [DebuggerDisplay("Header = {DebuggerDisplay}")]
-public class Camera25Object : ISceneObject, IDefinedObject
+public class Camera25Object : ISceneObject, IDefinedObject, ILoopHost
 {
     private string DebuggerDisplay => this.GetHeaderString();
     private ICollection<IKeyEvent> _events = new SortedSet<IKeyEvent>(EventSequenceComparer.Instance);
@@ -22,7 +22,24 @@ public class Camera25Object : ISceneObject, IDefinedObject
     public double DefaultX { get; set; } = 0;
     public double DefaultZ { get; set; } = 1;
     public string CameraIdentifier { get; set; }
+
     public List<Loop> LoopList { get; } = new();
+
+    public void AddLoop(Loop loop)
+    {
+        LoopList.Add(loop);
+    }
+
+    public bool RemoveLoop(Loop loop)
+    {
+        return LoopList.Remove(loop);
+    }
+
+    public void ClearLoops()
+    {
+        LoopList.Clear();
+    }
+
     public double MaxTime() => Events.Count > 0 ? Events.Max(k => k.EndTime) : 0;
     public double MinTime() => Events.Count > 0 ? Events.Min(k => k.StartTime) : 0;
     public double MaxStartTime() => Events.Count > 0 ? Events.Max(k => k.StartTime) : 0;
@@ -40,6 +57,7 @@ public class Camera25Object : ISceneObject, IDefinedObject
 
     IReadOnlyCollection<IKeyEvent> IEventHost.Events => Events;
 
+    IReadOnlyList<Loop> ILoopHost.LoopList => LoopList;
     public void AddEvent(IKeyEvent @event)
     {
         _events.Add(@event);
