@@ -40,8 +40,7 @@ public class SpriteCompressor : IDisposable
     public SpriteCompressor(ICollection<ISceneObject> sprites, Action<CompressOptions>? configureOption = null)
     {
         _targetSprites = sprites
-            .Where(k => k is Sprite)
-            .Cast<Sprite>()
+            .OfType<Sprite>()
             .ToList();
         _sourceSprites = sprites;
         Options = new CompressOptions();
@@ -52,8 +51,7 @@ public class SpriteCompressor : IDisposable
     {
         _layer = layer;
         _targetSprites = layer.SceneObjects
-            .Where(k => k is Sprite)
-            .Cast<Sprite>()
+            .OfType<Sprite>()
             .ToList();
         _sourceSprites = layer.SceneObjects;
         Options = new CompressOptions();
@@ -81,8 +79,7 @@ public class SpriteCompressor : IDisposable
         {
             if (_layer.ExpandSubHosts())
                 _targetSprites = _layer.SceneObjects
-                    .Where(k => k is Sprite)
-                    .Cast<Sprite>()
+                    .OfType<Sprite>()
                     .ToList();
         }
 

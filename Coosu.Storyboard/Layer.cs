@@ -135,13 +135,11 @@ public class Layer : ISpriteHost, IAdjustable
     public double MinEndTime() => SceneObjects.Count == 0 ? 0 : SceneObjects.Min(k => k.MinEndTime());
 
     public IList<Sprite> Sprites => SceneObjects
-        .Where(k => k is Sprite)
-        .Cast<Sprite>()
+        .OfType<Sprite>()
         .ToList();
 
     public IList<ISpriteHost> SubHosts => SceneObjects
-        .Where(k => k is ISpriteHost)
-        .Cast<ISpriteHost>()
+        .OfType<ISpriteHost>()
         .ToList();
 
     public Camera2 Camera2 { get; } = new();
