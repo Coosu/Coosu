@@ -65,7 +65,7 @@ class Program
 
 [SimpleJob(RuntimeMoniker.Net48)]
 [SimpleJob(RuntimeMoniker.Net60)]
-[SimpleJob(RuntimeMoniker.Net70)]
+[SimpleJob(RuntimeMoniker.Net80)]
 [MemoryDiagnoser]
 [Orderer(SummaryOrderPolicy.FastestToSlowest)]
 [MarkdownExporter]
