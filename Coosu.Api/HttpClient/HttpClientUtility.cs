@@ -195,8 +195,8 @@ internal class HttpClientUtility
             {
 #if DEBUG
                 var text = await response.Content.ReadAsStringAsync();
-                throw new Exception("Server responded: " + text, ex);
 #endif
+                throw new Exception("Server responded: " + text, ex);
             }
             finally
             {
