@@ -9,7 +9,6 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace Coosu.Api.HttpClient;
 
@@ -191,6 +190,13 @@ internal class HttpClientUtility
 
                 using var responseStream = await response.Content.ReadAsStreamAsync();
                 return (await JsonSerializer.DeserializeAsync<T>(responseStream))!;
+            }
+            catch (Exception ex)
+            {
+#if DEBUG
+                var text = await response.Content.ReadAsStringAsync();
+                throw new Exception("Server responded: " + text, ex);
+#endif
             }
             finally
             {

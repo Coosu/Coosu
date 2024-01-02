@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Text;
-using System.Web;
 
 namespace Coosu.Api.V2.RequestModels;
 
@@ -25,6 +24,8 @@ public record SearchOptions
     public GenreType Genre { get; set; }
     //l=1
     public LanguageType Language { get; set; }
+    //nsfw=
+    public bool Nsfw { get; set; }
 
     //r=XH.X.SH.S.A.B.C.D
     public bool ScoreHasXH { get; set; }
@@ -42,14 +43,15 @@ public record SearchOptions
     //sort=xxx_desc
     public BeatmapsetSearchSort? Sort { get; set; }
     public bool IsSortAscending { get; set; }
-    public int Page { get; set; }
+    //public int Page { get; set; }
 
     public string GetQueryString()
     {
         var sb = new StringBuilder();
         if (!string.IsNullOrWhiteSpace(Query))
         {
-            sb.Append("q=" + HttpUtils.UrlEncode(Query));
+            if (sb.Length > 0) sb.Append('&');
+            sb.Append("q=" + (Query == null ? "" : HttpUtils.UrlEncode(Query)));
         }
 
         if (OnlyRecommended || IncludeConverted || OnlySubscribedMappers)
@@ -78,12 +80,13 @@ public record SearchOptions
             var result = BeatmapsetStatus switch
             {
                 BeatmapsetStatus.Any => "any",
-                BeatmapsetStatus.Leaderboard => "leaderboard",
+                //BeatmapsetStatus.Leaderboard => "leaderboard",
                 BeatmapsetStatus.Ranked => "ranked",
                 BeatmapsetStatus.Qualified => "qualified",
                 BeatmapsetStatus.Loved => "loved",
                 BeatmapsetStatus.Favourites => "favourites",
                 BeatmapsetStatus.Pending => "pending",
+                BeatmapsetStatus.Wip => "wip",
                 BeatmapsetStatus.Graveyard => "graveyard",
                 BeatmapsetStatus.Mine => "mine",
                 _ => ""
@@ -116,15 +119,20 @@ public record SearchOptions
         if (Genre != GenreType.Any)
         {
             if (sb.Length > 0) sb.Append('&');
-            sb.Append("g=" + (int)Genre);
+            sb.Append("g=" + (Genre == GenreType.Any ? "" : (int)Genre));
         }
 
         if (Language != LanguageType.Any)
         {
             if (sb.Length > 0) sb.Append('&');
-            sb.Append("l=" + (int)Language);
+            sb.Append("l=" + (Language == LanguageType.Any ? "" : (int)Language));
         }
 
+        if (!Nsfw)
+        {
+            if (sb.Length > 0) sb.Append('&');
+            sb.Append("nsfw=false");
+        }
 
         if (ScoreHasXH || ScoreHasX || ScoreHasSH || ScoreHasS ||
             ScoreHasA || ScoreHasB || ScoreHasC || ScoreHasD)
@@ -203,14 +211,21 @@ public record SearchOptions
             };
 
             if (sb.Length > 0) sb.Append('&');
-            sb.Append(("sort=" + result) + (IsSortAscending ? "_asc" : "_desc"));
+            if (Sort is BeatmapsetSearchSort.Relevance && !IsSortAscending)
+            {
+                sb.Append("sort=");
+            }
+            else
+            {
+                sb.Append(("sort=" + result) + (IsSortAscending ? "_asc" : "_desc"));
+            }
         }
 
-        if (Page > 1)
-        {
-            if (sb.Length > 0) sb.Append('&');
-            sb.Append("page=" + Page);
-        }
+        //if (Page > 1)
+        //{
+        //    if (sb.Length > 0) sb.Append('&');
+        //    sb.Append("page=" + Page);
+        //}
 
         return sb.ToString();
     }

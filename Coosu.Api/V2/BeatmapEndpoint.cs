@@ -71,7 +71,7 @@ public class BeatmapEndpoint
     {
         string route = $"/beatmapsets/search/";
         var options = searchOptions?.GetQueryString();
-        var actualRoute = string.IsNullOrWhiteSpace(options) ? route : route + "filters?" + options;
+        var actualRoute = string.IsNullOrWhiteSpace(options) ? route : route + "?" + options;
         var obj = await _httpClient.HttpGet<BeatmapsetSearchResult>(OsuClientV2.BaseUri + actualRoute);
         return obj;
     }

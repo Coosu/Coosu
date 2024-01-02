@@ -2,5 +2,6 @@
 
 public enum BeatmapsetStatus
 {
-    Any, Leaderboard, Ranked, Qualified, Loved, Favourites, Pending, Graveyard, Mine
+    Any, Leaderboard, Ranked, Qualified, Loved, Favourites, Pending, Wip, Graveyard, Mine
+
 }
