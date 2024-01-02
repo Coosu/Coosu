@@ -1,11 +1,11 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using JsonPropertyAttribute = System.Text.Json.Serialization.JsonPropertyNameAttribute;
-using JsonConverterAttribute = System.Text.Json.Serialization.JsonConverterAttribute;
-using JsonIgnoreAttribute = System.Text.Json.Serialization.JsonIgnoreAttribute;
 
 namespace Coosu.Api.V2.ResponseModels;
 
+[DebuggerDisplay("{LastUpdated}: {ArtistUnicode} - {TitleUnicode} by {Creator}")]
 public class BeatmapsetSearch : IBeatmapset
 {
     [JsonProperty("artist")]

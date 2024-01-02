@@ -43,7 +43,7 @@ public record SearchOptions
     //sort=xxx_desc
     public BeatmapsetSearchSort? Sort { get; set; }
     public bool IsSortAscending { get; set; }
-    public int Page { get; set; }
+    public string? CursorString { get; set; }
 
     public string GetQueryString()
     {
@@ -221,10 +221,10 @@ public record SearchOptions
             }
         }
 
-        if (Page > 1)
+        if (CursorString != null)
         {
             if (sb.Length > 0) sb.Append('&');
-            sb.Append("page=" + Page);
+            sb.Append("cursor_string=" + CursorString);
         }
 
         return sb.ToString();
