@@ -191,13 +191,13 @@ internal class HttpClientUtility
                 using var responseStream = await response.Content.ReadAsStreamAsync();
                 return (await JsonSerializer.DeserializeAsync<T>(responseStream))!;
             }
+#if DEBUG
             catch (Exception ex)
             {
-#if DEBUG
                 var text = await response.Content.ReadAsStringAsync();
-#endif
                 throw new Exception("Server responded: " + text, ex);
             }
+#endif
             finally
             {
                 response.Dispose();
