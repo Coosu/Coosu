@@ -12,10 +12,8 @@ namespace CoosuUnitTest.Section;
 
 public class SectionTest
 {
-
     private class TestSection : KeyValueSection
     {
-
         [SectionProperty("TestFloatProperty", UseSpecificFormat = true)]
         public float TestFloatProperty { get; set; } = 114.514f;
 
@@ -25,21 +23,17 @@ public class SectionTest
 
     private class Test2Section : KeyValueSection
     {
-        public Test2Section() : base(CultureInfo.GetCultureInfo("it-IT"))
-        {
-            
-        }
-
-        [SectionProperty("TestFloatProperty", UseSpecificFormat = true)]
+        [SectionProperty("TestFloatProperty", UseSpecificFormat = false)]
         public float TestFloatProperty { get; set; } = 114.514f;
 
-        [SectionProperty("TestDoubleProperty", UseSpecificFormat = true)]
+        [SectionProperty("TestDoubleProperty", UseSpecificFormat = false)]
         public double TestDoubleProperty { get; set; } = 114.514d;
     }
 
     [Fact]
-    public async void TestShouldSerializeWithInvariantCultureDefault()
+    public async void TestShouldSerializeWithUseSpecificFormat()
     {
+        CultureInfo.CurrentCulture = new CultureInfo("it-IT");
         var section = new TestSection();
         var ms = new MemoryStream();
 
@@ -58,8 +52,9 @@ public class SectionTest
     }
 
     [Fact]
-    public async void TestShouldSerializeWithInvariantCultureByCtorCulture()
+    public async void TestShouldSerializeWithoutUseSpecificFormat()
     {
+        CultureInfo.CurrentCulture = new CultureInfo("it-IT");
         var section = new Test2Section();
         var ms = new MemoryStream();
 
