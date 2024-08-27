@@ -16,17 +16,10 @@ public abstract class KeyValueSection : Section
 
     protected readonly Dictionary<string, SectionInfo> PropertyInfos;
 
-    private readonly CultureInfo _culture = CultureInfo.InvariantCulture;
-
     public KeyValueSection()
     {
         var thisType = GetType();
         PropertyInfos = TypePropertyInfoCache.GetOrAdd(thisType, AddTypeSectionInfo);
-    }
-
-    public KeyValueSection(CultureInfo culture) : this()
-    {
-        _culture = culture;
     }
 
     [SectionIgnore]
@@ -204,11 +197,15 @@ public abstract class KeyValueSection : Section
         {
             if (rawObj is float floatObj)
             {
-                value = floatObj.ToString(_culture);
+                value = sectionInfo.UseSpecificFormat
+                    ? floatObj.ToEnUsFormatString()
+                    : floatObj.ToString(CultureInfo.CurrentCulture);
             }
             else if (rawObj is double doubleObj)
             {
-                value = doubleObj.ToString(_culture);
+                value = sectionInfo.UseSpecificFormat
+                    ? doubleObj.ToEnUsFormatString()
+                    : doubleObj.ToString(CultureInfo.CurrentCulture);
             }
             else
             {
