@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
 using Coosu.Beatmap.Internal;
@@ -192,10 +193,24 @@ public abstract class KeyValueSection : Section
                 };
             }
         }
-
         if (value == null && rawObj != null)
         {
-            value = rawObj.ToString();
+            if (rawObj is float floatObj)
+            {
+                value = sectionInfo.UseSpecificFormat
+                    ? floatObj.ToEnUsFormatString()
+                    : floatObj.ToString(CultureInfo.CurrentCulture);
+            }
+            else if (rawObj is double doubleObj)
+            {
+                value = sectionInfo.UseSpecificFormat
+                    ? doubleObj.ToEnUsFormatString()
+                    : doubleObj.ToString(CultureInfo.CurrentCulture);
+            }
+            else
+            {
+                value = rawObj.ToString();
+            }
         }
 
         textWriter.Write(name);
