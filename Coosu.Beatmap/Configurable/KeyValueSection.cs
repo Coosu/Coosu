@@ -200,17 +200,20 @@ public abstract class KeyValueSection : Section
                 };
             }
         }
-        if (rawObj is float floatObj)
+        if (value == null && rawObj != null)
         {
-            value = floatObj.ToString(_culture);
-        }
-        else if (rawObj is double doubleObj)
-        {
-            value = doubleObj.ToString(_culture);
-        }
-        else if (value == null && rawObj != null)
-        {
-            value = rawObj.ToString();
+            if (rawObj is float floatObj)
+            {
+                value = floatObj.ToString(_culture);
+            }
+            else if (rawObj is double doubleObj)
+            {
+                value = doubleObj.ToString(_culture);
+            }
+            else
+            {
+                value = rawObj.ToString();
+            }
         }
 
         textWriter.Write(name);
