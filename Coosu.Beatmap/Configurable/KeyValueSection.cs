@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
 using Coosu.Beatmap.Internal;
@@ -15,10 +16,17 @@ public abstract class KeyValueSection : Section
 
     protected readonly Dictionary<string, SectionInfo> PropertyInfos;
 
+    private readonly CultureInfo _culture = CultureInfo.InvariantCulture;
+
     public KeyValueSection()
     {
         var thisType = GetType();
         PropertyInfos = TypePropertyInfoCache.GetOrAdd(thisType, AddTypeSectionInfo);
+    }
+
+    public KeyValueSection(CultureInfo culture) : this()
+    {
+        _culture = culture;
     }
 
     [SectionIgnore]
@@ -192,8 +200,15 @@ public abstract class KeyValueSection : Section
                 };
             }
         }
-
-        if (value == null && rawObj != null)
+        if (rawObj is float floatObj)
+        {
+            value = floatObj.ToString(_culture);
+        }
+        else if (rawObj is double doubleObj)
+        {
+            value = doubleObj.ToString(_culture);
+        }
+        else if (value == null && rawObj != null)
         {
             value = rawObj.ToString();
         }
