@@ -1,8 +1,5 @@
 ﻿using System;
-using Coosu.Api.V1.Internal;
 using JsonPropertyAttribute = System.Text.Json.Serialization.JsonPropertyNameAttribute;
-using JsonConverterAttribute = System.Text.Json.Serialization.JsonConverterAttribute;
-using JsonIgnoreAttribute = System.Text.Json.Serialization.JsonIgnoreAttribute;
 
 namespace Coosu.Api.V1.User;
 
@@ -15,7 +12,6 @@ public class OsuUser
     /// User ID.
     /// </summary>
     [JsonProperty("user_id")]
-    [JsonConverter(typeof(ParseStringConverter))]
     public long UserId { get; set; }
 
     /// <summary>
@@ -35,7 +31,6 @@ public class OsuUser
     /// Total amount for all ranked, approved, and loved beatmaps played.
     /// </summary>
     [JsonProperty("count300")]
-    [JsonConverter(typeof(ParseStringConverter))]
     public long Count300 { get; set; }
 
     /// <summary>
@@ -43,7 +38,6 @@ public class OsuUser
     /// Total amount for all ranked, approved, and loved beatmaps played.
     /// </summary>
     [JsonProperty("count100")]
-    [JsonConverter(typeof(ParseStringConverter))]
     public long Count100 { get; set; }
 
     /// <summary>
@@ -51,7 +45,6 @@ public class OsuUser
     /// Total amount for all ranked, approved, and loved beatmaps played.
     /// </summary>
     [JsonProperty("count50")]
-    [JsonConverter(typeof(ParseStringConverter))]
     public long Count50 { get; set; }
 
     /// <summary>
@@ -59,28 +52,24 @@ public class OsuUser
     /// Only counts ranked, approved, and loved beatmaps.
     /// </summary>
     [JsonProperty("playcount")]
-    [JsonConverter(typeof(ParseStringConverter))]
     public long PlayCount { get; set; }
 
     /// <summary>
     /// Counts the best individual score on each ranked, approved, and loved beatmaps.
     /// </summary>
     [JsonProperty("ranked_score")]
-    [JsonConverter(typeof(ParseStringConverter))]
     public long RankedScore { get; set; }
 
     /// <summary>
     /// Counts every score on ranked, approved, and loved beatmaps
     /// </summary>
     [JsonProperty("total_score")]
-    [JsonConverter(typeof(ParseStringConverter))]
     public long TotalScore { get; set; }
 
     /// <summary>
     /// PP rank of the user.
     /// </summary>
     [JsonProperty("pp_rank")]
-    [JsonConverter(typeof(ParseStringConverter))]
     public long PpRank { get; set; }
 
     /// <summary>
@@ -105,35 +94,30 @@ public class OsuUser
     /// Counts for SS ranks on maps.
     /// </summary>
     [JsonProperty("count_rank_ss")]
-    [JsonConverter(typeof(ParseStringConverter))]
     public long CountRankSs { get; set; }
 
     /// <summary>
     /// Counts for SSH ranks on maps.
     /// </summary>
     [JsonProperty("count_rank_ssh")]
-    [JsonConverter(typeof(ParseStringConverter))]
     public long CountRankSsh { get; set; }
 
     /// <summary>
     /// Counts for S ranks on maps.
     /// </summary>
     [JsonProperty("count_rank_s")]
-    [JsonConverter(typeof(ParseStringConverter))]
     public long CountRankS { get; set; }
 
     /// <summary>
     /// Counts for SH ranks on maps.
     /// </summary>
     [JsonProperty("count_rank_sh")]
-    [JsonConverter(typeof(ParseStringConverter))]
     public long CountRankSh { get; set; }
 
     /// <summary>
     /// Counts for A ranks on maps.
     /// </summary>
     [JsonProperty("count_rank_a")]
-    [JsonConverter(typeof(ParseStringConverter))]
     public long CountRankA { get; set; }
 
     /// <summary>
@@ -148,14 +132,12 @@ public class OsuUser
     /// Total play seconds of the user.
     /// </summary>
     [JsonProperty("total_seconds_played")]
-    [JsonConverter(typeof(ParseStringConverter))]
     public long TotalSecondsPlayed { get; set; }
 
     /// <summary>
     /// The user's rank in the country.
     /// </summary>
     [JsonProperty("pp_country_rank")]
-    [JsonConverter(typeof(ParseStringConverter))]
     public long PpCountryRank { get; set; }
 
     /// <summary>

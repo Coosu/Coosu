@@ -1,8 +1,5 @@
 ﻿using System;
-using Coosu.Api.V1.Internal;
 using JsonPropertyAttribute = System.Text.Json.Serialization.JsonPropertyNameAttribute;
-using JsonConverterAttribute = System.Text.Json.Serialization.JsonConverterAttribute;
-using JsonIgnoreAttribute = System.Text.Json.Serialization.JsonIgnoreAttribute;
 
 namespace Coosu.Api.V1.Beatmap;
 
@@ -39,14 +36,12 @@ public class OsuBeatmap
     /// Beatmap ID.
     /// </summary>
     [JsonProperty("beatmap_id")]
-    [JsonConverter(typeof(ParseStringConverter))]
     public long BeatmapId { get; set; }
 
     /// <summary>
     /// Beatmap-set ID.
     /// </summary>
     [JsonProperty("beatmapset_id")]
-    [JsonConverter(typeof(ParseStringConverter))]
     public long BeatmapSetId { get; set; }
 
     /// <summary>
@@ -65,7 +60,6 @@ public class OsuBeatmap
     /// Beatmap creator's ID.
     /// </summary>
     [JsonProperty("creator_id")]
-    [JsonConverter(typeof(ParseStringConverter))]
     public long CreatorId { get; set; }
 
     /// <summary>

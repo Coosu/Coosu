@@ -1,8 +1,6 @@
 ﻿using System;
-using Coosu.Api.V1.Internal;
-using JsonPropertyAttribute = System.Text.Json.Serialization.JsonPropertyNameAttribute;
-using JsonConverterAttribute = System.Text.Json.Serialization.JsonConverterAttribute;
 using JsonIgnoreAttribute = System.Text.Json.Serialization.JsonIgnoreAttribute;
+using JsonPropertyAttribute = System.Text.Json.Serialization.JsonPropertyNameAttribute;
 
 
 namespace Coosu.Api.V1.Score;
@@ -16,12 +14,10 @@ public class OsuUserRecent : IScore
     /// Beatmap ID.
     /// </summary>
     [JsonProperty("beatmap_id")]
-    [JsonConverter(typeof(ParseStringConverter))]
     public long BeatmapId { get; set; }
 
     /// <inheritdoc />
     [JsonProperty("score")]
-    [JsonConverter(typeof(ParseStringConverter))]
     public long Score { get; set; }
 
     /// <inheritdoc />
@@ -62,18 +58,19 @@ public class OsuUserRecent : IScore
     /// Enabled mods of the score.
     /// </summary>
     [JsonProperty("enabled_mods")]
-    public Mod EnabledMods { get; set; }
+    public int RawMods { get; set; }
+
+    public Mod EnabledMods => (Mod)RawMods;
 
     /// <inheritdoc />
     [JsonProperty("user_id")]
-    [JsonConverter(typeof(ParseStringConverter))]
     public long UserId { get; set; }
 
     /// <summary>
     /// Score date. (UTC)
     /// </summary>
     [JsonIgnore]
-    public DateTimeOffset Date => DateTimeOffset.Parse(DateString);
+    public DateTimeOffset Date => new(DateTime.Parse(DateString), TimeSpan.Zero);
 
     /// <summary>
     /// Score date string. (UTC)

@@ -1,8 +1,5 @@
 ﻿using System;
-using Coosu.Api.V1.Internal;
 using JsonPropertyAttribute = System.Text.Json.Serialization.JsonPropertyNameAttribute;
-using JsonConverterAttribute = System.Text.Json.Serialization.JsonConverterAttribute;
-using JsonIgnoreAttribute = System.Text.Json.Serialization.JsonIgnoreAttribute;
 
 namespace Coosu.Api.V1.MultiPlayer;
 
@@ -15,7 +12,6 @@ public class OsuMatchMetadata
     /// Match ID.
     /// </summary>
     [JsonProperty("match_id")]
-    [JsonConverter(typeof(ParseStringConverter))]
     public long MatchId { get; set; }
 
     /// <summary>

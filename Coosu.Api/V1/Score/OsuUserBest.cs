@@ -19,7 +19,6 @@ public class OsuUserBest : IScore
 
     /// <inheritdoc />
     [JsonProperty("score")]
-    [JsonConverter(typeof(ParseStringConverter))]
     public long Score { get; set; }
 
     /// <inheritdoc />
@@ -64,7 +63,6 @@ public class OsuUserBest : IScore
 
     /// <inheritdoc />
     [JsonProperty("user_id")]
-    [JsonConverter(typeof(ParseStringConverter))]
     public long UserId { get; set; }
 
     /// <summary>

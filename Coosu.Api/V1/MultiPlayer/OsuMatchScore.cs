@@ -1,8 +1,6 @@
-﻿using Coosu.Api.V1.Internal;
-using Coosu.Api.V1.Score;
-using JsonPropertyAttribute = System.Text.Json.Serialization.JsonPropertyNameAttribute;
-using JsonConverterAttribute = System.Text.Json.Serialization.JsonConverterAttribute;
+﻿using Coosu.Api.V1.Score;
 using JsonIgnoreAttribute = System.Text.Json.Serialization.JsonIgnoreAttribute;
+using JsonPropertyAttribute = System.Text.Json.Serialization.JsonPropertyNameAttribute;
 
 namespace Coosu.Api.V1.MultiPlayer;
 
@@ -25,12 +23,10 @@ public class OsuMatchScore : IScore
 
     /// <inheritdoc />
     [JsonProperty("user_id")]
-    [JsonConverter(typeof(ParseStringConverter))]
     public long UserId { get; set; }
 
     /// <inheritdoc />
     [JsonProperty("score")]
-    [JsonConverter(typeof(ParseStringConverter))]
     public long Score { get; set; }
 
     /// <inheritdoc />

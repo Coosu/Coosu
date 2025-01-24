@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -30,6 +31,11 @@ internal class HttpClientUtility
             }
         };
     }
+
+    private static readonly JsonSerializerOptions JsonSerializerOptions = new JsonSerializerOptions()
+    {
+        NumberHandling = JsonNumberHandling.AllowReadingFromString
+    };
 
     private static readonly ConcurrentDictionary<string, System.Net.Http.HttpClient> HttpClients = new();
 
@@ -189,7 +195,7 @@ internal class HttpClientUtility
                 response.EnsureSuccessStatusCode();
 
                 using var responseStream = await response.Content.ReadAsStreamAsync();
-                return (await JsonSerializer.DeserializeAsync<T>(responseStream))!;
+                return (await JsonSerializer.DeserializeAsync<T>(responseStream, JsonSerializerOptions))!;
             }
 #if DEBUG
             catch (Exception ex)

@@ -1,8 +1,6 @@
 ﻿using System;
-using Coosu.Api.V1.Internal;
-using JsonPropertyAttribute = System.Text.Json.Serialization.JsonPropertyNameAttribute;
-using JsonConverterAttribute = System.Text.Json.Serialization.JsonConverterAttribute;
 using JsonIgnoreAttribute = System.Text.Json.Serialization.JsonIgnoreAttribute;
+using JsonPropertyAttribute = System.Text.Json.Serialization.JsonPropertyNameAttribute;
 
 namespace Coosu.Api.V1.Score;
 
@@ -15,12 +13,10 @@ public class OsuPlayScore : IScore
     /// Score ID.
     /// </summary>
     [JsonProperty("score_id")]
-    [JsonConverter(typeof(ParseStringConverter))]
     public long ScoreId { get; set; }
 
     /// <inheritdoc />
     [JsonProperty("score")]
-    [JsonConverter(typeof(ParseStringConverter))]
     public long Score { get; set; }
 
     /// <summary>
@@ -71,7 +67,6 @@ public class OsuPlayScore : IScore
 
     /// <inheritdoc />
     [JsonProperty("user_id")]
-    [JsonConverter(typeof(ParseStringConverter))]
     public long UserId { get; set; }
 
     /// <summary>
