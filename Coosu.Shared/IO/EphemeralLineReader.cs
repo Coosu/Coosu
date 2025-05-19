@@ -56,9 +56,10 @@ public class EphemeralLineReader : IDisposable
                 if (_internalCharLen == 0)
                 {
                     // If there's pending data in _lineReturnBuffer, return it as the last line
-                    return lineReturnBufferPos > 0
-                        ? new ReadOnlyMemory<char>(_lineReturnBuffer, 0, lineReturnBufferPos)
-                        : null;
+                    if (lineReturnBufferPos > 0)
+                        return new ReadOnlyMemory<char>(_lineReturnBuffer, 0, lineReturnBufferPos);
+                    // else, return null (EOF)
+                    return null;
                 }
             }
 
