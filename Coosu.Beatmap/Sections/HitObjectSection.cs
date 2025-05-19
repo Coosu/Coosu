@@ -17,8 +17,6 @@ public sealed class HitObjectSection : Section
 {
     private readonly TimingSection _timingSection;
     private readonly DifficultySection _difficulty;
-    private readonly SpanSplitArgs _sliderArgs = new();
-    private readonly SpanSplitArgs _holdArgs = new();
     public List<RawHitObject> HitObjectList { get; set; } = new();
 
     [SectionIgnore]
@@ -91,19 +89,18 @@ public sealed class HitObjectSection : Section
         HitsoundType hitsound = default;
         ReadOnlySpan<char> others = default;
 
-        int i = -1;
-        _sliderArgs.Canceled = false;
-        foreach (var span in line.SpanSplit(',', _sliderArgs))
+        var enumerator = line.SpanSplit(',', 6);
+        while (enumerator.MoveNext())
         {
-            i++;
-            switch (i)
+            var span = enumerator.Current;
+            switch (enumerator.CurrentIndex)
             {
                 case 0: x = ParseHelper.ParseInt32(span); break;
                 case 1: y = ParseHelper.ParseInt32(span); break;
                 case 2: offset = ParseHelper.ParseInt32(span); break;
                 case 3: type = (RawObjectType)ParseHelper.ParseByte(span); break;
-                case 4: hitsound = (HitsoundType)ParseHelper.ParseByte(span); _sliderArgs.Canceled = true; break;
-                default: others = span; break;
+                case 4: hitsound = (HitsoundType)ParseHelper.ParseByte(span); break;
+                case 5: others = span; break; // The rest of the string after 5 splits
             }
         }
 
@@ -164,16 +161,16 @@ public sealed class HitObjectSection : Section
 
     private void ToHold(RawHitObject hitObject, ReadOnlySpan<char> others)
     {
-        _holdArgs.Canceled = false;
-        int i = -1;
         int holdEnd = default;
         ReadOnlySpan<char> extras = default;
-        foreach (var span in others.SpanSplit(':', _holdArgs))
+
+        var enumerator = others.SpanSplit(':', maxSplits: 2);
+        while (enumerator.MoveNext())
         {
-            i++;
-            switch (i)
+            var span = enumerator.Current;
+            switch (enumerator.CurrentIndex)
             {
-                case 0: holdEnd = ParseHelper.ParseInt32(span); _holdArgs.Canceled = true; break;
+                case 0: holdEnd = ParseHelper.ParseInt32(span); break;
                 case 1: extras = span; break;
             }
         }
