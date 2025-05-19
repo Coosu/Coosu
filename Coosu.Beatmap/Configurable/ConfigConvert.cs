@@ -34,7 +34,6 @@ public static class ConfigConvert
         Type[] constructorParameter = { configType };
         Section? currentSection = null;
         bool isSkippingSection = false;
-
         var currentLine = reader.ReadLine();
         while (currentLine != null)
         {

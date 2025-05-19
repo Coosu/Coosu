@@ -12,14 +12,15 @@ namespace Coosu.Beatmap.Configurable;
 
 public abstract class KeyValueSection : Section
 {
-    private static readonly ConcurrentDictionary<Type, Dictionary<string, SectionInfo>> TypePropertyInfoCache = new();
+    private static readonly ConcurrentDictionary<Type, SectionPropertyLookup> TypePropertyLookupCache = new();
 
-    protected readonly Dictionary<string, SectionInfo> PropertyInfos;
+    protected readonly SectionPropertyLookup PropertiesLookup;
 
     public KeyValueSection()
     {
         var thisType = GetType();
-        PropertyInfos = TypePropertyInfoCache.GetOrAdd(thisType, AddTypeSectionInfo);
+        PropertiesLookup = TypePropertyLookupCache.GetOrAdd(thisType,
+            type => new SectionPropertyLookup(AddTypeSectionInfo(type)));
     }
 
     [SectionIgnore]
@@ -34,11 +35,10 @@ public abstract class KeyValueSection : Section
     public override void Match(string line)
     {
         MatchKeyValue(line, out var keySpan, out var valueSpan);
-        var key = keySpan.ToString();
 
-        if (!PropertyInfos.TryGetValue(key, out var sectionInfo))
+        if (!PropertiesLookup.TryGetValue(keySpan, out var sectionInfo) || sectionInfo == null)
         {
-            UndefinedPairs.Add(key, valueSpan.ToString());
+            UndefinedPairs.Add(keySpan.ToString(), valueSpan.ToString());
         }
         else
         {
@@ -51,10 +51,10 @@ public abstract class KeyValueSection : Section
                 var converter = attr.GetConverter();
                 prop.SetValue(this, converter.ReadSection(valueSpan, propType));
             }
-            else if (propType.BaseType == StaticTypes.Enum)
+            else if (propType.IsEnum)
             {
-#if NET6_0_OR_GREATER
-                prop.SetValue(this, Enum.Parse(propType, valueSpan));
+#if NETCOREAPP3_1_OR_GREATER || NET5_0_OR_GREATER
+                prop.SetValue(this, Enum.Parse(propType, valueSpan.ToString()));
 #else
                 prop.SetValue(this, Enum.Parse(propType, valueSpan.ToString()));
 #endif
@@ -69,7 +69,7 @@ public abstract class KeyValueSection : Section
                 catch (Exception ex)
                 {
                     throw new ValueConvertException(
-                        $"Can not convert {{{key}}} key's value {{{valueSpan.ToString()}}} to type {propType}.", ex);
+                        $"Can not convert {{{keySpan.ToString()}}} key's value {{{valueSpan.ToString()}}} to type {propType}.", ex);
                 }
 
                 prop.SetValue(this, converted);
@@ -83,7 +83,7 @@ public abstract class KeyValueSection : Section
         textWriter.Write(SectionName);
         textWriter.WriteLine(']');
 
-        foreach (var kvp in PropertyInfos)
+        foreach (var kvp in PropertiesLookup.OriginalMap)
         {
             var name = kvp.Key;
             var sectionInfo = kvp.Value;
@@ -222,34 +222,28 @@ public abstract class KeyValueSection : Section
     {
         var propertyInfos = new Dictionary<string, SectionInfo>();
         var props = type.GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
-        for (var i = 0; i < props.Length; i++)
+        foreach (var propertyInfo in props)
         {
-            var propertyInfo = props[i];
             if (propertyInfo.SetMethod == null) continue;
-            var isPublic = propertyInfo.SetMethod.IsPublic;
-            if (!isPublic)
-            {
-                var sectionPropertyAttr = propertyInfo.GetCustomAttribute<SectionPropertyAttribute>();
-                if (sectionPropertyAttr == null) continue;
-                propertyInfos.Add(sectionPropertyAttr.Name ?? propertyInfo.Name, new SectionInfo(propertyInfo)
-                {
-                    UseSpecificFormat = sectionPropertyAttr.UseSpecificFormat,
-                    Attribute = sectionPropertyAttr
-                });
-            }
-            else
-            {
-                var sectionIgnoreAttr = propertyInfo.GetCustomAttribute<SectionIgnoreAttribute>();
-                if (sectionIgnoreAttr != null) continue;
-                var sectionPropertyAttr = propertyInfo.GetCustomAttribute<SectionPropertyAttribute>();
-                propertyInfos.Add(sectionPropertyAttr?.Name ?? propertyInfo.Name, new SectionInfo(propertyInfo)
-                {
-                    UseSpecificFormat = sectionPropertyAttr?.UseSpecificFormat ?? false,
-                    Attribute = sectionPropertyAttr,
-                });
-            }
-        }
 
+            var sectionIgnoreAttr = propertyInfo.GetCustomAttribute<SectionIgnoreAttribute>();
+            if (sectionIgnoreAttr != null) continue;
+
+            var sectionPropertyAttr = propertyInfo.GetCustomAttribute<SectionPropertyAttribute>();
+            string keyName = sectionPropertyAttr?.Name ?? propertyInfo.Name;
+            bool useSpecificFormat = sectionPropertyAttr?.UseSpecificFormat ?? false;
+
+            if (!propertyInfo.SetMethod.IsPublic && sectionPropertyAttr == null) 
+            {
+                 continue;
+            }
+
+            propertyInfos.Add(keyName, new SectionInfo(propertyInfo)
+            {
+                UseSpecificFormat = useSpecificFormat,
+                Attribute = sectionPropertyAttr,
+            });
+        }
         return propertyInfos;
     }
 }
