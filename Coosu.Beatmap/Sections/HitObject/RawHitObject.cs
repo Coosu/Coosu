@@ -56,11 +56,11 @@ public sealed class RawHitObject : SerializeWritableObject
 
     internal void SetExtras(ReadOnlySpan<char> extraInfo)
     {
-        int i = -1;
-        foreach (var span in extraInfo.SpanSplit(':'))
+        var enumerator = extraInfo.SpanSplit(':');
+        while (enumerator.MoveNext())
         {
-            i++;
-            switch (i)
+            var span = enumerator.Current;
+            switch (enumerator.CurrentIndex)
             {
                 case 0: SampleSet = (ObjectSamplesetType)ParseHelper.ParseByte(span); break;
                 case 1: AdditionSet = (ObjectSamplesetType)ParseHelper.ParseByte(span); break;

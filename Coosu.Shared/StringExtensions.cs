@@ -20,6 +20,8 @@ public static class StringExtensions
     public ref struct CharSplitEnumerator
     {
         private ReadOnlySpan<char> _span;
+        private int _currentIndex;
+
         private readonly char _c;
         private readonly SpanSplitArgs? _e;
 
@@ -29,6 +31,7 @@ public static class StringExtensions
             _c = c;
             _e = e;
             Current = default;
+            _currentIndex = -1;
         }
 
         // Needed to be compatible with the foreach operator
@@ -39,6 +42,8 @@ public static class StringExtensions
             var span = _span;
             if (span.Length == 0) // Reach the end of the string
                 return false;
+
+            _currentIndex++;
             if (_e is { Canceled: true })
             {
                 Current = _span; // The remaining string
@@ -60,5 +65,6 @@ public static class StringExtensions
         }
 
         public ReadOnlySpan<char> Current { get; private set; }
+        public int CurrentIndex => _currentIndex;
     }
 }

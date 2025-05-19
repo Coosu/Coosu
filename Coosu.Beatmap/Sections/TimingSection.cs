@@ -38,11 +38,11 @@ public sealed class TimingSection : Section
         bool inherit = default;
         Effects effects = default;
 
-        int i = -1;
-        foreach (var span in line.SpanSplit(','))
+        var enumerator = line.SpanSplit(',');
+        while (enumerator.MoveNext())
         {
-            i++;
-            switch (i)
+            var span = enumerator.Current;
+            switch (enumerator.CurrentIndex)
             {
                 case 0: offset = ParseHelper.ParseDouble(span, ParseHelper.EnUsNumberFormat); break;
                 case 1: factor = ParseHelper.ParseDouble(span, ParseHelper.EnUsNumberFormat); break;

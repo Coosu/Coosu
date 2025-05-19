@@ -14,17 +14,16 @@ public sealed class ColorConverter : ValueConverter<ReadyOnlyVector3<byte>>
         byte y = default;
         byte z = default;
 
-        int i = 0;
-        foreach (var span in value.SpanSplit(','))
+        var enumerator = value.SpanSplit(',');
+        while (enumerator.MoveNext())
         {
-            switch (i)
+            var span = enumerator.Current;
+            switch (enumerator.CurrentIndex)
             {
                 case 0: x = ParseHelper.ParseByte(span); break;
                 case 1: y = ParseHelper.ParseByte(span); break;
                 case 2: z = ParseHelper.ParseByte(span); break;
             }
-
-            i++;
         }
 
         return new ReadyOnlyVector3<byte>(x, y, z);

@@ -142,13 +142,13 @@ public sealed class HitObjectSection : Section
 
     private void ToSpinner(RawHitObject hitObject, ReadOnlySpan<char> others)
     {
-        int i = -1;
         int holdEnd = default;
         ReadOnlySpan<char> extras = default;
-        foreach (var span in others.SpanSplit(','))
+        var enumerator = others.SpanSplit(',');
+        while (enumerator.MoveNext())
         {
-            i++;
-            switch (i)
+            var span = enumerator.Current;
+            switch (enumerator.CurrentIndex) // Assuming CurrentIndex is available and 0-based
             {
                 case 0: holdEnd = ParseHelper.ParseInt32(span); break;
                 case 1: extras = span; break;
@@ -188,11 +188,11 @@ public sealed class HitObjectSection : Section
         ReadOnlySpan<char> sampleAdditionInfo = default;
         ReadOnlySpan<char> extraInfo = default;
 
-        int index = -1;
-        foreach (var infoSpan in others.SpanSplit(','))
+        var enumerator = others.SpanSplit(',');
+        while (enumerator.MoveNext())
         {
-            index++;
-            switch (index)
+            var infoSpan = enumerator.Current;
+            switch (enumerator.CurrentIndex)
             {
                 case 0:
                     curveInfo = infoSpan;
@@ -225,22 +225,22 @@ public sealed class HitObjectSection : Section
                 : new List<Vector2>(30)
             : new List<Vector2>();
 
-        int j = -1;
-        foreach (var point in curveInfo.SpanSplit('|'))
+        var curveEnumerator = curveInfo.SpanSplit('|');
+        while (curveEnumerator.MoveNext())
         {
-            j++;
-            if (j < 1)
+            var point = curveEnumerator.Current;
+            if (curveEnumerator.CurrentIndex < 1)
             {
                 sliderType = point[0];
                 continue; // curvePoints skip 1
             }
 
             int x = 0;
-            int i = -1;
-            foreach (var s in point.SpanSplit(':'))
+            var pointSplitEnumerator = point.SpanSplit(':');
+            while (pointSplitEnumerator.MoveNext())
             {
-                i++;
-                if (i == 0)
+                var s = pointSplitEnumerator.Current;
+                if (pointSplitEnumerator.CurrentIndex == 0)
                 {
                     x = ParseHelper.ParseInt32(s);
                 }
@@ -256,7 +256,7 @@ public sealed class HitObjectSection : Section
         HitsoundType[]? edgeHitsounds;
         ObjectSamplesetType[]? edgeSamples;
         ObjectSamplesetType[]? edgeAdditions;
-        if (index < 3)
+        if (enumerator.CurrentIndex < 3)
         {
             edgeHitsounds = null;
             edgeSamples = null;
@@ -265,14 +265,14 @@ public sealed class HitObjectSection : Section
         else
         {
             edgeHitsounds = new HitsoundType[repeat + 1];
-            int g = -1;
-            foreach (var span in edgeHitsoundInfo.SpanSplit('|'))
+            var edgeHitsoundEnumerator = edgeHitsoundInfo.SpanSplit('|');
+            while (edgeHitsoundEnumerator.MoveNext())
             {
-                g++;
-                edgeHitsounds[g] = (HitsoundType)ParseHelper.ParseByte(span);
+                var span = edgeHitsoundEnumerator.Current;
+                edgeHitsounds[edgeHitsoundEnumerator.CurrentIndex] = (HitsoundType)ParseHelper.ParseByte(span);
             }
 
-            if (index < 4)
+            if (enumerator.CurrentIndex < 4)
             {
                 edgeSamples = null;
                 edgeAdditions = null;
@@ -281,23 +281,24 @@ public sealed class HitObjectSection : Section
             {
                 edgeSamples = new ObjectSamplesetType[edgeHitsounds.Length];
                 edgeAdditions = new ObjectSamplesetType[edgeHitsounds.Length];
-                int i = -1;
-                foreach (var span in sampleAdditionInfo.SpanSplit('|'))
+                var sampleAdditionEnumerator = sampleAdditionInfo.SpanSplit('|');
+                while (sampleAdditionEnumerator.MoveNext())
                 {
-                    i++;
-                    int k = -1;
-                    foreach (var span2 in span.SpanSplit(':'))
+                    var span = sampleAdditionEnumerator.Current;
+                    var currentIndex = sampleAdditionEnumerator.CurrentIndex;
+                    var span2Enumerator = span.SpanSplit(':');
+                    while(span2Enumerator.MoveNext())
                     {
-                        k++;
-                        switch (k)
+                        var span2 = span2Enumerator.Current;
+                        switch (span2Enumerator.CurrentIndex)
                         {
                             case 0:
                                 var x = (ObjectSamplesetType)ParseHelper.ParseByte(span2);
-                                edgeSamples[i] = x;
+                                edgeSamples[currentIndex] = x;
                                 break;
                             case 1:
                                 var y = (ObjectSamplesetType)ParseHelper.ParseByte(span2);
-                                edgeAdditions[i] = y;
+                                edgeAdditions[currentIndex] = y;
                                 break;
                         }
                     }
@@ -306,7 +307,7 @@ public sealed class HitObjectSection : Section
         }
 
         // extra
-        if (index == 5)
+        if (enumerator.CurrentIndex == 5)
         {
             hitObject.SetExtras(extraInfo);
         }

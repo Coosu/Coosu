@@ -90,11 +90,11 @@ public sealed class EventSection : Section
                         double offset = default;
                         string filename = "";
 
-                        int i = -1;
-                        foreach (var span in line.SpanSplit(','))
+                        var enumerator = line.SpanSplit(',');
+                        while (enumerator.MoveNext())
                         {
-                            i++;
-                            switch (i)
+                            var span = enumerator.Current;
+                            switch (enumerator.CurrentIndex)
                             {
                                 case 1: offset = ParseHelper.ParseDouble(span); break;
                                 case 2: filename = span.Trim('"').ToString(); break;
@@ -113,11 +113,11 @@ public sealed class EventSection : Section
                         double y = 0;
                         string filename = "";
 
-                        int i = -1;
-                        foreach (var span in line.SpanSplit(','))
+                        var enumerator = line.SpanSplit(',');
+                        while (enumerator.MoveNext())
                         {
-                            i++;
-                            switch (i)
+                            var span = enumerator.Current;
+                            switch (enumerator.CurrentIndex)
                             {
                                 case 2: filename = span.Trim('"').ToString(); break;
                                 case 3: x = ParseHelper.ParseDouble(span); break;
@@ -133,11 +133,11 @@ public sealed class EventSection : Section
                         int startTime = default;
                         int endTime = default;
 
-                        int i = -1;
-                        foreach (var span in line.SpanSplit(','))
+                        var enumerator = line.SpanSplit(',');
+                        while (enumerator.MoveNext())
                         {
-                            i++;
-                            switch (i)
+                            var span = enumerator.Current;
+                            switch (enumerator.CurrentIndex)
                             {
                                 case 1: startTime = ParseHelper.ParseInt32(span); break;
                                 case 2: endTime = ParseHelper.ParseInt32(span); break;
@@ -156,11 +156,11 @@ public sealed class EventSection : Section
                         string filename = "";
                         byte volume = default;
 
-                        int i = -1;
-                        foreach (var span in line.SpanSplit(','))
+                        var enumerator = line.SpanSplit(',');
+                        while (enumerator.MoveNext())
                         {
-                            i++;
-                            switch (i)
+                            var span = enumerator.Current;
+                            switch (enumerator.CurrentIndex)
                             {
                                 case 1: offset = ParseHelper.ParseInt32(span); break;
                                 case 2: magicalInt = ParseHelper.ParseByte(span); break;
