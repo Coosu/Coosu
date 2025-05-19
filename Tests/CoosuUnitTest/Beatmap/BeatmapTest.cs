@@ -1,19 +1,21 @@
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Coosu.Api.HttpClient;
-using Coosu.Api.V2;
-using Coosu.Api.V2.RequestModels;
-using Coosu.Api.V2.ResponseModels;
 using Coosu.Beatmap;
 using Coosu.Beatmap.Extensions.Playback;
-using Microsoft.Extensions.Configuration;
 using Xunit;
 
 namespace CoosuUnitTest.Beatmap;
 
 public class BeatmapTest
 {
+    [Fact]
+    public async Task ParseEdgeCase()
+    {
+        var folder = @"files";
+        var file = @"Chata & nayuta - Yuune Zekka, Ryouran no Sai (sjoy) [Replay].osu";
+        var osuFile = await OsuFile.ReadFromFileAsync(Path.Combine(folder, file));
+    }
 
     [Fact]
     public async Task ReadAndWrite()

@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Coosu.Beatmap.Configurable;
 using Coosu.Beatmap.Sections.Timing;
 using Coosu.Shared;
@@ -29,10 +31,10 @@ public sealed class TimingSection : Section
     {
         double offset = default;
         double factor = default;
-        byte rhythm = default;
-        var timingSampleset = _osuFile.General!.SampleSet;
-        ushort track = default;
-        byte volume = (byte)_osuFile.General.SampleVolume;
+        int rhythm = default;
+        TimingSamplesetType timingSampleset = _osuFile.General!.SampleSet;
+        int track = default;
+        int volume = _osuFile.General.SampleVolume;
         bool inherit = default;
         Effects effects = default;
 
@@ -44,14 +46,20 @@ public sealed class TimingSection : Section
             {
                 case 0: offset = ParseHelper.ParseDouble(span, ParseHelper.EnUsNumberFormat); break;
                 case 1: factor = ParseHelper.ParseDouble(span, ParseHelper.EnUsNumberFormat); break;
-                case 2: rhythm = ParseHelper.ParseByte(span); break;
+                case 2: rhythm = ParseHelper.ParseInt32(span); break;
                 case 3:
-                    var b = ParseHelper.ParseByte(span);
-                    timingSampleset = (TimingSamplesetType)(b == 0 ? 0 : b - 1); break;
-                case 4: track = ParseHelper.ParseUInt16(span); break;
-                case 5: volume = ParseHelper.ParseByte(span); break;
-                case 6: inherit = ParseHelper.ParseByte(span) == 0; break;
-                case 7: effects = (Effects)ParseHelper.ParseByte(span); break;
+                    timingSampleset = ParseHelper.ParseInt32(span) switch
+                    {
+                        1 => TimingSamplesetType.Normal,
+                        2 => TimingSamplesetType.Soft,
+                        3 => TimingSamplesetType.Drum,
+                        _ => timingSampleset
+                    };
+                    break;
+                case 4: track = ParseHelper.ParseInt32(span); break;
+                case 5: volume = ParseHelper.ParseInt32(span); break;
+                case 6: inherit = ParseHelper.ParseInt32(span) != 1; break;
+                case 7: effects = (Effects)ParseHelper.ParseInt32(span); break;
             }
         }
 
@@ -59,12 +67,12 @@ public sealed class TimingSection : Section
         {
             Offset = offset,
             Factor = factor,
-            Rhythm = rhythm,
+            Rhythm = rhythm < 1 ? 4 : rhythm,
             TimingSampleset = timingSampleset,
-            Track = track,
-            Volume = volume,
+            Track = (ushort)Math.Max(track, 0),
+            Volume = (byte)Clamp(volume, 0, 100),
             IsInherit = inherit,
-            Effects = effects,
+            Effects = effects & (Effects)0b1001,
         });
     }
 
@@ -79,5 +87,25 @@ public sealed class TimingSection : Section
             timingPoint.AppendSerializedString(textWriter);
             textWriter.WriteLine();
         }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static int Clamp(int value, int min, int max)
+    {
+        if (min > max)
+        {
+            throw new ArgumentException($"min ({min}) cannot be greater than max ({max})");
+        }
+
+        if (value < min)
+        {
+            return min;
+        }
+        else if (value > max)
+        {
+            return max;
+        }
+
+        return value;
     }
 }

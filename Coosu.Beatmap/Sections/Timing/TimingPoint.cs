@@ -7,7 +7,7 @@ namespace Coosu.Beatmap.Sections.Timing;
 
 public sealed class TimingPoint : SerializeWritableObject
 {
-    private byte _rhythm;
+    private int _rhythm;
     public double Offset { get; set; }
     public double Factor { get; set; } // 一拍的ms
 
@@ -33,7 +33,7 @@ public sealed class TimingPoint : SerializeWritableObject
         }
     }
 
-    public byte Rhythm
+    public int Rhythm
     {
         get => _rhythm;
         set
@@ -63,7 +63,7 @@ public sealed class TimingPoint : SerializeWritableObject
             Track,
             Volume,
             Convert.ToInt32(!IsInherit),
-            Convert.ToInt32(IsKiai));
+            Convert.ToInt32((int)Effects));
 
     public override void AppendSerializedString(TextWriter textWriter)
     {
