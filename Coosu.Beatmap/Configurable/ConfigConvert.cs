@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using Coosu.Beatmap.Internal;
+using Coosu.Shared.IO;
 
 namespace Coosu.Beatmap.Configurable;
 
@@ -34,17 +35,21 @@ public static class ConfigConvert
         Type[] constructorParameter = { configType };
         Section? currentSection = null;
         bool isSkippingSection = false;
-        var currentLine = reader.ReadLine();
-        while (currentLine != null)
+
+        using var lineReader = new EphemeralLineReader(reader);
+        ReadOnlyMemory<char>? currentLineMemory;
+
+        while ((currentLineMemory = lineReader.ReadLine()) != null)
         {
-            if (string.IsNullOrWhiteSpace(currentLine))
+            ReadOnlySpan<char> lineSpan = currentLineMemory.Value.Span;
+            if (lineSpan.IsEmpty || lineSpan.IsWhiteSpace())
             {
-                currentLine = reader.ReadLine();
                 continue;
             }
 
-            if (MatchedSection(currentLine, out var sectionName))
+            if (MatchedSection(lineSpan, out var sectionNameSpan))
             {
+                string sectionName = sectionNameSpan.ToString();
                 if (options.IncludeMode == null)
                 {
                     isSkippingSection = false;
@@ -81,7 +86,7 @@ public static class ConfigConvert
                     else
                     {
                         currentSection = null;
-                        config.HandleCustom(currentLine);
+                        config.HandleCustom(currentLineMemory.Value);
                     }
                 }
             }
@@ -91,16 +96,14 @@ public static class ConfigConvert
                 {
                     if (currentSection != null)
                     {
-                        currentSection.Match(currentLine);
+                        currentSection.Match(currentLineMemory.Value);
                     }
                     else
                     {
-                        config.HandleCustom(currentLine);
+                        config.HandleCustom(currentLineMemory.Value);
                     }
                 }
             }
-
-            currentLine = reader.ReadLine();
         }
 
         config.OnDeserialized();
@@ -125,15 +128,15 @@ public static class ConfigConvert
         return reflectInfos;
     }
 
-    private static bool MatchedSection(string line, out string sectionName)
+    private static bool MatchedSection(ReadOnlySpan<char> line, out ReadOnlySpan<char> sectionNameSpan)
     {
-        if (line[0] == '[' && line[line.Length - 1] == ']')
+        if (line.Length >= 2 && line[0] == '[' && line[line.Length - 1] == ']')
         {
-            sectionName = line.Substring(1, line.Length - 2);
+            sectionNameSpan = line.Slice(1, line.Length - 2);
             return true;
         }
 
-        sectionName = null!;
+        sectionNameSpan = default;
         return false;
     }
 

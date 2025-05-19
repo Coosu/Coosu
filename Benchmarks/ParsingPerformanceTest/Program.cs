@@ -82,25 +82,32 @@ public class ReadingTask
         Console.WriteLine(_path);
     }
 
-    [Benchmark(Baseline = true)]
-    public double Multiple()
+    [Benchmark]
+    public async Task<object> Read()
     {
-        //var osu = await OsuFile.ReadFromFileAsync(_path);
-        //return osu;
-        return _value3 * _value1;
+        var osu = await OsuFile.ReadFromFileAsync(_path);
+        return osu;
     }
 
-    [Benchmark]
-    public double Divide()
-    {
-        return _value3 / _value2;
-    }
+    //[Benchmark(Baseline = true)]
+    //public double Multiple()
+    //{
+    //    //var osu = await OsuFile.ReadFromFileAsync(_path);
+    //    //return osu;
+    //    return _value3 * _value1;
+    //}
 
-    [Benchmark]
-    public double Const()
-    {
-        const double _value2 = 2.0;
-        const double _value3 = 21235.12351236;
-        return _value3 / _value2;
-    }
+    //[Benchmark]
+    //public double Divide()
+    //{
+    //    return _value3 / _value2;
+    //}
+
+    //[Benchmark]
+    //public double Const()
+    //{
+    //    const double _value2 = 2.0;
+    //    const double _value3 = 21235.12351236;
+    //    return _value3 / _value2;
+    //}
 }

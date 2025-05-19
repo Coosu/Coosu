@@ -32,9 +32,10 @@ public abstract class KeyValueSection : Section
     [SectionIgnore]
     protected virtual IReadOnlyList<FlagRule> FuzzyFlagRules { get; } = FlagRules.FuzzyRules;
 
-    public override void Match(string line)
+    public override void Match(ReadOnlyMemory<char> memory)
     {
-        MatchKeyValue(line, out var keySpan, out var valueSpan);
+        var lineSpan = memory.Span;
+        MatchKeyValue(lineSpan, out var keySpan, out var valueSpan);
 
         if (!PropertiesLookup.TryGetValue(keySpan, out var sectionInfo) || sectionInfo == null)
         {
@@ -91,33 +92,33 @@ public abstract class KeyValueSection : Section
         }
     }
 
-    protected void MatchKeyValue(string line, out ReadOnlySpan<char> keySpan, out ReadOnlySpan<char> valueSpan)
+    protected void MatchKeyValue(ReadOnlySpan<char> lineSpan, out ReadOnlySpan<char> keySpan, out ReadOnlySpan<char> valueSpan)
     {
-        int index = MatchFlag(line, out var flagRule);
-        if (index == -1) throw new Exception($"Unknown Key-Value: {line}");
+        int index = MatchFlag(lineSpan, out var flagRule);
+        if (index == -1) throw new Exception($"Unknown Key-Value: {lineSpan.ToString()}");
 
-        keySpan = line.AsSpan(0, index);
+        keySpan = lineSpan.Slice(0, index);
         if (flagRule!.TrimType is TrimType.Key or TrimType.Both)
         {
             keySpan = keySpan.Trim();
         }
 
-        valueSpan = line.AsSpan(index + flagRule.SplitFlag.Length);
+        valueSpan = lineSpan.Slice(index + flagRule.SplitFlag.Length);
         if (flagRule.TrimType is TrimType.Value or TrimType.Both)
         {
             valueSpan = valueSpan.Trim();
         }
     }
 
-    protected int MatchFlag(string line, out FlagRule? flagRule)
+    protected int MatchFlag(ReadOnlySpan<char> lineSpan, out FlagRule? flagRule)
     {
-        var index = line.IndexOf(FlagRule.SplitFlag, StringComparison.Ordinal);
+        var index = lineSpan.IndexOf(FlagRule.SplitFlag.AsSpan());
         if (index == -1)
         {
             flagRule = null;
             foreach (var rule in FuzzyFlagRules)
             {
-                index = line.IndexOf(rule.SplitFlag, StringComparison.Ordinal);
+                index = lineSpan.IndexOf(rule.SplitFlag.AsSpan());
                 if (index == -1) continue;
                 flagRule = rule;
                 return index;
@@ -233,9 +234,9 @@ public abstract class KeyValueSection : Section
             string keyName = sectionPropertyAttr?.Name ?? propertyInfo.Name;
             bool useSpecificFormat = sectionPropertyAttr?.UseSpecificFormat ?? false;
 
-            if (!propertyInfo.SetMethod.IsPublic && sectionPropertyAttr == null) 
+            if (!propertyInfo.SetMethod.IsPublic && sectionPropertyAttr == null)
             {
-                 continue;
+                continue;
             }
 
             propertyInfos.Add(keyName, new SectionInfo(propertyInfo)

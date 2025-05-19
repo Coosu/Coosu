@@ -7,6 +7,7 @@ using Coosu.Beatmap.Configurable;
 using Coosu.Beatmap.Sections;
 using Coosu.Beatmap.Sections.Event;
 using Coosu.Beatmap.Sections.Timing;
+using Coosu.Shared.Numerics;
 
 namespace Coosu.Beatmap;
 
@@ -122,21 +123,22 @@ public class OsuFile : Config
             this.TimingPoints.TimingList = this.TimingPoints.TimingList.OrderBy(k => k.Offset).ToList();
     }
 
-    public override void HandleCustom(string line)
+    public override void HandleCustom(ReadOnlyMemory<char> memory)
     {
         if (Version != 0) return;
-        if (line.StartsWith(VerFlag, StringComparison.Ordinal))
+        var line = memory.Span;
+        if (line.StartsWith(VerFlag.AsSpan()))
         {
-            var str = line.Substring(VerFlag.Length);
-            if (!int.TryParse(str, out var verNum))
-                throw new BadOsuFormatException("Unknown osu file format: " + str);
+            var verSpan = line.Slice(VerFlag.Length);
+            if (!ParseHelper.TryParseInt32(verSpan, out var verNum))
+                throw new BadOsuFormatException("Unknown osu file format: " + verSpan.ToString());
             if (verNum is < 3 or > 14)
                 throw new VersionNotSupportedException(verNum);
             Version = verNum;
         }
         else
         {
-            throw new BadOsuFormatException("Invalid header declaration: " + line);
+            throw new BadOsuFormatException("Invalid header declaration: " + line.ToString());
         }
     }
 

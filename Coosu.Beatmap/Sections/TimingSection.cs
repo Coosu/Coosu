@@ -27,8 +27,10 @@ public sealed class TimingSection : Section
     [SectionIgnore]
     public double MaxTime => TimingList.Count == 0 ? 0 : TimingList.Max(t => t.Offset);
 
-    public override void Match(string line)
+    public override void Match(ReadOnlyMemory<char> memory)
     {
+        var lineSpan = memory.Span;
+
         double offset = default;
         double factor = default;
         int rhythm = default;
@@ -38,7 +40,7 @@ public sealed class TimingSection : Section
         bool inherit = default;
         Effects effects = default;
 
-        var enumerator = line.SpanSplit(',');
+        var enumerator = lineSpan.SpanSplit(',');
         while (enumerator.MoveNext())
         {
             var span = enumerator.Current;

@@ -80,8 +80,10 @@ public sealed class HitObjectSection : Section
         }
     }
 
-    public override void Match(string line)
+    public override void Match(ReadOnlyMemory<char> memory)
     {
+        var lineSpan = memory.Span;
+
         int x = default;
         int y = default;
         int offset = default;
@@ -89,7 +91,7 @@ public sealed class HitObjectSection : Section
         HitsoundType hitsound = default;
         ReadOnlySpan<char> others = default;
 
-        var enumerator = line.SpanSplit(',', 6);
+        var enumerator = lineSpan.SpanSplit(',', 6);
         while (enumerator.MoveNext())
         {
             var span = enumerator.Current;
@@ -287,7 +289,7 @@ public sealed class HitObjectSection : Section
                     var span = sampleAdditionEnumerator.Current;
                     var currentIndex = sampleAdditionEnumerator.CurrentIndex;
                     var span2Enumerator = span.SpanSplit(':');
-                    while(span2Enumerator.MoveNext())
+                    while (span2Enumerator.MoveNext())
                     {
                         var span2 = span2Enumerator.Current;
                         switch (span2Enumerator.CurrentIndex)

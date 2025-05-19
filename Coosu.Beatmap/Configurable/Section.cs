@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 
 namespace Coosu.Beatmap.Configurable;
 
@@ -14,5 +15,5 @@ public abstract class Section : SerializeWritableObject, ISection
         SectionName = sb?.Name ?? type.Name;
     }
 
-    public abstract void Match(string line);
+    public abstract void Match(ReadOnlyMemory<char> memory);
 }

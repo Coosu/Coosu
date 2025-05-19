@@ -1,7 +1,8 @@
-﻿namespace Coosu.Beatmap.Configurable;
+﻿using System;
+
+namespace Coosu.Beatmap.Configurable;
 
 public interface ISection : ISerializeWritable
 {
-    void Match(string line);
-
+    void Match(ReadOnlyMemory<char> memory);
 }

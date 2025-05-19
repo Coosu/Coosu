@@ -42,11 +42,13 @@ public sealed class EventSection : Section
     /// </summary>
     public string? StoryboardText { get; set; }
 
-    public override void Match(string line)
+    public override void Match(ReadOnlyMemory<char> memory)
     {
-        if (line.StartsWith("//", StringComparison.Ordinal))
+        var lineSpan = memory.Span;
+
+        if (lineSpan.StartsWith("//".AsSpan()))
         {
-            var section = line.Trim();
+            var section = lineSpan.Trim();
             switch (section)
             {
                 case SectionBgVideo:
@@ -65,15 +67,15 @@ public sealed class EventSection : Section
                     _currentSection = SectionSbSamples;
                     break;
                 default:
-                    if (section.StartsWith(SectionStoryboard, StringComparison.Ordinal))
+                    if (section.StartsWith(SectionStoryboard.AsSpan()))
                     {
                         _currentSection = SectionStoryboard;
-                        if (!_options.StoryboardIgnored) _sbInfo.AppendLine(line);
+                        if (!_options.StoryboardIgnored) _sbInfo.AppendLine(lineSpan.ToString());
                     }
                     else
                     {
-                        _currentSection = section;
-                        _unknownSection.Add(section, new StringBuilder());
+                        _currentSection = section.ToString();
+                        _unknownSection.Add(section.ToString(), new StringBuilder());
                     }
                     break;
             }
@@ -84,13 +86,13 @@ public sealed class EventSection : Section
             {
                 case SectionBgVideo:
                     // https://osu.ppy.sh/help/wiki/osu!_File_Formats/Osu_(file_format)#videos
-                    if (line.StartsWith("Video,", StringComparison.Ordinal) ||
-                        line.StartsWith("1,", StringComparison.Ordinal))
+                    if (lineSpan.StartsWith("Video,".AsSpan()) ||
+                        lineSpan.StartsWith("1,".AsSpan()))
                     {
                         double offset = default;
                         string filename = "";
 
-                        var enumerator = line.SpanSplit(',');
+                        var enumerator = lineSpan.SpanSplit(',');
                         while (enumerator.MoveNext())
                         {
                             var span = enumerator.Current;
@@ -103,7 +105,7 @@ public sealed class EventSection : Section
 
                         VideoInfo = new VideoData { Offset = offset, Filename = filename };
                     }
-                    else if (line.StartsWith("_") || line.StartsWith(" "))
+                    else if (lineSpan.Length > 0 && (lineSpan[0] == '_' || lineSpan[0] == ' '))
                     {
                         break;
                     }
@@ -113,7 +115,7 @@ public sealed class EventSection : Section
                         double y = 0;
                         string filename = "";
 
-                        var enumerator = line.SpanSplit(',');
+                        var enumerator = lineSpan.SpanSplit(',');
                         while (enumerator.MoveNext())
                         {
                             var span = enumerator.Current;
@@ -133,7 +135,7 @@ public sealed class EventSection : Section
                         int startTime = default;
                         int endTime = default;
 
-                        var enumerator = line.SpanSplit(',');
+                        var enumerator = lineSpan.SpanSplit(',');
                         while (enumerator.MoveNext())
                         {
                             var span = enumerator.Current;
@@ -148,15 +150,15 @@ public sealed class EventSection : Section
                     }
                     break;
                 case SectionSbSamples:
-                    if (!_options.SampleIgnored && (line.StartsWith("Sample,", StringComparison.Ordinal) ||
-                                                    line.StartsWith("5,", StringComparison.Ordinal)))
+                    if (!_options.SampleIgnored && (lineSpan.StartsWith("Sample,".AsSpan()) ||
+                                                    lineSpan.StartsWith("5,".AsSpan())))
                     {
                         int offset = default;
                         byte magicalInt = default;
                         string filename = "";
                         byte volume = default;
 
-                        var enumerator = line.SpanSplit(',');
+                        var enumerator = lineSpan.SpanSplit(',');
                         while (enumerator.MoveNext())
                         {
                             var span = enumerator.Current;
@@ -179,10 +181,10 @@ public sealed class EventSection : Section
                     }
                     break;
                 case SectionStoryboard:
-                    if (!_options.StoryboardIgnored) _sbInfo.AppendLine(line);
+                    if (!_options.StoryboardIgnored) _sbInfo.AppendLine(lineSpan.ToString());
                     break;
                 default:
-                    if (_currentSection != null) _unknownSection[_currentSection].AppendLine(line);
+                    if (_currentSection != null) _unknownSection[_currentSection].AppendLine(lineSpan.ToString());
                     break;
             }
         }

@@ -1482,7 +1482,7 @@
         <member name="P:Coosu.Api.V1.Score.OsuUserRecent.IsPerfect">
             <inheritdoc />
         </member>
-        <member name="P:Coosu.Api.V1.Score.OsuUserRecent.EnabledMods">
+        <member name="P:Coosu.Api.V1.Score.OsuUserRecent.RawMods">
             <summary>
             Enabled mods of the score.
             </summary>

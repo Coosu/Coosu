@@ -1,7 +1,6 @@
 ﻿#nullable enable
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -126,7 +125,7 @@ public static class ConfigConvertOld
                 }
                 else
                 {
-                    instance.HandleCustom(line);
+                    instance.HandleCustom(line.AsMemory());
                 }
             }
             else
@@ -134,10 +133,10 @@ public static class ConfigConvertOld
                 if (!skippingSection)
                 {
                     if (currentSection != null)
-                        currentSection.Match(line);
+                        currentSection.Match(line.AsMemory());
                     else
                     {
-                        instance.HandleCustom(line);
+                        instance.HandleCustom(line.AsMemory());
                     }
                 }
             }
