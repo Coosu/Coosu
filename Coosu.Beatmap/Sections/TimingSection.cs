@@ -21,7 +21,7 @@ public sealed class TimingSection : Section
         _osuFile.General ??= new GeneralSection();
     }
 
-    public List<TimingPoint> TimingList { get; set; } = new();
+    public List<TimingPoint> TimingList { get; set; } = new(1024);
     [SectionIgnore]
     public double MinTime => TimingList.Count == 0 ? 0 : TimingList.Min(t => t.Offset);
     [SectionIgnore]

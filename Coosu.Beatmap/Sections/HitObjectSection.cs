@@ -17,7 +17,7 @@ public sealed class HitObjectSection : Section
 {
     private readonly TimingSection _timingSection;
     private readonly DifficultySection _difficulty;
-    public List<RawHitObject> HitObjectList { get; set; } = new();
+    public List<RawHitObject> HitObjectList { get; set; } = new(1024);
 
     [SectionIgnore]
     public double MinTime => HitObjectList.Count == 0 ? 0 : HitObjectList.Min(t => t.Offset);
