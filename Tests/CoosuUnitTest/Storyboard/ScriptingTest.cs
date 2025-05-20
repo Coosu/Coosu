@@ -4,11 +4,8 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Reflection.Emit;
 using System.Threading.Tasks;
 using Coosu.Storyboard;
-using Coosu.Storyboard.Easing;
-using Coosu.Storyboard.Events;
 using Coosu.Storyboard.Extensions.Optimizing;
 using Coosu.Storyboard.OsbX;
 using Xunit;
@@ -303,7 +300,7 @@ public class ScriptingTest
         var compressor = new SpriteCompressor(layer);
         await compressor.CompressAsync();
         var folder = Path.GetDirectoryName(path);
-        await using var sw = new StreamWriter(Path.Combine(folder, "compressed.osb"));
+        using var sw = new StreamWriter(Path.Combine(folder, "compressed.osb"));
         await layer.WriteFullScriptAsync(sw);
     }
 }

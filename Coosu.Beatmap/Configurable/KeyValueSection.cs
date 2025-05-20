@@ -55,7 +55,7 @@ public abstract class KeyValueSection : Section
             else if (propType.IsEnum)
             {
 #if NETCOREAPP3_1_OR_GREATER || NET5_0_OR_GREATER
-                prop.SetValue(this, Enum.Parse(propType, valueSpan.ToString()));
+                prop.SetValue(this, Enum.Parse(propType, valueSpan));
 #else
                 prop.SetValue(this, Enum.Parse(propType, valueSpan.ToString()));
 #endif

@@ -44,7 +44,7 @@ public class SectionTest
         await writer.FlushAsync();
         var buffer = ms.GetBuffer();
         var result = Encoding.UTF8.GetString(buffer);
-        result = result[0..result.IndexOf('\0')];
+        result = result.Substring(0, result.IndexOf('\0'));
 
         Assert.Equal(
             "[TestSection]\r\nTestFloatProperty:114.514\r\nTestDoubleProperty:114.514\r\n",
@@ -65,7 +65,7 @@ public class SectionTest
         await writer.FlushAsync();
         var buffer = ms.GetBuffer();
         var result = Encoding.UTF8.GetString(buffer);
-        result = result[0..result.IndexOf('\0')];
+        result = result.Substring(0, result.IndexOf('\0'));
 
         Assert.Equal(
             "[Test2Section]\r\nTestFloatProperty:114,514\r\nTestDoubleProperty:114,514\r\n",
