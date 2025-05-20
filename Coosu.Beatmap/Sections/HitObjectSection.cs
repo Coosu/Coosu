@@ -10,9 +10,16 @@ using Coosu.Beatmap.Sections.Timing;
 using Coosu.Shared;
 using Coosu.Shared.Numerics;
 
+#if NET6_0_OR_GREATER
+using System.Diagnostics.CodeAnalysis;
+#endif
+
 namespace Coosu.Beatmap.Sections;
 
 [SectionProperty("HitObjects")]
+#if NET6_0_OR_GREATER
+[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.NonPublicConstructors)]
+#endif
 public sealed class HitObjectSection : Section
 {
     private readonly TimingSection _timingSection;

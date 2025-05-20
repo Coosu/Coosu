@@ -2,9 +2,16 @@
 using Coosu.Beatmap.Sections.GamePlay;
 using Coosu.Beatmap.Sections.Timing;
 
+#if NET6_0_OR_GREATER
+using System.Diagnostics.CodeAnalysis;
+#endif
+
 namespace Coosu.Beatmap.Sections;
 
 [SectionProperty("General")]
+#if NET6_0_OR_GREATER
+[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.NonPublicConstructors)]
+#endif
 public sealed class GeneralSection : KeyValueSection
 {
     /// <summary>

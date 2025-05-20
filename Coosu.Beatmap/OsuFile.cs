@@ -9,12 +9,26 @@ using Coosu.Beatmap.Sections.Event;
 using Coosu.Beatmap.Sections.Timing;
 using Coosu.Shared.Numerics;
 
+#if NET6_0_OR_GREATER
+using System.Diagnostics.CodeAnalysis;
+#endif
+
 namespace Coosu.Beatmap;
 
 public class OsuFile : Config
 {
     private const string VerFlag = "osu file format v";
 
+#if NET6_0_OR_GREATER
+    [DynamicDependency(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor, typeof(GeneralSection))]
+    [DynamicDependency(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor, typeof(EditorSection))]
+    [DynamicDependency(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor, typeof(MetadataSection))]
+    [DynamicDependency(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor, typeof(DifficultySection))]
+    [DynamicDependency(DynamicallyAccessedMemberTypes.PublicConstructors, typeof(EventSection))]
+    [DynamicDependency(DynamicallyAccessedMemberTypes.PublicConstructors, typeof(TimingSection))]
+    [DynamicDependency(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor, typeof(ColorSection))]
+    [DynamicDependency(DynamicallyAccessedMemberTypes.PublicConstructors, typeof(HitObjectSection))]
+#endif
     protected OsuFile()
     {
     }
@@ -116,11 +130,11 @@ public class OsuFile : Config
     {
         var readOptions = (OsuReadOptions)Options;
         if (!readOptions.AutoCompute) return;
-        var hitObjectSection = this.HitObjects;
+        var hitObjectSection = HitObjects;
         if (hitObjectSection != null)
             hitObjectSection.ComputeSlidersByCurrentSettings();
-        if (this.TimingPoints != null)
-            this.TimingPoints.TimingList = this.TimingPoints.TimingList.OrderBy(k => k.Offset).ToList();
+        if (TimingPoints != null)
+            TimingPoints.TimingList = TimingPoints.TimingList.OrderBy(k => k.Offset).ToList();
     }
 
     public override void HandleCustom(ReadOnlyMemory<char> memory)
