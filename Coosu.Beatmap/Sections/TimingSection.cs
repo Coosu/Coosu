@@ -45,8 +45,8 @@ public sealed class TimingSection : Section
         TimingSamplesetType timingSampleset = _osuFile.General!.SampleSet;
         int track = default;
         int volume = _osuFile.General.SampleVolume;
-        bool inherit = default;
-        Effects effects = default;
+        int inherit = default;
+        int effects = default;
 
         var enumerator = lineSpan.SpanSplit(',');
         while (enumerator.MoveNext())
@@ -68,8 +68,8 @@ public sealed class TimingSection : Section
                     break;
                 case 4: track = ParseHelper.ParseInt32(span); break;
                 case 5: volume = ParseHelper.ParseInt32(span); break;
-                case 6: inherit = ParseHelper.ParseInt32(span) != 1; break;
-                case 7: effects = (Effects)ParseHelper.ParseInt32(span); break;
+                case 6: inherit = ParseHelper.ParseInt32(span); break;
+                case 7: effects = ParseHelper.ParseInt32(span); break;
             }
         }
 
@@ -81,8 +81,8 @@ public sealed class TimingSection : Section
             TimingSampleset = timingSampleset,
             Track = (ushort)Math.Max(track, 0),
             Volume = (byte)Clamp(volume, 0, 100),
-            IsInherit = inherit,
-            Effects = effects & (Effects)0b1001,
+            IsInherit = inherit != 1,
+            Effects = (Effects)(effects & 0b1001),
         });
     }
 

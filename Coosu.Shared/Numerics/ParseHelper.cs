@@ -252,6 +252,16 @@ public static class ParseHelper
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool TryParseEnum<T>(ReadOnlySpan<char> input, out T value) where T : struct
+    {
+#if NETCOREAPP3_1_OR_GREATER
+        return Enum.TryParse<T>(input, out value);
+#else
+        return Enum.TryParse(input.ToString(), false, out value);
+#endif
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool TryParseDateTime(ReadOnlySpan<char> input, out DateTime value)
     {
 #if NETCOREAPP3_1_OR_GREATER
@@ -259,5 +269,49 @@ public static class ParseHelper
 #else
         return DateTime.TryParse(input.ToString(), out value);
 #endif
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool TryParse<T>(ReadOnlySpan<char> s, out T result) where T : struct =>
+        TryParse(s, EnUsNumberFormat, out result);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool TryParse<T>(ReadOnlySpan<char> s, NumberFormatInfo? provider, out T result) where T : struct
+    {
+        result = default;
+        return typeof(T) switch
+        {
+            // Floating point types (provider sensitive)
+            { } t when t == typeof(double) => TryParseDouble(s, out Unsafe.As<T, double>(ref result), provider),
+            { } t when t == typeof(float) => TryParseSingle(s, out Unsafe.As<T, float>(ref result), provider),
+
+            // Integer types (provider is ignored by these specific TryParse helpers)
+            { } t when t == typeof(byte) => TryParseByte(s, out Unsafe.As<T, byte>(ref result)),
+            { } t when t == typeof(sbyte) => TryParseSByte(s, out Unsafe.As<T, sbyte>(ref result)),
+            { } t when t == typeof(short) => TryParseInt16(s, out Unsafe.As<T, short>(ref result)),
+            { } t when t == typeof(ushort) => TryParseUInt16(s, out Unsafe.As<T, ushort>(ref result)),
+            { } t when t == typeof(int) => TryParseInt32(s, out Unsafe.As<T, int>(ref result)),
+            { } t when t == typeof(uint) => TryParseUInt32(s, out Unsafe.As<T, uint>(ref result)),
+            { } t when t == typeof(long) => TryParseInt64(s, out Unsafe.As<T, long>(ref result)),
+            { } t when t == typeof(ulong) => TryParseUInt64(s, out Unsafe.As<T, ulong>(ref result)),
+
+            // Other types (provider is ignored by these specific TryParse helpers)
+            { } t when t == typeof(bool) => TryParseBoolean(s, out Unsafe.As<T, bool>(ref result)),
+            { } t when t == typeof(DateTime) => TryParseDateTime(s, out Unsafe.As<T, DateTime>(ref result)),
+
+            { IsEnum: true } => TryParseEnum(s, out Unsafe.As<T, DateTime>(ref result)),
+
+            _ => throw new NotSupportedException(
+                $"Type {typeof(T)} is not supported by this generic TryParse method. " +
+                $"Supported types are: double, float, byte, sbyte, short, ushort, int, uint, long, ulong, bool, DateTime.")
+        };
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool TryParseNext<T>(ref StringExtensions.CharSplitEnumerator enumerator, out T value) where T : struct
+    {
+        if (enumerator.MoveNext() && TryParse(enumerator.Current, out value)) return true;
+        value = default;
+        return false;
     }
 }
