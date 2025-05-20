@@ -6,18 +6,21 @@
     <PackageTags>osu, osu!, osugame</PackageTags>
     <IsTrimmable>true</IsTrimmable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion>12</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
 
-  <ItemGroup Condition="$(TargetFramework) == 'net48'">
-    <PackageReference Include="System.Memory" Version="4.5.4" />
+  <ItemGroup Condition="$(TargetFramework) == 'netstandard2.0'">
+    <PackageReference Include="System.Memory" Version="4.6.3" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.2" />
   </ItemGroup>
 
-  <ItemGroup Condition="$(TargetFramework) == 'netstandard2.0'">
-    <PackageReference Include="System.Memory" Version="4.5.5" />
+  <ItemGroup Condition="$(TargetFramework) != 'netstandard2.0'">
+    <Compile Remove="RefTools\**" />
+    <Compile Remove="Backports\**" />
   </ItemGroup>
 
 </Project>
