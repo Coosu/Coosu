@@ -7,9 +7,7 @@ namespace Coosu.Shared.Numerics;
 public static class ParseHelper
 {
     public static readonly NumberFormatInfo EnUsNumberFormat = new CultureInfo("en-US", false).NumberFormat;
-#if NETCOREAPP3_1_OR_GREATER
     private const NumberStyles DefaultNumberStyle = NumberStyles.Float | NumberStyles.AllowThousands;
-#endif
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool ParseBoolean(ReadOnlySpan<char> input)
@@ -17,7 +15,7 @@ public static class ParseHelper
 #if NETCOREAPP3_1_OR_GREATER
         return bool.Parse(input);
 #else
-        return bool.Parse(input.ToString());
+        return Backports.Numbers.Parse<bool>(input) ?? throw new FormatException();
 #endif
     }
 
@@ -27,7 +25,7 @@ public static class ParseHelper
 #if NETCOREAPP3_1_OR_GREATER
         return byte.Parse(input);
 #else
-        return byte.Parse(input.ToString());
+        return Backports.Numbers.Parse<byte>(input) ?? throw new FormatException();
 #endif
     }
 
@@ -37,7 +35,7 @@ public static class ParseHelper
 #if NETCOREAPP3_1_OR_GREATER
         return sbyte.Parse(input);
 #else
-        return sbyte.Parse(input.ToString());
+        return Backports.Numbers.Parse<sbyte>(input) ?? throw new FormatException();
 #endif
     }
 
@@ -47,7 +45,7 @@ public static class ParseHelper
 #if NETCOREAPP3_1_OR_GREATER
         return short.Parse(input);
 #else
-        return short.Parse(input.ToString());
+        return Backports.Numbers.Parse<short>(input) ?? throw new FormatException();
 #endif
     }
 
@@ -57,7 +55,7 @@ public static class ParseHelper
 #if NETCOREAPP3_1_OR_GREATER
         return ushort.Parse(input);
 #else
-        return ushort.Parse(input.ToString());
+        return Backports.Numbers.Parse<ushort>(input) ?? throw new FormatException();
 #endif
     }
 
@@ -67,7 +65,7 @@ public static class ParseHelper
 #if NETCOREAPP3_1_OR_GREATER
         return int.Parse(input);
 #else
-        return int.Parse(input.ToString());
+        return Backports.Numbers.Parse<int>(input) ?? throw new FormatException();
 #endif
     }
 
@@ -77,7 +75,7 @@ public static class ParseHelper
 #if NETCOREAPP3_1_OR_GREATER
         return uint.Parse(input);
 #else
-        return uint.Parse(input.ToString());
+        return Backports.Numbers.Parse<uint>(input) ?? throw new FormatException();
 #endif
     }
 
@@ -87,7 +85,7 @@ public static class ParseHelper
 #if NETCOREAPP3_1_OR_GREATER
         return long.Parse(input);
 #else
-        return long.Parse(input.ToString());
+        return Backports.Numbers.Parse<long>(input) ?? throw new FormatException();
 #endif
     }
 
@@ -97,7 +95,7 @@ public static class ParseHelper
 #if NETCOREAPP3_1_OR_GREATER
         return ulong.Parse(input);
 #else
-        return ulong.Parse(input.ToString());
+        return Backports.Numbers.Parse<ulong>(input) ?? throw new FormatException();
 #endif
     }
 
@@ -107,7 +105,8 @@ public static class ParseHelper
 #if NETCOREAPP3_1_OR_GREATER
         return float.Parse(input, provider: nfi);
 #else
-        return float.Parse(input.ToString(), nfi);
+        return Backports.Numbers.Parse<float>(input, DefaultNumberStyle, nfi) ??
+               throw new FormatException();
 #endif
     }
 
@@ -117,7 +116,8 @@ public static class ParseHelper
 #if NETCOREAPP3_1_OR_GREATER
         return double.Parse(input, provider: nfi);
 #else
-        return double.Parse(input.ToString(), nfi);
+        return Backports.Numbers.Parse<double>(input, DefaultNumberStyle, nfi) ??
+               throw new FormatException();
 #endif
     }
 
@@ -147,7 +147,7 @@ public static class ParseHelper
 #if NETCOREAPP3_1_OR_GREATER
         return bool.TryParse(input, out value);
 #else
-        return bool.TryParse(input.ToString(), out value);
+        return Backports.Numbers.TryParse(input, out value);
 #endif
     }
 
@@ -157,7 +157,7 @@ public static class ParseHelper
 #if NETCOREAPP3_1_OR_GREATER
         return byte.TryParse(input, out value);
 #else
-        return byte.TryParse(input.ToString(), out value);
+        return Backports.Numbers.TryParse(input, out value);
 #endif
     }
 
@@ -167,7 +167,7 @@ public static class ParseHelper
 #if NETCOREAPP3_1_OR_GREATER
         return sbyte.TryParse(input, out value);
 #else
-        return sbyte.TryParse(input.ToString(), out value);
+        return Backports.Numbers.TryParse(input, out value);
 #endif
     }
 
@@ -177,7 +177,7 @@ public static class ParseHelper
 #if NETCOREAPP3_1_OR_GREATER
         return short.TryParse(input, out value);
 #else
-        return short.TryParse(input.ToString(), out value);
+        return Backports.Numbers.TryParse(input, out value);
 #endif
     }
 
@@ -187,7 +187,7 @@ public static class ParseHelper
 #if NETCOREAPP3_1_OR_GREATER
         return ushort.TryParse(input, out value);
 #else
-        return ushort.TryParse(input.ToString(), out value);
+        return Backports.Numbers.TryParse(input, out value);
 #endif
     }
 
@@ -197,7 +197,7 @@ public static class ParseHelper
 #if NETCOREAPP3_1_OR_GREATER
         return int.TryParse(input, out value);
 #else
-        return int.TryParse(input.ToString(), out value);
+        return Backports.Numbers.TryParse(input, out value);
 #endif
     }
 
@@ -207,7 +207,7 @@ public static class ParseHelper
 #if NETCOREAPP3_1_OR_GREATER
         return uint.TryParse(input, out value);
 #else
-        return uint.TryParse(input.ToString(), out value);
+        return Backports.Numbers.TryParse(input, out value);
 #endif
     }
 
@@ -217,7 +217,7 @@ public static class ParseHelper
 #if NETCOREAPP3_1_OR_GREATER
         return long.TryParse(input, out value);
 #else
-        return long.TryParse(input.ToString(), out value);
+        return Backports.Numbers.TryParse(input, out value);
 #endif
     }
 
@@ -227,7 +227,7 @@ public static class ParseHelper
 #if NETCOREAPP3_1_OR_GREATER
         return ulong.TryParse(input, out value);
 #else
-        return ulong.TryParse(input.ToString(), out value);
+        return Backports.Numbers.TryParse(input, out value);
 #endif
     }
 
@@ -237,7 +237,7 @@ public static class ParseHelper
 #if NETCOREAPP3_1_OR_GREATER
         return float.TryParse(input, DefaultNumberStyle, nfi, out value);
 #else
-        return float.TryParse(input.ToString(), out value);
+        return Backports.Numbers.TryParse(input, DefaultNumberStyle, nfi, out value);
 #endif
     }
 
@@ -247,7 +247,7 @@ public static class ParseHelper
 #if NETCOREAPP3_1_OR_GREATER
         return double.TryParse(input, DefaultNumberStyle, nfi, out value);
 #else
-        return double.TryParse(input.ToString(), out value);
+        return Backports.Numbers.TryParse(input, DefaultNumberStyle, nfi, out value);
 #endif
     }
 
