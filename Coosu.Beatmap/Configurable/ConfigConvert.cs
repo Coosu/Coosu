@@ -5,18 +5,39 @@ using System.Reflection;
 using Coosu.Beatmap.Internal;
 using Coosu.Shared.IO;
 
+#if NET6_0_OR_GREATER
+using System.Diagnostics.CodeAnalysis;
+#endif
+
 namespace Coosu.Beatmap.Configurable;
 
 public static class ConfigConvert
 {
-
+#if NET6_0_OR_GREATER
+    public static T DeserializeObject<
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties |
+                                    DynamicallyAccessedMemberTypes.NonPublicProperties |
+                                    DynamicallyAccessedMemberTypes.PublicConstructors |
+                                    DynamicallyAccessedMemberTypes.NonPublicConstructors)]
+        T>(string value, ReadOptions options) where T : Config
+#else
     public static T DeserializeObject<T>(string value, ReadOptions options) where T : Config
+#endif
     {
         using var sw = new StringReader(value);
         return DeserializeObject<T>(sw, options);
     }
 
+#if NET6_0_OR_GREATER
+    public static T DeserializeObject<
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties |
+                                    DynamicallyAccessedMemberTypes.NonPublicProperties |
+                                    DynamicallyAccessedMemberTypes.PublicConstructors |
+                                    DynamicallyAccessedMemberTypes.NonPublicConstructors)]
+        T>(TextReader reader, ReadOptions options) where T : Config
+#else
     public static T DeserializeObject<T>(TextReader reader, ReadOptions options) where T : Config
+#endif
     {
         if (options == null) throw new ArgumentNullException(nameof(options));
         var reflectInfos = GetSectionsOfType<T>();
@@ -110,7 +131,14 @@ public static class ConfigConvert
         return config;
     }
 
-    public static IReadOnlyDictionary<string, ReflectInfo>? GetSectionsOfType<T>()
+#if NET6_0_OR_GREATER
+    public static IReadOnlyDictionary<string, ReflectInfo>? GetSectionsOfType<
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties |
+                                    DynamicallyAccessedMemberTypes.NonPublicProperties)]
+        T>() where T : Config
+#else
+    public static IReadOnlyDictionary<string, ReflectInfo>? GetSectionsOfType<T>() where T : Config
+#endif
     {
         var mainType = typeof(T);
         if (!mainType.IsSubclassOf(StaticTypes.Config))
@@ -139,7 +167,10 @@ public static class ConfigConvert
         sectionNameSpan = default;
         return false;
     }
-
+    
+#if NET6_0_OR_GREATER
+    [UnconditionalSuppressMessage("Aot", "IL2072", Justification = "The 'propType' is a derivative of 'Section' and is expected to have public constructors for Activator.CreateInstance. The ReflectInfo constructor requires its 'type' parameter (propType) to be annotated with PublicConstructors, but PropertyInfo.PropertyType does not carry this annotation.")]
+#endif
     private static void AddSectionsIfPossible(PropertyInfo info, IDictionary<string, ReflectInfo> reflectInfos)
     {
         var propType = info.PropertyType;

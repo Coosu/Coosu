@@ -9,8 +9,16 @@ using Coosu.Shared;
 using Coosu.Shared.Mathematics;
 using Coosu.Shared.Numerics;
 
+#if NET6_0_OR_GREATER
+using System.Diagnostics.CodeAnalysis;
+#endif
+
 namespace Coosu.Beatmap.Sections;
 
+#if NET6_0_OR_GREATER
+[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors |
+                            DynamicallyAccessedMemberTypes.NonPublicConstructors)]
+#endif
 [SectionProperty("Events")]
 public sealed class EventSection : Section
 {
@@ -24,7 +32,7 @@ public sealed class EventSection : Section
     private string? _currentSection;
     private readonly OsuReadOptions _options;
 
-    public EventSection(Config osuFile)
+    public EventSection(OsuFile osuFile)
     {
         _options = (OsuReadOptions)osuFile.Options;
     }

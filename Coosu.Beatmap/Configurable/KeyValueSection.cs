@@ -8,6 +8,10 @@ using System.Reflection;
 using Coosu.Beatmap.Internal;
 using Coosu.Shared;
 
+#if NET6_0_OR_GREATER
+using System.Diagnostics.CodeAnalysis;
+#endif
+
 namespace Coosu.Beatmap.Configurable;
 
 public abstract class KeyValueSection : Section
@@ -16,6 +20,11 @@ public abstract class KeyValueSection : Section
 
     protected readonly SectionPropertyLookup PropertiesLookup;
 
+#if NET6_0_OR_GREATER
+    [UnconditionalSuppressMessage("Aot", "IL2067",
+        Justification =
+            "The 'thisType' (and therefore the 'type' in the lambda) is passed to AddTypeSectionInfo, which is annotated to require PublicProperties and NonPublicProperties. The AOT analyzer cannot see this through the lambda, but the requirement is met.")]
+#endif
     public KeyValueSection()
     {
         var thisType = GetType();
@@ -70,7 +79,8 @@ public abstract class KeyValueSection : Section
                 catch (Exception ex)
                 {
                     throw new ValueConvertException(
-                        $"Can not convert {{{keySpan.ToString()}}} key's value {{{valueSpan.ToString()}}} to type {propType}.", ex);
+                        $"Can not convert {{{keySpan.ToString()}}} key's value {{{valueSpan.ToString()}}} to type {propType}.",
+                        ex);
                 }
 
                 prop.SetValue(this, converted);
@@ -92,7 +102,8 @@ public abstract class KeyValueSection : Section
         }
     }
 
-    protected void MatchKeyValue(ReadOnlySpan<char> lineSpan, out ReadOnlySpan<char> keySpan, out ReadOnlySpan<char> valueSpan)
+    protected void MatchKeyValue(ReadOnlySpan<char> lineSpan, out ReadOnlySpan<char> keySpan,
+        out ReadOnlySpan<char> valueSpan)
     {
         int index = MatchFlag(lineSpan, out var flagRule);
         if (index == -1) throw new Exception($"Unknown Key-Value: {lineSpan.ToString()}");
@@ -194,6 +205,7 @@ public abstract class KeyValueSection : Section
                 };
             }
         }
+
         if (value == null && rawObj != null)
         {
             if (rawObj is float floatObj)
@@ -219,7 +231,14 @@ public abstract class KeyValueSection : Section
         textWriter.WriteLine(value);
     }
 
+#if NET6_0_OR_GREATER
+    private static Dictionary<string, SectionInfo> AddTypeSectionInfo(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties |
+                                    DynamicallyAccessedMemberTypes.NonPublicProperties)]
+        Type type)
+#else
     private static Dictionary<string, SectionInfo> AddTypeSectionInfo(Type type)
+#endif
     {
         var propertyInfos = new Dictionary<string, SectionInfo>();
         var props = type.GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
@@ -245,6 +264,7 @@ public abstract class KeyValueSection : Section
                 Attribute = sectionPropertyAttr,
             });
         }
+
         return propertyInfos;
     }
 }

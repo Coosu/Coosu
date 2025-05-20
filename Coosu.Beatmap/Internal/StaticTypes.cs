@@ -3,6 +3,10 @@ using Coosu.Beatmap.Configurable;
 using Coosu.Beatmap.Sections;
 using Coosu.Beatmap.Sections.HitObject;
 
+#if NET6_0_OR_GREATER
+using System.Diagnostics.CodeAnalysis;
+#endif
+
 namespace Coosu.Beatmap.Internal;
 
 internal static class StaticTypes
@@ -15,6 +19,10 @@ internal static class StaticTypes
 
     public static readonly Type Object = typeof(object);
     public static readonly Type Enum = typeof(Enum);
+
+#if NET6_0_OR_GREATER
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)]
+#endif
     public static readonly Type SystemConvert = typeof(Convert);
 
     public static readonly Type Boolean = typeof(bool);

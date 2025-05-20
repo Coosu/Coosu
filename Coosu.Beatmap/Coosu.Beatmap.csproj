@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net6.0;net7.0;net8.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net8.0</TargetFrameworks>
     <Description>Coosu.Beatmap is library to read and write osu!beatmap data of .osu file.</Description>
     <PackageTags>osu, osu!, osugame</PackageTags>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <IsTrimmable>false</IsTrimmable>
+    <IsTrimmable Condition="$(TargetFramework)!='netstandard2.0'">true</IsTrimmable>
     <LangVersion>11.0</LangVersion>
   </PropertyGroup>
 
