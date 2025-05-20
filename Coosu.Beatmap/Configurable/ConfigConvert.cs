@@ -4,6 +4,7 @@ using System.IO;
 using System.Reflection;
 using Coosu.Beatmap.Internal;
 using Coosu.Shared.IO;
+using System.Collections.Concurrent;
 
 #if NET6_0_OR_GREATER
 using System.Diagnostics.CodeAnalysis;
@@ -13,6 +14,9 @@ namespace Coosu.Beatmap.Configurable;
 
 public static class ConfigConvert
 {
+    private static readonly ConcurrentDictionary<Type, IReadOnlyDictionary<string, ReflectInfo>?> TypeSectionsCache =
+        new();
+
 #if NET6_0_OR_GREATER
     public static T DeserializeObject<
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties |
@@ -141,8 +145,16 @@ public static class ConfigConvert
 #endif
     {
         var mainType = typeof(T);
+        if (TypeSectionsCache.TryGetValue(mainType, out var cachedResult))
+        {
+            return cachedResult;
+        }
+
         if (!mainType.IsSubclassOf(StaticTypes.Config))
+        {
+            TypeSectionsCache.TryAdd(mainType, null);
             return null;
+        }
 
         var reflectInfos = new Dictionary<string, ReflectInfo>();
         var props = mainType
@@ -153,7 +165,9 @@ public static class ConfigConvert
             AddSectionsIfPossible(info, reflectInfos);
         }
 
-        return reflectInfos;
+        var result = reflectInfos.Count > 0 ? reflectInfos : null;
+        TypeSectionsCache.TryAdd(mainType, result);
+        return result;
     }
 
     private static bool MatchedSection(ReadOnlySpan<char> line, out ReadOnlySpan<char> sectionNameSpan)
@@ -167,9 +181,11 @@ public static class ConfigConvert
         sectionNameSpan = default;
         return false;
     }
-    
+
 #if NET6_0_OR_GREATER
-    [UnconditionalSuppressMessage("Aot", "IL2072", Justification = "The 'propType' is a derivative of 'Section' and is expected to have public constructors for Activator.CreateInstance. The ReflectInfo constructor requires its 'type' parameter (propType) to be annotated with PublicConstructors, but PropertyInfo.PropertyType does not carry this annotation.")]
+    [UnconditionalSuppressMessage("Aot", "IL2072",
+        Justification =
+            "The 'propType' is a derivative of 'Section' and is expected to have public constructors for Activator.CreateInstance. The ReflectInfo constructor requires its 'type' parameter (propType) to be annotated with PublicConstructors, but PropertyInfo.PropertyType does not carry this annotation.")]
 #endif
     private static void AddSectionsIfPossible(PropertyInfo info, IDictionary<string, ReflectInfo> reflectInfos)
     {
