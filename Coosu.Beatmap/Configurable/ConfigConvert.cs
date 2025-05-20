@@ -23,7 +23,7 @@ public static class ConfigConvert
                                     DynamicallyAccessedMemberTypes.NonPublicProperties |
                                     DynamicallyAccessedMemberTypes.PublicConstructors |
                                     DynamicallyAccessedMemberTypes.NonPublicConstructors)]
-        T>(string value, ReadOptions options) where T : Config
+    T>(string value, ReadOptions options) where T : Config
 #else
     public static T DeserializeObject<T>(string value, ReadOptions options) where T : Config
 #endif
@@ -38,7 +38,7 @@ public static class ConfigConvert
                                     DynamicallyAccessedMemberTypes.NonPublicProperties |
                                     DynamicallyAccessedMemberTypes.PublicConstructors |
                                     DynamicallyAccessedMemberTypes.NonPublicConstructors)]
-        T>(TextReader reader, ReadOptions options) where T : Config
+    T>(TextReader reader, ReadOptions options) where T : Config
 #else
     public static T DeserializeObject<T>(TextReader reader, ReadOptions options) where T : Config
 #endif
@@ -106,7 +106,7 @@ public static class ConfigConvert
                             currentSection = Activator.CreateInstance(reflectInfo.Type) as Section;
                         }
 
-                        reflectInfo.PropertyInfo.SetValue(config, currentSection);
+                        reflectInfo.Setter(config, currentSection);
                     }
                     else
                     {
@@ -139,7 +139,7 @@ public static class ConfigConvert
     public static IReadOnlyDictionary<string, ReflectInfo>? GetSectionsOfType<
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties |
                                     DynamicallyAccessedMemberTypes.NonPublicProperties)]
-        T>() where T : Config
+    T>() where T : Config
 #else
     public static IReadOnlyDictionary<string, ReflectInfo>? GetSectionsOfType<T>() where T : Config
 #endif

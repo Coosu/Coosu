@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using Coosu.Beatmap.Internal;
 
 #if NET6_0_OR_GREATER
 using System.Diagnostics.CodeAnalysis;
@@ -21,6 +22,7 @@ public sealed class ReflectInfo
         PropertyInfo = propertyInfo;
         Type = type;
         Name = name;
+        Setter = DelegateHelper.CreateSetter(propertyInfo);
     }
 
     public PropertyInfo PropertyInfo { get; }
@@ -31,4 +33,6 @@ public sealed class ReflectInfo
     public Type Type { get; }
 
     public string Name { get; }
+
+    public Action<object, object?> Setter { get; }
 }

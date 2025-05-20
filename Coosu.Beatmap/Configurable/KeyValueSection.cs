@@ -59,14 +59,14 @@ public abstract class KeyValueSection : Section
             if (attr != null)
             {
                 var converter = attr.GetConverter();
-                prop.SetValue(this, converter.ReadSection(valueSpan, propType));
+                sectionInfo.Setter(this, converter.ReadSection(valueSpan, propType));
             }
             else if (propType.IsEnum)
             {
 #if NETCOREAPP3_1_OR_GREATER || NET5_0_OR_GREATER
-                prop.SetValue(this, Enum.Parse(propType, valueSpan));
+                sectionInfo.Setter(this, Enum.Parse(propType, valueSpan));
 #else
-                prop.SetValue(this, Enum.Parse(propType, valueSpan.ToString()));
+                sectionInfo.Setter(this, Enum.Parse(propType, valueSpan.ToString()));
 #endif
             }
             else
@@ -83,7 +83,7 @@ public abstract class KeyValueSection : Section
                         ex);
                 }
 
-                prop.SetValue(this, converted);
+                sectionInfo.Setter(this, converted);
             }
         }
     }
@@ -148,7 +148,7 @@ public abstract class KeyValueSection : Section
         var prop = sectionInfo.PropertyInfo;
 
         string? value = null;
-        var rawObj = prop.GetValue(this);
+        var rawObj = sectionInfo.Getter(this);
         if (sectionInfo.Attribute?.Default != null)
         {
             if (sectionInfo.Attribute.Default is SectionPropertyAttribute.DefaultValue)
@@ -173,7 +173,7 @@ public abstract class KeyValueSection : Section
             return;
         }
 
-        if (prop.GetMethod!.ReturnType.BaseType == StaticTypes.Enum && rawObj != null)
+        if (prop.GetMethod!.ReturnType.IsEnum && rawObj != null)
         {
             var enumAttr = prop.GetCustomAttribute<SectionEnumAttribute>(false);
             if (enumAttr != null)

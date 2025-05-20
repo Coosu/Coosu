@@ -13,6 +13,7 @@ public static class TimingExtensions
     /// <summary>
     /// 获取当前bpm的节奏的间隔
     /// </summary>
+    /// <param name="timingSection"></param>
     /// <param name="multiple">multiple: 1, 0.5, 1/3d, etc.</param>
     /// <returns></returns>
     public static Dictionary<double, double> GetInterval(this TimingSection timingSection, double multiple)
