@@ -63,10 +63,13 @@ class Program
             Console.WriteLine($"  AlwaysShowPlayfield: {general.AlwaysShowPlayfield}");
             Console.WriteLine($"  TimelineZoom (General): {general.TimelineZoom}");
 
-            Console.WriteLine("\n!!Undefined pairs in General section: ");
-            foreach (var pair in osuFile.General.UndefinedPairs)
+            if (osuFile.General.UndefinedPairs.Count > 0)
             {
-                Console.WriteLine($"  {pair.Key}: {pair.Value}");
+                Console.WriteLine("\n!!Undefined pairs in General section: ");
+                foreach (var pair in osuFile.General.UndefinedPairs)
+                {
+                    Console.WriteLine($"  {pair.Key}: {pair.Value}");
+                }
             }
         }
 
@@ -80,10 +83,13 @@ class Program
             Console.WriteLine($"  GridSize: {editor.GridSize}");
             Console.WriteLine($"  TimelineZoom (Editor): {editor.TimelineZoom}");
 
-            Console.WriteLine("\n!!Undefined pairs in Editor section: ");
-            foreach (var pair in osuFile.Editor.UndefinedPairs)
+            if (osuFile.Editor.UndefinedPairs.Count > 0)
             {
-                Console.WriteLine($"  {pair.Key}: {pair.Value}");
+                Console.WriteLine("\n!!Undefined pairs in Editor section: ");
+                foreach (var pair in osuFile.Editor.UndefinedPairs)
+                {
+                    Console.WriteLine($"  {pair.Key}: {pair.Value}");
+                }
             }
         }
 
@@ -102,10 +108,13 @@ class Program
             Console.WriteLine($"  BeatmapID: {metadata.BeatmapId}");
             Console.WriteLine($"  BeatmapSetID: {metadata.BeatmapSetId}");
 
-            Console.WriteLine("\n!!Undefined pairs in Metadata section: ");
-            foreach (var pair in osuFile.Metadata.UndefinedPairs)
+            if (osuFile.Metadata.UndefinedPairs.Count > 0)
             {
-                Console.WriteLine($"  {pair.Key}: {pair.Value}");
+                Console.WriteLine("\n!!Undefined pairs in Metadata section: ");
+                foreach (var pair in osuFile.Metadata.UndefinedPairs)
+                {
+                    Console.WriteLine($"  {pair.Key}: {pair.Value}");
+                }
             }
         }
 
@@ -120,10 +129,13 @@ class Program
             Console.WriteLine($"  SliderMultiplier: {difficulty.SliderMultiplier}");
             Console.WriteLine($"  SliderTickRate: {difficulty.SliderTickRate}");
 
-            Console.WriteLine("\n!!Undefined pairs in Difficulty section: ");
-            foreach (var pair in osuFile.Difficulty.UndefinedPairs)
+            if (osuFile.Difficulty.UndefinedPairs.Count > 0)
             {
-                Console.WriteLine($"  {pair.Key}: {pair.Value}");
+                Console.WriteLine("\n!!Undefined pairs in Difficulty section: ");
+                foreach (var pair in osuFile.Difficulty.UndefinedPairs)
+                {
+                    Console.WriteLine($"  {pair.Key}: {pair.Value}");
+                }
             }
         }
 
@@ -243,10 +255,13 @@ class Program
                 Console.WriteLine($"  SliderBorder: R={color.X}, G={color.Y}, B={color.Z}");
             }
 
-            Console.WriteLine("\n!!Undefined pairs in Difficulty section: ");
-            foreach (var pair in osuFile.Colours.UndefinedPairs)
+            if (osuFile.Colours.UndefinedPairs.Count > 0)
             {
-                Console.WriteLine($"  {pair.Key}: {pair.Value}");
+                Console.WriteLine("\n!!Undefined pairs in Difficulty section: ");
+                foreach (var pair in osuFile.Colours.UndefinedPairs)
+                {
+                    Console.WriteLine($"  {pair.Key}: {pair.Value}");
+                }
             }
         }
 

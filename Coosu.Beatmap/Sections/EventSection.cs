@@ -15,10 +15,11 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Coosu.Beatmap.Sections;
 
-[SectionProperty("Events")]
 #if NET6_0_OR_GREATER
-[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.NonPublicConstructors)]
+[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors |
+                            DynamicallyAccessedMemberTypes.NonPublicConstructors)]
 #endif
+[SectionProperty("Events")]
 public sealed class EventSection : Section
 {
     private const string SectionBgVideo = "//Background and Video events";

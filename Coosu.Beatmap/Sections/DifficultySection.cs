@@ -1,7 +1,18 @@
 ﻿using Coosu.Beatmap.Configurable;
 
+#if NET6_0_OR_GREATER
+using System.Diagnostics.CodeAnalysis;
+#endif
+
 namespace Coosu.Beatmap.Sections;
 
+#if NET6_0_OR_GREATER
+[DynamicallyAccessedMembers(
+    DynamicallyAccessedMemberTypes.PublicProperties |
+    DynamicallyAccessedMemberTypes.NonPublicProperties |
+    DynamicallyAccessedMemberTypes.PublicConstructors |
+    DynamicallyAccessedMemberTypes.NonPublicConstructors)]
+#endif
 [SectionProperty("Difficulty")]
 public sealed class DifficultySection : KeyValueSection
 {

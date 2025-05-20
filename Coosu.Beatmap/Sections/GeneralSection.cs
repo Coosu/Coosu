@@ -8,10 +8,14 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Coosu.Beatmap.Sections;
 
-[SectionProperty("General")]
 #if NET6_0_OR_GREATER
-[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.NonPublicConstructors)]
+[DynamicallyAccessedMembers(
+    DynamicallyAccessedMemberTypes.PublicConstructors |
+    DynamicallyAccessedMemberTypes.NonPublicConstructors |
+    DynamicallyAccessedMemberTypes.PublicProperties
+    | DynamicallyAccessedMemberTypes.NonPublicProperties)]
 #endif
+[SectionProperty("General")]
 public sealed class GeneralSection : KeyValueSection
 {
     /// <summary>

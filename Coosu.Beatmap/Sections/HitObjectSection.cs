@@ -16,10 +16,11 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Coosu.Beatmap.Sections;
 
-[SectionProperty("HitObjects")]
 #if NET6_0_OR_GREATER
-[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.NonPublicConstructors)]
+[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | 
+                            DynamicallyAccessedMemberTypes.NonPublicConstructors)]
 #endif
+[SectionProperty("HitObjects")]
 public sealed class HitObjectSection : Section
 {
     private readonly TimingSection _timingSection;

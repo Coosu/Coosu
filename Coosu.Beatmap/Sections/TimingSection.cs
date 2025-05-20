@@ -14,10 +14,11 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Coosu.Beatmap.Sections;
 
-[SectionProperty("TimingPoints")]
 #if NET6_0_OR_GREATER
-[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.NonPublicConstructors)]
+[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors |
+                            DynamicallyAccessedMemberTypes.NonPublicConstructors)]
 #endif
+[SectionProperty("TimingPoints")]
 public sealed class TimingSection : Section
 {
     private readonly OsuFile _osuFile;

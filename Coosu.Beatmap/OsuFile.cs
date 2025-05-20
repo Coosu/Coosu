@@ -20,15 +20,26 @@ public class OsuFile : Config
     private const string VerFlag = "osu file format v";
 
 #if NET6_0_OR_GREATER
-    [DynamicDependency(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor, typeof(GeneralSection))]
-    [DynamicDependency(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor, typeof(EditorSection))]
-    [DynamicDependency(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor, typeof(MetadataSection))]
-    [DynamicDependency(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor, typeof(DifficultySection))]
+    [DynamicDependency(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor |
+                       DynamicallyAccessedMemberTypes.PublicProperties |
+                       DynamicallyAccessedMemberTypes.NonPublicProperties, typeof(GeneralSection))]
+    [DynamicDependency(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor |
+                       DynamicallyAccessedMemberTypes.PublicProperties |
+                       DynamicallyAccessedMemberTypes.NonPublicProperties, typeof(EditorSection))]
+    [DynamicDependency(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor |
+                       DynamicallyAccessedMemberTypes.PublicProperties |
+                       DynamicallyAccessedMemberTypes.NonPublicProperties, typeof(MetadataSection))]
+    [DynamicDependency(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor |
+                       DynamicallyAccessedMemberTypes.PublicProperties |
+                       DynamicallyAccessedMemberTypes.NonPublicProperties, typeof(DifficultySection))]
+    [DynamicDependency(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor |
+                       DynamicallyAccessedMemberTypes.PublicProperties |
+                       DynamicallyAccessedMemberTypes.NonPublicProperties, typeof(ColorSection))]
     [DynamicDependency(DynamicallyAccessedMemberTypes.PublicConstructors, typeof(EventSection))]
-    [DynamicDependency(DynamicallyAccessedMemberTypes.PublicConstructors, typeof(TimingSection))]
-    [DynamicDependency(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor, typeof(ColorSection))]
     [DynamicDependency(DynamicallyAccessedMemberTypes.PublicConstructors, typeof(HitObjectSection))]
+    [DynamicDependency(DynamicallyAccessedMemberTypes.PublicConstructors, typeof(TimingSection))]
 #endif
+
     protected OsuFile()
     {
     }
