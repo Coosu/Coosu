@@ -1,15 +1,18 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 
 namespace Coosu.Shared;
 
 public static class StringExtensions
 {
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static CharSplitEnumerator SpanSplit(this string str, char c, SpanSplitArgs? e = null)
     {
         // LineSplitEnumerator is a struct so there is no allocation here
         return new CharSplitEnumerator(str.AsSpan(), c, e);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static CharSplitEnumerator SpanSplit(this ReadOnlySpan<char> span, char c, SpanSplitArgs? e = null)
     {
         // LineSplitEnumerator is a struct so there is no allocation here
@@ -35,6 +38,7 @@ public static class StringExtensions
         }
 
         // Needed to be compatible with the foreach operator
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public CharSplitEnumerator GetEnumerator() => this;
 
         public bool MoveNext()
@@ -64,7 +68,17 @@ public static class StringExtensions
             return true;
         }
 
-        public ReadOnlySpan<char> Current { get; private set; }
-        public int CurrentIndex => _currentIndex;
+        public ReadOnlySpan<char> Current
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get;
+            private set;
+        }
+
+        public int CurrentIndex
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => _currentIndex;
+        }
     }
 }
