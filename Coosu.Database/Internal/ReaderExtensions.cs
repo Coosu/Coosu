@@ -17,60 +17,27 @@ internal static class ReaderExtensions
         }
 
         return binaryReader.ReadString();
+    }
 
-        //        var rawLength = binaryReader.BaseStream.ReadLEB128Unsigned();
-        //        if (rawLength > int.MaxValue)
-        //        {
-        //            throw new ArgumentException("Error while reading string flag. The string length is too long.");
-        //        }
+    public static IntSinglePair ReadIntSinglePairA(this BinaryReader binaryReader)
+    {
+        var flag = binaryReader.ReadByte();
+        if (flag != 0x08)
+        {
+            throw new ArgumentOutOfRangeException(nameof(flag), $"0x{flag:X2}",
+                "Error while reading IntSinglePair first flag.");
+        }
 
-        //        var length = (int)rawLength;
-        //        if (length == 0) return "";
+        var intValue = binaryReader.ReadInt32();
+        flag = binaryReader.ReadByte();
+        if (flag != 0x0c)
+        {
+            throw new ArgumentOutOfRangeException(nameof(flag), $"0x{flag:X2}",
+                "Error while reading IntSinglePair second flag.");
+        }
 
-        //        byte[]? buffer = null;
-
-        //        Span<byte> span = length <= Constants.MaxStackLength
-        //            ? stackalloc byte[length]
-        //            : buffer = ArrayPool<byte>.Shared.Rent(length);
-        //        try
-        //        {
-        //            if (buffer != null)
-        //            {
-        //                span = span.Slice(0, length);
-        //            }
-
-        //#if NETFRAMEWORK
-        //            for (var i = 0; i < span.Length; i++)
-        //            {
-        //                span[i] = (byte)binaryReader.BaseStream.ReadByte();
-        //            }
-
-        //            unsafe
-        //            {
-        //                fixed (byte* p = span)
-        //                {
-        //                    var str = Encoding.UTF8.GetString(p, span.Length);
-        //                    return str;
-        //                }
-        //            }
-        //#else
-        //            var readLen = binaryReader.BaseStream.Read(span);
-        //            if (readLen < length)
-        //            {
-        //                throw new ArgumentException("Error while reading string. The string length doesn't match.");
-        //            }
-
-        //            var str = Encoding.UTF8.GetString(span);
-        //            return str;
-        //#endif
-        //        }
-        //        finally
-        //        {
-        //            if (buffer != null)
-        //            {
-        //                ArrayPool<byte>.Shared.Return(buffer);
-        //            }
-        //        }
+        var singleValue = binaryReader.ReadSingle();
+        return new IntSinglePair(intValue, singleValue);
     }
 
     public static IntDoublePair ReadIntDoublePairA(this BinaryReader binaryReader)

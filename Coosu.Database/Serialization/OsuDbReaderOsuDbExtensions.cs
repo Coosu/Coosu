@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Coosu.Database.DataTypes;
 using Coosu.Database.Internal;
@@ -136,14 +136,14 @@ public static class OsuDbReaderOsuDbExtensions
         }
     }
 
-    private static void FillStarRating(Dictionary<Mods, double> dictionary, OsuDbReader reader)
+    private static void FillStarRating(Dictionary<Mods, float> dictionary, OsuDbReader reader)
     {
         while (!reader.IsEndOfStream && reader.Read())
         {
             if (reader.NodeType == NodeType.ArrayEnd) break;
-            var data = reader.GetIntDoublePair();
+            var data = reader.GetIntSinglePair();
             var mods = (Mods)data.IntValue;
-            dictionary.Add(mods, data.DoubleValue);
+            dictionary.Add(mods, data.SingleValue);
         }
     }
 

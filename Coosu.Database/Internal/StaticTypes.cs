@@ -15,6 +15,7 @@ internal static class StaticTypes
     public static readonly Type String = typeof(string);
     public static readonly Type DateTime = typeof(DateTime);
     public static readonly Type TimeSpan = typeof(TimeSpan);
+    public static readonly Type IntSinglePair = typeof(IntSinglePair);
     public static readonly Type IntDoublePair = typeof(IntDoublePair);
     public static readonly Type TimingPoint = typeof(TimingPoint);
 }

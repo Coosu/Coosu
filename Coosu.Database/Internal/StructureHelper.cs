@@ -156,6 +156,8 @@ internal sealed class StructureHelper
             return DataType.String;
         if (targetType == StaticTypes.DateTime)
             return DataType.DateTime;
+        if (targetType == StaticTypes.IntSinglePair)
+            return DataType.Single;
         if (targetType == StaticTypes.IntDoublePair)
             return DataType.Double;
         if (targetType == StaticTypes.TimingPoint)

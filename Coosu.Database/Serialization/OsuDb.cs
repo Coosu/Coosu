@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using Coosu.Database.Annotations;
@@ -12,7 +12,7 @@ public class OsuDb
     public int FolderCount { get; set; }
     public bool AccountUnlocked { get; set; }
     public DateTime UnlockDate { get; set; }
-    public string PlayerName { get; set; }
+    public string PlayerName { get; set; } = null!;
     internal int BeatmapCount => Beatmaps?.Count ?? 0;
 
     [StructureArray(typeof(Beatmap), nameof(BeatmapCount),

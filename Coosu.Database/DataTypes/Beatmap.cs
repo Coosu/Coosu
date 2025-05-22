@@ -30,30 +30,30 @@ public record Beatmap
     internal int StarRatingStdCount => StarRatingStd?.Count ?? 0;
 
     [StructureArray(typeof(IntDoublePair), nameof(StarRatingStdCount),
-        ValueHandler = typeof(IntDoublePairHandler),
-        Converter = typeof(IntDoublePair2ModKeyValueConverter))]
-    public Dictionary<Mods, double>? StarRatingStd { get; set; }
+        ValueHandler = typeof(IntSinglePairHandler),
+        Converter = typeof(IntSinglePair2ModKeyValueConverter))]
+    public Dictionary<Mods, float>? StarRatingStd { get; set; }
 
     internal int StarRatingTaikoCount => StarRatingTaiko?.Count ?? 0;
 
     [StructureArray(typeof(IntDoublePair), nameof(StarRatingTaikoCount),
-        ValueHandler = typeof(IntDoublePairHandler),
-        Converter = typeof(IntDoublePair2ModKeyValueConverter))]
-    public Dictionary<Mods, double>? StarRatingTaiko { get; set; }
+        ValueHandler = typeof(IntSinglePairHandler),
+        Converter = typeof(IntSinglePair2ModKeyValueConverter))]
+    public Dictionary<Mods, float>? StarRatingTaiko { get; set; }
 
     internal int StarRatingCtbCount => StarRatingCtb?.Count ?? 0;
 
     [StructureArray(typeof(IntDoublePair), nameof(StarRatingCtbCount),
-        ValueHandler = typeof(IntDoublePairHandler),
-        Converter = typeof(IntDoublePair2ModKeyValueConverter))]
-    public Dictionary<Mods, double>? StarRatingCtb { get; set; }
+        ValueHandler = typeof(IntSinglePairHandler),
+        Converter = typeof(IntSinglePair2ModKeyValueConverter))]
+    public Dictionary<Mods, float>? StarRatingCtb { get; set; }
 
     internal int StarRatingManiaCount => StarRatingMania?.Count ?? 0;
 
-    [StructureArray(typeof(IntDoublePair), nameof(StarRatingManiaCount),
-        ValueHandler = typeof(IntDoublePairHandler),
-        Converter = typeof(IntDoublePair2ModKeyValueConverter))]
-    public Dictionary<Mods, double>? StarRatingMania { get; set; }
+    [StructureArray(typeof(IntSinglePair), nameof(StarRatingManiaCount),
+        ValueHandler = typeof(IntSinglePairHandler),
+        Converter = typeof(IntSinglePair2ModKeyValueConverter))]
+    public Dictionary<Mods, float>? StarRatingMania { get; set; }
 
     [StructureType(DataType.Int32)]
     public TimeSpan DrainTime { get; set; }
