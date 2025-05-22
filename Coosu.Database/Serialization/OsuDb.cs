@@ -1,8 +1,9 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using Coosu.Database.Annotations;
 using Coosu.Database.DataTypes;
+using Coosu.Database.Generated;
 
 namespace Coosu.Database.Serialization;
 
@@ -31,34 +32,30 @@ public class OsuDb
         var osuDb = new OsuDb();
         using var reader = new OsuDbReader(stream);
 
-        int itemIndex = -1;
         int beatmapCount = 0;
         while (!reader.IsEndOfStream && reader.Read())
         {
             var name = reader.Name;
             var nodeType = reader.NodeType;
+            var nodeId = (NodeId)reader.NodeId;
 
-            if (nodeType is NodeType.ArrayStart or NodeType.KeyValue)
-            {
-                itemIndex++;
-            }
-            else
+            if (nodeType is not (NodeType.ArrayStart or NodeType.KeyValue))
             {
                 continue;
             }
 
-            if (itemIndex == 0) osuDb.OsuVersion = reader.GetInt32();
-            else if (itemIndex == 1) osuDb.FolderCount = reader.GetInt32();
-            else if (itemIndex == 2) osuDb.AccountUnlocked = reader.GetBoolean();
-            else if (itemIndex == 3) osuDb.UnlockDate = reader.GetDateTime();
-            else if (itemIndex == 4) osuDb.PlayerName = reader.GetString();
-            else if (itemIndex == 5) beatmapCount = reader.GetInt32();
-            else if (itemIndex == 6)
+            if (nodeId == NodeId.OsuDb_OsuVersion) osuDb.OsuVersion = reader.GetInt32();
+            else if (nodeId == NodeId.OsuDb_FolderCount) osuDb.FolderCount = reader.GetInt32();
+            else if (nodeId == NodeId.OsuDb_AccountUnlocked) osuDb.AccountUnlocked = reader.GetBoolean();
+            else if (nodeId == NodeId.OsuDb_UnlockDate) osuDb.UnlockDate = reader.GetDateTime();
+            else if (nodeId == NodeId.OsuDb_PlayerName) osuDb.PlayerName = reader.GetString();
+            else if (nodeId == NodeId.OsuDb_BeatmapCount) beatmapCount = reader.GetInt32();
+            else if (nodeId == NodeId.OsuDb_BeatmapArray)
             {
                 osuDb.Beatmaps.Capacity = beatmapCount;
                 osuDb.Beatmaps.AddRange(reader.EnumerateBeatmaps());
             }
-            else if (itemIndex == 7) osuDb.Permissions = (Permissions)reader.GetInt32();
+            else if (nodeId == NodeId.OsuDb_Permissions) osuDb.Permissions = (Permissions)reader.GetInt32();
         }
 
         return osuDb;
