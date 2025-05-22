@@ -482,7 +482,7 @@ if (someOsuFileInDir != null)
     *   Slider tick sounds.
     *   Continuous slider slide and slider whistle sounds (represented by start/stop `ControlNode`s).
 
-## Performance & Benchmarks
+## Performance
 
 Coosu.Beatmap is designed with performance in mind. It utilizes techniques like:
 
