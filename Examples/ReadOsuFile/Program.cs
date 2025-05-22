@@ -1,4 +1,8 @@
-﻿using Coosu.Beatmap;
+﻿using System;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using Coosu.Beatmap;
 using Coosu.Beatmap.Sections.HitObject;
 using Coosu.Beatmap.Sections.Timing;
 

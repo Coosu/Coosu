@@ -1,4 +1,8 @@
-﻿dotnet build WritingOsuBenchmark --configuration Release --framework net6.0
-if ($LASTEXITCODE -eq 0) {
-  Start-Process .\WritingOsuBenchmark\bin\Release\net6.0\WritingOsuBenchmark.exe -WorkingDirectory .\WritingOsuBenchmark\bin\Release\net6.0 -NoNewWindow -Wait
+﻿Push-Location ./WritingOsuBenchmark
+try {
+    dotnet build --configuration Release --framework "net8.0" 
+    dotnet run --configuration Release --framework "net8.0" --no-build
+}
+finally {
+    Pop-Location
 }

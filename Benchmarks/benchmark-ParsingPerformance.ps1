@@ -1,4 +1,8 @@
-﻿dotnet build ParsingPerformanceTest --configuration Release --framework net6.0
-if ($LASTEXITCODE -eq 0) {
-  Start-Process .\ParsingPerformanceTest\bin\Release\net6.0\ParsingPerformanceTest.exe -WorkingDirectory .\ParsingPerformanceTest\bin\Release\net6.0 -NoNewWindow -Wait
+﻿Push-Location ./ParsingPerformanceTest
+try {
+    dotnet build --configuration Release --framework "net8.0" 
+    dotnet run --configuration Release --framework "net8.0" --no-build
+}
+finally {
+    Pop-Location
 }

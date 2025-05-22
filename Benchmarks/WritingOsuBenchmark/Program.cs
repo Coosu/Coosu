@@ -6,8 +6,12 @@ using System.Numerics;
 using System.Reflection;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Columns;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Running;
 using Coosu.Beatmap;
@@ -17,6 +21,87 @@ using Newtonsoft.Json.Serialization;
 using OsuParsers.Beatmaps;
 
 namespace WritingOsuBenchmark;
+
+public class Program
+{
+    static void Main(string[] args)
+    {
+        var config = new ManualConfig()
+            .AddExporter(MarkdownExporter.GitHub)
+            .AddLogger(ConsoleLogger.Default)
+            .AddDiagnoser(MemoryDiagnoser.Default)
+            .AddColumnProvider(DefaultColumnProviders.Instance)
+            .WithOptions(ConfigOptions.DisableLogFile);
+        BenchmarkRunner.Run<WritingTask>(config);
+    }
+
+    [SimpleJob(RuntimeMoniker.Net48)]
+    [SimpleJob(RuntimeMoniker.Net80)]
+    [MemoryDiagnoser]
+    [Orderer(SummaryOrderPolicy.FastestToSlowest)]
+    public class WritingTask
+    {
+        private string _path = null!;
+        private LocalOsuFile _coosu = null!;
+        private Beatmap _osuParsers = null!;
+        private JsonSerializer _serializer = null!;
+
+        [GlobalSetup]
+        public void Setup()
+        {
+            var path = Environment.GetEnvironmentVariable("test_osu_path");
+            _path = path ?? "test.osu";
+
+            _coosu = OsuFile.ReadFromFileAsync(_path).Result;
+            _osuParsers = global::OsuParsers.Decoders.BeatmapDecoder.Decode(_path);
+            _serializer = new JsonSerializer
+            {
+                ContractResolver = new MyContractResolver(),
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            };
+            _serializer.Converters.Add(new Vector2Converter());
+        }
+
+        [Benchmark(Baseline = true)]
+        public object? Coosu()
+        {
+            _coosu.Save("CoosuLatest_Write.osu");
+            return _coosu;
+        }
+
+        [Benchmark]
+        public object? JsonDotNet()
+        {
+            using var sw = new StreamWriter(@"JsonDotNet_Write.json");
+            _serializer.Serialize(sw, _coosu);
+            return _serializer;
+        }
+
+        [Benchmark]
+        public object? OsuParsers()
+        {
+            _osuParsers.Save("OsuParsers_Write.osu");
+            return _osuParsers;
+        }
+    }
+}
+
+internal class Vector2Converter : JsonConverter<Vector2>
+{
+    public override void WriteJson(JsonWriter writer, Vector2 value, JsonSerializer serializer)
+    {
+        writer.WriteStartArray();
+        writer.WriteValue(value.X);
+        writer.WriteValue(value.Y);
+        writer.WriteEndArray();
+    }
+
+    public override Vector2 ReadJson(JsonReader reader, Type objectType, Vector2 existingValue, bool hasExistingValue,
+        JsonSerializer serializer)
+    {
+        throw new NotImplementedException();
+    }
+}
 
 public class MyContractResolver : DefaultContractResolver
 {
@@ -40,110 +125,5 @@ public class MyContractResolver : DefaultContractResolver
         }
 
         return list;
-    }
-}
-
-public class Program
-{
-    static void Main(string[] args)
-    {
-        //var fi = new FileInfo(@"test.osu");
-        var fi = new FileInfo(@"F:\milkitic\Songs\1376486 Risshuu feat. Choko - Take\Risshuu feat. Choko - Take (yf_bmp) [Ta~ke take take take take take tatata~].osu");
-        if (!fi.Exists)
-            throw new FileNotFoundException("Test file does not exists: " + fi.FullName);
-        Environment.SetEnvironmentVariable("test_osu_path", fi.FullName);
-        var osu = OsuFile.ReadFromFileAsync(fi.FullName).Result;
-        osu.Save("new.osu");
-        using (var file = File.CreateText(@"new.json"))
-        {
-            var serializer = new JsonSerializer()
-            {
-                Formatting = Formatting.Indented,
-                ContractResolver = new MyContractResolver(),
-            };
-            serializer.Converters.Add(new Vector2Converter());
-            serializer.Serialize(file, osu);
-        }
-        //var sb = new StringBuilder();
-        //for (int i = 0; i < 5000; i++)
-        //{
-        //    osu.WriteOsuFile("new.osu");
-        //    Console.WriteLine(i);
-        //}
-
-        //return;
-
-        var osu2 = OsuFile.ReadFromFileAsync(fi.FullName).Result;
-        osu2.Save("old.osu");
-
-        var summary = BenchmarkRunner.Run<WritingTask>(/*config*/);
-    }
-
-    [SimpleJob(RuntimeMoniker.Net48)]
-    [SimpleJob(RuntimeMoniker.Net60)]
-    [SimpleJob(RuntimeMoniker.Net80)]
-    [MemoryDiagnoser]
-    [Orderer(SummaryOrderPolicy.FastestToSlowest)]
-    [MarkdownExporter]
-    public class WritingTask
-    {
-        private readonly string _path;
-        private readonly LocalOsuFile _latest;
-        private readonly Beatmap _osuParsers;
-        private readonly JsonSerializer _serializer;
-
-        public WritingTask()
-        {
-            var path = Environment.GetEnvironmentVariable("test_osu_path");
-            _path = path;
-            Console.WriteLine(_path);
-            _latest = OsuFile.ReadFromFileAsync(_path).Result;
-            _osuParsers = OsuParsers.Decoders.BeatmapDecoder.Decode(_path);
-            _serializer = new JsonSerializer
-            {
-                //Formatting = Formatting.Indented,
-                ContractResolver = new MyContractResolver(),
-            };
-            _serializer.Converters.Add(new Vector2Converter());
-        }
-
-        [Benchmark(Baseline = true)]
-        public async Task<object?> CoosuLatest_Write()
-        {
-            _latest.Save("CoosuLatest_Write.txt");
-            return null;
-        }
-
-        [Benchmark]
-        public async Task<object?> JsonDotNet_Write()
-        {
-            using var sw = new StreamWriter(@"JsonDotNet_Write.json");
-            _serializer.Serialize(sw, _latest);
-            return null;
-        }
-
-        [Benchmark]
-        public async Task<object?> OsuParsers_Write()
-        {
-            _osuParsers.Save("OsuParsers_Write.txt");
-            return null;
-        }
-    }
-}
-
-internal class Vector2Converter : JsonConverter<Vector2>
-{
-    public override void WriteJson(JsonWriter writer, Vector2 value, JsonSerializer serializer)
-    {
-        writer.WriteStartArray();
-        writer.WriteValue(value.X);
-        writer.WriteValue(value.Y);
-        writer.WriteEndArray();
-    }
-
-    public override Vector2 ReadJson(JsonReader reader, Type objectType, Vector2 existingValue, bool hasExistingValue,
-        JsonSerializer serializer)
-    {
-        throw new NotImplementedException();
     }
 }
