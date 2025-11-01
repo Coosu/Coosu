@@ -54,15 +54,6 @@ public class OsuFile : Config
     public ColorSection? Colours { get; set; }
     public HitObjectSection? HitObjects { get; set; }
 
-    private string Filename
-    {
-        get
-        {
-            Metadata ??= new MetadataSection();
-            return this.GetOsuFilename(Metadata.Version);
-        }
-    }
-
     public static OsuFile CreateEmpty()
     {
         var emptyFile = new OsuFile
@@ -135,7 +126,7 @@ public class OsuFile : Config
         WriteToPath(path);
     }
 
-    public override string ToString() => Filename;
+    public override string ToString() => this.Filename;
 
     public override void OnDeserialized()
     {

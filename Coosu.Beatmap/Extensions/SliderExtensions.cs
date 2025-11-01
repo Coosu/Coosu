@@ -6,64 +6,215 @@ using Coosu.Beatmap.Sections.HitObject;
 using Coosu.Beatmap.Utils;
 using Coosu.Shared;
 
-// ReSharper disable once CheckNamespace
 namespace Coosu.Beatmap;
 
 public static class SliderExtensions
 {
-    public static IEnumerable<SliderEdge> EnumerateEdges(this ExtendedSliderInfo sliderInfo)
+    extension(ExtendedSliderInfo sliderInfo)
     {
-        for (var i = 0; i < sliderInfo.Repeat + 1; i++)
+        public IEnumerable<SliderEdge> EnumerateEdges()
         {
-            yield return new SliderEdge
-            (
-                offset: sliderInfo.StartTime + sliderInfo.CurrentSingleDuration * i,
-                point: i % 2 == 0 ? sliderInfo.StartPoint : sliderInfo.EndPoint,
-                edgeHitsound: sliderInfo.EdgeHitsounds?[i] ?? sliderInfo.BaseObject.Hitsound,
-                edgeSample: sliderInfo.EdgeSamples?[i] ?? sliderInfo.BaseObject.SampleSet,
-                edgeAddition: sliderInfo.EdgeAdditions?[i] ?? sliderInfo.BaseObject.AdditionSet,
-                isHitsoundDefined: sliderInfo.EdgeHitsounds == null
-            );
-        }
-    }
-
-    public static SliderEdge[] GetEdges(this ExtendedSliderInfo sliderInfo)
-    {
-        return EnumerateEdges(sliderInfo).ToArray();
-    }
-
-    public static SliderTick[] GetSliderTicks(this ExtendedSliderInfo sliderInfo)
-    {
-        var tickInterval = sliderInfo.CurrentBeatDuration / sliderInfo.CurrentTickRate;
-        return ComputeDiscreteData(sliderInfo, tickInterval);
-    }
-
-    public static SliderTick[] GetSliderSlides(this ExtendedSliderInfo sliderInfo)
-    {
-        // 60fps
-        var interval = 1000 / 60d;
-        return ComputeDiscreteData(sliderInfo, interval);
-    }
-
-    // todo: not cut by rhythm
-    public static SliderTick[] ComputeDiscreteData(this ExtendedSliderInfo sliderInfo, double intervalMilliseconds)
-    {
-        SliderTick[] ticks;
-        switch (sliderInfo.SliderType)
-        {
-            case SliderType.Bezier:
-            case SliderType.Linear:
-                ticks = ComputeBezierDiscreteData(sliderInfo, intervalMilliseconds);
-                break;
-            case SliderType.Perfect:
-                ticks = ComputePerfectDiscreteData(sliderInfo, intervalMilliseconds);
-                break;
-            default:
-                ticks = EmptyArray<SliderTick>.Value;
-                break;
+            for (var i = 0; i < sliderInfo.Repeat + 1; i++)
+            {
+                yield return new SliderEdge
+                (
+                    offset: sliderInfo.StartTime + sliderInfo.CurrentSingleDuration * i,
+                    point: i % 2 == 0 ? sliderInfo.StartPoint : sliderInfo.EndPoint,
+                    edgeHitsound: sliderInfo.EdgeHitsounds?[i] ?? sliderInfo.BaseObject.Hitsound,
+                    edgeSample: sliderInfo.EdgeSamples?[i] ?? sliderInfo.BaseObject.SampleSet,
+                    edgeAddition: sliderInfo.EdgeAdditions?[i] ?? sliderInfo.BaseObject.AdditionSet,
+                    isHitsoundDefined: sliderInfo.EdgeHitsounds == null
+                );
+            }
         }
 
-        return ticks.ToArray();
+        public SliderEdge[] GetEdges()
+        {
+            return EnumerateEdges(sliderInfo).ToArray();
+        }
+
+        public SliderTick[] GetSliderTicks()
+        {
+            var tickInterval = sliderInfo.CurrentBeatDuration / sliderInfo.CurrentTickRate;
+            return ComputeDiscreteData(sliderInfo, tickInterval);
+        }
+
+        public SliderTick[] GetSliderSlides()
+        {
+            // 60fps
+            var interval = 1000 / 60d;
+            return ComputeDiscreteData(sliderInfo, interval);
+        }
+
+        // todo: not cut by rhythm
+        public SliderTick[] ComputeDiscreteData(double intervalMilliseconds)
+        {
+            SliderTick[] ticks;
+            switch (sliderInfo.SliderType)
+            {
+                case SliderType.Bezier:
+                case SliderType.Linear:
+                    ticks = ComputeBezierDiscreteData(sliderInfo, intervalMilliseconds);
+                    break;
+                case SliderType.Perfect:
+                    ticks = ComputePerfectDiscreteData(sliderInfo, intervalMilliseconds);
+                    break;
+                default:
+                    ticks = EmptyArray<SliderTick>.Value;
+                    break;
+            }
+
+            return ticks.ToArray();
+        }
+
+        // todo: not cut by rhythm
+        // todo: i forget math
+        private SliderTick[] ComputePerfectDiscreteData(double fixedInterval)
+        {
+            if (Math.Round(fixedInterval - sliderInfo.CurrentSingleDuration) >= 0)
+            {
+                return EmptyArray<SliderTick>.Value;
+            }
+
+            if (sliderInfo.ControlPoints.Count < 2)
+            {
+                sliderInfo.SliderType = SliderType.Linear;
+                return ComputeBezierDiscreteData(sliderInfo, fixedInterval);
+            }
+
+            var p1 = sliderInfo.StartPoint;
+            var p2 = sliderInfo.ControlPoints[0];
+            var p3 = sliderInfo.ControlPoints[1];
+
+            var circle = GetCircle(p1, p2, p3);
+
+            var radStart = Math.Atan2(p1.Y - circle.p.Y, p1.X - circle.p.X);
+            var radMid = Math.Atan2(p2.Y - circle.p.Y, p2.X - circle.p.X);
+            var radEnd = Math.Atan2(p3.Y - circle.p.Y, p3.X - circle.p.X);
+            if (radMid - radStart > Math.PI)
+            {
+                radMid -= Math.PI * 2;
+            }
+            else if (radMid - radStart < -Math.PI)
+            {
+                radMid += Math.PI * 2;
+            }
+
+            if (radEnd - radMid > Math.PI)
+            {
+                radEnd -= Math.PI * 2;
+            }
+            else if (radEnd - radMid < -Math.PI)
+            {
+                radEnd += Math.PI * 2;
+            }
+
+            var ticks = new List<SliderTick>();
+
+            for (int i = 1; i * fixedInterval < sliderInfo.CurrentSingleDuration; i++)
+            {
+                var offset = i * fixedInterval; // 当前tick的相对时间
+                var isOnEdges = Math.Abs(offset % sliderInfo.CurrentSingleDuration) < 0.5;
+                if (isOnEdges) continue;
+                var ratio = offset / sliderInfo.CurrentSingleDuration; // 相对整个滑条的时间比例，=距离比例
+                var relativeRad = (radEnd - radStart) * ratio; // 至滑条头的距离
+                var offsetRad = radStart + relativeRad;
+                var x = circle.p.X + circle.r * Math.Cos(offsetRad);
+                var y = circle.p.Y + circle.r * Math.Sin(offsetRad);
+
+                ticks.Add(new SliderTick(sliderInfo.StartTime + offset, new Vector2((float)x, (float)y)));
+            }
+
+            if (sliderInfo.Repeat > 1)
+            {
+                var firstSingleCopy = ticks.ToArray();
+                for (int i = 2; i <= sliderInfo.Repeat; i++)
+                {
+                    var reverse = i % 2 == 0;
+                    if (reverse)
+                    {
+                        ticks.AddRange(((IEnumerable<SliderTick>)firstSingleCopy).Reverse().Select(k =>
+                            new SliderTick(
+                                (sliderInfo.CurrentSingleDuration - (k.Offset - sliderInfo.StartTime)) +
+                                (i - 1) * sliderInfo.CurrentSingleDuration + sliderInfo.StartTime,
+                                k.Point)));
+                    }
+                    else
+                    {
+                        ticks.AddRange(firstSingleCopy.Select(k =>
+                            new SliderTick(k.Offset + (i - 1) * sliderInfo.CurrentSingleDuration, k.Point)));
+                    }
+                }
+            }
+
+            return ticks.ToArray();
+        }
+
+        private SliderTick[] ComputeBezierDiscreteData(double fixedInterval)
+        {
+            if (Math.Round(fixedInterval - sliderInfo.CurrentSingleDuration) >= 0)
+            {
+                return EmptyArray<SliderTick>.Value;
+            }
+
+            var groupedPoints = GetGroupedPoints(sliderInfo);
+            var groupedBezierLengths = GetGroupedBezierLengths(groupedPoints);
+            var totalLength = groupedBezierLengths.Sum();
+            var ticks = new List<SliderTick>();
+
+            for (int i = 1; i * fixedInterval < sliderInfo.CurrentSingleDuration; i++)
+            {
+                var offset = i * fixedInterval; // 当前tick的相对时间
+                var isOnEdges = Math.Abs(offset % sliderInfo.CurrentSingleDuration) < 0.5;
+                if (isOnEdges) continue;
+
+                var ratio = offset / sliderInfo.CurrentSingleDuration; // 相对整个滑条的时间比例，=距离比例
+                var relativeLen = totalLength * ratio; // 至滑条头的距离
+
+                var (index, lenInPart) = CalculateWhichPart(sliderInfo, relativeLen); // can be optimized
+                var len = groupedBezierLengths[index];
+                var tickPoint = BezierHelper.Compute(groupedPoints[index], (float)(lenInPart / len));
+                ticks.Add(new SliderTick(sliderInfo.StartTime + offset, tickPoint));
+            }
+
+            if (sliderInfo.Repeat > 1)
+            {
+                Span<SliderTick> span = stackalloc SliderTick[ticks.Count];
+                for (var i = 0; i < ticks.Count; i++)
+                {
+                    span[i] = ticks[i];
+                }
+
+                for (int i = 2; i <= sliderInfo.Repeat; i++)
+                {
+                    span.Reverse();
+                    var reverse = i % 2 == 0;
+                    if (reverse)
+                    {
+                        // span's enumerator is ok
+                        foreach (var baseTick in span)
+                        {
+                            // (sliderInfo.CurrentSingleDuration - (k.Offset - sliderInfo.StartTime)) + (i - 1) * sliderInfo.CurrentSingleDuration + sliderInfo.StartTime,
+                            var tick = new SliderTick(
+                                i * sliderInfo.CurrentSingleDuration - baseTick.Offset + sliderInfo.StartTime * 2,
+                                baseTick.Point);
+                            ticks.Add(tick);
+                        }
+                    }
+                    else
+                    {
+                        // span's enumerator is ok
+                        foreach (var baseTick in span)
+                        {
+                            var tick = new SliderTick(baseTick.Offset + (i - 1) * sliderInfo.CurrentSingleDuration, baseTick.Point);
+                            ticks.Add(tick);
+                        }
+                    }
+                }
+            }
+
+            return ticks.ToArray();
+        }
     }
 
     /// <summary>
@@ -93,155 +244,6 @@ public static class SliderExtensions
         }
 
         return ticks;
-    }
-
-    // todo: not cut by rhythm
-    // todo: i forget math
-    private static SliderTick[] ComputePerfectDiscreteData(ExtendedSliderInfo sliderInfo, double fixedInterval)
-    {
-        if (Math.Round(fixedInterval - sliderInfo.CurrentSingleDuration) >= 0)
-        {
-            return EmptyArray<SliderTick>.Value;
-        }
-
-        if (sliderInfo.ControlPoints.Count < 2)
-        {
-            sliderInfo.SliderType = SliderType.Linear;
-            return ComputeBezierDiscreteData(sliderInfo, fixedInterval);
-        }
-
-        var p1 = sliderInfo.StartPoint;
-        var p2 = sliderInfo.ControlPoints[0];
-        var p3 = sliderInfo.ControlPoints[1];
-
-        var circle = GetCircle(p1, p2, p3);
-
-        var radStart = Math.Atan2(p1.Y - circle.p.Y, p1.X - circle.p.X);
-        var radMid = Math.Atan2(p2.Y - circle.p.Y, p2.X - circle.p.X);
-        var radEnd = Math.Atan2(p3.Y - circle.p.Y, p3.X - circle.p.X);
-        if (radMid - radStart > Math.PI)
-        {
-            radMid -= Math.PI * 2;
-        }
-        else if (radMid - radStart < -Math.PI)
-        {
-            radMid += Math.PI * 2;
-        }
-
-        if (radEnd - radMid > Math.PI)
-        {
-            radEnd -= Math.PI * 2;
-        }
-        else if (radEnd - radMid < -Math.PI)
-        {
-            radEnd += Math.PI * 2;
-        }
-
-        var ticks = new List<SliderTick>();
-
-        for (int i = 1; i * fixedInterval < sliderInfo.CurrentSingleDuration; i++)
-        {
-            var offset = i * fixedInterval; // 当前tick的相对时间
-            var isOnEdges = Math.Abs(offset % sliderInfo.CurrentSingleDuration) < 0.5;
-            if (isOnEdges) continue;
-            var ratio = offset / sliderInfo.CurrentSingleDuration; // 相对整个滑条的时间比例，=距离比例
-            var relativeRad = (radEnd - radStart) * ratio; // 至滑条头的距离
-            var offsetRad = radStart + relativeRad;
-            var x = circle.p.X + circle.r * Math.Cos(offsetRad);
-            var y = circle.p.Y + circle.r * Math.Sin(offsetRad);
-
-            ticks.Add(new SliderTick(sliderInfo.StartTime + offset, new Vector2((float)x, (float)y)));
-        }
-
-        if (sliderInfo.Repeat > 1)
-        {
-            var firstSingleCopy = ticks.ToArray();
-            for (int i = 2; i <= sliderInfo.Repeat; i++)
-            {
-                var reverse = i % 2 == 0;
-                if (reverse)
-                {
-                    ticks.AddRange(firstSingleCopy.Reverse().Select(k =>
-                        new SliderTick(
-                            (sliderInfo.CurrentSingleDuration - (k.Offset - sliderInfo.StartTime)) +
-                            (i - 1) * sliderInfo.CurrentSingleDuration + sliderInfo.StartTime,
-                            k.Point)));
-                }
-                else
-                {
-                    ticks.AddRange(firstSingleCopy.Select(k =>
-                        new SliderTick(k.Offset + (i - 1) * sliderInfo.CurrentSingleDuration, k.Point)));
-                }
-            }
-        }
-
-        return ticks.ToArray();
-    }
-
-    private static SliderTick[] ComputeBezierDiscreteData(ExtendedSliderInfo sliderInfo, double fixedInterval)
-    {
-        if (Math.Round(fixedInterval - sliderInfo.CurrentSingleDuration) >= 0)
-        {
-            return EmptyArray<SliderTick>.Value;
-        }
-
-        var groupedPoints = GetGroupedPoints(sliderInfo);
-        var groupedBezierLengths = GetGroupedBezierLengths(groupedPoints);
-        var totalLength = groupedBezierLengths.Sum();
-        var ticks = new List<SliderTick>();
-
-        for (int i = 1; i * fixedInterval < sliderInfo.CurrentSingleDuration; i++)
-        {
-            var offset = i * fixedInterval; // 当前tick的相对时间
-            var isOnEdges = Math.Abs(offset % sliderInfo.CurrentSingleDuration) < 0.5;
-            if (isOnEdges) continue;
-
-            var ratio = offset / sliderInfo.CurrentSingleDuration; // 相对整个滑条的时间比例，=距离比例
-            var relativeLen = totalLength * ratio; // 至滑条头的距离
-
-            var (index, lenInPart) = CalculateWhichPart(sliderInfo, relativeLen); // can be optimized
-            var len = groupedBezierLengths[index];
-            var tickPoint = BezierHelper.Compute(groupedPoints[index], (float)(lenInPart / len));
-            ticks.Add(new SliderTick(sliderInfo.StartTime + offset, tickPoint));
-        }
-
-        if (sliderInfo.Repeat > 1)
-        {
-            Span<SliderTick> span = stackalloc SliderTick[ticks.Count];
-            for (var i = 0; i < ticks.Count; i++)
-            {
-                span[i] = ticks[i];
-            }
-
-            for (int i = 2; i <= sliderInfo.Repeat; i++)
-            {
-                span.Reverse();
-                var reverse = i % 2 == 0;
-                if (reverse)
-                {
-                    // span's enumerator is ok
-                    foreach (var baseTick in span)
-                    {
-                        // (sliderInfo.CurrentSingleDuration - (k.Offset - sliderInfo.StartTime)) + (i - 1) * sliderInfo.CurrentSingleDuration + sliderInfo.StartTime,
-                        var tick = new SliderTick(
-                            i * sliderInfo.CurrentSingleDuration - baseTick.Offset + sliderInfo.StartTime * 2,
-                            baseTick.Point);
-                        ticks.Add(tick);
-                    }
-                }
-                else
-                {
-                    // span's enumerator is ok
-                    foreach (var baseTick in span)
-                    {
-                        var tick = new SliderTick(baseTick.Offset + (i - 1) * sliderInfo.CurrentSingleDuration, baseTick.Point);
-                        ticks.Add(tick);
-                    }
-                }
-            }
-        }
-
-        return ticks.ToArray();
     }
 
     private static IReadOnlyList<Vector2> ComputePerfectApproximatedData(SliderInfo sliderInfo)
