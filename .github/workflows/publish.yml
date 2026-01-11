@@ -1,85 +1,78 @@
 name: publish
 on:
-  create:
+  push:
     tags:
       - "v*.*.*"
-  
+
 jobs:
   build:
     name: Build and Release
-    if: ${{ StartsWith(github.ref, 'refs/tags/') }}
     runs-on: windows-latest
+    permissions:
+      contents: write
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
-      with:
-        fetch-depth: '0'
-        submodules: 'recursive'
-    
+      uses: actions/checkout@v6
+
+    - name: Verify Version
+      if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
+      shell: pwsh
+      run: |
+        Write-Error "Not a tag trigger or invalid tag format"
+        exit 1
+
+    - name: Extract Version
+      id: meta
+      shell: pwsh
+      run: |
+        $tag = "${{ github.ref_name }}"
+        $version = $tag.TrimStart('v')
+        echo "version=$version" >> $env:GITHUB_OUTPUT
+        if ($version.Contains('-')) {
+          echo "prerelease=true" >> $env:GITHUB_OUTPUT
+        } else {
+          echo "prerelease=false" >> $env:GITHUB_OUTPUT
+        }
+
     - name: Setup .NET
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v5
       with:
         dotnet-version: 8.0.x
-      
-    # dotnet nuget add source --username Milkitic --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/Milkitic/index.json"     
-    - name: dotnet build
-      run: |
-        dotnet build --configuration Release
-     
-    - name: dotnet pack
-      run: |
-        dotnet pack --no-build Coosu.Database --configuration Release --output ci-pack
-        dotnet pack --no-build Coosu.Shared --configuration Release --output ci-pack
-        dotnet pack --no-build Coosu.Storyboard --configuration Release --output ci-pack
-        dotnet pack --no-build Coosu.Storyboard.Extensions --configuration Release --output ci-pack
-        dotnet pack --no-build Coosu.Storyboard.OsbX --configuration Release --output ci-pack
-        dotnet pack --no-build Coosu.Beatmap --configuration Release --output ci-pack
-        dotnet pack --no-build Coosu.Api --configuration Release --output ci-pack
-        
-    - name: action-minver
-      uses: thefringeninja/action-minver@2.0.0-preview1
-      id: version
-      with:
-        tag-prefix: v
-        minimum-major-minor: 1.0
-      
-    - name: Create new GitHub release
-      uses: softprops/action-gh-release@v1
-      if: ${{ success() && startsWith(github.ref, 'refs/tags/') }}
-      env:
-        GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN }}
-      with:
-        name: v${{ steps.version.outputs.version }}
-        prerelease: true
-        draft: false
-        files: |
-          ./ci-pack/Coosu.Database.${{ steps.version.outputs.version }}.nupkg
-          ./ci-pack/Coosu.Shared.${{ steps.version.outputs.version }}.nupkg
-          ./ci-pack/Coosu.Storyboard.${{ steps.version.outputs.version }}.nupkg
-          ./ci-pack/Coosu.Storyboard.Extensions.${{ steps.version.outputs.version }}.nupkg
-          ./ci-pack/Coosu.Storyboard.OsbX.${{ steps.version.outputs.version }}.nupkg
-          ./ci-pack/Coosu.Beatmap.${{ steps.version.outputs.version }}.nupkg
-          ./ci-pack/Coosu.Api.${{ steps.version.outputs.version }}.nupkg
 
-    # - name: Push Github Package
-    #   if: ${{ success() }}
-    #   run: |
-    #     dotnet nuget push "./ci-pack/Coosu.Database.${{ steps.version.outputs.version }}.nupkg"  --api-key ${{secrets.MILKI_COOSU_TOKEN}} --source "github"
-    #     dotnet nuget push "./ci-pack/Coosu.Shared.${{ steps.version.outputs.version }}.nupkg"  --api-key ${{secrets.MILKI_COOSU_TOKEN}} --source "github"
-    #     dotnet nuget push "./ci-pack/Coosu.Storyboard.${{ steps.version.outputs.version }}.nupkg"  --api-key ${{secrets.MILKI_COOSU_TOKEN}} --source "github"
-    #     dotnet nuget push "./ci-pack/Coosu.Storyboard.Extensions.${{ steps.version.outputs.version }}.nupkg"  --api-key ${{secrets.MILKI_COOSU_TOKEN}} --source "github"
-    #     dotnet nuget push "./ci-pack/Coosu.Storyboard.OsbX.${{ steps.version.outputs.version }}.nupkg"  --api-key ${{secrets.MILKI_COOSU_TOKEN}} --source "github"
-    #     dotnet nuget push "./ci-pack/Coosu.Beatmap.${{ steps.version.outputs.version }}.nupkg"  --api-key ${{secrets.MILKI_COOSU_TOKEN}} --source "github"
-    #     dotnet nuget push "./ci-pack/Coosu.Api.${{ steps.version.outputs.version }}.nupkg"  --api-key ${{secrets.MILKI_COOSU_TOKEN}} --source "github"
+    - name: Build
+      run: dotnet build Coosu.sln --configuration Release
+
+    - name: Pack
+      shell: pwsh
+      run: |
+        $version = "${{ steps.meta.outputs.version }}"
+        $projects = @(
+            "Coosu.Database",
+            "Coosu.Shared",
+            "Coosu.Storyboard",
+            "Coosu.Storyboard.Extensions",
+            "Coosu.Storyboard.OsbX",
+            "Coosu.Beatmap",
+            "Coosu.Api"
+        )
+        foreach ($proj in $projects) {
+            dotnet pack $proj --no-build --configuration Release --output ci-pack /p:Version=$version
+        }
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        name: v${{ steps.meta.outputs.version }}
+        files: ci-pack/*.nupkg
+        prerelease: ${{ steps.meta.outputs.prerelease }}
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Push Nuget Package
-      if: ${{ success() }}
+      shell: pwsh
       run: |
-        dotnet nuget push "./ci-pack/Coosu.Database.${{ steps.version.outputs.version }}.nupkg"  --api-key ${{secrets.NUGET_API_KEY}} --source "https://api.nuget.org/v3/index.json"
-        dotnet nuget push "./ci-pack/Coosu.Shared.${{ steps.version.outputs.version }}.nupkg"  --api-key ${{secrets.NUGET_API_KEY}} --source "https://api.nuget.org/v3/index.json"
-        dotnet nuget push "./ci-pack/Coosu.Storyboard.${{ steps.version.outputs.version }}.nupkg"  --api-key ${{secrets.NUGET_API_KEY}} --source "https://api.nuget.org/v3/index.json"
-        dotnet nuget push "./ci-pack/Coosu.Storyboard.Extensions.${{ steps.version.outputs.version }}.nupkg"  --api-key ${{secrets.NUGET_API_KEY}} --source "https://api.nuget.org/v3/index.json"
-        dotnet nuget push "./ci-pack/Coosu.Storyboard.OsbX.${{ steps.version.outputs.version }}.nupkg"  --api-key ${{secrets.NUGET_API_KEY}} --source "https://api.nuget.org/v3/index.json"
-        dotnet nuget push "./ci-pack/Coosu.Beatmap.${{ steps.version.outputs.version }}.nupkg"  --api-key ${{secrets.NUGET_API_KEY}} --source "https://api.nuget.org/v3/index.json"
-        dotnet nuget push "./ci-pack/Coosu.Api.${{ steps.version.outputs.version }}.nupkg"  --api-key ${{secrets.NUGET_API_KEY}} --source "https://api.nuget.org/v3/index.json"
+        Get-ChildItem -Path ci-pack/*.nupkg | ForEach-Object {
+          dotnet nuget push $_.FullName --api-key ${{ secrets.NUGET_API_KEY }} --source "https://api.nuget.org/v3/index.json" --skip-duplicate
+        }
