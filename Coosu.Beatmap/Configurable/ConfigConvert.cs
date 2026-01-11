@@ -138,7 +138,9 @@ public static class ConfigConvert
 #if NET6_0_OR_GREATER
     public static IReadOnlyDictionary<string, ReflectInfo>? GetSectionsOfType<
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties |
-                                    DynamicallyAccessedMemberTypes.NonPublicProperties)]
+                                    DynamicallyAccessedMemberTypes.NonPublicProperties |
+                                    DynamicallyAccessedMemberTypes.PublicConstructors |
+                                    DynamicallyAccessedMemberTypes.NonPublicConstructors)]
     T>() where T : Config
 #else
     public static IReadOnlyDictionary<string, ReflectInfo>? GetSectionsOfType<T>() where T : Config
