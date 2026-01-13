@@ -29,6 +29,7 @@ public sealed class HitObjectSection : Section
 
     [SectionIgnore]
     public double MinTime => HitObjectList.Count == 0 ? 0 : HitObjectList.Min(t => t.Offset);
+
     [SectionIgnore]
     public double MaxTime => HitObjectList.Count == 0 ? 0 : HitObjectList.Max(t => t.Offset);
 
@@ -231,18 +232,26 @@ public sealed class HitObjectSection : Section
         char sliderType = '\0';
         var points = curveInfo.Length > 100
             ? curveInfo.Length > 200
-                ? new List<Vector2>(50)
-                : new List<Vector2>(30)
-            : new List<Vector2>();
+                ? new List<Vector3>(50)
+                : new List<Vector3>(30)
+            : new List<Vector3>();
 
         var curveEnumerator = curveInfo.SpanSplit('|');
         while (curveEnumerator.MoveNext())
         {
             var point = curveEnumerator.Current;
+            if (point.Length < 1) continue;
             if (curveEnumerator.CurrentIndex < 1)
             {
                 sliderType = point[0];
                 continue; // curvePoints skip 1
+            }
+
+            if (!char.IsNumber(point[0]))
+            {
+                var type = point.SliderFlagToEnum();
+                points.Add(new Vector3(0, 0, (int)type + 1)); // v128 slider type storage
+                continue;
             }
 
             float x = 0;
@@ -257,7 +266,7 @@ public sealed class HitObjectSection : Section
                 else
                 {
                     var y = ParseHelper.ParseSingle(s);
-                    points.Add(new Vector2(x, y));
+                    points.Add(new Vector3(x, y, 0));
                 }
             }
         }
@@ -324,7 +333,7 @@ public sealed class HitObjectSection : Section
 
         hitObject.SliderInfo = new ExtendedSliderInfo(hitObject)
         {
-            StartPoint = new Vector2(hitObject.X, hitObject.Y),
+            StartPoint = new Vector3(hitObject.X, hitObject.Y, 0),
             StartTime = hitObject.Offset,
             PixelLength = pixelLength,
             ControlPoints = points,

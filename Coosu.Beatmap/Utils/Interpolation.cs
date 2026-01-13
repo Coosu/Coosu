@@ -10,7 +10,7 @@ internal static class Interpolation
     /// Calculates the Barycentric weights for a Lagrange polynomial for a given set of coordinates. Can be used as a helper function to compute a Lagrange polynomial repeatedly.
     /// </summary>
     /// <param name="points">An array of coordinates. No two x should be the same.</param>
-    public static double[] BarycentricWeights(IReadOnlyList<Vector2> points)
+    public static double[] BarycentricWeights(IReadOnlyList<Vector3> points)
     {
         int n = points.Count;
         double[] w = new double[n];
@@ -37,7 +37,7 @@ internal static class Interpolation
     /// <param name="points">An array of coordinates. No two x should be the same.</param>
     /// <param name="weights">An array of precomputed barycentric weights.</param>
     /// <param name="time">The x coordinate to calculate the basis polynomial for.</param>
-    public static double BarycentricLagrange(IReadOnlyList<Vector2> points, double[] weights, double time)
+    public static double BarycentricLagrange(IReadOnlyList<Vector3> points, double[] weights, double time)
     {
         if (points == null || points.Count == 0)
             throw new ArgumentException($"{nameof(points)} must contain at least one point");

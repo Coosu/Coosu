@@ -70,9 +70,9 @@ public static class SliderExtensions
     /// osu!lazer implementation to compute approximated data.
     /// </summary>
     /// <returns></returns>
-    public static IReadOnlyList<Vector2> ComputeApproximatedData(this SliderInfo sliderInfo)
+    public static IReadOnlyList<Vector3> ComputeApproximatedData(this SliderInfo sliderInfo)
     {
-        IReadOnlyList<Vector2> ticks;
+        IReadOnlyList<Vector3> ticks;
         switch (sliderInfo.SliderType)
         {
             case SliderType.Bezier:
@@ -88,7 +88,7 @@ public static class SliderExtensions
                 ticks = ComputeCatmullApproximatedData(sliderInfo);
                 break;
             default:
-                ticks = EmptyArray<Vector2>.Value;
+                ticks = EmptyArray<Vector3>.Value;
                 break;
         }
 
@@ -150,7 +150,7 @@ public static class SliderExtensions
             var x = circle.p.X + circle.r * Math.Cos(offsetRad);
             var y = circle.p.Y + circle.r * Math.Sin(offsetRad);
 
-            ticks.Add(new SliderTick(sliderInfo.StartTime + offset, new Vector2((float)x, (float)y)));
+            ticks.Add(new SliderTick(sliderInfo.StartTime + offset, new Vector3((float)x, (float)y, 0)));
         }
 
         if (sliderInfo.Repeat > 1)
@@ -244,11 +244,11 @@ public static class SliderExtensions
         return ticks.ToArray();
     }
 
-    private static IReadOnlyList<Vector2> ComputePerfectApproximatedData(SliderInfo sliderInfo)
+    private static IReadOnlyList<Vector3> ComputePerfectApproximatedData(SliderInfo sliderInfo)
     {
-        Vector2 p1;
-        Vector2 p2;
-        Vector2 p3;
+        Vector3 p1;
+        Vector3 p2;
+        Vector3 p3;
         try
         {
             p1 = sliderInfo.StartPoint;
@@ -263,22 +263,22 @@ public static class SliderExtensions
         return PathApproximator.ApproximateCircularArc(new[] { p1, p2, p3 });
     }
 
-    private static IReadOnlyList<Vector2> ComputeBezierApproximatedData(SliderInfo sliderInfo)
+    private static IReadOnlyList<Vector3> ComputeBezierApproximatedData(SliderInfo sliderInfo)
     {
-        var points = new List<Vector2>();
+        var points = new List<Vector3>();
         var groupedPoints = GetGroupedPoints(sliderInfo);
         for (var i = 0; i < groupedPoints.Count; i++)
         {
             var groupedPoint = groupedPoints[i];
             var bezierTrail = PathApproximator.ApproximateBezier(groupedPoint);
 
-            points.AddRange(bezierTrail.Select(k => new Vector2(k.X, k.Y)));
+            points.AddRange(bezierTrail.Select(k => new Vector3(k.X, k.Y, 0)));
         }
 
         return points;
     }
 
-    private static IReadOnlyList<Vector2> ComputeCatmullApproximatedData(SliderInfo sliderInfo)
+    private static IReadOnlyList<Vector3> ComputeCatmullApproximatedData(SliderInfo sliderInfo)
     {
         var all = sliderInfo.ControlPoints.ToList();
         all.Insert(0, sliderInfo.StartPoint);
@@ -287,7 +287,7 @@ public static class SliderExtensions
         return catmullTrail;
     }
 
-    private static (Vector2 p, double r) GetCircle(Vector2 p1, Vector2 p2, Vector2 p3)
+    private static (Vector3 p, double r) GetCircle(Vector3 p1, Vector3 p2, Vector3 p3)
     {
         var e = 2 * (p2.X - p1.X);
         var f = 2 * (p2.Y - p1.Y);
@@ -298,7 +298,7 @@ public static class SliderExtensions
         var x = (g * b - c * f) / (e * b - a * f);
         var y = (a * g - c * e) / (a * f - b * e);
         var r = Math.Pow(Math.Pow(x - p1.X, 2) + Math.Pow(y - p1.Y, 2), 0.5);
-        return (new Vector2((float)x, (float)y), r);
+        return (new Vector3((float)x, (float)y, 0), r);
     }
 
     private static (int index, double lenInPart) CalculateWhichPart(SliderInfo sliderInfo, double relativeLen)
@@ -315,14 +315,14 @@ public static class SliderExtensions
         return (-1, -1);
     }
 
-    private static List<List<Vector2>> GetGroupedPoints(SliderInfo sliderInfo)
+    private static List<List<Vector3>> GetGroupedPoints(SliderInfo sliderInfo)
     {
-        IReadOnlyList<Vector2> rawPoints = sliderInfo.ControlPoints;
+        IReadOnlyList<Vector3> rawPoints = sliderInfo.ControlPoints;
 
-        var groupedPoints = new List<List<Vector2>>();
-        var currentGroup = new List<Vector2>();
+        var groupedPoints = new List<List<Vector3>>();
+        var currentGroup = new List<Vector3>();
 
-        Vector2? nextPoint = default;
+        Vector3? nextPoint = default;
         for (var i = -1; i < rawPoints.Count - 1; i++)
         {
             var thisPoint = i == -1 ? sliderInfo.StartPoint : rawPoints[i];
@@ -335,7 +335,7 @@ public static class SliderExtensions
                     groupedPoints.Add(currentGroup);
                 }
 
-                currentGroup = new List<Vector2>();
+                currentGroup = new List<Vector3>();
             }
         }
 
@@ -358,7 +358,7 @@ public static class SliderExtensions
     }
 
     private static IReadOnlyList<double> GetGroupedBezierLengths(
-        IReadOnlyList<IReadOnlyList<Vector2>> groupedBezierPoints)
+        IReadOnlyList<IReadOnlyList<Vector3>> groupedBezierPoints)
     {
         var array = new double[groupedBezierPoints.Count];
         for (var i = 0; i < groupedBezierPoints.Count; i++)

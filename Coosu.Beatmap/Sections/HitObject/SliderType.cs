@@ -6,5 +6,6 @@ public enum SliderType
 {
     Linear, Perfect, Bezier,
     [Obsolete("Catmull style is obsolete for latest version of osu!")]
-    Catmull
+    Catmull,
+    Bezier4
 }

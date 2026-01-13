@@ -22,7 +22,7 @@ internal static class PathApproximator
     /// </summary>
     /// <param name="controlPoints">The control points.</param>
     /// <returns>A list of vectors representing the piecewise-linear approximation.</returns>
-    public static List<Vector2> ApproximateBezier(IReadOnlyList<Vector2> controlPoints)
+    public static List<Vector3> ApproximateBezier(IReadOnlyList<Vector3> controlPoints)
     {
         return ApproximateBSpline(controlPoints);
     }
@@ -37,16 +37,16 @@ internal static class PathApproximator
     /// <param name="controlPoints">The control points.</param>
     /// <param name="p">The polynomial order.</param>
     /// <returns>A list of vectors representing the piecewise-linear approximation.</returns>
-    public static List<Vector2> ApproximateBSpline(IReadOnlyList<Vector2> controlPoints, int p = 0)
+    public static List<Vector3> ApproximateBSpline(IReadOnlyList<Vector3> controlPoints, int p = 0)
     {
-        List<Vector2> output = new List<Vector2>();
+        List<Vector3> output = new List<Vector3>();
         int n = controlPoints.Count - 1;
 
         if (n < 0)
             return output;
 
-        Stack<Vector2[]> toFlatten = new Stack<Vector2[]>();
-        Stack<Vector2[]> freeBuffers = new Stack<Vector2[]>();
+        Stack<Vector3[]> toFlatten = new Stack<Vector3[]>();
+        Stack<Vector3[]> freeBuffers = new Stack<Vector3[]>();
 
         var points = controlPoints.ToArray();
 
@@ -55,7 +55,7 @@ internal static class PathApproximator
             // Subdivide B-spline into bezier control points at knots.
             for (int i = 0; i < n - p; i++)
             {
-                var subBezier = new Vector2[p + 1];
+                var subBezier = new Vector3[p + 1];
                 subBezier[0] = points[i];
 
                 // Destructively insert the knot p-1 times via Boehm's algorithm.
@@ -74,10 +74,10 @@ internal static class PathApproximator
                 toFlatten.Push(subBezier);
             }
 
-            var span = new Span<Vector2>(points);
+            var span = new Span<Vector3>(points);
             toFlatten.Push(span.Slice(n - p).ToArray());
             // Reverse the stack so elements can be accessed in order.
-            toFlatten = new Stack<Vector2[]>(toFlatten);
+            toFlatten = new Stack<Vector3[]>(toFlatten);
         }
         else
         {
@@ -91,14 +91,14 @@ internal static class PathApproximator
         // <a href="https://en.wikipedia.org/wiki/Depth-first_search">Depth-first search</a>
         // over the tree resulting from the subdivisions we make.)
 
-        var subdivisionBuffer1 = new Vector2[p + 1];
-        var subdivisionBuffer2 = new Vector2[p * 2 + 1];
+        var subdivisionBuffer1 = new Vector3[p + 1];
+        var subdivisionBuffer2 = new Vector3[p * 2 + 1];
 
-        Vector2[] leftChild = subdivisionBuffer2;
+        Vector3[] leftChild = subdivisionBuffer2;
 
         while (toFlatten.Count > 0)
         {
-            Vector2[] parent = toFlatten.Pop();
+            Vector3[] parent = toFlatten.Pop();
 
             if (bezierIsFlatEnough(parent))
             {
@@ -114,7 +114,7 @@ internal static class PathApproximator
 
             // If we do not yet have a sufficiently "flat" (in other words, detailed) approximation we keep
             // subdividing the curve we are currently operating on.
-            Vector2[] rightChild = freeBuffers.Count > 0 ? freeBuffers.Pop() : new Vector2[p + 1];
+            Vector3[] rightChild = freeBuffers.Count > 0 ? freeBuffers.Pop() : new Vector3[p + 1];
             bezierSubdivide(parent, leftChild, rightChild, subdivisionBuffer1, p + 1);
 
             // We re-use the buffer of the parent for one of the children, so that we save one allocation per iteration.
@@ -133,9 +133,9 @@ internal static class PathApproximator
     /// Creates a piecewise-linear approximation of a Catmull-Rom spline.
     /// </summary>
     /// <returns>A list of vectors representing the piecewise-linear approximation.</returns>
-    public static List<Vector2> ApproximateCatmull(IReadOnlyList<Vector2> controlPoints, int catmullDetail = 50)
+    public static List<Vector3> ApproximateCatmull(IReadOnlyList<Vector3> controlPoints, int catmullDetail = 50)
     {
-        var result = new List<Vector2>((controlPoints.Count - 1) * catmullDetail * 2);
+        var result = new List<Vector3>((controlPoints.Count - 1) * catmullDetail * 2);
 
         for (int i = 0; i < controlPoints.Count - 1; i++)
         {
@@ -158,7 +158,7 @@ internal static class PathApproximator
     /// Creates a piecewise-linear approximation of a circular arc curve.
     /// </summary>
     /// <returns>A list of vectors representing the piecewise-linear approximation.</returns>
-    public static List<Vector2> ApproximateCircularArc(IReadOnlyList<Vector2> controlPoints)
+    public static List<Vector3> ApproximateCircularArc(IReadOnlyList<Vector3> controlPoints)
     {
         CircularArcProperties pr = circularArcProperties(controlPoints);
         if (!pr.IsValid)
@@ -171,13 +171,13 @@ internal static class PathApproximator
         // the tolerance. This is a pathological rather than a realistic case.
         int amountPoints = 2 * pr.Radius <= circular_arc_tolerance ? 2 : Math.Max(2, (int)Math.Ceiling(pr.ThetaRange / (2 * Math.Acos(1 - circular_arc_tolerance / pr.Radius))));
 
-        List<Vector2> output = new List<Vector2>(amountPoints);
+        List<Vector3> output = new List<Vector3>(amountPoints);
 
         for (int i = 0; i < amountPoints; ++i)
         {
             double fract = (double)i / (amountPoints - 1);
             double theta = pr.ThetaStart + pr.Direction * fract * pr.ThetaRange;
-            Vector2 o = new Vector2((float)Math.Cos(theta), (float)Math.Sin(theta)) * pr.Radius;
+            Vector3 o = new Vector3((float)Math.Cos(theta), (float)Math.Sin(theta), 0) * pr.Radius;
             output.Add(pr.Centre + o);
         }
 
@@ -189,7 +189,7 @@ internal static class PathApproximator
     /// </summary>
     /// <param name="controlPoints">Three distinct points on the arc.</param>
     /// <returns>The rectangle inscribing the circular arc.</returns>
-    public static RectangleF CircularArcBoundingBox(IReadOnlyList<Vector2> controlPoints)
+    public static RectangleF CircularArcBoundingBox(IReadOnlyList<Vector3> controlPoints)
     {
         CircularArcProperties pr = circularArcProperties(controlPoints);
         if (!pr.IsValid)
@@ -197,7 +197,7 @@ internal static class PathApproximator
 
         // We find the bounding box using the end-points, as well as
         // each 90 degree angle inside the range of the arc
-        List<Vector2> points = new List<Vector2>
+        List<Vector3> points = new List<Vector3>
         {
             controlPoints[0],
             controlPoints[2]
@@ -221,7 +221,7 @@ internal static class PathApproximator
             if (Precision.DefinitelyBigger((angle - pr.ThetaEnd) * pr.Direction, 0))
                 break;
 
-            Vector2 o = new Vector2((float)Math.Cos(angle), (float)Math.Sin(angle)) * pr.Radius;
+            Vector3 o = new Vector3((float)Math.Cos(angle), (float)Math.Sin(angle), 0) * pr.Radius;
             points.Add(pr.Centre + o);
         }
 
@@ -238,9 +238,9 @@ internal static class PathApproximator
     /// Basically, returns the input.
     /// </summary>
     /// <returns>A list of vectors representing the piecewise-linear approximation.</returns>
-    public static List<Vector2> ApproximateLinear(IReadOnlyList<Vector2> controlPoints)
+    public static List<Vector3> ApproximateLinear(IReadOnlyList<Vector3> controlPoints)
     {
-        var result = new List<Vector2>(controlPoints.Count);
+        var result = new List<Vector3>(controlPoints.Count);
 
         foreach (var c in controlPoints)
             result.Add(c);
@@ -252,12 +252,12 @@ internal static class PathApproximator
     /// Creates a piecewise-linear approximation of a lagrange polynomial.
     /// </summary>
     /// <returns>A list of vectors representing the piecewise-linear approximation.</returns>
-    public static List<Vector2> ApproximateLagrangePolynomial(IReadOnlyList<Vector2> controlPoints)
+    public static List<Vector3> ApproximateLagrangePolynomial(IReadOnlyList<Vector3> controlPoints)
     {
         // TODO: add some smarter logic here, chebyshev nodes?
         const int num_steps = 51;
 
-        var result = new List<Vector2>(num_steps);
+        var result = new List<Vector3>(num_steps);
 
         double[] weights = Interpolation.BarycentricWeights(controlPoints);
 
@@ -276,7 +276,7 @@ internal static class PathApproximator
         {
             float x = minX + dx / (num_steps - 1) * i;
             float y = (float)Interpolation.BarycentricLagrange(controlPoints, weights, x);
-            result.Add(new Vector2(x, y));
+            result.Add(new Vector3(x, y, 0));
         }
 
         return result;
@@ -289,11 +289,11 @@ internal static class PathApproximator
         public readonly double ThetaRange;
         public readonly double Direction;
         public readonly float Radius;
-        public readonly Vector2 Centre;
+        public readonly Vector3 Centre;
 
         public double ThetaEnd => ThetaStart + ThetaRange * Direction;
 
-        public CircularArcProperties(double thetaStart, double thetaRange, double direction, float radius, Vector2 centre)
+        public CircularArcProperties(double thetaStart, double thetaRange, double direction, float radius, Vector3 centre)
         {
             IsValid = true;
             ThetaStart = thetaStart;
@@ -308,11 +308,11 @@ internal static class PathApproximator
     /// Computes various properties that can be used to approximate the circular arc.
     /// </summary>
     /// <param name="controlPoints">Three distinct points on the arc.</param>
-    private static CircularArcProperties circularArcProperties(IReadOnlyList<Vector2> controlPoints)
+    private static CircularArcProperties circularArcProperties(IReadOnlyList<Vector3> controlPoints)
     {
-        Vector2 a = controlPoints[0];
-        Vector2 b = controlPoints[1];
-        Vector2 c = controlPoints[2];
+        Vector3 a = controlPoints[0];
+        Vector3 b = controlPoints[1];
+        Vector3 c = controlPoints[2];
 
         // If we have a degenerate triangle where a side-length is almost zero, then give up and fallback to a more numerically stable method.
         if (Precision.AlmostEquals(0, (b.Y - a.Y) * (c.X - a.X) - (b.X - a.X) * (c.Y - a.Y)))
@@ -324,12 +324,13 @@ internal static class PathApproximator
         float bSq = b.LengthSquared();
         float cSq = c.LengthSquared();
 
-        Vector2 centre = new Vector2(
+        Vector3 centre = new Vector3(
             aSq * (b - c).Y + bSq * (c - a).Y + cSq * (a - b).Y,
-            aSq * (c - b).X + bSq * (a - c).X + cSq * (b - a).X) / d;
+            aSq * (c - b).X + bSq * (a - c).X + cSq * (b - a).X,
+            0) / d;
 
-        Vector2 dA = a - centre;
-        Vector2 dC = c - centre;
+        Vector3 dA = a - centre;
+        Vector3 dC = c - centre;
 
         float r = dA.Length();
 
@@ -344,10 +345,10 @@ internal static class PathApproximator
 
         // Decide in which direction to draw the circle, depending on which side of
         // AC B lies.
-        Vector2 orthoAtoC = c - a;
-        orthoAtoC = new Vector2(orthoAtoC.Y, -orthoAtoC.X);
+        Vector3 orthoAtoC = c - a;
+        orthoAtoC = new Vector3(orthoAtoC.Y, -orthoAtoC.X, 0);
 
-        if (Vector2.Dot(orthoAtoC, b - a) < 0)
+        if (Vector3.Dot(orthoAtoC, b - a) < 0)
         {
             dir = -dir;
             thetaRange = 2 * Math.PI - thetaRange;
@@ -364,7 +365,7 @@ internal static class PathApproximator
     /// </summary>
     /// <param name="controlPoints">The control points to check for flatness.</param>
     /// <returns>Whether the control points are flat enough.</returns>
-    private static bool bezierIsFlatEnough(Vector2[] controlPoints)
+    private static bool bezierIsFlatEnough(Vector3[] controlPoints)
     {
         for (int i = 1; i < controlPoints.Length - 1; i++)
         {
@@ -385,9 +386,9 @@ internal static class PathApproximator
     /// <param name="r">Output: The control points corresponding to the right half of the curve.</param>
     /// <param name="subdivisionBuffer">The first buffer containing the current subdivision state.</param>
     /// <param name="count">The number of control points in the original list.</param>
-    private static void bezierSubdivide(Vector2[] controlPoints, Vector2[] l, Vector2[] r, Vector2[] subdivisionBuffer, int count)
+    private static void bezierSubdivide(Vector3[] controlPoints, Vector3[] l, Vector3[] r, Vector3[] subdivisionBuffer, int count)
     {
-        Vector2[] midpoints = subdivisionBuffer;
+        Vector3[] midpoints = subdivisionBuffer;
 
         for (int i = 0; i < count; ++i)
             midpoints[i] = controlPoints[i];
@@ -411,10 +412,10 @@ internal static class PathApproximator
     /// <param name="count">The number of control points in the original list.</param>
     /// <param name="subdivisionBuffer1">The first buffer containing the current subdivision state.</param>
     /// <param name="subdivisionBuffer2">The second buffer containing the current subdivision state.</param>
-    private static void bezierApproximate(Vector2[] controlPoints, List<Vector2> output, Vector2[] subdivisionBuffer1, Vector2[] subdivisionBuffer2, int count)
+    private static void bezierApproximate(Vector3[] controlPoints, List<Vector3> output, Vector3[] subdivisionBuffer1, Vector3[] subdivisionBuffer2, int count)
     {
-        Vector2[] l = subdivisionBuffer2;
-        Vector2[] r = subdivisionBuffer1;
+        Vector3[] l = subdivisionBuffer2;
+        Vector3[] r = subdivisionBuffer1;
 
         bezierSubdivide(controlPoints, l, r, subdivisionBuffer1, count);
 
@@ -426,7 +427,7 @@ internal static class PathApproximator
         for (int i = 1; i < count - 1; ++i)
         {
             int index = 2 * i;
-            Vector2 p = 0.25f * (l[index - 1] + 2 * l[index] + l[index + 1]);
+            Vector3 p = 0.25f * (l[index - 1] + 2 * l[index] + l[index + 1]);
             output.Add(p);
         }
     }
@@ -440,14 +441,15 @@ internal static class PathApproximator
     /// <param name="vec4">The fourth vector.</param>
     /// <param name="t">The parameter at which to find the point on the spline, in the range [0, 1].</param>
     /// <returns>The point on the spline at <paramref name="t"/>.</returns>
-    public static Vector2 CatmullFindPoint(ref Vector2 vec1, ref Vector2 vec2, ref Vector2 vec3, ref Vector2 vec4, float t)
+    public static Vector3 CatmullFindPoint(ref Vector3 vec1, ref Vector3 vec2, ref Vector3 vec3, ref Vector3 vec4, float t)
     {
         float t2 = t * t;
         float t3 = t * t2;
 
-        Vector2 result;
+        Vector3 result;
         result.X = 0.5f * (2f * vec2.X + (-vec1.X + vec3.X) * t + (2f * vec1.X - 5f * vec2.X + 4f * vec3.X - vec4.X) * t2 + (-vec1.X + 3f * vec2.X - 3f * vec3.X + vec4.X) * t3);
         result.Y = 0.5f * (2f * vec2.Y + (-vec1.Y + vec3.Y) * t + (2f * vec1.Y - 5f * vec2.Y + 4f * vec3.Y - vec4.Y) * t2 + (-vec1.Y + 3f * vec2.Y - 3f * vec3.Y + vec4.Y) * t3);
+        result.Z = 0;
 
         return result;
     }
