@@ -48,6 +48,66 @@ public static class SliderExtensions
     // todo: not cut by rhythm
     public static SliderTick[] ComputeDiscreteData(this ExtendedSliderInfo sliderInfo, double intervalMilliseconds)
     {
+        //var singleTime = sliderInfo.CurrentSingleDuration;
+        //var allTicks = new List<SliderTick>();
+
+        //var segmentSliderType = sliderInfo.SliderType;
+        //var segmentControlPoints = new List<Vector3>();
+
+        //foreach (var controlPoint in sliderInfo.ControlPoints)
+        //{
+        //    if (controlPoint.Z != 0)
+        //    {
+        //        if (segmentControlPoints.Count > 0)
+        //        {
+        //            SliderTick[] ticks;
+        //            switch (segmentSliderType)
+        //            {
+        //                case SliderType.Bezier:
+        //                case SliderType.Linear:
+        //                    ticks = ComputeBezierDiscreteData(segmentControlPoints, intervalMilliseconds);
+        //                    break;
+        //                case SliderType.Perfect:
+        //                    ticks = ComputePerfectDiscreteData(segmentControlPoints, intervalMilliseconds);
+        //                    break;
+        //                default:
+        //                    ticks = EmptyArray<SliderTick>.Value;
+        //                    break;
+        //            }
+
+        //            allTicks.AddRange(ticks);
+        //        }
+
+        //        segmentSliderType = (SliderType)((int)controlPoint.Z - 1);
+        //        segmentControlPoints.Clear();
+        //    }
+        //    else
+        //    {
+        //        segmentControlPoints.Add(controlPoint);
+        //    }
+        //}
+
+        //if (segmentControlPoints.Count > 0)
+        //{
+        //    SliderTick[] ticks;
+        //    switch (segmentSliderType)
+        //    {
+        //        case SliderType.Bezier:
+        //        case SliderType.Linear:
+        //            ticks = ComputeBezierDiscreteData(segmentControlPoints, intervalMilliseconds);
+        //            break;
+        //        case SliderType.Perfect:
+        //            ticks = ComputePerfectDiscreteData(segmentControlPoints, intervalMilliseconds);
+        //            break;
+        //        default:
+        //            ticks = EmptyArray<SliderTick>.Value;
+        //            break;
+        //    }
+        //    allTicks.AddRange(ticks);
+        //}
+
+        //return allTicks.ToArray();
+
         SliderTick[] ticks;
         switch (sliderInfo.SliderType)
         {
@@ -63,7 +123,7 @@ public static class SliderExtensions
                 break;
         }
 
-        return ticks.ToArray();
+        return ticks;
     }
 
     /// <summary>
