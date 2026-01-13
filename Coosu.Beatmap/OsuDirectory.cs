@@ -99,7 +99,7 @@ public sealed class OsuDirectory
                     catch (Exception e)
                     {
                         throw new HitsoundAnalyzingException(
-                            "Error while analyzing hitsound. Object Info: " + obj.ToSerializedString(), e);
+                            "Error while analyzing hitsound. Object Info: " + obj.ToSerializedString(osuFile.Version), e);
                     }
                 });
 

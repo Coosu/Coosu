@@ -336,7 +336,7 @@ public sealed class HitObjectSection : Section
         };
     }
 
-    public override void AppendSerializedString(TextWriter textWriter)
+    public override void AppendSerializedString(TextWriter textWriter, int version)
     {
         textWriter.Write('[');
         textWriter.Write(SectionName);
@@ -344,7 +344,7 @@ public sealed class HitObjectSection : Section
         for (var i = 0; i < HitObjectList.Count; i++)
         {
             var hitObject = HitObjectList[i];
-            hitObject.AppendSerializedString(textWriter);
+            hitObject.AppendSerializedString(textWriter, version);
             textWriter.WriteLine();
         }
     }

@@ -63,16 +63,16 @@ public sealed class MetadataSection : KeyValueSection
     [SectionIgnore]
     public MetaString ArtistMeta => new(Artist, ArtistUnicode);
 
-    public void AppendSerializedString(TextWriter textWriter, string? overrideDifficulty)
+    public void AppendSerializedString(TextWriter textWriter, string? overrideDifficulty, int version)
     {
         if (overrideDifficulty == null)
         {
-            base.AppendSerializedString(textWriter);
+            base.AppendSerializedString(textWriter, version);
             return;
         }
 
         var clonedSection = (MetadataSection)this.MemberwiseClone();
         clonedSection.Version = overrideDifficulty;
-        clonedSection.AppendSerializedString(textWriter);
+        clonedSection.AppendSerializedString(textWriter, version);
     }
 }

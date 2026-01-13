@@ -181,48 +181,53 @@ public class OsuFile : Config
         return targetPath;
     }
 
-    private void WriteToPath(string path, string? overrideDifficulty = null)
+    public void SaveTo(TextWriter writer, string? overrideDifficulty = null)
     {
-        using var sw = new StreamWriter(path);
-        sw.Write(VerFlag);
-        sw.WriteLine(Version);
-        sw.WriteLine();
+        writer.Write(VerFlag);
+        writer.WriteLine(Version);
+        writer.WriteLine();
 
         General ??= new GeneralSection();
-        General.AppendSerializedString(sw);
-        sw.WriteLine();
+        General.AppendSerializedString(writer, Version);
+        writer.WriteLine();
 
         Editor ??= new EditorSection();
-        Editor.AppendSerializedString(sw);
-        sw.WriteLine();
+        Editor.AppendSerializedString(writer, Version);
+        writer.WriteLine();
 
         Metadata ??= new MetadataSection();
-        Metadata.AppendSerializedString(sw, overrideDifficulty);
-        sw.WriteLine();
+        Metadata.AppendSerializedString(writer, overrideDifficulty, Version);
+        writer.WriteLine();
 
         Difficulty ??= new DifficultySection();
-        Difficulty.AppendSerializedString(sw);
-        sw.WriteLine();
+        Difficulty.AppendSerializedString(writer, Version);
+        writer.WriteLine();
 
         Events ??= new EventSection(this);
-        Events.AppendSerializedString(sw);
-        sw.WriteLine();
+        Events.AppendSerializedString(writer, Version);
+        writer.WriteLine();
 
         if (TimingPoints != null)
         {
-            TimingPoints.AppendSerializedString(sw);
-            sw.WriteLine(Environment.NewLine);
+            TimingPoints.AppendSerializedString(writer, Version);
+            writer.WriteLine(Environment.NewLine);
         }
 
         if (Colours != null)
         {
-            Colours.AppendSerializedString(sw);
-            sw.WriteLine();
+            Colours.AppendSerializedString(writer, Version);
+            writer.WriteLine();
         }
 
         if (HitObjects != null)
         {
-            HitObjects.AppendSerializedString(sw);
+            HitObjects.AppendSerializedString(writer, Version);
         }
+    }
+
+    private void WriteToPath(string path, string? overrideDifficulty = null)
+    {
+        using var sw = new StreamWriter(path);
+        SaveTo(sw, overrideDifficulty);
     }
 }

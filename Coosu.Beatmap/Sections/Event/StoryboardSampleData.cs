@@ -12,7 +12,7 @@ public sealed class StoryboardSampleData : SerializeWritableObject
 
     public override string ToString() => $"Sample,{Offset},{MagicalInt},\"{Filename}\",{Volume}";
 
-    public override void AppendSerializedString(TextWriter textWriter)
+    public override void AppendSerializedString(TextWriter textWriter, int version)
     {
         textWriter.Write("Sample," + Offset + "," + MagicalInt + ",\"" + Filename + "\"," + Volume);
     }

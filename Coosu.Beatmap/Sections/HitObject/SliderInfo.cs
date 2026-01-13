@@ -30,7 +30,7 @@ public class SliderInfo : SerializeWritableObject
 
     public RawHitObject BaseObject { get; }
 
-    public override void AppendSerializedString(TextWriter textWriter)
+    public override void AppendSerializedString(TextWriter textWriter, int version)
     {
         textWriter.Write(SliderType.ToSliderFlag());
         textWriter.Write('|');

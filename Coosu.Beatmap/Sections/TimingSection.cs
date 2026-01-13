@@ -86,7 +86,7 @@ public sealed class TimingSection : Section
         });
     }
 
-    public override void AppendSerializedString(TextWriter textWriter)
+    public override void AppendSerializedString(TextWriter textWriter, int version)
     {
         textWriter.Write('[');
         textWriter.Write(SectionName);
@@ -94,7 +94,7 @@ public sealed class TimingSection : Section
         for (var i = 0; i < TimingList.Count; i++)
         {
             var timingPoint = TimingList[i];
-            timingPoint.AppendSerializedString(textWriter);
+            timingPoint.AppendSerializedString(textWriter, version);
             textWriter.WriteLine();
         }
     }

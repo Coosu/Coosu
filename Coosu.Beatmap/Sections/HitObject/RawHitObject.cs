@@ -71,7 +71,7 @@ public sealed class RawHitObject : SerializeWritableObject
         }
     }
 
-    public override void AppendSerializedString(TextWriter textWriter)
+    public override void AppendSerializedString(TextWriter textWriter, int version)
     {
         textWriter.Write(X);
         textWriter.Write(',');
@@ -85,7 +85,7 @@ public sealed class RawHitObject : SerializeWritableObject
         textWriter.Write(',');
         if (ObjectType == HitObjectType.Slider && SliderInfo != null)
         {
-            SliderInfo.AppendSerializedString(textWriter);
+            SliderInfo.AppendSerializedString(textWriter, version);
             //if (SliderInfo.EdgeHitsounds == null &&
             //    SampleSet == 0 && AdditionSet == 0 && CustomIndex == 0 && SampleVolume == 0 &&
             //    string.IsNullOrEmpty(FileName))

@@ -198,15 +198,15 @@ public sealed class EventSection : Section
         }
     }
 
-    public override void AppendSerializedString(TextWriter textWriter)
+    public override void AppendSerializedString(TextWriter textWriter, int version)
     {
         textWriter.Write('[');
         textWriter.Write(SectionName);
         textWriter.WriteLine(']');
 
         textWriter.WriteLine(SectionBgVideo);
-        VideoInfo?.AppendSerializedString(textWriter);
-        BackgroundInfo?.AppendSerializedString(textWriter);
+        VideoInfo?.AppendSerializedString(textWriter, version);
+        BackgroundInfo?.AppendSerializedString(textWriter, version);
         textWriter.WriteLine(SectionBreak);
         foreach (var range in Breaks)
         {
@@ -221,7 +221,7 @@ public sealed class EventSection : Section
         var validSampleList = Samples.Where(k => k.Volume > 0);
         foreach (var sampleData in validSampleList)
         {
-            sampleData.AppendSerializedString(textWriter);
+            sampleData.AppendSerializedString(textWriter, version);
             textWriter.WriteLine();
         }
 
