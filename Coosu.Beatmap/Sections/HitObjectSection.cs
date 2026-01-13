@@ -17,7 +17,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace Coosu.Beatmap.Sections;
 
 #if NET6_0_OR_GREATER
-[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | 
+[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors |
                             DynamicallyAccessedMemberTypes.NonPublicConstructors)]
 #endif
 [SectionProperty("HitObjects")]
@@ -92,8 +92,8 @@ public sealed class HitObjectSection : Section
     {
         var lineSpan = memory.Span;
 
-        int x = default;
-        int y = default;
+        float x = default;
+        float y = default;
         int offset = default;
         RawObjectType type = default;
         HitsoundType hitsound = default;
@@ -105,8 +105,8 @@ public sealed class HitObjectSection : Section
             var span = enumerator.Current;
             switch (enumerator.CurrentIndex)
             {
-                case 0: x = ParseHelper.ParseInt32(span); break;
-                case 1: y = ParseHelper.ParseInt32(span); break;
+                case 0: x = ParseHelper.ParseSingle(span); break;
+                case 1: y = ParseHelper.ParseSingle(span); break;
                 case 2: offset = ParseHelper.ParseInt32(span); break;
                 case 3: type = (RawObjectType)ParseHelper.ParseByte(span); break;
                 case 4: hitsound = (HitsoundType)ParseHelper.ParseByte(span); break;
@@ -245,18 +245,18 @@ public sealed class HitObjectSection : Section
                 continue; // curvePoints skip 1
             }
 
-            int x = 0;
+            float x = 0;
             var pointSplitEnumerator = point.SpanSplit(':');
             while (pointSplitEnumerator.MoveNext())
             {
                 var s = pointSplitEnumerator.Current;
                 if (pointSplitEnumerator.CurrentIndex == 0)
                 {
-                    x = ParseHelper.ParseInt32(s);
+                    x = ParseHelper.ParseSingle(s);
                 }
                 else
                 {
-                    var y = ParseHelper.ParseInt32(s);
+                    var y = ParseHelper.ParseSingle(s);
                     points.Add(new Vector2(x, y));
                 }
             }

@@ -88,7 +88,7 @@ public abstract class KeyValueSection : Section
         }
     }
 
-    public override void AppendSerializedString(TextWriter textWriter)
+    public override void AppendSerializedString(TextWriter textWriter, int version)
     {
         textWriter.Write('[');
         textWriter.Write(SectionName);

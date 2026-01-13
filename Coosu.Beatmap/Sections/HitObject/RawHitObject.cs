@@ -8,8 +8,8 @@ namespace Coosu.Beatmap.Sections.HitObject;
 
 public sealed class RawHitObject : SerializeWritableObject
 {
-    public int X { get; set; }
-    public int Y { get; set; }
+    public float X { get; set; }
+    public float Y { get; set; }
     public int Offset { get; set; }
     public RawObjectType RawType { get; set; }
 
@@ -73,9 +73,19 @@ public sealed class RawHitObject : SerializeWritableObject
 
     public override void AppendSerializedString(TextWriter textWriter, int version)
     {
-        textWriter.Write(X);
-        textWriter.Write(',');
-        textWriter.Write(Y);
+        if (version < 128)
+        {
+            textWriter.Write((int)X);
+            textWriter.Write(',');
+            textWriter.Write((int)Y);
+        }
+        else
+        {
+            textWriter.Write(X.ToString(ParseHelper.EnUsNumberFormat));
+            textWriter.Write(',');
+            textWriter.Write(Y.ToString(ParseHelper.EnUsNumberFormat));
+        }
+
         textWriter.Write(',');
         textWriter.Write(Offset);
         textWriter.Write(',');

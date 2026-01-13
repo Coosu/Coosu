@@ -157,7 +157,7 @@ public class OsuFile : Config
             var verSpan = line.Slice(VerFlag.Length);
             if (!ParseHelper.TryParseInt32(verSpan, out var verNum))
                 throw new BadOsuFormatException("Unknown osu file format: " + verSpan.ToString());
-            if (verNum is < 3 or > 14)
+            if (verNum is < 3 or > 14 && verNum != 128)
                 throw new VersionNotSupportedException(verNum);
             Version = verNum;
         }
