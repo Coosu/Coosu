@@ -1,0 +1,47 @@
+﻿osu file format v128
+
+[General]
+AudioFilename: audio.mp3
+AudioLeadIn: 0
+PreviewTime: 0
+Countdown: 0
+SampleSet: Normal
+StackLeniency: 0.7
+Mode: 0
+LetterboxInBreaks: 0
+WidescreenStoryboard: 1
+
+[Editor]
+DistanceSpacing: 1
+BeatDivisor: 4
+GridSize: 4
+TimelineZoom: 1
+
+[Metadata]
+Title: Test Title
+TitleUnicode: Test TitleUnicode
+Artist: Test Artist
+ArtistUnicode: Test ArtistUnicode
+Creator: Test Creator
+Version: New Difficulty
+Source: Test Source
+Tags: Test Tag
+BeatmapSetID: -1
+
+[Difficulty]
+HPDrainRate: 5
+CircleSize: 5
+OverallDifficulty: 5
+ApproachRate: 5
+SliderMultiplier: 1.4
+SliderTickRate: 1
+
+[Events]
+0,0,"BG.jpg",0,0
+
+[TimingPoints]
+0,357.142857142857,4,1,0,100,1,0
+
+
+[HitObjects]
+67.99998,206.96883,1042,6,0,B|148.00003:244|156.00003:128.00002|P|207.25885:175.97568|236:236.00002|L|309.02518:235.77657|B4|324.00003:156.00002|280.00003:36|394.69653:97.18754,2,525,0|0|0,1:0|1:0|1:0,1:0:0:0:

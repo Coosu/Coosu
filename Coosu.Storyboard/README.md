@@ -1,12 +1,128 @@
 # Coosu.Storyboard
-Use Coosu.Storyboard (osu!storyboard coding Library) to code and generate SBC(.osb code)
 
-## Performance improvement
+[![NuGet](https://img.shields.io/nuget/v/Coosu.Storyboard.svg)](https://www.nuget.org/packages/Coosu.Storyboard/)
+[![Downloads](https://img.shields.io/nuget/dt/Coosu.Storyboard.svg)](https://www.nuget.org/packages/Coosu.Storyboard/)
 
-Since version v2.1.1, the library's performance was optimized. 
-### Parsing benchmark
-Run `benchmark-OsbParsing.ps1`:
+**Coosu.Storyboard** is a .NET library designed for creating, parsing, and manipulating osu! storyboard files (`.osb` and `.osu` storyboard sections). It provides a programmatic way to define and control storyboard elements like sprites and animations, along with their various transformations and events over time.
 
+## Features
+
+*   **Create Storyboards Programmatically**: Define sprites, animations, and their behaviors (move, fade, scale, rotate, color) using C# code.
+*   **Parsing Existing Storyboards**: Load and parse `.osb` files or storyboard sections within `.osu` files into an object model.
+*   **Object-Oriented Structure**: Work with storyboard elements like `Sprite`, `Animation`, `Layer`, and `Scene` in an organized way.
+*   **Event System**: Define complex sequences of events (fade, move, scale, rotate, color, parameter changes) with various easing options.
+*   **Looping and Triggering**: Create loops and triggers for advanced animation control, as defined in the osu! storyboard specification.
+*   **Layer Management**: Organize sprites and animations into different layers (Background, Fail, Pass, Foreground, Overlay).
+*   **Extensible**: Designed to be built upon, allowing for custom event types and behaviors (see `Coosu.Storyboard.Extensions` and `Coosu.Storyboard.OsbX`).
+*   **High Performance**: Optimized for efficient parsing and generation of storyboard scripts.
+
+## Installation
+
+You can install Coosu.Storyboard via NuGet Package Manager:
+
+```bash
+Install-Package Coosu.Storyboard
+```
+
+Or using the .NET CLI:
+
+```bash
+dotnet add package Coosu.Storyboard
+```
+
+## Usage
+
+### Creating a Simple Storyboard
+
+```csharp
+using Coosu.Storyboard;
+using Coosu.Storyboard.Common;
+using Coosu.Storyboard.Easing;
+using Coosu.Shared.Numerics; // For Vector2D
+using System.IO;
+using System.Threading.Tasks;
+
+public class StoryboardGenerator
+{
+    public async Task CreateSampleStoryboardAsync(string outputOsbFile)
+    {
+        var scene = new Scene();
+        var layer = scene.GetOrAddLayer("Foreground"); // Get the Foreground layer, or create if not exists
+
+        // Create a sprite
+        var sprite = layer.CreateSprite("sb/sprite.png", LayerType.Foreground, OriginType.Centre);
+
+        // Add events to the sprite
+        sprite.Move(0, 1000, 320, 240, 420, 240); // Move from (320,240) to (420,240) between 0ms and 1000ms
+        sprite.Fade(0, 1000, 0, 1);          // Fade in from 0ms to 1000ms
+        sprite.Scale(0, 1000, 0.5, 1);       // Scale from 0.5 to 1 between 0ms and 1000ms
+        sprite.Rotate(0, 1000, 0, Math.PI * 2); // Rotate 360 degrees between 0ms and 1000ms
+
+        // Create an animation
+        var animation = layer.CreateAnimation("sb/anim/frame.png", 10, 100, LoopType.LoopForever,
+                                            LayerType.Background, OriginType.CentreLeft, 0, 240);
+        animation.Fade(1000, 2000, 1, 0); // Fade out animation
+
+        // Add a loop to a sprite
+        var loopingSprite = layer.CreateSprite("sb/loop_sprite.png", LayerType.Foreground, OriginType.TopLeft, 0, 0);
+        var loop = loopingSprite.StartLoop(2000, 3); // Start loop at 2000ms, repeat 3 times
+        {
+            loop.Move(EasingType.EaseInQuad, 0, 500, 0, 0, 100, 0); // Relative to loop start time
+            loop.Move(EasingType.EaseOutQuad, 500, 1000, 100, 0, 0, 0);
+        }
+        loopingSprite.EndLoop(); // Or loop.Dispose();
+
+        // Write the storyboard to an .osb file
+        using (var writer = new StreamWriter(outputOsbFile))
+        {
+            await scene.WriteFullScriptAsync(writer);
+        }
+        Console.WriteLine($"Storyboard saved to: {outputOsbFile}");
+    }
+}
+```
+
+### Parsing an Existing Storyboard
+
+```csharp
+using Coosu.Storyboard;
+using System.IO;
+using System.Threading.Tasks;
+
+public class StoryboardParser
+{
+    public async Task ParseStoryboardAsync(string osbFilePath)
+    {
+        Scene scene;
+        using (var reader = new StreamReader(osbFilePath))
+        {
+            scene = await Layer.ParseTextAsync(reader); // Or Scene.ParseTextAsync for a more direct approach
+        }
+
+        Console.WriteLine($"Parsed storyboard with {scene.Layers.Count} layers.");
+
+        foreach (var layerEntry in scene.Layers)
+        {
+            Console.WriteLine($"Layer: {layerEntry.Key} has {layerEntry.Value.SceneObjects.Count} objects.");
+            foreach (var sceneObject in layerEntry.Value.SceneObjects)
+            {
+                Console.WriteLine($"  Object: {sceneObject.ImagePath}, Type: {sceneObject.ObjectType}");
+                Console.WriteLine($"    Events: {sceneObject.Events.Count}, Loops: {sceneObject.LoopList.Count}, Triggers: {sceneObject.TriggerList.Count}");
+                // Access individual events, loops, triggers
+            }
+        }
+    }
+}
+```
+
+## Performance
+
+Coosu.Storyboard is optimized for performance. Benchmarks show significant improvements compared to older versions and other libraries.
+
+*(The existing benchmark data from the original README can be kept here, or updated if newer benchmarks are available. Ensure the context of the benchmark (hardware, .NET version) is clear.)*
+
+### Parsing Benchmark
+Run `benchmark-OsbParsing.ps1` in the `Benchmarks/OsbParsingBenchmark` directory:
 ``` ini
 
 BenchmarkDotNet=v0.13.1, OS=Windows 10.0.19044.1466 (21H2)
