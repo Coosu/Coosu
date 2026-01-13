@@ -10,6 +10,14 @@ namespace CoosuUnitTest.Beatmap;
 public class BeatmapTest
 {
     [Fact]
+    public async Task ParseV128Case()
+    {
+        var folder = @"files";
+        var file = @"Test Artist - Test Title (Test Creator) [New Difficulty].osu";
+        var osuFile = await OsuFile.ReadFromFileAsync(Path.Combine(folder, file));
+    }
+
+    [Fact]
     public async Task ParseEdgeCase()
     {
         var folder = @"files";

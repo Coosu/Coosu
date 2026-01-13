@@ -37,9 +37,19 @@ public class SliderInfo : SerializeWritableObject
         for (var i = 0; i < ControlPoints.Count; i++)
         {
             var controlPoint = ControlPoints[i];
-            textWriter.Write(controlPoint.X.ToString(ParseHelper.EnUsNumberFormat));
-            textWriter.Write(':');
-            textWriter.Write(controlPoint.Y.ToString(ParseHelper.EnUsNumberFormat));
+            if (version < 128)
+            {
+                textWriter.Write((int)controlPoint.X);
+                textWriter.Write(':');
+                textWriter.Write((int)controlPoint.Y);
+            }
+            else
+            {
+                textWriter.Write(controlPoint.X.ToString(ParseHelper.EnUsNumberFormat));
+                textWriter.Write(':');
+                textWriter.Write(controlPoint.Y.ToString(ParseHelper.EnUsNumberFormat));
+            }
+
             if (i < ControlPoints.Count - 1)
             {
                 textWriter.Write('|');
