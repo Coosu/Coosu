@@ -26,7 +26,7 @@ public class SliderInfo : SerializeWritableObject
     public Vector2 StartPoint { get; set; }
     public Vector2 EndPoint => ControlPoints[ControlPoints.Count - 1];
 
-    public int StartTime { get; set; }
+    public double StartTime { get; set; }
 
     public RawHitObject BaseObject { get; }
 

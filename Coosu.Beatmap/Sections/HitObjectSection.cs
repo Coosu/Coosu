@@ -46,9 +46,9 @@ public sealed class HitObjectSection : Section
             .ToList(); // Use LINQ for stable sort
 
         var currentIndex = 0;
-        double? nextTiming = default;
-        TimingPoint? currentLine = default;
-        TimingPoint? currentRedLine = default;
+        double? nextTiming = null;
+        TimingPoint? currentLine = null;
+        TimingPoint? currentRedLine = null;
         UpdateTiming(ref currentIndex, ref nextTiming, ref currentLine, ref currentRedLine, true);
 
         for (var i = 0; i < HitObjectList.Count; i++)
@@ -92,9 +92,9 @@ public sealed class HitObjectSection : Section
     {
         var lineSpan = memory.Span;
 
-        float x = default;
-        float y = default;
-        int offset = default;
+        float x = 0;
+        float y = 0;
+        double offset = 0;
         RawObjectType type = default;
         HitsoundType hitsound = default;
         ReadOnlySpan<char> others = default;
@@ -107,7 +107,7 @@ public sealed class HitObjectSection : Section
             {
                 case 0: x = ParseHelper.ParseSingle(span); break;
                 case 1: y = ParseHelper.ParseSingle(span); break;
-                case 2: offset = ParseHelper.ParseInt32(span); break;
+                case 2: offset = ParseHelper.ParseDouble(span); break;
                 case 3: type = (RawObjectType)ParseHelper.ParseByte(span); break;
                 case 4: hitsound = (HitsoundType)ParseHelper.ParseByte(span); break;
                 case 5: others = span; break; // The rest of the string after 5 splits
@@ -152,7 +152,7 @@ public sealed class HitObjectSection : Section
 
     private void ToSpinner(RawHitObject hitObject, ReadOnlySpan<char> others)
     {
-        int holdEnd = default;
+        int holdEnd = 0;
         ReadOnlySpan<char> extras = default;
         var enumerator = others.SpanSplit(',');
         while (enumerator.MoveNext())
@@ -171,7 +171,7 @@ public sealed class HitObjectSection : Section
 
     private void ToHold(RawHitObject hitObject, ReadOnlySpan<char> others)
     {
-        int holdEnd = default;
+        int holdEnd = 0;
         ReadOnlySpan<char> extras = default;
 
         var enumerator = others.SpanSplit(':', maxSplits: 2);
@@ -192,8 +192,8 @@ public sealed class HitObjectSection : Section
     private void ToSlider(RawHitObject hitObject, ReadOnlySpan<char> others)
     {
         ReadOnlySpan<char> curveInfo = default;
-        int repeat = default;
-        double pixelLength = default;
+        int repeat = 0;
+        double pixelLength = 0;
         ReadOnlySpan<char> edgeHitsoundInfo = default;
         ReadOnlySpan<char> sampleAdditionInfo = default;
         ReadOnlySpan<char> extraInfo = default;
@@ -228,7 +228,7 @@ public sealed class HitObjectSection : Section
         }
 
         // slider curve
-        char sliderType = default;
+        char sliderType = '\0';
         var points = curveInfo.Length > 100
             ? curveInfo.Length > 200
                 ? new List<Vector2>(50)
