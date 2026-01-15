@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.0.31612.314
+# Visual Studio Version 18
+VisualStudioVersion = 18.3.11408.92 d18.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Coosu.Api", "Coosu.Api\Coosu.Api.csproj", "{3108AE4A-DE35-40AE-A449-1EFB9719367D}"
 EndProject
@@ -52,6 +52,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Coosu.Database.SourceGenerator", "Coosu.Database.SourceGenerator\Coosu.Database.SourceGenerator.csproj", "{D6B1784B-7335-F13E-8477-2170E20A0345}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvaloniaTest", "Tests\AvaloniaTest\AvaloniaTest.csproj", "{C817230E-74E7-490A-9774-0EAC3364C429}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoosuDebugConsole", "Tests\CoosuDebugConsole\CoosuDebugConsole.csproj", "{5D8EADFF-B9FC-4524-B508-22EABB39BFF6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -327,6 +329,18 @@ Global
 		{C817230E-74E7-490A-9774-0EAC3364C429}.Release|x64.Build.0 = Release|Any CPU
 		{C817230E-74E7-490A-9774-0EAC3364C429}.Release|x86.ActiveCfg = Release|Any CPU
 		{C817230E-74E7-490A-9774-0EAC3364C429}.Release|x86.Build.0 = Release|Any CPU
+		{5D8EADFF-B9FC-4524-B508-22EABB39BFF6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D8EADFF-B9FC-4524-B508-22EABB39BFF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D8EADFF-B9FC-4524-B508-22EABB39BFF6}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{5D8EADFF-B9FC-4524-B508-22EABB39BFF6}.Debug|x64.Build.0 = Debug|Any CPU
+		{5D8EADFF-B9FC-4524-B508-22EABB39BFF6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5D8EADFF-B9FC-4524-B508-22EABB39BFF6}.Debug|x86.Build.0 = Debug|Any CPU
+		{5D8EADFF-B9FC-4524-B508-22EABB39BFF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D8EADFF-B9FC-4524-B508-22EABB39BFF6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D8EADFF-B9FC-4524-B508-22EABB39BFF6}.Release|x64.ActiveCfg = Release|Any CPU
+		{5D8EADFF-B9FC-4524-B508-22EABB39BFF6}.Release|x64.Build.0 = Release|Any CPU
+		{5D8EADFF-B9FC-4524-B508-22EABB39BFF6}.Release|x86.ActiveCfg = Release|Any CPU
+		{5D8EADFF-B9FC-4524-B508-22EABB39BFF6}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -344,6 +358,7 @@ Global
 		{BF08EF26-7659-4265-834C-3BA4AAAAB848} = {91EF2168-FEDF-406B-86D7-BA6177977D5E}
 		{A1C23A81-EEE7-4398-93E1-5D1C6E92ADF2} = {B36A84DF-456D-A817-6EDD-3EC3E7F6E11F}
 		{C817230E-74E7-490A-9774-0EAC3364C429} = {020FD699-A91C-4AD7-9AC7-FC69BD65D51E}
+		{5D8EADFF-B9FC-4524-B508-22EABB39BFF6} = {020FD699-A91C-4AD7-9AC7-FC69BD65D51E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1E82D4BA-E134-4C4A-A48B-F02A601C59CF}

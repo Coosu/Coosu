@@ -23,4 +23,10 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Coosu.Beatmap\Coosu.Beatmap.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Test Artist - Test Title %28Test Creator%29 [New Difficulty].osu">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>

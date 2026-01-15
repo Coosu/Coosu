@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Buffers;
 using System.Collections.Generic;
 using System.Linq;
@@ -235,6 +235,7 @@ public static class SliderExtensions
         {
             case SliderType.Bezier:
             case SliderType.Linear:
+            case SliderType.Bezier4:
                 ComputePathVerticesBezier(points, ref builder);
                 break;
             case SliderType.Perfect:
