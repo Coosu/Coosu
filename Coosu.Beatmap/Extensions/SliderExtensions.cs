@@ -11,6 +11,8 @@ namespace Coosu.Beatmap;
 
 public static class SliderExtensions
 {
+    #region Public Methods
+
     public static IEnumerable<SliderEdge> EnumerateEdges(this ExtendedSliderInfo sliderInfo)
     {
         for (var i = 0; i < sliderInfo.Repeat + 1; i++)
@@ -35,60 +37,35 @@ public static class SliderExtensions
     public static SliderTick[] GetSliderTicks(this ExtendedSliderInfo sliderInfo)
     {
         var tickInterval = sliderInfo.CurrentBeatDuration / sliderInfo.CurrentTickRate;
-        return ComputeDiscreteData(sliderInfo, tickInterval);
+        return ComputeTicks(sliderInfo, tickInterval);
     }
 
     public static SliderTick[] GetSliderSlides(this ExtendedSliderInfo sliderInfo)
     {
         // 60fps
         var interval = 1000 / 60d;
-        return ComputeDiscreteData(sliderInfo, interval);
+        return ComputeTicks(sliderInfo, interval);
     }
 
     // todo: not cut by rhythm
-    public static SliderTick[] ComputeDiscreteData(this ExtendedSliderInfo sliderInfo, double intervalMilliseconds)
+    public static SliderTick[] ComputeTicks(this ExtendedSliderInfo sliderInfo, double intervalMilliseconds)
     {
-        return ComputePiecewiseDiscreteData(sliderInfo, intervalMilliseconds);
+        return ComputeTicksByInterval(sliderInfo, intervalMilliseconds);
     }
 
-    /// <summary>
-    /// osu!lazer implementation to compute approximated data.
-    /// </summary>
-    /// <returns></returns>
-    private static IReadOnlyList<Vector2> ComputeApproximatedData(this SliderInfo sliderInfo)
-    {
-        IReadOnlyList<Vector2> ticks;
-        switch (sliderInfo.SliderType)
-        {
-            case SliderType.Bezier:
-            case SliderType.Linear:
-                ticks = ComputeBezierApproximatedData(sliderInfo);
-                break;
-            case SliderType.Perfect:
-                ticks = ComputePerfectApproximatedData(sliderInfo);
-                break;
-#pragma warning disable CS0618 // 类型或成员已过时
-            case SliderType.Catmull:
-#pragma warning restore CS0618 // 类型或成员已过时
-                ticks = ComputeCatmullApproximatedData(sliderInfo);
-                break;
-            default:
-                ticks = EmptyArray<Vector2>.Value;
-                break;
-        }
+    #endregion
 
-        return ticks;
-    }
+    #region Private Core Logic
 
     // todo: not cut by rhythm
-    private static SliderTick[] ComputePiecewiseDiscreteData(ExtendedSliderInfo sliderInfo, double fixedInterval)
+    private static SliderTick[] ComputeTicksByInterval(ExtendedSliderInfo sliderInfo, double fixedInterval)
     {
         if (Math.Round(fixedInterval - sliderInfo.CurrentSingleDuration) >= 0)
         {
             return EmptyArray<SliderTick>.Value;
         }
 
-        var approximated = sliderInfo.ComputeApproximatedData();
+        var approximated = sliderInfo.ComputePathVertices();
         if (approximated.Count < 2)
         {
             return EmptyArray<SliderTick>.Value;
@@ -156,6 +133,86 @@ public static class SliderExtensions
         }
     }
 
+    /// <summary>
+    /// osu!lazer implementation to compute approximated data.
+    /// </summary>
+    /// <returns></returns>
+    private static IReadOnlyList<Vector2> ComputePathVertices(this SliderInfo sliderInfo)
+    {
+        IReadOnlyList<Vector2> ticks;
+        switch (sliderInfo.SliderType)
+        {
+            case SliderType.Bezier:
+            case SliderType.Linear:
+                ticks = ComputePathVerticesBezier(sliderInfo);
+                break;
+            case SliderType.Perfect:
+                ticks = ComputePathVerticesPerfect(sliderInfo);
+                break;
+#pragma warning disable CS0618 // 类型或成员已过时
+            case SliderType.Catmull:
+#pragma warning restore CS0618 // 类型或成员已过时
+                ticks = ComputePathVerticesCatmull(sliderInfo);
+                break;
+            default:
+                ticks = EmptyArray<Vector2>.Value;
+                break;
+        }
+
+        return ticks;
+    }
+
+    #endregion
+
+    #region Path Algorithms
+
+    private static IReadOnlyList<Vector2> ComputePathVerticesPerfect(SliderInfo sliderInfo)
+    {
+        Vector2 p1;
+        Vector2 p2;
+        Vector2 p3;
+        try
+        {
+            p1 = sliderInfo.StartPoint;
+            p2 = sliderInfo.ControlPoints[0];
+            p3 = sliderInfo.ControlPoints[1];
+        }
+        catch (IndexOutOfRangeException)
+        {
+            return ComputePathVerticesBezier(sliderInfo);
+        }
+
+        return PathApproximator.CircularArcToPiecewiseLinear(new[] { p1, p2, p3 });
+    }
+
+    private static IReadOnlyList<Vector2> ComputePathVerticesBezier(SliderInfo sliderInfo)
+    {
+        var points = new List<Vector2>();
+        var groupedPoints = GetGroupedPoints(sliderInfo);
+        for (var i = 0; i < groupedPoints.Count; i++)
+        {
+            var groupedPoint = groupedPoints[i];
+            var bezierTrail = PathApproximator.BezierToPiecewiseLinear(groupedPoint);
+
+            points.AddRange(bezierTrail);
+        }
+
+        return points;
+    }
+
+    private static IReadOnlyList<Vector2> ComputePathVerticesCatmull(SliderInfo sliderInfo)
+    {
+        var all = sliderInfo.ControlPoints.ToList();
+        all.Insert(0, sliderInfo.StartPoint);
+
+        var catmullTrail = PathApproximator.CatmullToPiecewiseLinear(all.ToArray());
+        return catmullTrail;
+    }
+
+    #endregion
+
+    #region Helpers
+
     private static (double[] segmentLengths, double[] cumulativeLengths, double totalLength) CreateCumulativeLengths(
         IReadOnlyList<Vector2> points)
     {
@@ -215,49 +272,6 @@ public static class SliderExtensions
         return Vector2.Lerp(points[index], points[index + 1], t);
     }
 
-    private static IReadOnlyList<Vector2> ComputePerfectApproximatedData(SliderInfo sliderInfo)
-    {
-        Vector2 p1;
-        Vector2 p2;
-        Vector2 p3;
-        try
-        {
-            p1 = sliderInfo.StartPoint;
-            p2 = sliderInfo.ControlPoints[0];
-            p3 = sliderInfo.ControlPoints[1];
-        }
-        catch (IndexOutOfRangeException)
-        {
-            return ComputeBezierApproximatedData(sliderInfo);
-        }
-
-        return PathApproximator.CircularArcToPiecewiseLinear(new[] { p1, p2, p3 });
-    }
-
-    private static IReadOnlyList<Vector2> ComputeBezierApproximatedData(SliderInfo sliderInfo)
-    {
-        var points = new List<Vector2>();
-        var groupedPoints = GetGroupedPoints(sliderInfo);
-        for (var i = 0; i < groupedPoints.Count; i++)
-        {
-            var groupedPoint = groupedPoints[i];
-            var bezierTrail = PathApproximator.BezierToPiecewiseLinear(groupedPoint);
-
-            points.AddRange(bezierTrail);
-        }
-
-        return points;
-    }
-
-    private static IReadOnlyList<Vector2> ComputeCatmullApproximatedData(SliderInfo sliderInfo)
-    {
-        var all = sliderInfo.ControlPoints.ToList();
-        all.Insert(0, sliderInfo.StartPoint);
-
-        var catmullTrail = PathApproximator.CatmullToPiecewiseLinear(all.ToArray());
-        return catmullTrail;
-    }
-
     private static List<Vector2[]> GetGroupedPoints(SliderInfo sliderInfo)
     {
         var controlPoints = sliderInfo.ControlPoints;
@@ -310,4 +324,6 @@ public static class SliderExtensions
 
         return groupedPoints;
     }
+
+    #endregion
 }
