@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Coosu.Beatmap;
@@ -17,7 +17,7 @@ public class BeatmapTest
         var osuFile = await OsuFile.ReadFromFileAsync(Path.Combine(folder, file));
     }
 
-    [Fact]
+    [Fact(Skip = "Depends on local files outside repository.")]
     public async Task ReadAndWrite()
     {
         //var folder = @"C:\Users\milkitic\Desktop\1002455 supercell - Giniro Hikousen  (Ttm bootleg Edit)";
@@ -29,7 +29,7 @@ public class BeatmapTest
         osuFile.SaveToDirectory(folder, osuFile.Metadata.Version + " (TEST)");
     }
 
-    [Fact]
+    [Fact(Skip = "Depends on local files outside repository.")]
     public async Task ReadHitsounds()
     {
         var folder = @"C:\Users\milkitic\Downloads\606833 BlackYooh vs. siromaru - BLACK or WHITE";
