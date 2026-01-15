@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -129,35 +130,43 @@ public static class SliderExtensions
     private static void AppendRepeatTicks(ExtendedSliderInfo sliderInfo, ref ValueListBuilder<SliderTick> ticks)
     {
         var count = ticks.Length;
+        SliderTick[]? pooled = null;
         Span<SliderTick> span = count <= 256
             ? stackalloc SliderTick[count]
-            : new SliderTick[count];
+            : (pooled = ArrayPool<SliderTick>.Shared.Rent(count)).AsSpan(0, count);
 
-        ticks.AsSpan().CopyTo(span);
-
-        for (int i = 2; i <= sliderInfo.Repeat; i++)
+        try
         {
-            span.Reverse();
-            var reverse = i % 2 == 0;
-            if (reverse)
+            ticks.AsSpan().CopyTo(span);
+
+            for (int i = 2; i <= sliderInfo.Repeat; i++)
             {
-                foreach (var baseTick in span)
+                span.Reverse();
+                var reverse = i % 2 == 0;
+                if (reverse)
                 {
-                    var tick = new SliderTick(
-                        i * sliderInfo.CurrentSingleDuration - baseTick.Offset + sliderInfo.StartTime * 2,
-                        baseTick.Point);
-                    ticks.Append(tick);
+                    foreach (var baseTick in span)
+                    {
+                        var tick = new SliderTick(
+                            i * sliderInfo.CurrentSingleDuration - baseTick.Offset + sliderInfo.StartTime * 2,
+                            baseTick.Point);
+                        ticks.Append(tick);
+                    }
+                }
+                else
+                {
+                    foreach (var baseTick in span)
+                    {
+                        var tick = new SliderTick(baseTick.Offset + (i - 1) * sliderInfo.CurrentSingleDuration,
+                            baseTick.Point);
+                        ticks.Append(tick);
+                    }
                 }
             }
-            else
-            {
-                foreach (var baseTick in span)
-                {
-                    var tick = new SliderTick(baseTick.Offset + (i - 1) * sliderInfo.CurrentSingleDuration,
-                        baseTick.Point);
-                    ticks.Append(tick);
-                }
-            }
+        }
+        finally
+        {
+            if (pooled != null) ArrayPool<SliderTick>.Shared.Return(pooled);
         }
     }
 
@@ -207,27 +216,106 @@ public static class SliderExtensions
             return;
         }
 
-        var result = PathApproximator.CircularArcToPiecewiseLinear([p1, p2, p3]);
+        Span<Vector2> points = stackalloc Vector2[3];
+        points[0] = p1;
+        points[1] = p2;
+        points[2] = p3;
+
+        var result = PathApproximator.CircularArcToPiecewiseLinear(points);
         foreach (var p in result) builder.Append(p);
     }
 
     private static void ComputePathVerticesBezier(SliderInfo sliderInfo, ref ValueListBuilder<Vector2> builder)
     {
-        var groupedPoints = GetGroupedPoints(sliderInfo);
-        for (var i = 0; i < groupedPoints.Count; i++)
-        {
-            var groupedPoint = groupedPoints[i];
-            var bezierTrail = PathApproximator.BezierToPiecewiseLinear(groupedPoint);
+        var controlPoints = sliderInfo.ControlPoints;
+        if (controlPoints.Count == 0) return;
 
-            foreach (var p in bezierTrail) builder.Append(p);
+        int totalCount = controlPoints.Count + 1;
+        Vector2[]? pooled = null;
+        Span<Vector2> allPoints = totalCount <= 256
+            ? stackalloc Vector2[totalCount]
+            : (pooled = ArrayPool<Vector2>.Shared.Rent(totalCount)).AsSpan(0, totalCount);
+
+        try
+        {
+            allPoints[0] = sliderInfo.StartPoint;
+            for (int i = 0; i < controlPoints.Count; i++)
+            {
+                allPoints[i + 1] = controlPoints[i];
+            }
+
+            bool anySegmentAdded = false;
+            int start = 0;
+
+            for (var i = 0; i < totalCount - 1; i++)
+            {
+                var thisPoint = allPoints[i];
+                var nextPoint = allPoints[i + 1];
+
+                // 如果当前点等于下一个点，说明这里是路径的分段点
+                if (thisPoint.Equals(nextPoint))
+                {
+                    int length = i - start + 1;
+                    // 如果当前组有效（超过1个点），则添加
+                    if (length > 1)
+                    {
+                        var subPoints = allPoints.Slice(start, length);
+                        var bezierTrail = PathApproximator.BezierToPiecewiseLinear(subPoints);
+                        foreach (var p in bezierTrail) builder.Append(p);
+                        anySegmentAdded = true;
+                    }
+
+                    start = i + 1;
+                }
+            }
+
+            // 添加最后一个点
+            int lastLength = totalCount - start;
+            if (lastLength > 1)
+            {
+                var subPoints = allPoints.Slice(start, lastLength);
+                var bezierTrail = PathApproximator.BezierToPiecewiseLinear(subPoints);
+                foreach (var p in bezierTrail) builder.Append(p);
+                anySegmentAdded = true;
+            }
+
+            // Fallback: 如果有控制点但没有生成任何有效组（例如 A, A），则将整体作为一个组
+            if (!anySegmentAdded)
+            {
+                var bezierTrail = PathApproximator.BezierToPiecewiseLinear(allPoints);
+                foreach (var p in bezierTrail) builder.Append(p);
+            }
+        }
+        finally
+        {
+            if (pooled != null) ArrayPool<Vector2>.Shared.Return(pooled);
         }
     }
 
     private static void ComputePathVerticesCatmull(SliderInfo sliderInfo, ref ValueListBuilder<Vector2> builder)
     {
-        List<Vector2> all = [sliderInfo.StartPoint, .. sliderInfo.ControlPoints];
-        var catmullTrail = PathApproximator.CatmullToPiecewiseLinear(all);
-        foreach (var p in catmullTrail) builder.Append(p);
+        var controlPoints = sliderInfo.ControlPoints;
+        int totalCount = controlPoints.Count + 1;
+        Vector2[]? pooled = null;
+        Span<Vector2> allPoints = totalCount <= 256
+            ? stackalloc Vector2[totalCount]
+            : (pooled = ArrayPool<Vector2>.Shared.Rent(totalCount)).AsSpan(0, totalCount);
+
+        try
+        {
+            allPoints[0] = sliderInfo.StartPoint;
+            for (int i = 0; i < controlPoints.Count; i++)
+            {
+                allPoints[i + 1] = controlPoints[i];
+            }
+
+            var catmullTrail = PathApproximator.CatmullToPiecewiseLinear(allPoints);
+            foreach (var p in catmullTrail) builder.Append(p);
+        }
+        finally
+        {
+            if (pooled != null) ArrayPool<Vector2>.Shared.Return(pooled);
+        }
     }
 
     #endregion
@@ -290,59 +378,6 @@ public static class SliderExtensions
 
         var t = (float)((targetLen - previousSum) / segLen);
         return Vector2.Lerp(points[index], points[index + 1], t);
-    }
-
-    private static List<Vector2[]> GetGroupedPoints(SliderInfo sliderInfo)
-    {
-        var controlPoints = sliderInfo.ControlPoints;
-        var groupedPoints = new List<Vector2[]>();
-
-        // 如果没有控制点，只有起点是无法构成滑条路径的
-        if (controlPoints.Count == 0)
-        {
-            return groupedPoints;
-        }
-
-        var allPoints = new List<Vector2>(controlPoints.Count + 1) { sliderInfo.StartPoint };
-        allPoints.AddRange(controlPoints);
-
-        var currentGroup = new List<Vector2>();
-
-        for (var i = 0; i < allPoints.Count - 1; i++)
-        {
-            var thisPoint = allPoints[i];
-            var nextPoint = allPoints[i + 1];
-
-            currentGroup.Add(thisPoint);
-
-            // 如果当前点等于下一个点，说明这里是路径的分段点
-            if (thisPoint.Equals(nextPoint))
-            {
-                // 如果当前组有效（超过1个点），则添加
-                if (currentGroup.Count > 1)
-                {
-                    groupedPoints.Add(currentGroup.ToArray());
-                }
-
-                currentGroup.Clear();
-            }
-        }
-
-        // 添加最后一个点
-        currentGroup.Add(allPoints[allPoints.Count - 1]);
-
-        if (currentGroup.Count > 1)
-        {
-            groupedPoints.Add(currentGroup.ToArray());
-        }
-
-        // Fallback: 如果有控制点但没有生成任何有效组（例如 A, A），则将整体作为一个组
-        if (groupedPoints.Count == 0)
-        {
-            groupedPoints.Add(allPoints.ToArray());
-        }
-
-        return groupedPoints;
     }
 
     #endregion
