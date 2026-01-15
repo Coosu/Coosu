@@ -9,6 +9,10 @@
     <LangVersion>11.0</LangVersion>
   </PropertyGroup>
 
+  <ItemGroup Condition="$(TargetFramework)!='netstandard2.0'">
+    <PackageReference Include="System.Numerics.Tensors" Version="10.0.2" />
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\Coosu.Shared\Coosu.Shared.csproj" />
   </ItemGroup>

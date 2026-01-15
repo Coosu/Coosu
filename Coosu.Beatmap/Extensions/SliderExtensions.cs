@@ -5,6 +5,7 @@ using System.Numerics;
 using Coosu.Beatmap.Sections.HitObject;
 using Coosu.Beatmap.Utils;
 using Coosu.Shared;
+using osu.Framework.Utils;
 
 // ReSharper disable once CheckNamespace
 namespace Coosu.Beatmap;
@@ -260,7 +261,7 @@ public static class SliderExtensions
             return ComputeBezierApproximatedData(sliderInfo);
         }
 
-        return PathApproximator.ApproximateCircularArc(new[] { p1, p2, p3 });
+        return PathApproximator.CircularArcToPiecewiseLinear(new[] { p1, p2, p3 });
     }
 
     private static IReadOnlyList<Vector2> ComputeBezierApproximatedData(SliderInfo sliderInfo)
@@ -270,7 +271,7 @@ public static class SliderExtensions
         for (var i = 0; i < groupedPoints.Count; i++)
         {
             var groupedPoint = groupedPoints[i];
-            var bezierTrail = PathApproximator.ApproximateBezier(groupedPoint);
+            var bezierTrail = PathApproximator.BezierToPiecewiseLinear(groupedPoint);
 
             points.AddRange(bezierTrail.Select(k => new Vector2(k.X, k.Y)));
         }
@@ -283,7 +284,7 @@ public static class SliderExtensions
         var all = sliderInfo.ControlPoints.ToList();
         all.Insert(0, sliderInfo.StartPoint);
 
-        var catmullTrail = PathApproximator.ApproximateCatmull(all);
+        var catmullTrail = PathApproximator.CatmullToPiecewiseLinear(all.ToArray());
         return catmullTrail;
     }
 
@@ -315,11 +316,11 @@ public static class SliderExtensions
         return (-1, -1);
     }
 
-    private static List<List<Vector2>> GetGroupedPoints(SliderInfo sliderInfo)
+    private static List<Vector2[]> GetGroupedPoints(SliderInfo sliderInfo)
     {
         IReadOnlyList<Vector2> rawPoints = sliderInfo.ControlPoints;
 
-        var groupedPoints = new List<List<Vector2>>();
+        var groupedPoints = new List<Vector2[]>();
         var currentGroup = new List<Vector2>();
 
         Vector2? nextPoint = default;
@@ -332,7 +333,7 @@ public static class SliderExtensions
             {
                 if (currentGroup.Count > 1)
                 {
-                    groupedPoints.Add(currentGroup);
+                    groupedPoints.Add(currentGroup.ToArray());
                 }
 
                 currentGroup = new List<Vector2>();
@@ -346,7 +347,7 @@ public static class SliderExtensions
 
         if (currentGroup.Count != 0)
         {
-            groupedPoints.Add(currentGroup);
+            groupedPoints.Add(currentGroup.ToArray());
         }
 
         if (groupedPoints.Count == 0 && rawPoints.Count != 0)
