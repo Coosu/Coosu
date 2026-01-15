@@ -5,9 +5,9 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Coosu.Shared;
-using Coosu.Shared.Mathematics;
 using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Easing;
+using osu.Framework.Utils;
 
 namespace Coosu.Storyboard.Extensions;
 

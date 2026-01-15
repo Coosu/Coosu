@@ -49,6 +49,17 @@ public ref struct ValueListBuilder<T>
         _pos = pos + 1;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Append(ReadOnlySpan<T> source)
+    {
+        int pos = _pos;
+        if (pos + source.Length > _span.Length)
+            Grow(pos + source.Length);
+
+        source.CopyTo(_span.Slice(pos));
+        _pos = pos + source.Length;
+    }
+
     public ReadOnlySpan<T> AsSpan()
     {
         return _span.Slice(0, _pos);
@@ -65,9 +76,12 @@ public ref struct ValueListBuilder<T>
         }
     }
 
-    private void Grow()
+    private void Grow(int minCapacity = 0)
     {
-        T[] array = ArrayPool<T>.Shared.Rent(_span.Length * 2);
+        int newCapacity = _span.Length * 2;
+        if (newCapacity < minCapacity) newCapacity = minCapacity;
+
+        T[] array = ArrayPool<T>.Shared.Rent(newCapacity);
 
         bool success = _span.TryCopyTo(array);
         Debug.Assert(success);

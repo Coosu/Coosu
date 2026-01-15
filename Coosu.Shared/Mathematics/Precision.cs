@@ -1,9 +1,12 @@
-﻿using System;
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+using System;
 using System.Drawing;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 
-namespace Coosu.Shared.Mathematics;
+namespace osu.Framework.Utils;
 
 /// <summary>
 /// Utility class to compare <see cref="float"/> or <see cref="double"/> values for equality.
@@ -27,6 +30,7 @@ public static class Precision
     /// <param name="value2">The value to compare against.</param>
     /// <param name="acceptableDifference">The acceptable difference. Defaults to <see cref="FLOAT_EPSILON"/>.</param>
     /// <returns>Whether <paramref name="value1"/> is definitely greater than <paramref name="value2"/>.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool DefinitelyBigger(float value1, float value2, float acceptableDifference = FLOAT_EPSILON) => value1 - acceptableDifference > value2;
 
     /// <summary>
@@ -46,6 +50,7 @@ public static class Precision
     /// <param name="value2">The value to compare against.</param>
     /// <param name="acceptableDifference">The acceptable difference. Defaults to <see cref="FLOAT_EPSILON"/>.</param>
     /// <returns>Whether <paramref name="value1"/> is almost greater than <paramref name="value2"/>.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool AlmostBigger(float value1, float value2, float acceptableDifference = FLOAT_EPSILON) => value1 > value2 - acceptableDifference;
 
     /// <summary>
@@ -55,6 +60,7 @@ public static class Precision
     /// <param name="value2">The value to compare against.</param>
     /// <param name="acceptableDifference">The acceptable difference. Defaults to <see cref="DOUBLE_EPSILON"/>.</param>
     /// <returns>Whether <paramref name="value1"/> is almost greater than <paramref name="value2"/>.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool AlmostBigger(double value1, double value2, double acceptableDifference = DOUBLE_EPSILON) => value1 > value2 - acceptableDifference;
 
     /// <summary>
@@ -74,6 +80,7 @@ public static class Precision
     /// <param name="value2">The second <see cref="Vector2"/>.</param>
     /// <param name="acceptableDifference">The acceptable difference. Defaults to <see cref="FLOAT_EPSILON"/>.</param>
     /// <returns>Whether <paramref name="value1"/> and <paramref name="value2"/> are almost equal.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool AlmostEquals(Vector2 value1, Vector2 value2, float acceptableDifference = FLOAT_EPSILON) => AlmostEquals(value1.X, value2.X, acceptableDifference) && AlmostEquals(value1.Y, value2.Y, acceptableDifference);
 
     /// <summary>
@@ -93,6 +100,7 @@ public static class Precision
     /// <param name="rect2">The second <see cref="RectangleF"/>.</param>
     /// <param name="acceptableDifference">The acceptable difference. Defaults to <see cref="FLOAT_EPSILON"/>.</param>
     /// <returns>Whether <paramref name="rect1"/> and <paramref name="rect2"/> intersect.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool AlmostIntersects(RectangleF rect1, RectangleF rect2, float acceptableDifference = FLOAT_EPSILON)
         => rect1.X <= rect2.X + rect2.Width + acceptableDifference
            && rect2.X <= rect1.X + rect1.Width + acceptableDifference
