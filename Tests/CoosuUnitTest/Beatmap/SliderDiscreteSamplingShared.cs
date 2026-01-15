@@ -8,14 +8,14 @@ namespace CoosuUnitTest.Beatmap;
 
 internal static class SliderDiscreteSamplingShared
 {
-    internal static List<Vector2[]> GetGroupedPoints(SliderInfo sliderInfo)
+    internal static List<Vector3[]> GetGroupedPoints(SliderInfo sliderInfo)
     {
-        IReadOnlyList<Vector2> rawPoints = sliderInfo.ControlPoints;
+        IReadOnlyList<Vector3> rawPoints = sliderInfo.ControlPoints;
 
-        var groupedPoints = new List<Vector2[]>();
-        var currentGroup = new List<Vector2>();
+        var groupedPoints = new List<Vector3[]>();
+        var currentGroup = new List<Vector3>();
 
-        Vector2? nextPoint = default;
+        Vector3? nextPoint = default;
         for (var i = -1; i < rawPoints.Count - 1; i++)
         {
             var thisPoint = i == -1 ? sliderInfo.StartPoint : rawPoints[i];
@@ -28,7 +28,7 @@ internal static class SliderDiscreteSamplingShared
                     groupedPoints.Add(currentGroup.ToArray());
                 }
 
-                currentGroup = new List<Vector2>();
+                currentGroup = new List<Vector3>();
             }
         }
 
@@ -50,7 +50,7 @@ internal static class SliderDiscreteSamplingShared
         return groupedPoints;
     }
 
-    internal static IReadOnlyList<double> GetGroupedBezierLengths(IReadOnlyList<IReadOnlyList<Vector2>> groupedBezierPoints)
+    internal static IReadOnlyList<double> GetGroupedBezierLengths(IReadOnlyList<IReadOnlyList<Vector3>> groupedBezierPoints)
     {
         var array = new double[groupedBezierPoints.Count];
         for (var i = 0; i < groupedBezierPoints.Count; i++)
@@ -76,7 +76,7 @@ internal static class SliderDiscreteSamplingShared
         return (-1, -1);
     }
 
-    internal static (Vector2 p, double r) GetCircle(Vector2 p1, Vector2 p2, Vector2 p3)
+    internal static (Vector3 p, double r) GetCircle(Vector3 p1, Vector3 p2, Vector3 p3)
     {
         var e = 2 * (p2.X - p1.X);
         var f = 2 * (p2.Y - p1.Y);
@@ -87,10 +87,10 @@ internal static class SliderDiscreteSamplingShared
         var x = (g * b - c * f) / (e * b - a * f);
         var y = (a * g - c * e) / (a * f - b * e);
         var r = Math.Pow(Math.Pow(x - p1.X, 2) + Math.Pow(y - p1.Y, 2), 0.5);
-        return (new Vector2((float)x, (float)y), r);
+        return (new Vector3((float)x, (float)y, 0), r);
     }
 
-    internal static (double[] segmentLengths, double[] cumulativeLengths, double totalLength) CreateCumulativeLengths(IReadOnlyList<Vector2> points)
+    internal static (double[] segmentLengths, double[] cumulativeLengths, double totalLength) CreateCumulativeLengths(IReadOnlyList<Vector3> points)
     {
         var segmentCount = points.Count - 1;
         var segmentLengths = new double[segmentCount];
@@ -113,8 +113,8 @@ internal static class SliderDiscreteSamplingShared
         return (segmentLengths, cumulativeLengths, totalLength);
     }
 
-    internal static Vector2 SamplePointAtLength(
-        IReadOnlyList<Vector2> points,
+    internal static Vector3 SamplePointAtLength(
+        IReadOnlyList<Vector3> points,
         double[] segmentLengths,
         double[] cumulativeLengths,
         double targetLen)
@@ -145,13 +145,13 @@ internal static class SliderDiscreteSamplingShared
         }
 
         var t = (float)((targetLen - prevSum) / segLen);
-        return Vector2.Lerp(points[index], points[index + 1], t);
+        return Vector3.Lerp(points[index], points[index + 1], t);
     }
 
-    internal static List<Vector2> CreateHighResolutionBezierPolyline(SliderInfo sliderInfo, int resolution)
+    internal static List<Vector3> CreateHighResolutionBezierPolyline(SliderInfo sliderInfo, int resolution)
     {
         var groupedPoints = GetGroupedPoints(sliderInfo);
-        var points = new List<Vector2>(groupedPoints.Count * (resolution + 1));
+        var points = new List<Vector3>(groupedPoints.Count * (resolution + 1));
         for (var i = 0; i < groupedPoints.Count; i++)
         {
             var segment = groupedPoints[i];

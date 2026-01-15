@@ -77,7 +77,7 @@ internal static class SliderDiscreteSamplingLegacy
             var x = circle.p.X + circle.r * Math.Cos(offsetRad);
             var y = circle.p.Y + circle.r * Math.Sin(offsetRad);
 
-            ticks.Add(new SliderTick(sliderInfo.StartTime + offset, new Vector2((float)x, (float)y)));
+            ticks.Add(new SliderTick(sliderInfo.StartTime + offset, new Vector3((float)x, (float)y, 0)));
         }
 
         if (sliderInfo.Repeat > 1)

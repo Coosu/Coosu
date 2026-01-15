@@ -68,7 +68,7 @@ public static class SliderExtensions
             return EmptyArray<SliderTick>.Value;
         }
 
-        var pathBuilder = new ValueListBuilder<Vector2>(stackalloc Vector2[64]);
+        var pathBuilder = new ValueListBuilder<Vector3>(stackalloc Vector3[64]);
         try
         {
             sliderInfo.ComputePathVertices(ref pathBuilder);
@@ -178,7 +178,7 @@ public static class SliderExtensions
     /// osu!lazer implementation to compute approximated data.
     /// </summary>
     /// <returns></returns>
-    private static void ComputePathVertices(this SliderInfo sliderInfo, ref ValueListBuilder<Vector2> builder)
+    private static void ComputePathVertices(this SliderInfo sliderInfo, ref ValueListBuilder<Vector3> builder)
     {
         switch (sliderInfo.SliderType)
         {
@@ -203,7 +203,7 @@ public static class SliderExtensions
 
     #region Path Algorithms
 
-    private static void ComputePathVerticesPerfect(SliderInfo sliderInfo, ref ValueListBuilder<Vector2> builder)
+    private static void ComputePathVerticesPerfect(SliderInfo sliderInfo, ref ValueListBuilder<Vector3> builder)
     {
         if (sliderInfo.ControlPoints.Count < 2)
         {
@@ -211,7 +211,7 @@ public static class SliderExtensions
             return;
         }
 
-        Span<Vector2> points = stackalloc Vector2[3];
+        Span<Vector3> points = stackalloc Vector3[3];
         points[0] = sliderInfo.StartPoint;
         points[1] = sliderInfo.ControlPoints[0];
         points[2] = sliderInfo.ControlPoints[1];
@@ -220,16 +220,16 @@ public static class SliderExtensions
         foreach (var p in result) builder.Append(p);
     }
 
-    private static void ComputePathVerticesBezier(SliderInfo sliderInfo, ref ValueListBuilder<Vector2> builder)
+    private static void ComputePathVerticesBezier(SliderInfo sliderInfo, ref ValueListBuilder<Vector3> builder)
     {
         var controlPoints = sliderInfo.ControlPoints;
         if (controlPoints.Count == 0) return;
 
         int totalCount = controlPoints.Count + 1;
-        Vector2[]? pooled = null;
-        Span<Vector2> allPoints = totalCount <= 256
-            ? stackalloc Vector2[totalCount]
-            : (pooled = ArrayPool<Vector2>.Shared.Rent(totalCount)).AsSpan(0, totalCount);
+        Vector3[]? pooled = null;
+        Span<Vector3> allPoints = totalCount <= 256
+            ? stackalloc Vector3[totalCount]
+            : (pooled = ArrayPool<Vector3>.Shared.Rent(totalCount)).AsSpan(0, totalCount);
 
         try
         {
@@ -283,18 +283,18 @@ public static class SliderExtensions
         }
         finally
         {
-            if (pooled != null) ArrayPool<Vector2>.Shared.Return(pooled);
+            if (pooled != null) ArrayPool<Vector3>.Shared.Return(pooled);
         }
     }
 
-    private static void ComputePathVerticesCatmull(SliderInfo sliderInfo, ref ValueListBuilder<Vector2> builder)
+    private static void ComputePathVerticesCatmull(SliderInfo sliderInfo, ref ValueListBuilder<Vector3> builder)
     {
         var controlPoints = sliderInfo.ControlPoints;
         int totalCount = controlPoints.Count + 1;
-        Vector2[]? pooled = null;
-        Span<Vector2> allPoints = totalCount <= 256
-            ? stackalloc Vector2[totalCount]
-            : (pooled = ArrayPool<Vector2>.Shared.Rent(totalCount)).AsSpan(0, totalCount);
+        Vector3[]? pooled = null;
+        Span<Vector3> allPoints = totalCount <= 256
+            ? stackalloc Vector3[totalCount]
+            : (pooled = ArrayPool<Vector3>.Shared.Rent(totalCount)).AsSpan(0, totalCount);
 
         try
         {
@@ -309,7 +309,7 @@ public static class SliderExtensions
         }
         finally
         {
-            if (pooled != null) ArrayPool<Vector2>.Shared.Return(pooled);
+            if (pooled != null) ArrayPool<Vector3>.Shared.Return(pooled);
         }
     }
 
@@ -318,7 +318,7 @@ public static class SliderExtensions
     #region Helpers
 
     private static void CreateCumulativeLengths(
-        ReadOnlySpan<Vector2> points,
+        ReadOnlySpan<Vector3> points,
         ref ValueListBuilder<double> segmentLengths,
         ref ValueListBuilder<double> cumulativeLengths,
         out double totalLength)
@@ -340,8 +340,8 @@ public static class SliderExtensions
         }
     }
 
-    private static Vector2 InterpolateSequential(
-        ReadOnlySpan<Vector2> points,
+    private static Vector3 InterpolateSequential(
+        ReadOnlySpan<Vector3> points,
         ReadOnlySpan<double> segmentLengths,
         ReadOnlySpan<double> cumulativeLengths,
         double targetLen,
@@ -381,7 +381,7 @@ public static class SliderExtensions
         }
 
         var t = (float)((targetLen - previousSum) / segLen);
-        return Vector2.Lerp(points[segmentIndex], points[segmentIndex + 1], t);
+        return Vector3.Lerp(points[segmentIndex], points[segmentIndex + 1], t);
     }
 
     #endregion

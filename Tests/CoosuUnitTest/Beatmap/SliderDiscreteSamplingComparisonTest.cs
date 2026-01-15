@@ -22,28 +22,28 @@ public sealed class SliderDiscreteSamplingComparisonTest
     {
         var cases = new[]
         {
-            ("linear-repeat3", CreateSlider(SliderType.Linear, new Vector2(64, 192), new[]
+            ("linear-repeat3", CreateSlider(SliderType.Linear, new Vector3(64, 192, 0), new[]
             {
-                new Vector2(448, 192),
+                new Vector3(448, 192, 0),
             }, repeat: 3)),
-            ("bezier-single", CreateSlider(SliderType.Bezier, new Vector2(64, 192), new[]
+            ("bezier-single", CreateSlider(SliderType.Bezier, new Vector3(64, 192, 0), new[]
             {
-                new Vector2(128, 64),
-                new Vector2(320, 64),
-                new Vector2(448, 192),
+                new Vector3(128, 64, 0),
+                new Vector3(320, 64, 0),
+                new Vector3(448, 192, 0),
             }, repeat: 1)),
-            ("bezier-multi-repeat2", CreateSlider(SliderType.Bezier, new Vector2(64, 192), new[]
+            ("bezier-multi-repeat2", CreateSlider(SliderType.Bezier, new Vector3(64, 192, 0), new[]
             {
-                new Vector2(128, 64),
-                new Vector2(256, 64),
-                new Vector2(256, 64),
-                new Vector2(320, 256),
-                new Vector2(448, 192),
+                new Vector3(128, 64, 0),
+                new Vector3(256, 64, 0),
+                new Vector3(256, 64, 0),
+                new Vector3(320, 256, 0),
+                new Vector3(448, 192, 0),
             }, repeat: 2)),
-            ("perfect-single", CreateSlider(SliderType.Perfect, new Vector2(64, 192), new[]
+            ("perfect-single", CreateSlider(SliderType.Perfect, new Vector3(64, 192, 0), new[]
             {
-                new Vector2(256, 64),
-                new Vector2(448, 192),
+                new Vector3(256, 64, 0),
+                new Vector3(448, 192, 0),
             }, repeat: 1)),
         };
 
@@ -81,7 +81,8 @@ public sealed class SliderDiscreteSamplingComparisonTest
                 }
             }
 
-            _output.WriteLine($"maxOffsetDelta={maxOffsetDelta:0.########} maxDistanceDelta={maxDistanceDelta:0.######} mismatches={mismatchCount}");
+            _output.WriteLine(
+                $"maxOffsetDelta={maxOffsetDelta:0.########} maxDistanceDelta={maxDistanceDelta:0.######} mismatches={mismatchCount}");
 
             Assert.Equal(reference.Length, current.Length);
             Assert.True(maxOffsetDelta <= 1e-7, $"Unexpected offset delta in case={name}: {maxOffsetDelta}");
@@ -94,28 +95,28 @@ public sealed class SliderDiscreteSamplingComparisonTest
     {
         var cases = new[]
         {
-            ("linear-repeat3", CreateSlider(SliderType.Linear, new Vector2(64, 192), new[]
+            ("linear-repeat3", CreateSlider(SliderType.Linear, new Vector3(64, 192, 0), new[]
             {
-                new Vector2(448, 192),
+                new Vector3(448, 192, 0),
             }, repeat: 3)),
-            ("bezier-single", CreateSlider(SliderType.Bezier, new Vector2(64, 192), new[]
+            ("bezier-single", CreateSlider(SliderType.Bezier, new Vector3(64, 192, 0), new[]
             {
-                new Vector2(128, 64),
-                new Vector2(320, 64),
-                new Vector2(448, 192),
+                new Vector3(128, 64, 0),
+                new Vector3(320, 64, 0),
+                new Vector3(448, 192, 0),
             }, repeat: 1)),
-            ("bezier-multi-repeat2", CreateSlider(SliderType.Bezier, new Vector2(64, 192), new[]
+            ("bezier-multi-repeat2", CreateSlider(SliderType.Bezier, new Vector3(64, 192, 0), new[]
             {
-                new Vector2(128, 64),
-                new Vector2(256, 64),
-                new Vector2(256, 64),
-                new Vector2(320, 256),
-                new Vector2(448, 192),
+                new Vector3(128, 64, 0),
+                new Vector3(256, 64, 0),
+                new Vector3(256, 64, 0),
+                new Vector3(320, 256, 0),
+                new Vector3(448, 192, 0),
             }, repeat: 2)),
-            ("perfect-single", CreateSlider(SliderType.Perfect, new Vector2(64, 192), new[]
+            ("perfect-single", CreateSlider(SliderType.Perfect, new Vector3(64, 192, 0), new[]
             {
-                new Vector2(256, 64),
-                new Vector2(448, 192),
+                new Vector3(256, 64, 0),
+                new Vector3(448, 192, 0),
             }, repeat: 1)),
         };
 
@@ -156,14 +157,16 @@ public sealed class SliderDiscreteSamplingComparisonTest
                 }
             }
 
-            _output.WriteLine($"maxOffsetDelta={maxOffsetDelta:0.########} maxDistanceDelta={maxDistanceDelta:0.######} mismatches={mismatchCount}");
+            _output.WriteLine(
+                $"maxOffsetDelta={maxOffsetDelta:0.########} maxDistanceDelta={maxDistanceDelta:0.######} mismatches={mismatchCount}");
 
             Assert.Equal(legacy.Length, current.Length);
             Assert.True(maxOffsetDelta <= 1e-7, $"Unexpected offset delta in case={name}: {maxOffsetDelta}");
         }
     }
 
-    private static ExtendedSliderInfo CreateSlider(SliderType sliderType, Vector2 startPoint, IReadOnlyList<Vector2> controlPoints, int repeat)
+    private static ExtendedSliderInfo CreateSlider(SliderType sliderType, Vector3 startPoint,
+        IReadOnlyList<Vector3> controlPoints, int repeat)
     {
         var raw = new RawHitObject
         {

@@ -34,7 +34,7 @@ public static class PathApproximator
     /// </summary>
     /// <param name="controlPoints">The control points.</param>
     /// <returns>A list of vectors representing the piecewise-linear approximation.</returns>
-    public static List<Vector2> BezierToPiecewiseLinear(ReadOnlySpan<Vector2> controlPoints)
+    public static List<Vector3> BezierToPiecewiseLinear(ReadOnlySpan<Vector3> controlPoints)
     {
         return BSplineToPiecewiseLinear(controlPoints, Math.Max(1, controlPoints.Length - 1));
     }
@@ -51,7 +51,7 @@ public static class PathApproximator
     /// <param name="degree">The polynomial order.</param>
     /// <returns>An array of vectors containing control point positions for the resulting Bezier curve.</returns>
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="degree"/> was less than 1.</exception>
-    public static Vector2[] BSplineToBezier(ReadOnlySpan<Vector2> controlPoints, int degree)
+    public static Vector3[] BSplineToBezier(ReadOnlySpan<Vector3> controlPoints, int degree)
     {
         // Zero-th degree splines would be piecewise-constant, which cannot be represented by the piecewise-
         // linear output of this function. Negative degrees would require rational splines which this code
@@ -61,7 +61,7 @@ public static class PathApproximator
         // Spline fitting does not make sense when the input contains no points or just one point. In this case
         // the user likely wants this function to behave like a no-op.
         if (controlPoints.Length < 2)
-            return controlPoints.Length == 0 ? Array.Empty<Vector2>() : new[] { controlPoints[0] };
+            return controlPoints.Length == 0 ? Array.Empty<Vector3>() : new[] { controlPoints[0] };
 
         return bSplineToBezierInternal(controlPoints, ref degree).SelectMany(segment => segment).ToArray();
     }
@@ -80,7 +80,7 @@ public static class PathApproximator
     /// <param name="degree">The polynomial order.</param>
     /// <returns>A list of vectors representing the piecewise-linear approximation.</returns>
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="degree"/> was less than 1.</exception>
-    public static List<Vector2> BSplineToPiecewiseLinear(ReadOnlySpan<Vector2> controlPoints, int degree)
+    public static List<Vector3> BSplineToPiecewiseLinear(ReadOnlySpan<Vector3> controlPoints, int degree)
     {
         // Zero-th degree splines would be piecewise-constant, which cannot be represented by the piecewise-
         // linear output of this function. Negative degrees would require rational splines which this code
@@ -90,18 +90,18 @@ public static class PathApproximator
         // Spline fitting does not make sense when the input contains no points or just one point. In this case
         // the user likely wants this function to behave like a no-op.
         if (controlPoints.Length < 2)
-            return controlPoints.Length == 0 ? new List<Vector2>() : new List<Vector2> { controlPoints[0] };
+            return controlPoints.Length == 0 ? new List<Vector3>() : new List<Vector3> { controlPoints[0] };
 
         // With fewer control points than the degree, splines can not be unambiguously fitted. Rather than erroring
         // out, we set the degree to the minimal number that permits a unique fit to avoid special casing in
         // incremental spline building algorithms that call this function.
         degree = Math.Min(degree, controlPoints.Length - 1);
 
-        List<Vector2> output = new List<Vector2>();
+        List<Vector3> output = new List<Vector3>();
         int pointCount = controlPoints.Length - 1;
 
-        Stack<Vector2[]> toFlatten = bSplineToBezierInternal(controlPoints, ref degree);
-        Stack<Vector2[]> freeBuffers = new Stack<Vector2[]>();
+        Stack<Vector3[]> toFlatten = bSplineToBezierInternal(controlPoints, ref degree);
+        Stack<Vector3[]> freeBuffers = new Stack<Vector3[]>();
 
         // "toFlatten" contains all the curves which are not yet approximated well enough.
         // We use a stack to emulate recursion without the risk of running into a stack overflow.
@@ -109,8 +109,8 @@ public static class PathApproximator
         // <a href="https://en.wikipedia.org/wiki/Depth-first_search">Depth-first search</a>
         // over the tree resulting from the subdivisions we make.)
 
-        var subdivisionBuffer1 = new Vector2[degree + 1];
-        var subdivisionBuffer2 = new Vector2[degree * 2 + 1];
+        var subdivisionBuffer1 = new Vector3[degree + 1];
+        var subdivisionBuffer2 = new Vector3[degree * 2 + 1];
 
         Vector3[] leftChild = subdivisionBuffer2;
 
@@ -132,7 +132,7 @@ public static class PathApproximator
 
             // If we do not yet have a sufficiently "flat" (in other words, detailed) approximation we keep
             // subdividing the curve we are currently operating on.
-            Vector2[] rightChild = freeBuffers.Count > 0 ? freeBuffers.Pop() : new Vector2[degree + 1];
+            Vector3[] rightChild = freeBuffers.Count > 0 ? freeBuffers.Pop() : new Vector3[degree + 1];
             bezierSubdivide(parent, leftChild, rightChild, subdivisionBuffer1, degree + 1);
 
             // We re-use the buffer of the parent for one of the children, so that we save one allocation per iteration.
@@ -151,9 +151,9 @@ public static class PathApproximator
     /// Creates a piecewise-linear approximation of a Catmull-Rom spline.
     /// </summary>
     /// <returns>A list of vectors representing the piecewise-linear approximation.</returns>
-    public static List<Vector2> CatmullToPiecewiseLinear(ReadOnlySpan<Vector2> controlPoints)
+    public static List<Vector3> CatmullToPiecewiseLinear(ReadOnlySpan<Vector3> controlPoints)
     {
-        var result = new List<Vector2>((controlPoints.Length - 1) * catmull_detail * 2);
+        var result = new List<Vector3>((controlPoints.Length - 1) * catmull_detail * 2);
 
         for (int i = 0; i < controlPoints.Length - 1; i++)
         {
@@ -172,9 +172,9 @@ public static class PathApproximator
         return result;
     }
 
-    public static List<Vector2> CatmullToPiecewiseLinear(IReadOnlyList<Vector2> controlPoints)
+    public static List<Vector3> CatmullToPiecewiseLinear(IReadOnlyList<Vector3> controlPoints)
     {
-        var result = new List<Vector2>((controlPoints.Count - 1) * catmull_detail * 2);
+        var result = new List<Vector3>((controlPoints.Count - 1) * catmull_detail * 2);
 
         for (int i = 0; i < controlPoints.Count - 1; i++)
         {
@@ -197,7 +197,7 @@ public static class PathApproximator
     /// Creates a piecewise-linear approximation of a circular arc curve.
     /// </summary>
     /// <returns>A list of vectors representing the piecewise-linear approximation.</returns>
-    public static List<Vector2> CircularArcToPiecewiseLinear(ReadOnlySpan<Vector2> controlPoints)
+    public static List<Vector3> CircularArcToPiecewiseLinear(ReadOnlySpan<Vector3> controlPoints)
     {
         CircularArcProperties pr = new CircularArcProperties(controlPoints);
         if (!pr.IsValid)
@@ -228,7 +228,7 @@ public static class PathApproximator
     /// </summary>
     /// <param name="controlPoints">Three distinct points on the arc.</param>
     /// <returns>The rectangle inscribing the circular arc.</returns>
-    public static RectangleF CircularArcBoundingBox(ReadOnlySpan<Vector2> controlPoints)
+    public static RectangleF CircularArcBoundingBox(ReadOnlySpan<Vector3> controlPoints)
     {
         CircularArcProperties pr = new CircularArcProperties(controlPoints);
         if (!pr.IsValid)
@@ -277,9 +277,9 @@ public static class PathApproximator
     /// Basically, returns the input.
     /// </summary>
     /// <returns>A list of vectors representing the piecewise-linear approximation.</returns>
-    public static List<Vector2> LinearToPiecewiseLinear(ReadOnlySpan<Vector2> controlPoints)
+    public static List<Vector3> LinearToPiecewiseLinear(ReadOnlySpan<Vector3> controlPoints)
     {
-        var result = new List<Vector2>(controlPoints.Length);
+        var result = new List<Vector3>(controlPoints.Length);
 
         foreach (var c in controlPoints)
             result.Add(c);
@@ -291,7 +291,7 @@ public static class PathApproximator
     /// Creates a piecewise-linear approximation of a lagrange polynomial.
     /// </summary>
     /// <returns>A list of vectors representing the piecewise-linear approximation.</returns>
-    public static List<Vector2> LagrangePolynomialToPiecewiseLinear(ReadOnlySpan<Vector2> controlPoints)
+    public static List<Vector3> LagrangePolynomialToPiecewiseLinear(ReadOnlySpan<Vector3> controlPoints)
     {
         // TODO: add some smarter logic here, chebyshev nodes?
         const int num_steps = 51;
@@ -334,14 +334,14 @@ public static class PathApproximator
     /// <param name="initialControlPoints">The initial bezier control points to use before optimization. The length of this list should be equal to <paramref name="numControlPoints"/>.</param>
     /// <param name="learnableMask">Mask determining which control point positions are fixed and cannot be changed by the optimiser.</param>
     /// <returns>A List of vectors representing the bezier control points.</returns>
-    public static List<Vector2> PiecewiseLinearToBezier(ReadOnlySpan<Vector2> inputPath,
+    public static List<Vector3> PiecewiseLinearToBezier(ReadOnlySpan<Vector3> inputPath,
         int numControlPoints,
         int numTestPoints = 100,
         int maxIterations = 100,
         float learningRate = 8f,
         float b1 = 0.8f,
         float b2 = 0.99f,
-        List<Vector2>? initialControlPoints = null,
+        List<Vector3>? initialControlPoints = null,
         float[,]? learnableMask = null)
     {
         numTestPoints = Math.Max(numTestPoints, 3);
@@ -363,7 +363,7 @@ public static class PathApproximator
     /// <param name="initialControlPoints">The initial B-spline control points to use before optimization. The length of this list should be equal to <paramref name="numControlPoints"/>.</param>
     /// <param name="learnableMask">Mask determining which control point positions are fixed and cannot be changed by the optimiser.</param>
     /// <returns>A List of vectors representing the B-spline control points.</returns>
-    public static List<Vector2> PiecewiseLinearToBSpline(ReadOnlySpan<Vector2> inputPath,
+    public static List<Vector3> PiecewiseLinearToBSpline(ReadOnlySpan<Vector3> inputPath,
         int numControlPoints,
         int degree,
         int numTestPoints = 100,
@@ -371,7 +371,7 @@ public static class PathApproximator
         float learningRate = 8f,
         float b1 = 0.8f,
         float b2 = 0.99f,
-        List<Vector2>? initialControlPoints = null,
+        List<Vector3>? initialControlPoints = null,
         float[,]? learnableMask = null)
     {
         degree = Math.Min(degree, numControlPoints - 1);
@@ -393,13 +393,13 @@ public static class PathApproximator
     /// <param name="initialControlPoints">The initial control points to use before optimization. The length of this list should be equal to the number of test points.</param>
     /// <param name="learnableMask">Mask determining which control point positions are fixed and cannot be changed by the optimiser.</param>
     /// <returns>A List of vectors representing the spline control points.</returns>
-    private static List<Vector2> piecewiseLinearToSpline(ReadOnlySpan<Vector2> inputPath,
+    private static List<Vector3> piecewiseLinearToSpline(ReadOnlySpan<Vector3> inputPath,
         float[,] weights,
         int maxIterations = 100,
         float learningRate = 8f,
         float b1 = 0.8f,
         float b2 = 0.99f,
-        List<Vector2>? initialControlPoints = null,
+        List<Vector3>? initialControlPoints = null,
         float[,]? learnableMask = null)
     {
         int numControlPoints = weights.GetLength(1);
@@ -482,11 +482,11 @@ public static class PathApproximator
         }
 
         // Convert the resulting control points array
-        var result = new List<Vector2>(numControlPoints);
+        var result = new List<Vector3>(numControlPoints);
 
         for (int i = 0; i < numControlPoints; i++)
         {
-            result.Add(new Vector2(controlPoints[0, i], controlPoints[1, i]));
+            result.Add(new Vector3(controlPoints[0, i], controlPoints[1, i], 0));
         }
 
         return result;
@@ -621,7 +621,7 @@ public static class PathApproximator
         private readonly int ny;
         private readonly float[,] ys;
 
-        public Interpolator(ReadOnlySpan<Vector2> inputPath, int resolution = 1000)
+        public Interpolator(ReadOnlySpan<Vector3> inputPath, int resolution = 1000)
         {
             float[,] arr = new float[2, inputPath.Length];
 
@@ -796,9 +796,9 @@ public static class PathApproximator
         return coefficients;
     }
 
-    private static Stack<Vector2[]> bSplineToBezierInternal(ReadOnlySpan<Vector2> controlPoints, ref int degree)
+    private static Stack<Vector3[]> bSplineToBezierInternal(ReadOnlySpan<Vector3> controlPoints, ref int degree)
     {
-        Stack<Vector2[]> result = new Stack<Vector2[]>();
+        Stack<Vector3[]> result = new Stack<Vector3[]>();
 
         // With fewer control points than the degree, splines can not be unambiguously fitted. Rather than erroring
         // out, we set the degree to the minimal number that permits a unique fit to avoid special casing in
@@ -818,7 +818,7 @@ public static class PathApproximator
             // Subdivide B-spline into bezier control points at knots.
             for (int i = 0; i < pointCount - degree; i++)
             {
-                var subBezier = new Vector2[degree + 1];
+                var subBezier = new Vector3[degree + 1];
                 subBezier[0] = points[i];
 
                 // Destructively insert the knot degree-1 times via Boehm's algorithm.
@@ -839,14 +839,14 @@ public static class PathApproximator
 
 #if NETSTANDARD2_0
             int startIdx = pointCount - degree;
-            var finalSegment = new Vector2[points.Length - startIdx];
+            var finalSegment = new Vector3[points.Length - startIdx];
             Array.Copy(points, startIdx, finalSegment, 0, finalSegment.Length);
             result.Push(finalSegment);
 #else
             result.Push(points[(pointCount - degree)..]);
 #endif
             // Reverse the stack so elements can be accessed in order.
-            result = new Stack<Vector2[]>(result);
+            result = new Stack<Vector3[]>(result);
         }
 
         return result;
@@ -936,7 +936,7 @@ public static class PathApproximator
     /// <param name="vec4">The fourth vector.</param>
     /// <param name="t">The parameter at which to find the point on the spline, in the range [0, 1].</param>
     /// <returns>The point on the spline at <paramref name="t"/>.</returns>
-    private static Vector2 catmullFindPoint(ref Vector2 vec1, ref Vector2 vec2, ref Vector2 vec3, ref Vector2 vec4, float t)
+    private static Vector3 catmullFindPoint(ref Vector3 vec1, ref Vector3 vec2, ref Vector3 vec3, ref Vector3 vec4, float t)
     {
         float t2 = t * t;
         float t3 = t * t2;

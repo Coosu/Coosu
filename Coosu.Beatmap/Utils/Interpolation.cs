@@ -48,7 +48,7 @@ public static class Interpolation
     /// </summary>
     /// <param name="points">An array of coordinates. No two x should be the same.</param>
     /// <param name="time">The x coordinate to calculate the y coordinate for.</param>
-    public static double Lagrange(ReadOnlySpan<Vector2> points, double time)
+    public static double Lagrange(ReadOnlySpan<Vector3> points, double time)
     {
         if (points == null || points.Length == 0)
             throw new ArgumentException($"{nameof(points)} must contain at least one point");
@@ -65,7 +65,7 @@ public static class Interpolation
     /// <param name="points">An array of coordinates. No two x should be the same.</param>
     /// <param name="base">The index inside the coordinate array which polynomial to compute.</param>
     /// <param name="time">The x coordinate to calculate the basis polynomial for.</param>
-    public static double LagrangeBasis(ReadOnlySpan<Vector2> points, int @base, double time)
+    public static double LagrangeBasis(ReadOnlySpan<Vector3> points, int @base, double time)
     {
         double product = 1;
 
@@ -82,7 +82,7 @@ public static class Interpolation
     /// Calculates the Barycentric weights for a Lagrange polynomial for a given set of coordinates. Can be used as a helper function to compute a Lagrange polynomial repeatedly.
     /// </summary>
     /// <param name="points">An array of coordinates. No two x should be the same.</param>
-    public static double[] BarycentricWeights(ReadOnlySpan<Vector2> points)
+    public static double[] BarycentricWeights(ReadOnlySpan<Vector3> points)
     {
         int n = points.Length;
         double[] w = new double[n];
@@ -109,7 +109,7 @@ public static class Interpolation
     /// <param name="points">An array of coordinates. No two x should be the same.</param>
     /// <param name="weights">An array of precomputed barycentric weights.</param>
     /// <param name="time">The x coordinate to calculate the basis polynomial for.</param>
-    public static double BarycentricLagrange(ReadOnlySpan<Vector2> points, double[] weights, double time)
+    public static double BarycentricLagrange(ReadOnlySpan<Vector3> points, double[] weights, double time)
     {
         if (points == null || points.Length == 0)
             throw new ArgumentException($"{nameof(points)} must contain at least one point");
