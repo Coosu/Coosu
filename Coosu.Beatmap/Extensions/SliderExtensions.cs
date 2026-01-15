@@ -180,19 +180,70 @@ public static class SliderExtensions
     /// <returns></returns>
     private static void ComputePathVertices(this SliderInfo sliderInfo, ref ValueListBuilder<Vector3> builder)
     {
-        switch (sliderInfo.SliderType)
+        var controlPoints = sliderInfo.ControlPoints;
+        if (controlPoints.Count == 0) return;
+
+        var currentType = sliderInfo.SliderType;
+        var maxPoints = controlPoints.Count + 1;
+        Vector3[]? pooled = null;
+        Span<Vector3> segmentBuffer = maxPoints <= 256
+            ? stackalloc Vector3[maxPoints]
+            : (pooled = ArrayPool<Vector3>.Shared.Rent(maxPoints)).AsSpan(0, maxPoints);
+
+        try
+        {
+            int segmentCount = 0;
+            segmentBuffer[segmentCount++] = sliderInfo.StartPoint;
+
+            for (int i = 0; i < controlPoints.Count; i++)
+            {
+                var cp = controlPoints[i];
+                if (cp.Z != 0) // Type delimiter
+                {
+                    if (segmentCount > 1)
+                    {
+                        ComputePath(currentType, segmentBuffer.Slice(0, segmentCount), ref builder);
+                    }
+
+                    // Prepare for next segment
+                    var lastPoint = segmentBuffer[segmentCount - 1];
+                    segmentCount = 0;
+                    segmentBuffer[segmentCount++] = lastPoint;
+
+                    currentType = (SliderType)((int)cp.Z - 1);
+                }
+                else
+                {
+                    segmentBuffer[segmentCount++] = cp;
+                }
+            }
+
+            if (segmentCount > 1)
+            {
+                ComputePath(currentType, segmentBuffer.Slice(0, segmentCount), ref builder);
+            }
+        }
+        finally
+        {
+            if (pooled != null) ArrayPool<Vector3>.Shared.Return(pooled);
+        }
+    }
+
+    private static void ComputePath(SliderType type, scoped ReadOnlySpan<Vector3> points, ref ValueListBuilder<Vector3> builder)
+    {
+        switch (type)
         {
             case SliderType.Bezier:
             case SliderType.Linear:
-                ComputePathVerticesBezier(sliderInfo, ref builder);
+                ComputePathVerticesBezier(points, ref builder);
                 break;
             case SliderType.Perfect:
-                ComputePathVerticesPerfect(sliderInfo, ref builder);
+                ComputePathVerticesPerfect(points, ref builder);
                 break;
 #pragma warning disable CS0618 // 类型或成员已过时
             case SliderType.Catmull:
 #pragma warning restore CS0618 // 类型或成员已过时
-                ComputePathVerticesCatmull(sliderInfo, ref builder);
+                ComputePathVerticesCatmull(points, ref builder);
                 break;
             default:
                 break;
@@ -203,114 +254,76 @@ public static class SliderExtensions
 
     #region Path Algorithms
 
-    private static void ComputePathVerticesPerfect(SliderInfo sliderInfo, ref ValueListBuilder<Vector3> builder)
+    private static void ComputePathVerticesPerfect(scoped ReadOnlySpan<Vector3> points, ref ValueListBuilder<Vector3> builder)
     {
-        if (sliderInfo.ControlPoints.Count < 2)
+        if (points.Length != 3)
         {
-            ComputePathVerticesBezier(sliderInfo, ref builder);
+            ComputePathVerticesBezier(points, ref builder);
             return;
         }
 
-        Span<Vector3> points = stackalloc Vector3[3];
-        points[0] = sliderInfo.StartPoint;
-        points[1] = sliderInfo.ControlPoints[0];
-        points[2] = sliderInfo.ControlPoints[1];
-
         var result = PathApproximator.CircularArcToPiecewiseLinear(points);
+        if (result.Count == 0)
+        {
+            ComputePathVerticesBezier(points, ref builder);
+            return;
+        }
+
         foreach (var p in result) builder.Append(p);
     }
 
-    private static void ComputePathVerticesBezier(SliderInfo sliderInfo, ref ValueListBuilder<Vector3> builder)
+    private static void ComputePathVerticesBezier(scoped ReadOnlySpan<Vector3> allPoints, ref ValueListBuilder<Vector3> builder)
     {
-        var controlPoints = sliderInfo.ControlPoints;
-        if (controlPoints.Count == 0) return;
+        int totalCount = allPoints.Length;
+        if (totalCount < 2) return;
 
-        int totalCount = controlPoints.Count + 1;
-        Vector3[]? pooled = null;
-        Span<Vector3> allPoints = totalCount <= 256
-            ? stackalloc Vector3[totalCount]
-            : (pooled = ArrayPool<Vector3>.Shared.Rent(totalCount)).AsSpan(0, totalCount);
+        bool anySegmentAdded = false;
+        int start = 0;
 
-        try
+        for (var i = 0; i < totalCount - 1; i++)
         {
-            allPoints[0] = sliderInfo.StartPoint;
-            for (int i = 0; i < controlPoints.Count; i++)
+            var thisPoint = allPoints[i];
+            var nextPoint = allPoints[i + 1];
+
+            // 如果当前点等于下一个点，说明这里是路径的分段点
+            if (thisPoint.Equals(nextPoint))
             {
-                allPoints[i + 1] = controlPoints[i];
-            }
-
-            bool anySegmentAdded = false;
-            int start = 0;
-
-            for (var i = 0; i < totalCount - 1; i++)
-            {
-                var thisPoint = allPoints[i];
-                var nextPoint = allPoints[i + 1];
-
-                // 如果当前点等于下一个点，说明这里是路径的分段点
-                if (thisPoint.Equals(nextPoint))
+                int length = i - start + 1;
+                // 如果当前组有效（超过1个点），则添加
+                if (length > 1)
                 {
-                    int length = i - start + 1;
-                    // 如果当前组有效（超过1个点），则添加
-                    if (length > 1)
-                    {
-                        var subPoints = allPoints.Slice(start, length);
-                        var bezierTrail = PathApproximator.BezierToPiecewiseLinear(subPoints);
-                        foreach (var p in bezierTrail) builder.Append(p);
-                        anySegmentAdded = true;
-                    }
-
-                    start = i + 1;
+                    var subPoints = allPoints.Slice(start, length);
+                    var bezierTrail = PathApproximator.BezierToPiecewiseLinear(subPoints);
+                    foreach (var p in bezierTrail) builder.Append(p);
+                    anySegmentAdded = true;
                 }
-            }
 
-            // 添加最后一个点
-            int lastLength = totalCount - start;
-            if (lastLength > 1)
-            {
-                var subPoints = allPoints.Slice(start, lastLength);
-                var bezierTrail = PathApproximator.BezierToPiecewiseLinear(subPoints);
-                foreach (var p in bezierTrail) builder.Append(p);
-                anySegmentAdded = true;
-            }
-
-            // Fallback: 如果有控制点但没有生成任何有效组（例如 A, A），则将整体作为一个组
-            if (!anySegmentAdded)
-            {
-                var bezierTrail = PathApproximator.BezierToPiecewiseLinear(allPoints);
-                foreach (var p in bezierTrail) builder.Append(p);
+                start = i + 1;
             }
         }
-        finally
+
+        // 添加最后一个点
+        int lastLength = totalCount - start;
+        if (lastLength > 1)
         {
-            if (pooled != null) ArrayPool<Vector3>.Shared.Return(pooled);
+            var subPoints = allPoints.Slice(start, lastLength);
+            var bezierTrail = PathApproximator.BezierToPiecewiseLinear(subPoints);
+            foreach (var p in bezierTrail) builder.Append(p);
+            anySegmentAdded = true;
+        }
+
+        // Fallback: 如果有控制点但没有生成任何有效组（例如 A, A），则将整体作为一个组
+        if (!anySegmentAdded)
+        {
+            var bezierTrail = PathApproximator.BezierToPiecewiseLinear(allPoints);
+            foreach (var p in bezierTrail) builder.Append(p);
         }
     }
 
-    private static void ComputePathVerticesCatmull(SliderInfo sliderInfo, ref ValueListBuilder<Vector3> builder)
+    private static void ComputePathVerticesCatmull(scoped ReadOnlySpan<Vector3> allPoints, ref ValueListBuilder<Vector3> builder)
     {
-        var controlPoints = sliderInfo.ControlPoints;
-        int totalCount = controlPoints.Count + 1;
-        Vector3[]? pooled = null;
-        Span<Vector3> allPoints = totalCount <= 256
-            ? stackalloc Vector3[totalCount]
-            : (pooled = ArrayPool<Vector3>.Shared.Rent(totalCount)).AsSpan(0, totalCount);
-
-        try
-        {
-            allPoints[0] = sliderInfo.StartPoint;
-            for (int i = 0; i < controlPoints.Count; i++)
-            {
-                allPoints[i + 1] = controlPoints[i];
-            }
-
-            var catmullTrail = PathApproximator.CatmullToPiecewiseLinear(allPoints);
-            foreach (var p in catmullTrail) builder.Append(p);
-        }
-        finally
-        {
-            if (pooled != null) ArrayPool<Vector3>.Shared.Return(pooled);
-        }
+        var catmullTrail = PathApproximator.CatmullToPiecewiseLinear(allPoints);
+        foreach (var p in catmullTrail) builder.Append(p);
     }
 
     #endregion
