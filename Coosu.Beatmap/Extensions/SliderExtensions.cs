@@ -1,9 +1,8 @@
-﻿﻿using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using Coosu.Beatmap.Sections.HitObject;
-using Coosu.Beatmap.Utils;
 using Coosu.Shared;
 using osu.Framework.Utils;
 
@@ -51,9 +50,8 @@ public static class SliderExtensions
     {
         return sliderInfo.SliderType switch
         {
-            SliderType.Bezier => ComputePiecewiseDiscreteData(sliderInfo, intervalMilliseconds),
-            SliderType.Linear => ComputePiecewiseDiscreteData(sliderInfo, intervalMilliseconds),
-            SliderType.Perfect => ComputePiecewiseDiscreteData(sliderInfo, intervalMilliseconds),
+            SliderType.Bezier or SliderType.Linear or SliderType.Perfect => ComputePiecewiseDiscreteData(sliderInfo,
+                intervalMilliseconds),
 #pragma warning disable CS0618 // 类型或成员已过时
             SliderType.Catmull => ComputePiecewiseDiscreteData(sliderInfo, intervalMilliseconds),
 #pragma warning restore CS0618 // 类型或成员已过时
@@ -104,24 +102,7 @@ public static class SliderExtensions
             return EmptyArray<SliderTick>.Value;
         }
 
-        var segmentCount = approximated.Count - 1;
-        var segmentLengths = new double[segmentCount];
-        var cumulativeLengths = new double[segmentCount];
-
-        double totalLength = 0;
-        for (var i = 0; i < segmentCount; i++)
-        {
-            var a = approximated[i];
-            var b = approximated[i + 1];
-            var dx = b.X - a.X;
-            var dy = b.Y - a.Y;
-            var len = Math.Sqrt(dx * dx + dy * dy);
-
-            segmentLengths[i] = len;
-            totalLength += len;
-            cumulativeLengths[i] = totalLength;
-        }
-
+        var (segmentLengths, cumulativeLengths, totalLength) = CreateCumulativeLengths(approximated);
         if (totalLength <= 0)
         {
             return EmptyArray<SliderTick>.Value;
@@ -143,42 +124,68 @@ public static class SliderExtensions
 
         if (sliderInfo.Repeat > 1)
         {
-            Span<SliderTick> span = stackalloc SliderTick[ticks.Count];
-            for (var i = 0; i < ticks.Count; i++)
-            {
-                span[i] = ticks[i];
-            }
-
-            for (int i = 2; i <= sliderInfo.Repeat; i++)
-            {
-                span.Reverse();
-                var reverse = i % 2 == 0;
-                if (reverse)
-                {
-                    // span's enumerator is ok
-                    foreach (var baseTick in span)
-                    {
-                        // (sliderInfo.CurrentSingleDuration - (k.Offset - sliderInfo.StartTime)) + (i - 1) * sliderInfo.CurrentSingleDuration + sliderInfo.StartTime,
-                        var tick = new SliderTick(
-                            i * sliderInfo.CurrentSingleDuration - baseTick.Offset + sliderInfo.StartTime * 2,
-                            baseTick.Point);
-                        ticks.Add(tick);
-                    }
-                }
-                else
-                {
-                    // span's enumerator is ok
-                    foreach (var baseTick in span)
-                    {
-                        var tick = new SliderTick(baseTick.Offset + (i - 1) * sliderInfo.CurrentSingleDuration,
-                            baseTick.Point);
-                        ticks.Add(tick);
-                    }
-                }
-            }
+            AppendRepeatTicks(sliderInfo, ticks);
         }
 
         return ticks.ToArray();
+    }
+
+    private static void AppendRepeatTicks(ExtendedSliderInfo sliderInfo, List<SliderTick> ticks)
+    {
+        Span<SliderTick> span = stackalloc SliderTick[ticks.Count];
+        for (var i = 0; i < ticks.Count; i++)
+        {
+            span[i] = ticks[i];
+        }
+
+        for (int i = 2; i <= sliderInfo.Repeat; i++)
+        {
+            span.Reverse();
+            var reverse = i % 2 == 0;
+            if (reverse)
+            {
+                foreach (var baseTick in span)
+                {
+                    var tick = new SliderTick(
+                        i * sliderInfo.CurrentSingleDuration - baseTick.Offset + sliderInfo.StartTime * 2,
+                        baseTick.Point);
+                    ticks.Add(tick);
+                }
+            }
+            else
+            {
+                foreach (var baseTick in span)
+                {
+                    var tick = new SliderTick(baseTick.Offset + (i - 1) * sliderInfo.CurrentSingleDuration,
+                        baseTick.Point);
+                    ticks.Add(tick);
+                }
+            }
+        }
+    }
+
+    private static (double[] segmentLengths, double[] cumulativeLengths, double totalLength) CreateCumulativeLengths(
+        IReadOnlyList<Vector2> points)
+    {
+        var segmentCount = points.Count - 1;
+        var segmentLengths = new double[segmentCount];
+        var cumulativeLengths = new double[segmentCount];
+
+        double totalLength = 0;
+        for (var i = 0; i < segmentCount; i++)
+        {
+            var a = points[i];
+            var b = points[i + 1];
+            var dx = b.X - a.X;
+            var dy = b.Y - a.Y;
+            var len = Math.Sqrt(dx * dx + dy * dy);
+
+            segmentLengths[i] = len;
+            totalLength += len;
+            cumulativeLengths[i] = totalLength;
+        }
+
+        return (segmentLengths, cumulativeLengths, totalLength);
     }
 
     private static Vector2 SamplePointAtLength(
@@ -244,7 +251,7 @@ public static class SliderExtensions
             var groupedPoint = groupedPoints[i];
             var bezierTrail = PathApproximator.BezierToPiecewiseLinear(groupedPoint);
 
-            points.AddRange(bezierTrail.Select(k => new Vector2(k.X, k.Y)));
+            points.AddRange(bezierTrail);
         }
 
         return points;
