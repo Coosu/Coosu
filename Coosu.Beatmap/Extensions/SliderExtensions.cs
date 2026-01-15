@@ -65,47 +65,75 @@ public static class SliderExtensions
             return EmptyArray<SliderTick>.Value;
         }
 
-        var approximated = sliderInfo.ComputePathVertices();
-        if (approximated.Count < 2)
+        var pathBuilder = new ValueListBuilder<Vector2>(stackalloc Vector2[64]);
+        try
         {
-            return EmptyArray<SliderTick>.Value;
-        }
+            sliderInfo.ComputePathVertices(ref pathBuilder);
+            var approximated = pathBuilder.AsSpan();
 
-        var (segmentLengths, cumulativeLengths, totalLength) = CreateCumulativeLengths(approximated);
-        if (totalLength <= 0)
+            if (approximated.Length < 2)
+            {
+                return EmptyArray<SliderTick>.Value;
+            }
+
+            var segLens = new ValueListBuilder<double>(stackalloc double[64]);
+            var cumLens = new ValueListBuilder<double>(stackalloc double[64]);
+            try
+            {
+                CreateCumulativeLengths(approximated, ref segLens, ref cumLens, out var totalLength);
+                if (totalLength <= 0)
+                {
+                    return EmptyArray<SliderTick>.Value;
+                }
+
+                var ticks = new ValueListBuilder<SliderTick>(stackalloc SliderTick[64]);
+                try
+                {
+                    for (int i = 1; i * fixedInterval < sliderInfo.CurrentSingleDuration; i++)
+                    {
+                        var offset = i * fixedInterval;
+                        var isOnEdges = Math.Abs(offset % sliderInfo.CurrentSingleDuration) < 0.5;
+                        if (isOnEdges) continue;
+
+                        var ratio = offset / sliderInfo.CurrentSingleDuration;
+                        var targetLen = totalLength * ratio;
+                        var tickPoint =
+                            SamplePointAtLength(approximated, segLens.AsSpan(), cumLens.AsSpan(), targetLen);
+                        ticks.Append(new SliderTick(sliderInfo.StartTime + offset, tickPoint));
+                    }
+
+                    if (sliderInfo.Repeat > 1)
+                    {
+                        AppendRepeatTicks(sliderInfo, ref ticks);
+                    }
+
+                    return ticks.AsSpan().ToArray();
+                }
+                finally
+                {
+                    ticks.Dispose();
+                }
+            }
+            finally
+            {
+                segLens.Dispose();
+                cumLens.Dispose();
+            }
+        }
+        finally
         {
-            return EmptyArray<SliderTick>.Value;
+            pathBuilder.Dispose();
         }
-
-        var ticks = new List<SliderTick>();
-
-        for (int i = 1; i * fixedInterval < sliderInfo.CurrentSingleDuration; i++)
-        {
-            var offset = i * fixedInterval;
-            var isOnEdges = Math.Abs(offset % sliderInfo.CurrentSingleDuration) < 0.5;
-            if (isOnEdges) continue;
-
-            var ratio = offset / sliderInfo.CurrentSingleDuration;
-            var targetLen = totalLength * ratio;
-            var tickPoint = SamplePointAtLength(approximated, segmentLengths, cumulativeLengths, targetLen);
-            ticks.Add(new SliderTick(sliderInfo.StartTime + offset, tickPoint));
-        }
-
-        if (sliderInfo.Repeat > 1)
-        {
-            AppendRepeatTicks(sliderInfo, ticks);
-        }
-
-        return ticks.ToArray();
     }
 
-    private static void AppendRepeatTicks(ExtendedSliderInfo sliderInfo, List<SliderTick> ticks)
+    private static void AppendRepeatTicks(ExtendedSliderInfo sliderInfo, ref ValueListBuilder<SliderTick> ticks)
     {
-        Span<SliderTick> span = stackalloc SliderTick[ticks.Count];
-        for (var i = 0; i < ticks.Count; i++)
-        {
-            span[i] = ticks[i];
-        }
+        var count = ticks.Length;
+        Span<SliderTick> span = count <= 256
+            ? stackalloc SliderTick[count]
+            : new SliderTick[count];
+
+        ticks.AsSpan().CopyTo(span);
 
         for (int i = 2; i <= sliderInfo.Repeat; i++)
         {
@@ -118,7 +146,7 @@ public static class SliderExtensions
                     var tick = new SliderTick(
                         i * sliderInfo.CurrentSingleDuration - baseTick.Offset + sliderInfo.StartTime * 2,
                         baseTick.Point);
-                    ticks.Add(tick);
+                    ticks.Append(tick);
                 }
             }
             else
@@ -127,7 +155,7 @@ public static class SliderExtensions
                 {
                     var tick = new SliderTick(baseTick.Offset + (i - 1) * sliderInfo.CurrentSingleDuration,
                         baseTick.Point);
-                    ticks.Add(tick);
+                    ticks.Append(tick);
                 }
             }
         }
@@ -137,36 +165,32 @@ public static class SliderExtensions
     /// osu!lazer implementation to compute approximated data.
     /// </summary>
     /// <returns></returns>
-    private static IReadOnlyList<Vector2> ComputePathVertices(this SliderInfo sliderInfo)
+    private static void ComputePathVertices(this SliderInfo sliderInfo, ref ValueListBuilder<Vector2> builder)
     {
-        IReadOnlyList<Vector2> ticks;
         switch (sliderInfo.SliderType)
         {
             case SliderType.Bezier:
             case SliderType.Linear:
-                ticks = ComputePathVerticesBezier(sliderInfo);
+                ComputePathVerticesBezier(sliderInfo, ref builder);
                 break;
             case SliderType.Perfect:
-                ticks = ComputePathVerticesPerfect(sliderInfo);
+                ComputePathVerticesPerfect(sliderInfo, ref builder);
                 break;
 #pragma warning disable CS0618 // 类型或成员已过时
             case SliderType.Catmull:
 #pragma warning restore CS0618 // 类型或成员已过时
-                ticks = ComputePathVerticesCatmull(sliderInfo);
+                ComputePathVerticesCatmull(sliderInfo, ref builder);
                 break;
             default:
-                ticks = EmptyArray<Vector2>.Value;
                 break;
         }
-
-        return ticks;
     }
 
     #endregion
 
     #region Path Algorithms
 
-    private static IReadOnlyList<Vector2> ComputePathVerticesPerfect(SliderInfo sliderInfo)
+    private static void ComputePathVerticesPerfect(SliderInfo sliderInfo, ref ValueListBuilder<Vector2> builder)
     {
         Vector2 p1;
         Vector2 p2;
@@ -179,48 +203,46 @@ public static class SliderExtensions
         }
         catch (IndexOutOfRangeException)
         {
-            return ComputePathVerticesBezier(sliderInfo);
+            ComputePathVerticesBezier(sliderInfo, ref builder);
+            return;
         }
 
-        return PathApproximator.CircularArcToPiecewiseLinear(new[] { p1, p2, p3 });
+        var result = PathApproximator.CircularArcToPiecewiseLinear([p1, p2, p3]);
+        foreach (var p in result) builder.Append(p);
     }
 
-    private static IReadOnlyList<Vector2> ComputePathVerticesBezier(SliderInfo sliderInfo)
+    private static void ComputePathVerticesBezier(SliderInfo sliderInfo, ref ValueListBuilder<Vector2> builder)
     {
-        var points = new List<Vector2>();
         var groupedPoints = GetGroupedPoints(sliderInfo);
         for (var i = 0; i < groupedPoints.Count; i++)
         {
             var groupedPoint = groupedPoints[i];
             var bezierTrail = PathApproximator.BezierToPiecewiseLinear(groupedPoint);
 
-            points.AddRange(bezierTrail);
+            foreach (var p in bezierTrail) builder.Append(p);
         }
-
-        return points;
     }
 
-    private static IReadOnlyList<Vector2> ComputePathVerticesCatmull(SliderInfo sliderInfo)
+    private static void ComputePathVerticesCatmull(SliderInfo sliderInfo, ref ValueListBuilder<Vector2> builder)
     {
-        var all = sliderInfo.ControlPoints.ToList();
-        all.Insert(0, sliderInfo.StartPoint);
-
-        var catmullTrail = PathApproximator.CatmullToPiecewiseLinear(all.ToArray());
-        return catmullTrail;
+        List<Vector2> all = [sliderInfo.StartPoint, .. sliderInfo.ControlPoints];
+        var catmullTrail = PathApproximator.CatmullToPiecewiseLinear(all);
+        foreach (var p in catmullTrail) builder.Append(p);
     }
 
     #endregion
 
     #region Helpers
 
-    private static (double[] segmentLengths, double[] cumulativeLengths, double totalLength) CreateCumulativeLengths(
-        IReadOnlyList<Vector2> points)
+    private static void CreateCumulativeLengths(
+        ReadOnlySpan<Vector2> points,
+        ref ValueListBuilder<double> segmentLengths,
+        ref ValueListBuilder<double> cumulativeLengths,
+        out double totalLength)
     {
-        var segmentCount = points.Count - 1;
-        var segmentLengths = new double[segmentCount];
-        var cumulativeLengths = new double[segmentCount];
+        var segmentCount = points.Length - 1;
 
-        double totalLength = 0;
+        totalLength = 0;
         for (var i = 0; i < segmentCount; i++)
         {
             var a = points[i];
@@ -229,18 +251,16 @@ public static class SliderExtensions
             var dy = b.Y - a.Y;
             var len = Math.Sqrt(dx * dx + dy * dy);
 
-            segmentLengths[i] = len;
+            segmentLengths.Append(len);
             totalLength += len;
-            cumulativeLengths[i] = totalLength;
+            cumulativeLengths.Append(totalLength);
         }
-
-        return (segmentLengths, cumulativeLengths, totalLength);
     }
 
     private static Vector2 SamplePointAtLength(
-        IReadOnlyList<Vector2> points,
-        double[] segmentLengths,
-        double[] cumulativeLengths,
+        ReadOnlySpan<Vector2> points,
+        ReadOnlySpan<double> segmentLengths,
+        ReadOnlySpan<double> cumulativeLengths,
         double targetLen)
     {
         if (targetLen <= 0)
@@ -251,10 +271,10 @@ public static class SliderExtensions
         var totalLen = cumulativeLengths.Length == 0 ? 0 : cumulativeLengths[cumulativeLengths.Length - 1];
         if (targetLen >= totalLen)
         {
-            return points[points.Count - 1];
+            return points[points.Length - 1];
         }
 
-        var index = Array.BinarySearch(cumulativeLengths, targetLen);
+        var index = cumulativeLengths.BinarySearch(targetLen);
         index = index < 0 ? ~index : Math.Min(index + 1, cumulativeLengths.Length - 1);
         if (index >= cumulativeLengths.Length)
         {

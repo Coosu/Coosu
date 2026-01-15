@@ -6,7 +6,7 @@
     <PackageTags>osu, osu!, osugame</PackageTags>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <IsTrimmable Condition="$(TargetFramework)!='netstandard2.0'">true</IsTrimmable>
-    <LangVersion>11.0</LangVersion>
+    <LangVersion>14</LangVersion>
   </PropertyGroup>
 
   <ItemGroup Condition="$(TargetFramework)!='netstandard2.0'">

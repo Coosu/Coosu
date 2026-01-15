@@ -172,6 +172,27 @@ public static class PathApproximator
         return result;
     }
 
+    public static List<Vector2> CatmullToPiecewiseLinear(IReadOnlyList<Vector2> controlPoints)
+    {
+        var result = new List<Vector2>((controlPoints.Count - 1) * catmull_detail * 2);
+
+        for (int i = 0; i < controlPoints.Count - 1; i++)
+        {
+            var v1 = i > 0 ? controlPoints[i - 1] : controlPoints[i];
+            var v2 = controlPoints[i];
+            var v3 = i < controlPoints.Count - 1 ? controlPoints[i + 1] : v2 + v2 - v1;
+            var v4 = i < controlPoints.Count - 2 ? controlPoints[i + 2] : v3 + v3 - v2;
+
+            for (int c = 0; c < catmull_detail; c++)
+            {
+                result.Add(catmullFindPoint(ref v1, ref v2, ref v3, ref v4, (float)c / catmull_detail));
+                result.Add(catmullFindPoint(ref v1, ref v2, ref v3, ref v4, (float)(c + 1) / catmull_detail));
+            }
+        }
+
+        return result;
+    }
+
     /// <summary>
     /// Creates a piecewise-linear approximation of a circular arc curve.
     /// </summary>
