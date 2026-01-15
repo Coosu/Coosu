@@ -48,22 +48,14 @@ public static class SliderExtensions
     // todo: not cut by rhythm
     public static SliderTick[] ComputeDiscreteData(this ExtendedSliderInfo sliderInfo, double intervalMilliseconds)
     {
-        return sliderInfo.SliderType switch
-        {
-            SliderType.Bezier or SliderType.Linear or SliderType.Perfect => ComputePiecewiseDiscreteData(sliderInfo,
-                intervalMilliseconds),
-#pragma warning disable CS0618 // 类型或成员已过时
-            SliderType.Catmull => ComputePiecewiseDiscreteData(sliderInfo, intervalMilliseconds),
-#pragma warning restore CS0618 // 类型或成员已过时
-            _ => EmptyArray<SliderTick>.Value,
-        };
+        return ComputePiecewiseDiscreteData(sliderInfo, intervalMilliseconds);
     }
 
     /// <summary>
     /// osu!lazer implementation to compute approximated data.
     /// </summary>
     /// <returns></returns>
-    public static IReadOnlyList<Vector2> ComputeApproximatedData(this SliderInfo sliderInfo)
+    private static IReadOnlyList<Vector2> ComputeApproximatedData(this SliderInfo sliderInfo)
     {
         IReadOnlyList<Vector2> ticks;
         switch (sliderInfo.SliderType)
@@ -268,41 +260,52 @@ public static class SliderExtensions
 
     private static List<Vector2[]> GetGroupedPoints(SliderInfo sliderInfo)
     {
-        IReadOnlyList<Vector2> rawPoints = sliderInfo.ControlPoints;
-
+        var controlPoints = sliderInfo.ControlPoints;
         var groupedPoints = new List<Vector2[]>();
+
+        // 如果没有控制点，只有起点是无法构成滑条路径的
+        if (controlPoints.Count == 0)
+        {
+            return groupedPoints;
+        }
+
+        var allPoints = new List<Vector2>(controlPoints.Count + 1) { sliderInfo.StartPoint };
+        allPoints.AddRange(controlPoints);
+
         var currentGroup = new List<Vector2>();
 
-        Vector2? nextPoint = default;
-        for (var i = -1; i < rawPoints.Count - 1; i++)
+        for (var i = 0; i < allPoints.Count - 1; i++)
         {
-            var thisPoint = i == -1 ? sliderInfo.StartPoint : rawPoints[i];
-            nextPoint = rawPoints[i + 1];
+            var thisPoint = allPoints[i];
+            var nextPoint = allPoints[i + 1];
+
             currentGroup.Add(thisPoint);
+
+            // 如果当前点等于下一个点，说明这里是路径的分段点
             if (thisPoint.Equals(nextPoint))
             {
+                // 如果当前组有效（超过1个点），则添加
                 if (currentGroup.Count > 1)
                 {
                     groupedPoints.Add(currentGroup.ToArray());
                 }
 
-                currentGroup = new List<Vector2>();
+                currentGroup.Clear();
             }
         }
 
-        if (currentGroup.Count != 0 && nextPoint != null)
-        {
-            currentGroup.Add(nextPoint.Value);
-        }
+        // 添加最后一个点
+        currentGroup.Add(allPoints[allPoints.Count - 1]);
 
-        if (currentGroup.Count != 0)
+        if (currentGroup.Count > 1)
         {
             groupedPoints.Add(currentGroup.ToArray());
         }
 
-        if (groupedPoints.Count == 0 && rawPoints.Count != 0)
+        // Fallback: 如果有控制点但没有生成任何有效组（例如 A, A），则将整体作为一个组
+        if (groupedPoints.Count == 0)
         {
-            currentGroup.AddRange(rawPoints);
+            groupedPoints.Add(allPoints.ToArray());
         }
 
         return groupedPoints;
