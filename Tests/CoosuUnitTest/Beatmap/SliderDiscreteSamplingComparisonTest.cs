@@ -51,7 +51,7 @@ public sealed class SliderDiscreteSamplingComparisonTest
 
         foreach (var (name, slider) in cases)
         {
-            var current = slider.ComputeDiscreteData(interval);
+            var current = slider.ComputeTicks(interval);
             var reference = SliderDiscreteSamplingReference.ComputeDiscreteData(slider, interval);
 
             _output.WriteLine($"case={name}");
@@ -123,7 +123,7 @@ public sealed class SliderDiscreteSamplingComparisonTest
 
         foreach (var (name, slider) in cases)
         {
-            var current = slider.ComputeDiscreteData(interval);
+            var current = slider.ComputeTicks(interval);
             var legacy = SliderDiscreteSamplingLegacy.ComputeDiscreteData(slider, interval);
 
             _output.WriteLine($"case={name}");
