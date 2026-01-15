@@ -7,51 +7,53 @@ using Coosu.Beatmap.Sections.HitObject;
 using Coosu.Shared;
 using osu.Framework.Utils;
 
-// ReSharper disable once CheckNamespace
 namespace Coosu.Beatmap;
 
 public static class SliderExtensions
 {
     #region Public Methods
 
-    public static IEnumerable<SliderEdge> EnumerateEdges(this ExtendedSliderInfo sliderInfo)
+    extension(ExtendedSliderInfo sliderInfo)
     {
-        for (var i = 0; i < sliderInfo.Repeat + 1; i++)
+        public SliderEdge[] GetEdges()
         {
-            yield return new SliderEdge
-            (
-                offset: sliderInfo.StartTime + sliderInfo.CurrentSingleDuration * i,
-                point: i % 2 == 0 ? sliderInfo.StartPoint : sliderInfo.EndPoint,
-                edgeHitsound: sliderInfo.EdgeHitsounds?[i] ?? sliderInfo.BaseObject.Hitsound,
-                edgeSample: sliderInfo.EdgeSamples?[i] ?? sliderInfo.BaseObject.SampleSet,
-                edgeAddition: sliderInfo.EdgeAdditions?[i] ?? sliderInfo.BaseObject.AdditionSet,
-                isHitsoundDefined: sliderInfo.EdgeHitsounds == null
-            );
+            return EnumerateEdges(sliderInfo).ToArray();
         }
-    }
 
-    public static SliderEdge[] GetEdges(this ExtendedSliderInfo sliderInfo)
-    {
-        return EnumerateEdges(sliderInfo).ToArray();
-    }
+        public SliderTick[] GetSliderTicks()
+        {
+            var tickInterval = sliderInfo.CurrentBeatDuration / sliderInfo.CurrentTickRate;
+            return ComputeTicks(sliderInfo, tickInterval);
+        }
 
-    public static SliderTick[] GetSliderTicks(this ExtendedSliderInfo sliderInfo)
-    {
-        var tickInterval = sliderInfo.CurrentBeatDuration / sliderInfo.CurrentTickRate;
-        return ComputeTicks(sliderInfo, tickInterval);
-    }
+        public SliderTick[] GetSliderSlides()
+        {
+            // 60fps
+            var interval = 1000 / 60d;
+            return ComputeTicks(sliderInfo, interval);
+        }
 
-    public static SliderTick[] GetSliderSlides(this ExtendedSliderInfo sliderInfo)
-    {
-        // 60fps
-        var interval = 1000 / 60d;
-        return ComputeTicks(sliderInfo, interval);
-    }
+        // todo: not cut by rhythm
+        public SliderTick[] ComputeTicks(double intervalMilliseconds)
+        {
+            return ComputeTicksByInterval(sliderInfo, intervalMilliseconds);
+        }
 
-    // todo: not cut by rhythm
-    public static SliderTick[] ComputeTicks(this ExtendedSliderInfo sliderInfo, double intervalMilliseconds)
-    {
-        return ComputeTicksByInterval(sliderInfo, intervalMilliseconds);
+        public IEnumerable<SliderEdge> EnumerateEdges()
+        {
+            for (var i = 0; i < sliderInfo.Repeat + 1; i++)
+            {
+                yield return new SliderEdge
+                (
+                    offset: sliderInfo.StartTime + sliderInfo.CurrentSingleDuration * i,
+                    point: i % 2 == 0 ? sliderInfo.StartPoint : sliderInfo.EndPoint,
+                    edgeHitsound: sliderInfo.EdgeHitsounds?[i] ?? sliderInfo.BaseObject.Hitsound,
+                    edgeSample: sliderInfo.EdgeSamples?[i] ?? sliderInfo.BaseObject.SampleSet,
+                    edgeAddition: sliderInfo.EdgeAdditions?[i] ?? sliderInfo.BaseObject.AdditionSet,
+                    isHitsoundDefined: sliderInfo.EdgeHitsounds == null
+                );
+            }
+        }
     }
 
     #endregion
@@ -90,6 +92,8 @@ public static class SliderExtensions
                 var ticks = new ValueListBuilder<SliderTick>(stackalloc SliderTick[64]);
                 try
                 {
+                    var segmentIndex = 0;
+                    var previousSum = 0d;
                     for (int i = 1; i * fixedInterval < sliderInfo.CurrentSingleDuration; i++)
                     {
                         var offset = i * fixedInterval;
@@ -98,8 +102,8 @@ public static class SliderExtensions
 
                         var ratio = offset / sliderInfo.CurrentSingleDuration;
                         var targetLen = totalLength * ratio;
-                        var tickPoint =
-                            SamplePointAtLength(approximated, segLens.AsSpan(), cumLens.AsSpan(), targetLen);
+                        var tickPoint = InterpolateSequential(approximated, segLens.AsSpan(), cumLens.AsSpan(),
+                            targetLen, ref segmentIndex, ref previousSum);
                         ticks.Append(new SliderTick(sliderInfo.StartTime + offset, tickPoint));
                     }
 
@@ -201,25 +205,16 @@ public static class SliderExtensions
 
     private static void ComputePathVerticesPerfect(SliderInfo sliderInfo, ref ValueListBuilder<Vector2> builder)
     {
-        Vector2 p1;
-        Vector2 p2;
-        Vector2 p3;
-        try
-        {
-            p1 = sliderInfo.StartPoint;
-            p2 = sliderInfo.ControlPoints[0];
-            p3 = sliderInfo.ControlPoints[1];
-        }
-        catch (IndexOutOfRangeException)
+        if (sliderInfo.ControlPoints.Count < 2)
         {
             ComputePathVerticesBezier(sliderInfo, ref builder);
             return;
         }
 
         Span<Vector2> points = stackalloc Vector2[3];
-        points[0] = p1;
-        points[1] = p2;
-        points[2] = p3;
+        points[0] = sliderInfo.StartPoint;
+        points[1] = sliderInfo.ControlPoints[0];
+        points[2] = sliderInfo.ControlPoints[1];
 
         var result = PathApproximator.CircularArcToPiecewiseLinear(points);
         foreach (var p in result) builder.Append(p);
@@ -345,39 +340,48 @@ public static class SliderExtensions
         }
     }
 
-    private static Vector2 SamplePointAtLength(
+    private static Vector2 InterpolateSequential(
         ReadOnlySpan<Vector2> points,
         ReadOnlySpan<double> segmentLengths,
         ReadOnlySpan<double> cumulativeLengths,
-        double targetLen)
+        double targetLen,
+        ref int segmentIndex,
+        ref double previousSum)
     {
         if (targetLen <= 0)
         {
+            segmentIndex = 0;
+            previousSum = 0;
             return points[0];
         }
 
         var totalLen = cumulativeLengths.Length == 0 ? 0 : cumulativeLengths[cumulativeLengths.Length - 1];
         if (targetLen >= totalLen)
         {
+            segmentIndex = Math.Max(0, cumulativeLengths.Length - 1);
+            previousSum = segmentIndex == 0 ? 0 : cumulativeLengths[segmentIndex - 1];
             return points[points.Length - 1];
         }
 
-        var index = cumulativeLengths.BinarySearch(targetLen);
-        index = index < 0 ? ~index : Math.Min(index + 1, cumulativeLengths.Length - 1);
-        if (index >= cumulativeLengths.Length)
+        if (segmentIndex < 0) segmentIndex = 0;
+        if (segmentIndex >= cumulativeLengths.Length) segmentIndex = cumulativeLengths.Length - 1;
+
+        var currentCum = cumulativeLengths[segmentIndex];
+        while (segmentIndex < cumulativeLengths.Length - 1 && targetLen >= currentCum)
         {
-            index = cumulativeLengths.Length - 1;
+            previousSum = currentCum;
+            segmentIndex++;
+            currentCum = cumulativeLengths[segmentIndex];
         }
 
-        var previousSum = index == 0 ? 0 : cumulativeLengths[index - 1];
-        var segLen = segmentLengths[index];
+        var segLen = segmentLengths[segmentIndex];
         if (segLen <= 0)
         {
-            return points[index];
+            return points[segmentIndex];
         }
 
         var t = (float)((targetLen - previousSum) / segLen);
-        return Vector2.Lerp(points[index], points[index + 1], t);
+        return Vector2.Lerp(points[segmentIndex], points[segmentIndex + 1], t);
     }
 
     #endregion
