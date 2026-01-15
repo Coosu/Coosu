@@ -247,7 +247,7 @@ public sealed class HitObjectSection : Section
                 continue; // curvePoints skip 1
             }
 
-            if (!char.IsNumber(point[0]))
+            if (!char.IsNumber(point[0]) && point[0] != '-')
             {
                 var type = point.SliderFlagToEnum();
                 points.Add(new Vector3(0, 0, (int)type + 1)); // v128 slider type storage
