@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Coosu.Shared;
-using Coosu.Shared.Mathematics;
 using Coosu.Storyboard.Events;
+using osu.Framework.Utils;
 
 namespace Coosu.Storyboard.Extensions.Computing;
 

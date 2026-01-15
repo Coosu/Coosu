@@ -1,4 +1,4 @@
-using System;
+锘縰sing System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -260,10 +260,10 @@ public class ScriptingTest
         _testOutputHelper.WriteLine(sprite.ToScriptString());
     }
 
-    [Fact]
+    [Fact(Skip = "Depends on local files outside repository.")]
     public async Task Parse2()
     {
-        var path = @"E:\其他文件\osu!\Songs\1841885 cYsmix - triangles\cYsmix - triangles (yf_bmp).osb";
+        var path = @"E:\鍏朵粬鏂囦欢\osu!\Songs\1841885 cYsmix - triangles\cYsmix - triangles (yf_bmp).osb";
 
         using var reader = new StreamReader(path);
         var scene = await OsbxConvert.DeserializeObjectAsync(reader);
@@ -284,7 +284,7 @@ public class ScriptingTest
         Assert.Equal(1, group.SceneObjects.Count);
     }
 
-    [Fact]
+    [Fact(Skip = "Depends on local files outside repository.")]
     public void Parse()
     {
         CultureInfo.CurrentCulture = new CultureInfo("ru-RU");
@@ -292,7 +292,7 @@ public class ScriptingTest
             @"C:\Users\milkitic\Documents\Tencent Files\2241521134\FileRecv\cYsmix_-_triangles\cYsmix - triangles (yf_bmp).osb");
     }
 
-    [Fact]
+    [Fact(Skip = "Depends on local files outside repository.")]
     public async Task Compress()
     {
         var path = @"C:\Users\milkitic\Downloads\406217 Chata - enn\Chata - enn (EvilElvis).osb";

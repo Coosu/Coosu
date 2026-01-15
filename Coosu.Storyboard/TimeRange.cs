@@ -4,6 +4,7 @@ using System.Linq;
 using Coosu.Shared;
 using Coosu.Shared.Mathematics;
 using Coosu.Storyboard.Common;
+using osu.Framework.Utils;
 
 namespace Coosu.Storyboard;
 

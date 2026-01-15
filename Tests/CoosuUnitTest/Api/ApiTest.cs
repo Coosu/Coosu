@@ -1,4 +1,4 @@
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Coosu.Api.HttpClient;
 using Coosu.Api.V2;
 using Coosu.Api.V2.RequestModels;
@@ -10,33 +10,10 @@ namespace CoosuUnitTest.Api;
 
 public class ApiTest
 {
-    private readonly int _clientId;
-    private readonly string _clientSecret;
-    private readonly IConfiguration _configuration;
-    private readonly UserToken _publicToken;
-    private readonly OsuClientV2 _client;
-
-    public ApiTest()
-    {
-        var builder = new ConfigurationBuilder()
-            .AddUserSecrets<Secretes>();
-
-        var clientOptions = new ClientOptions()
-        {
-            ProxyUrl = "http://127.0.0.1:10801"
-        };
-        _configuration = builder.Build();
-        _clientId = int.Parse(_configuration["ClientId"]);
-        _clientSecret = _configuration["ClientSecret"];
-        var client = new AuthorizationClient(clientOptions);
-        _publicToken = client.GetPublicToken(_clientId, _clientSecret).Result;
-        _client = new OsuClientV2(_publicToken, clientOptions);
-    }
-
-    [Fact]
+    [Fact(Skip = "Requires osu! API credentials and network access.")]
     public async Task SearchBeatmapset()
     {
-        var v2 = new OsuClientV2(_publicToken);
+        var v2 = new OsuClientV2(await GetPublicToken());
         var beatmaps = await v2.Beatmap.SearchBeatmapset(new SearchOptions
         {
             BeatmapsetStatus = BeatmapsetStatus.Any,
@@ -49,18 +26,35 @@ public class ApiTest
         });
     }
 
-    [Fact]
+    [Fact(Skip = "Requires osu! API credentials and network access.")]
     public async Task SearchUser()
     {
-        var v2 = new OsuClientV2(_publicToken);
+        var v2 = new OsuClientV2(await GetPublicToken());
         var beatmaps = await v2.User.GetUser("1243669", GameMode.Osu);
     }
 
-    [Fact]
+    [Fact(Skip = "Requires osu! API credentials and network access.")]
     public async Task GetUserScores()
     {
-        var v2 = new OsuClientV2(_publicToken);
+        var v2 = new OsuClientV2(await GetPublicToken());
         var beatmaps = await v2.User.GetUserScores("1243669", ScoreType.Best, gameMode: GameMode.Mania);
+    }
+
+    private static async Task<UserToken> GetPublicToken()
+    {
+        var builder = new ConfigurationBuilder()
+            .AddUserSecrets<Secretes>();
+
+        var clientOptions = new ClientOptions()
+        {
+            ProxyUrl = "http://127.0.0.1:7897"
+        };
+
+        var configuration = builder.Build();
+        var clientId = int.Parse(configuration["ClientId"]);
+        var clientSecret = configuration["ClientSecret"];
+        var client = new AuthorizationClient(clientOptions);
+        return await client.GetPublicToken(clientId, clientSecret);
     }
 }
 
