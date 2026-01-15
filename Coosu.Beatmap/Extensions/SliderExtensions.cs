@@ -64,7 +64,7 @@ public static class SliderExtensions
                 break;
         }
 
-        return ticks.ToArray();
+        return ticks;
     }
 
     /// <summary>
@@ -188,7 +188,14 @@ public static class SliderExtensions
 
         var groupedPoints = GetGroupedPoints(sliderInfo);
         var groupedBezierLengths = GetGroupedBezierLengths(groupedPoints);
-        var totalLength = groupedBezierLengths.Sum();
+        var cumulativeLengths = new double[groupedBezierLengths.Count];
+        double totalLength = 0;
+        for (var i = 0; i < groupedBezierLengths.Count; i++)
+        {
+            totalLength += groupedBezierLengths[i];
+            cumulativeLengths[i] = totalLength;
+        }
+
         var ticks = new List<SliderTick>();
 
         for (int i = 1; i * fixedInterval < sliderInfo.CurrentSingleDuration; i++)
@@ -200,7 +207,7 @@ public static class SliderExtensions
             var ratio = offset / sliderInfo.CurrentSingleDuration; // 相对整个滑条的时间比例，=距离比例
             var relativeLen = totalLength * ratio; // 至滑条头的距离
 
-            var (index, lenInPart) = CalculateWhichPart(sliderInfo, relativeLen); // can be optimized
+            var (index, lenInPart) = CalculateWhichPart(relativeLen, cumulativeLengths);
             var len = groupedBezierLengths[index];
             var tickPoint = BezierHelper.Compute(groupedPoints[index], (float)(lenInPart / len));
             ticks.Add(new SliderTick(sliderInfo.StartTime + offset, tickPoint));
@@ -235,7 +242,8 @@ public static class SliderExtensions
                     // span's enumerator is ok
                     foreach (var baseTick in span)
                     {
-                        var tick = new SliderTick(baseTick.Offset + (i - 1) * sliderInfo.CurrentSingleDuration, baseTick.Point);
+                        var tick = new SliderTick(baseTick.Offset + (i - 1) * sliderInfo.CurrentSingleDuration,
+                            baseTick.Point);
                         ticks.Add(tick);
                     }
                 }
@@ -302,18 +310,22 @@ public static class SliderExtensions
         return (new Vector2((float)x, (float)y), r);
     }
 
-    private static (int index, double lenInPart) CalculateWhichPart(SliderInfo sliderInfo, double relativeLen)
+    private static (int index, double lenInPart) CalculateWhichPart(double relativeLen, double[] cumulativeLengths)
     {
-        double sum = 0;
-        var groupedBezierLengths = GetGroupedBezierLengths(GetGroupedPoints(sliderInfo));
-        for (var i = 0; i < groupedBezierLengths.Count; i++)
+        if (cumulativeLengths.Length == 0)
         {
-            var len = groupedBezierLengths[i];
-            sum += len;
-            if (relativeLen < sum) return (i, len - (sum - relativeLen));
+            return (-1, -1);
         }
 
-        return (-1, -1);
+        var index = Array.BinarySearch(cumulativeLengths, relativeLen);
+        index = index < 0 ? ~index : Math.Min(index + 1, cumulativeLengths.Length - 1);
+        if (index >= cumulativeLengths.Length)
+        {
+            index = cumulativeLengths.Length - 1;
+        }
+
+        var previousSum = index == 0 ? 0 : cumulativeLengths[index - 1];
+        return (index, relativeLen - previousSum);
     }
 
     private static List<Vector2[]> GetGroupedPoints(SliderInfo sliderInfo)
