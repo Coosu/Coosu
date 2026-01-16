@@ -253,10 +253,32 @@ public static class SliderExtensions
                             builder.Length = i + 2;
                         }
 
-                        break;
+                        return;
                     }
 
                     currentLength += dist;
+                }
+
+                // Extend if actual length is less than pixelLength
+                if (count >= 2)
+                {
+                    var pPrev = builder[count - 2];
+                    var pLast = builder[count - 1];
+                    var dx = (double)pLast.X - pPrev.X;
+                    var dy = (double)pLast.Y - pPrev.Y;
+                    var dist = Math.Sqrt(dx * dx + dy * dy);
+
+                    if (dist > 1e-4) // Avoid division by zero
+                    {
+                        var remaining = pixelLength - currentLength;
+                        var ratio = remaining / dist;
+                        var newPoint = new Vector3(
+                            (float)(pLast.X + dx * ratio),
+                            (float)(pLast.Y + dy * ratio),
+                            pLast.Z
+                        );
+                        builder.Append(newPoint);
+                    }
                 }
             }
         }
