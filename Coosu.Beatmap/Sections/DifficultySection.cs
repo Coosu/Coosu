@@ -25,7 +25,7 @@ public sealed class DifficultySection : KeyValueSection
     [SectionProperty("ApproachRate", UseSpecificFormat = true)]
     public float ApproachRate { get; set; } = 5;
     [SectionProperty("SliderMultiplier", UseSpecificFormat = true)]
-    public float SliderMultiplier { get; set; } = 1.0f;
+    public double SliderMultiplier { get; set; } = 1.0; // double start from v128
     [SectionProperty("SliderTickRate", UseSpecificFormat = true)]
     public float SliderTickRate { get; set; } = 1.0f;
 }
