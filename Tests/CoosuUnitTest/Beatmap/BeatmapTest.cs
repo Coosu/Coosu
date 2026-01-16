@@ -3,12 +3,31 @@ using System.Linq;
 using System.Threading.Tasks;
 using Coosu.Beatmap;
 using Coosu.Beatmap.Extensions.Playback;
+using Coosu.Beatmap.Sections.HitObject;
 using Xunit;
 
 namespace CoosuUnitTest.Beatmap;
 
 public class BeatmapTest
 {
+    [Theory()]
+    [InlineData("Test Artist - Test Title (Test Creator) [New Difficulty].osu")]
+    [InlineData("Tachiiri Kinshi - Zi Fu Ling (Momoyaya) [goldfish].osu")]
+    public async Task ParseV128Case(string file)
+    {
+        var folder = @"files";
+        var osuFile = await OsuFile.ReadFromFileAsync(Path.Combine(folder, file));
+        var parsed = osuFile.HitObjects.ToSerializedString(osuFile.Version).Trim();
+
+        //var expected = """
+        //               [HitObjects]
+        //               0,31.999996,1042,6,2,B|96.000015:31.999996|96.000015:128.00002|P|192:128.00002|192:224.00003|L|320.00003:224.00003|B4|416.00003:128|416.00003:31.999996|512.00006:31.999996,2,746.5360107421875,2|12|2,1:2|2:1|3:2,3:0:0:0:
+        //               0,32,5714.285714285712,6,2,B|96.000015:32|96.000015:128.00002|P|192:128.00002|192:224.00003|L|320.00003:224.00003|B4|416.00003:128|416.00003:32|512.00006:32,1,746.5360107421875,2|12,1:2|2:1,3:0:0:0:
+        //               168,88,10890,54,0,B|200:72|200:72|232:88|232:88|264:72|264:72|296:88|296:88|328:72|328:72|360:88,1,180,4|0,0:0|0:0,0:0:0:0:
+        //               """;
+        //Assert.Equal(expected, parsed);
+    }
+
     [Fact]
     public async Task ParseEdgeCase()
     {

@@ -8,9 +8,9 @@ namespace Coosu.Beatmap.Sections.HitObject;
 
 public sealed class RawHitObject : SerializeWritableObject
 {
-    public int X { get; set; }
-    public int Y { get; set; }
-    public int Offset { get; set; }
+    public float X { get; set; }
+    public float Y { get; set; }
+    public double Offset { get; set; }
     public RawObjectType RawType { get; set; }
 
     public HitObjectType ObjectType
@@ -71,13 +71,25 @@ public sealed class RawHitObject : SerializeWritableObject
         }
     }
 
-    public override void AppendSerializedString(TextWriter textWriter)
+    public override void AppendSerializedString(TextWriter textWriter, int version)
     {
-        textWriter.Write(X);
-        textWriter.Write(',');
-        textWriter.Write(Y);
-        textWriter.Write(',');
-        textWriter.Write(Offset);
+        if (version < 128)
+        {
+            textWriter.Write((int)X);
+            textWriter.Write(',');
+            textWriter.Write((int)Y);
+            textWriter.Write(',');
+            textWriter.Write((int)Offset);
+        }
+        else
+        {
+            textWriter.Write(X.ToString(ParseHelper.EnUsNumberFormat));
+            textWriter.Write(',');
+            textWriter.Write(Y.ToString(ParseHelper.EnUsNumberFormat));
+            textWriter.Write(',');
+            textWriter.Write(Offset.ToString(ParseHelper.EnUsNumberFormat));
+        }
+
         textWriter.Write(',');
         textWriter.Write((byte)RawType);
         textWriter.Write(',');
@@ -85,14 +97,7 @@ public sealed class RawHitObject : SerializeWritableObject
         textWriter.Write(',');
         if (ObjectType == HitObjectType.Slider && SliderInfo != null)
         {
-            SliderInfo.AppendSerializedString(textWriter);
-            //if (SliderInfo.EdgeHitsounds == null &&
-            //    SampleSet == 0 && AdditionSet == 0 && CustomIndex == 0 && SampleVolume == 0 &&
-            //    string.IsNullOrEmpty(FileName))
-            //{
-            //    return;
-            //}
-
+            SliderInfo.AppendSerializedString(textWriter, version);
             textWriter.Write(',');
         }
         else if (ObjectType == HitObjectType.Spinner)

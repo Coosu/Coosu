@@ -2,7 +2,8 @@
 using Coosu.Beatmap.Sections.HitObject;
 using Coosu.Beatmap.Sections.Timing;
 
-namespace Coosu.Beatmap.Extensions;
+// ReSharper disable once CheckNamespace
+namespace Coosu.Beatmap;
 
 public static class HitsoundToStringExtensions
 {

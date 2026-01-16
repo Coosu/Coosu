@@ -4,6 +4,6 @@ namespace Coosu.Beatmap.Configurable;
 
 public interface ISerializeWritable
 {
-    string ToSerializedString();
-    void AppendSerializedString(TextWriter textWriter);
+    string ToSerializedString(int version);
+    void AppendSerializedString(TextWriter textWriter, int version);
 }

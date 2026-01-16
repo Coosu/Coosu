@@ -13,11 +13,11 @@ public readonly struct CircularArcProperties
     public readonly double ThetaRange;
     public readonly double Direction;
     public readonly float Radius;
-    public readonly Vector2 Centre;
+    public readonly Vector3 Centre;
 
     public double ThetaEnd => ThetaStart + ThetaRange * Direction;
 
-    public CircularArcProperties(double thetaStart, double thetaRange, double direction, float radius, Vector2 centre)
+    public CircularArcProperties(double thetaStart, double thetaRange, double direction, float radius, Vector3 centre)
     {
         IsValid = true;
         ThetaStart = thetaStart;
@@ -31,11 +31,11 @@ public readonly struct CircularArcProperties
     /// Computes various properties that can be used to approximate the circular arc.
     /// </summary>
     /// <param name="controlPoints">Three distinct points on the arc.</param>
-    public CircularArcProperties(ReadOnlySpan<Vector2> controlPoints)
+    public CircularArcProperties(ReadOnlySpan<Vector3> controlPoints)
     {
-        Vector2 a = controlPoints[0];
-        Vector2 b = controlPoints[1];
-        Vector2 c = controlPoints[2];
+        Vector3 a = controlPoints[0];
+        Vector3 b = controlPoints[1];
+        Vector3 c = controlPoints[2];
 
         // If we have a degenerate triangle where a side-length is almost zero, then give up and fallback to a more numerically stable method.
         if (Precision.AlmostEquals(0, (b.Y - a.Y) * (c.X - a.X) - (b.X - a.X) * (c.Y - a.Y)))
@@ -55,12 +55,13 @@ public readonly struct CircularArcProperties
         float bSq = b.LengthSquared();
         float cSq = c.LengthSquared();
 
-        Centre = new Vector2(
+        Centre = new Vector3(
             aSq * (b - c).Y + bSq * (c - a).Y + cSq * (a - b).Y,
-            aSq * (c - b).X + bSq * (a - c).X + cSq * (b - a).X) / d;
+            aSq * (c - b).X + bSq * (a - c).X + cSq * (b - a).X,
+            0) / d;
 
-        Vector2 dA = a - Centre;
-        Vector2 dC = c - Centre;
+        Vector3 dA = a - Centre;
+        Vector3 dC = c - Centre;
 
         Radius = dA.Length();
 
@@ -75,10 +76,10 @@ public readonly struct CircularArcProperties
 
         // Decide in which direction to draw the circle, depending on which side of
         // AC B lies.
-        Vector2 orthoAtoC = c - a;
-        orthoAtoC = new Vector2(orthoAtoC.Y, -orthoAtoC.X);
+        Vector3 orthoAtoC = c - a;
+        orthoAtoC = new Vector3(orthoAtoC.Y, -orthoAtoC.X, 0);
 
-        if (Vector2.Dot(orthoAtoC, b - a) < 0)
+        if (Vector3.Dot(orthoAtoC, b - a) < 0)
         {
             Direction = -Direction;
             ThetaRange = 2 * Math.PI - ThetaRange;

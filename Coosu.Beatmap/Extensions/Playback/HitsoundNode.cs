@@ -9,7 +9,7 @@ public abstract class HitsoundNode
     /// </summary>
     public float Balance { get; internal set; }
     public string? Filename { get; internal set; }
-    public int Offset { get; internal set; }
+    public double Offset { get; internal set; }
     public bool UseUserSkin { get; internal set; }
 
     /// <summary>
@@ -19,7 +19,7 @@ public abstract class HitsoundNode
 
     public static PlayableNode Create(
         Guid guid,
-        int offset,
+        double offset,
         float volume,
         float balance,
         string filename,
@@ -40,7 +40,7 @@ public abstract class HitsoundNode
     }
 
     public static ControlNode CreateLoopSignal(
-        int offset,
+        double offset,
         float volume,
         float balance,
         string filename,

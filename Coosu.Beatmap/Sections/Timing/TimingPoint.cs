@@ -65,7 +65,7 @@ public sealed class TimingPoint : SerializeWritableObject
             Convert.ToInt32(!IsInherit),
             Convert.ToInt32((int)Effects));
 
-    public override void AppendSerializedString(TextWriter textWriter)
+    public override void AppendSerializedString(TextWriter textWriter, int version)
     {
         textWriter.Write(Offset.ToString(ParseHelper.EnUsNumberFormat));
         textWriter.Write(',');

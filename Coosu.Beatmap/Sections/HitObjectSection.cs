@@ -17,7 +17,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace Coosu.Beatmap.Sections;
 
 #if NET6_0_OR_GREATER
-[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | 
+[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors |
                             DynamicallyAccessedMemberTypes.NonPublicConstructors)]
 #endif
 [SectionProperty("HitObjects")]
@@ -29,6 +29,7 @@ public sealed class HitObjectSection : Section
 
     [SectionIgnore]
     public double MinTime => HitObjectList.Count == 0 ? 0 : HitObjectList.Min(t => t.Offset);
+
     [SectionIgnore]
     public double MaxTime => HitObjectList.Count == 0 ? 0 : HitObjectList.Max(t => t.Offset);
 
@@ -46,9 +47,9 @@ public sealed class HitObjectSection : Section
             .ToList(); // Use LINQ for stable sort
 
         var currentIndex = 0;
-        double? nextTiming = default;
-        TimingPoint? currentLine = default;
-        TimingPoint? currentRedLine = default;
+        double? nextTiming = null;
+        TimingPoint? currentLine = null;
+        TimingPoint? currentRedLine = null;
         UpdateTiming(ref currentIndex, ref nextTiming, ref currentLine, ref currentRedLine, true);
 
         for (var i = 0; i < HitObjectList.Count; i++)
@@ -92,9 +93,9 @@ public sealed class HitObjectSection : Section
     {
         var lineSpan = memory.Span;
 
-        int x = default;
-        int y = default;
-        int offset = default;
+        float x = 0;
+        float y = 0;
+        double offset = 0;
         RawObjectType type = default;
         HitsoundType hitsound = default;
         ReadOnlySpan<char> others = default;
@@ -105,9 +106,9 @@ public sealed class HitObjectSection : Section
             var span = enumerator.Current;
             switch (enumerator.CurrentIndex)
             {
-                case 0: x = ParseHelper.ParseInt32(span); break;
-                case 1: y = ParseHelper.ParseInt32(span); break;
-                case 2: offset = ParseHelper.ParseInt32(span); break;
+                case 0: x = ParseHelper.ParseSingle(span); break;
+                case 1: y = ParseHelper.ParseSingle(span); break;
+                case 2: offset = ParseHelper.ParseDouble(span); break;
                 case 3: type = (RawObjectType)ParseHelper.ParseByte(span); break;
                 case 4: hitsound = (HitsoundType)ParseHelper.ParseByte(span); break;
                 case 5: others = span; break; // The rest of the string after 5 splits
@@ -152,7 +153,7 @@ public sealed class HitObjectSection : Section
 
     private void ToSpinner(RawHitObject hitObject, ReadOnlySpan<char> others)
     {
-        int holdEnd = default;
+        int holdEnd = 0;
         ReadOnlySpan<char> extras = default;
         var enumerator = others.SpanSplit(',');
         while (enumerator.MoveNext())
@@ -171,7 +172,7 @@ public sealed class HitObjectSection : Section
 
     private void ToHold(RawHitObject hitObject, ReadOnlySpan<char> others)
     {
-        int holdEnd = default;
+        int holdEnd = 0;
         ReadOnlySpan<char> extras = default;
 
         var enumerator = others.SpanSplit(':', maxSplits: 2);
@@ -192,8 +193,8 @@ public sealed class HitObjectSection : Section
     private void ToSlider(RawHitObject hitObject, ReadOnlySpan<char> others)
     {
         ReadOnlySpan<char> curveInfo = default;
-        int repeat = default;
-        double pixelLength = default;
+        int repeat = 0;
+        double pixelLength = 0;
         ReadOnlySpan<char> edgeHitsoundInfo = default;
         ReadOnlySpan<char> sampleAdditionInfo = default;
         ReadOnlySpan<char> extraInfo = default;
@@ -228,36 +229,44 @@ public sealed class HitObjectSection : Section
         }
 
         // slider curve
-        char sliderType = default;
+        char sliderType = '\0';
         var points = curveInfo.Length > 100
             ? curveInfo.Length > 200
-                ? new List<Vector2>(50)
-                : new List<Vector2>(30)
-            : new List<Vector2>();
+                ? new List<Vector3>(50)
+                : new List<Vector3>(30)
+            : new List<Vector3>();
 
         var curveEnumerator = curveInfo.SpanSplit('|');
         while (curveEnumerator.MoveNext())
         {
             var point = curveEnumerator.Current;
+            if (point.Length < 1) continue;
             if (curveEnumerator.CurrentIndex < 1)
             {
                 sliderType = point[0];
                 continue; // curvePoints skip 1
             }
 
-            int x = 0;
+            if (!char.IsNumber(point[0]) && point[0] != '-')
+            {
+                var type = point.SliderFlagToEnum();
+                points.Add(new Vector3(0, 0, (int)type + 1)); // v128 slider type storage
+                continue;
+            }
+
+            float x = 0;
             var pointSplitEnumerator = point.SpanSplit(':');
             while (pointSplitEnumerator.MoveNext())
             {
                 var s = pointSplitEnumerator.Current;
                 if (pointSplitEnumerator.CurrentIndex == 0)
                 {
-                    x = ParseHelper.ParseInt32(s);
+                    x = ParseHelper.ParseSingle(s);
                 }
                 else
                 {
-                    var y = ParseHelper.ParseInt32(s);
-                    points.Add(new Vector2(x, y));
+                    var y = ParseHelper.ParseSingle(s);
+                    points.Add(new Vector3(x, y, 0));
                 }
             }
         }
@@ -324,7 +333,7 @@ public sealed class HitObjectSection : Section
 
         hitObject.SliderInfo = new ExtendedSliderInfo(hitObject)
         {
-            StartPoint = new Vector2(hitObject.X, hitObject.Y),
+            StartPoint = new Vector3(hitObject.X, hitObject.Y, 0),
             StartTime = hitObject.Offset,
             PixelLength = pixelLength,
             ControlPoints = points,
@@ -336,7 +345,7 @@ public sealed class HitObjectSection : Section
         };
     }
 
-    public override void AppendSerializedString(TextWriter textWriter)
+    public override void AppendSerializedString(TextWriter textWriter, int version)
     {
         textWriter.Write('[');
         textWriter.Write(SectionName);
@@ -344,7 +353,7 @@ public sealed class HitObjectSection : Section
         for (var i = 0; i < HitObjectList.Count; i++)
         {
             var hitObject = HitObjectList[i];
-            hitObject.AppendSerializedString(textWriter);
+            hitObject.AppendSerializedString(textWriter, version);
             textWriter.WriteLine();
         }
     }

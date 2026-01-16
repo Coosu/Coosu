@@ -1,10 +1,9 @@
+﻿using System.Linq;
+using System.Numerics;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Media;
 using Coosu.Beatmap;
-using Coosu.Beatmap.Sections.HitObject;
-using System.Collections.Generic;
-using System.Numerics;
 
 namespace AvaloniaTest
 {
@@ -18,63 +17,70 @@ namespace AvaloniaTest
 
         private void DrawSlider()
         {
-            var raw = new RawHitObject { X = 100, Y = 100, Offset = 1000 };
-            var sliderInfo = new SliderInfo(raw);
-            sliderInfo.StartPoint = new Vector2(100, 100);
-            sliderInfo.ControlPoints = new List<Vector2>
-            {
-                new Vector2(150, 200),
-                new Vector2(250, 50),
-                new Vector2(400, 300)
-            };
-            sliderInfo.SliderType = SliderType.Bezier;
-            sliderInfo.PixelLength = 400;
-            sliderInfo.Repeat = 1;
-            sliderInfo.StartTime = 1000;
+            var file = OsuFile.ReadFromFile("Test Artist - Test Title (Test Creator) [New Difficulty].osu");
+            var sliderInfo = file.HitObjects!.HitObjectList[0].SliderInfo;
+            var extended = sliderInfo!;
+            //var raw = new RawHitObject { X = 100, Y = 100, Offset = 1000 };
+            //var sliderInfo = new SliderInfo(raw);
+            //sliderInfo.StartPoint = new Vector3(100, 100, 0);
+            //sliderInfo.ControlPoints = new List<Vector3>
+            //{
+            //    new Vector3(150, 200, 0),
+            //    new Vector3(250, 50, 0),
+            //    new Vector3(400, 300, 0)
+            //};
+            //sliderInfo.SliderType = SliderType.Bezier;
+            //sliderInfo.PixelLength = 400;
+            //sliderInfo.Repeat = 1;
+            //sliderInfo.StartTime = 1000;
 
-            var extended = new ExtendedSliderInfo(sliderInfo, raw);
-            
+            //var extended = new ExtendedSliderInfo(sliderInfo, raw);
+
             // double lastRedFactor, double lastLineMultiple, double diffSliderMultiplier, float diffTickRate
-            extended.UpdateComputedValues(600, 1, 1.4, 1); 
+            //extended.UpdateComputedValues(600, 1, 1.4, 1);
 
-            var slides = extended.GetSliderSlides();
+            var slides = extended.ComputeTicks(16.666666 / 2);
 
             var canvas = this.FindControl<Canvas>("MainCanvas");
 
             if (canvas == null) return;
 
+            // Draw Anchor Points
+            DrawPoint(sliderInfo.StartPoint, Brushes.Green, canvas);
+            foreach (var p in sliderInfo.ControlPoints.Where(k => k.Z == 0))
+            {
+                DrawPoint(p, Brushes.Yellow, canvas);
+            }
+
             // Draw Slides
             foreach (var slide in slides)
             {
+                var size = 3f;
+                var offset = size / 2;
                 var ellipse = new Ellipse
                 {
-                    Width = 4,
-                    Height = 4,
+                    Width = size,
+                    Height = size,
                     Fill = Brushes.Red
                 };
-                Canvas.SetLeft(ellipse, slide.Point.X - 2);
-                Canvas.SetTop(ellipse, slide.Point.Y - 2);
+                Canvas.SetLeft(ellipse, slide.Point.X - offset);
+                Canvas.SetTop(ellipse, slide.Point.Y - offset);
                 canvas.Children.Add(ellipse);
             }
-            
-             // Draw Anchor Points
-            DrawPoint(sliderInfo.StartPoint, Brushes.Green, canvas);
-            foreach(var p in sliderInfo.ControlPoints)
-            {
-                 DrawPoint(p, Brushes.Yellow, canvas);
-            }
         }
-        
-        private void DrawPoint(Vector2 vec, IBrush brush, Canvas canvas)
+
+        private void DrawPoint(Vector3 vec, IBrush brush, Canvas canvas)
         {
-             var ellipse = new Ellipse
+            var size = 8f;
+            var offset = size / 2;
+            var ellipse = new Ellipse
             {
-                Width = 8,
-                Height = 8,
+                Width = size,
+                Height = size,
                 Fill = brush
             };
-            Canvas.SetLeft(ellipse, vec.X - 4);
-            Canvas.SetTop(ellipse, vec.Y - 4);
+            Canvas.SetLeft(ellipse, vec.X - offset);
+            Canvas.SetTop(ellipse, vec.Y - offset);
             canvas.Children.Add(ellipse);
         }
     }

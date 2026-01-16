@@ -66,31 +66,31 @@ public static class BezierHelper
         0.0123412297999871995468056670700372915759f,
     };
 
-    public static float ArcFunction(IReadOnlyList<Vector2> points, float t)
+    public static float ArcFunction(IReadOnlyList<Vector3> points, float t)
     {
         var vec = Compute(points, t);
         var l = vec.X * vec.X + vec.Y * vec.Y;
 #if NETCOREAPP3_1_OR_GREATER
-            return MathF.Sqrt(l);
+        return MathF.Sqrt(l);
 #else
         return (float)Math.Sqrt(l);
 #endif
     }
 
-    public static IList<Vector2> GetBezierTrail(IReadOnlyList<Vector2> points, int count)
+    public static IList<Vector3> GetBezierTrail(IReadOnlyList<Vector3> points, int count)
     {
-        var allPoints = new List<Vector2>();
+        var allPoints = new List<Vector3>();
         for (int s = 0; s <= count; s++)
         {
             var t = s / (float)count;
-            var Vector2 = Compute(points, t);
-            allPoints.Add(Vector2);
+            var Vector3 = Compute(points, t);
+            allPoints.Add(Vector3);
         }
 
         return allPoints;
     }
 
-    public static Vector2 Compute(IReadOnlyList<Vector2> points, float t)
+    public static Vector3 Compute(IReadOnlyList<Vector3> points, float t)
     {
         if (t == 0)
         {
@@ -113,9 +113,10 @@ public static class BezierHelper
         // linear?
         if (points.Count == 2)
         {
-            var ret = new Vector2(
+            var ret = new Vector3(
                 nt * points[0].X + t * points[1].X,
-                nt * points[0].Y + t * points[1].Y
+                nt * points[0].Y + t * points[1].Y,
+                0
             );
             return ret;
         }
@@ -131,9 +132,10 @@ public static class BezierHelper
                 var b = nt * t * 2;
                 var c = t2;
 
-                var ret = new Vector2(
+                var ret = new Vector3(
                     a * points[0].X + b * points[1].X + c * points[2].X,
-                    a * points[0].Y + b * points[1].Y + c * points[2].Y
+                    a * points[0].Y + b * points[1].Y + c * points[2].Y,
+                    0
                 );
                 return ret;
             }
@@ -144,9 +146,10 @@ public static class BezierHelper
                 var c = nt * t2 * 3;
                 var d = t * t2;
 
-                var ret = new Vector2(
+                var ret = new Vector3(
                     a * points[0].X + b * points[1].X + c * points[2].X + d * points[3].X,
-                    a * points[0].Y + b * points[1].Y + c * points[2].Y + d * points[3].Y
+                    a * points[0].Y + b * points[1].Y + c * points[2].Y + d * points[3].Y,
+                    0
                 );
                 return ret;
             }
@@ -155,7 +158,7 @@ public static class BezierHelper
         // higher order curves: use de Casteljau's computation
         unsafe
         {
-            var span = stackalloc Vector2[points.Count];
+            var span = stackalloc Vector3[points.Count];
             for (var i = 0; i < points.Count; i++)
             {
                 span[i] = points[i];
@@ -183,17 +186,18 @@ public static class BezierHelper
         }
     }
 
-    public static IEnumerable<IReadOnlyList<Vector2>> Derive(IReadOnlyList<Vector2> controlPoints)
+    public static IEnumerable<IReadOnlyList<Vector3>> Derive(IReadOnlyList<Vector3> controlPoints)
     {
         for (int d = controlPoints.Count, c = d - 1; d > 1; d--, c--)
         {
-            var list = new List<Vector2>();
+            var list = new List<Vector3>();
 
             for (var j = 0; j < c; j++)
             {
-                var dpt = new Vector2(
+                var dpt = new Vector3(
                     c * (controlPoints[j + 1].X - controlPoints[j].X),
-                    c * (controlPoints[j + 1].Y - controlPoints[j].Y)
+                    c * (controlPoints[j + 1].Y - controlPoints[j].Y),
+                    0
                 );
 
                 list.Add(dpt);
@@ -203,10 +207,10 @@ public static class BezierHelper
             controlPoints = list;
         }
 
-        yield return EmptyArray<Vector2>.Value;
+        yield return EmptyArray<Vector3>.Value;
     }
 
-    public static float Length(IReadOnlyList<Vector2> controlPoints)
+    public static float Length(IReadOnlyList<Vector3> controlPoints)
     {
         const float z = 0.5f;
         float sum = 0;

@@ -1,11 +1,7 @@
-﻿using Coosu.Beatmap.Configurable;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
+﻿using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using Coosu.Beatmap.Configurable;
 using Xunit;
 
 namespace CoosuUnitTest.Section;
@@ -39,7 +35,7 @@ public class SectionTest
 
         using var writer = new StreamWriter(ms);
 
-        section.AppendSerializedString(writer);
+        section.AppendSerializedString(writer, 14);
 
         await writer.FlushAsync();
         var buffer = ms.GetBuffer();
@@ -60,7 +56,7 @@ public class SectionTest
 
         using var writer = new StreamWriter(ms);
 
-        section.AppendSerializedString(writer);
+        section.AppendSerializedString(writer, 14);
 
         await writer.FlushAsync();
         var buffer = ms.GetBuffer();

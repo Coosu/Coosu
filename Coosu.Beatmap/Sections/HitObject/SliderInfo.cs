@@ -16,30 +16,48 @@ public class SliderInfo : SerializeWritableObject
     }
 
     public SliderType SliderType { get; set; }
-    public IReadOnlyList<Vector2> ControlPoints { get; set; } = EmptyArray<Vector2>.Value;
+    public IReadOnlyList<Vector3> ControlPoints { get; set; } = EmptyArray<Vector3>.Value;
     public int Repeat { get; set; }
     public double PixelLength { get; set; }
     public HitsoundType[]? EdgeHitsounds { get; set; }
     public ObjectSamplesetType[]? EdgeSamples { get; set; }
     public ObjectSamplesetType[]? EdgeAdditions { get; set; }
 
-    public Vector2 StartPoint { get; set; }
-    public Vector2 EndPoint => ControlPoints[ControlPoints.Count - 1];
+    public Vector3 StartPoint { get; set; }
+    public Vector3 EndPoint => ControlPoints[ControlPoints.Count - 1];
 
-    public int StartTime { get; set; }
+    public double StartTime { get; set; }
 
     public RawHitObject BaseObject { get; }
 
-    public override void AppendSerializedString(TextWriter textWriter)
+    public override void AppendSerializedString(TextWriter textWriter, int version)
     {
         textWriter.Write(SliderType.ToSliderFlag());
         textWriter.Write('|');
         for (var i = 0; i < ControlPoints.Count; i++)
         {
             var controlPoint = ControlPoints[i];
-            textWriter.Write(controlPoint.X.ToString(ParseHelper.EnUsNumberFormat));
-            textWriter.Write(':');
-            textWriter.Write(controlPoint.Y.ToString(ParseHelper.EnUsNumberFormat));
+            if (version < 128)
+            {
+                textWriter.Write((int)controlPoint.X);
+                textWriter.Write(':');
+                textWriter.Write((int)controlPoint.Y);
+            }
+            else
+            {
+                if (controlPoint.Z != 0)
+                {
+                    var sliderType = (SliderType)((int)controlPoint.Z - 1);
+                    textWriter.Write(sliderType.ToSliderFlag());
+                }
+                else
+                {
+                    textWriter.Write(controlPoint.X.ToString(ParseHelper.EnUsNumberFormat));
+                    textWriter.Write(':');
+                    textWriter.Write(controlPoint.Y.ToString(ParseHelper.EnUsNumberFormat));
+                }
+            }
+
             if (i < ControlPoints.Count - 1)
             {
                 textWriter.Write('|');
