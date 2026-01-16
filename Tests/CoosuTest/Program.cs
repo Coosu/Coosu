@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Coosu.Beatmap;
-using Coosu.Beatmap.Sections.HitObject;
 using Coosu.Database;
 using Coosu.Database.Serialization;
 using Coosu.Storyboard;
@@ -32,10 +30,6 @@ class Program
         //var osu = OsuFile.ReadFromStream(ms);
 
         //var osu = await OsuFile.ReadFromFileAsync(@"E:/Games/osu!\Songs\BmsToOsu/IIDX\29075\P -  (bms2osu) [lv.10].osu");
-        var osuDir = new OsuDirectory(@"C:\Users\milkitic\AppData\Local\osu!\Songs\663519 tofubeats - CANDYYYLAND feat LIZ - Pa's Lam System Remix");
-        await osuDir.InitializeAsync("tofubeats - CANDYYYLAND feat LIZ - Pa's Lam System Remix (ProfessionalBox) [Bittersweet Surrender].osu");
-        var o = await osuDir.GetHitsoundNodesAsync(osuDir.OsuFiles[0]);
-
         //var osu = await OsuFile.ReadFromFileAsync(@"crack.osu");
         var list = new List<ValueTuple<string?, object?, string, string>>(8294626);
         for (int i = 0; i < 10; i++)
@@ -63,21 +57,6 @@ class Program
                 //list.Add(valueTuple);
             }
         }
-
-        var dir = new OsuDirectory(@"E:\Games\osu!\Songs\take yf");
-        await dir.InitializeAsync();
-        var osuFile = dir.OsuFiles.FirstOrDefault(k => k.Metadata.Version?.Contains("~") == true);
-        var slider1 = osuFile.HitObjects.HitObjectList.FirstOrDefault(k => k.ObjectType == HitObjectType.Slider);
-        var slider = osuFile.HitObjects.HitObjectList.First(k => k.Offset == 48819);
-        var gg = slider.SliderInfo.GetSliderSlides();
-
-
-        var allHs = dir.OsuFiles.AsParallel().Select(k =>
-        {
-            return dir.GetHitsoundNodesAsync(k).Result;
-        }).SelectMany(k => k).ToArray();
-
-        var hitsounds = await dir.GetHitsoundNodesAsync(osuFile);
 
         var text1 = File.ReadAllText(
             "D:\\GitHub\\ReOsuStoryboardPlayer\\ReOsuStoryboardPlayer.Core.UnitTest\\TestData\\" +
@@ -189,22 +168,22 @@ class Program
     private static async Task OutputOldOsb(string text)
     {
 #if NET5_0_OR_GREATER
-            var ctx = new System.Runtime.Loader.AssemblyLoadContext("old", false);
-            var path = Path.Combine(Environment.CurrentDirectory, @"..\..\..\V1.0.0.0\Coosu.Storyboard.dll");
-            var asm = ctx.LoadFromAssemblyPath(path);
-            //ctx.Unload();
-            var egT = asm.GetType("Coosu.Storyboard.Management.ElementGroup");
-            var method = egT?.GetMethod("ParseFromText", BindingFlags.Static | BindingFlags.Public);
-            var eg = method?.Invoke(null, new object?[] { text });
-            var type = eg?.GetType();
-            var compressorT = asm.GetType("Coosu.Storyboard.Management.ElementCompressor");
-            var compressor = (dynamic)Activator.CreateInstance(compressorT, eg);
-            var task1 = (Task)compressor.CompressAsync();
-            await task1;
-            var methodSave = type?.GetMethod("SaveOsbFileAsync");
-            var task = (Task)methodSave.Invoke(eg,
-                new object?[] { Path.Combine(Environment.CurrentDirectory, "output_old.osb") });
-            await task;
+        var ctx = new System.Runtime.Loader.AssemblyLoadContext("old", false);
+        var path = Path.Combine(Environment.CurrentDirectory, @"..\..\..\V1.0.0.0\Coosu.Storyboard.dll");
+        var asm = ctx.LoadFromAssemblyPath(path);
+        //ctx.Unload();
+        var egT = asm.GetType("Coosu.Storyboard.Management.ElementGroup");
+        var method = egT?.GetMethod("ParseFromText", BindingFlags.Static | BindingFlags.Public);
+        var eg = method?.Invoke(null, new object?[] { text });
+        var type = eg?.GetType();
+        var compressorT = asm.GetType("Coosu.Storyboard.Management.ElementCompressor");
+        var compressor = (dynamic)Activator.CreateInstance(compressorT, eg);
+        var task1 = (Task)compressor.CompressAsync();
+        await task1;
+        var methodSave = type?.GetMethod("SaveOsbFileAsync");
+        var task = (Task)methodSave.Invoke(eg,
+            new object?[] { Path.Combine(Environment.CurrentDirectory, "output_old.osb") });
+        await task;
 #endif
     }
 }
