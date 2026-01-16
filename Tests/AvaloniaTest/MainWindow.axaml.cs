@@ -1,11 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Numerics;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Media;
 using Coosu.Beatmap;
-using Coosu.Beatmap.Sections.HitObject;
 
 namespace AvaloniaTest
 {
@@ -41,25 +39,11 @@ namespace AvaloniaTest
             // double lastRedFactor, double lastLineMultiple, double diffSliderMultiplier, float diffTickRate
             //extended.UpdateComputedValues(600, 1, 1.4, 1);
 
-            var slides = extended.ComputeTicks(33);
+            var slides = extended.ComputeTicks(16.666666 / 2);
 
             var canvas = this.FindControl<Canvas>("MainCanvas");
 
             if (canvas == null) return;
-
-            // Draw Slides
-            foreach (var slide in slides)
-            {
-                var ellipse = new Ellipse
-                {
-                    Width = 4,
-                    Height = 4,
-                    Fill = Brushes.Red
-                };
-                Canvas.SetLeft(ellipse, slide.Point.X - 2);
-                Canvas.SetTop(ellipse, slide.Point.Y - 2);
-                canvas.Children.Add(ellipse);
-            }
 
             // Draw Anchor Points
             DrawPoint(sliderInfo.StartPoint, Brushes.Green, canvas);
@@ -67,18 +51,36 @@ namespace AvaloniaTest
             {
                 DrawPoint(p, Brushes.Yellow, canvas);
             }
+
+            // Draw Slides
+            foreach (var slide in slides)
+            {
+                var size = 3f;
+                var offset = size / 2;
+                var ellipse = new Ellipse
+                {
+                    Width = size,
+                    Height = size,
+                    Fill = Brushes.Red
+                };
+                Canvas.SetLeft(ellipse, slide.Point.X - offset);
+                Canvas.SetTop(ellipse, slide.Point.Y - offset);
+                canvas.Children.Add(ellipse);
+            }
         }
 
         private void DrawPoint(Vector3 vec, IBrush brush, Canvas canvas)
         {
+            var size = 8f;
+            var offset = size / 2;
             var ellipse = new Ellipse
             {
-                Width = 8,
-                Height = 8,
+                Width = size,
+                Height = size,
                 Fill = brush
             };
-            Canvas.SetLeft(ellipse, vec.X - 4);
-            Canvas.SetTop(ellipse, vec.Y - 4);
+            Canvas.SetLeft(ellipse, vec.X - offset);
+            Canvas.SetTop(ellipse, vec.Y - offset);
             canvas.Children.Add(ellipse);
         }
     }
