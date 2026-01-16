@@ -17,7 +17,21 @@ public static class SliderExtensions
     {
         public SliderEdge[] GetEdges()
         {
-            return EnumerateEdges(sliderInfo).ToArray();
+            var edges = new SliderEdge[sliderInfo.Repeat + 1];
+            for (var i = 0; i < edges.Length; i++)
+            {
+                edges[i] = new SliderEdge
+                (
+                    offset: sliderInfo.StartTime + sliderInfo.CurrentSingleDuration * i,
+                    point: i % 2 == 0 ? sliderInfo.StartPoint : sliderInfo.EndPoint,
+                    edgeHitsound: sliderInfo.EdgeHitsounds?[i] ?? sliderInfo.BaseObject.Hitsound,
+                    edgeSample: sliderInfo.EdgeSamples?[i] ?? sliderInfo.BaseObject.SampleSet,
+                    edgeAddition: sliderInfo.EdgeAdditions?[i] ?? sliderInfo.BaseObject.AdditionSet,
+                    isHitsoundDefined: sliderInfo.EdgeHitsounds == null
+                );
+            }
+
+            return edges;
         }
 
         public SliderTick[] GetSliderTicks()
@@ -71,19 +85,19 @@ public static class SliderExtensions
         var pathBuilder = new ValueListBuilder<Vector3>(stackalloc Vector3[64]);
         try
         {
-            sliderInfo.ComputePathVertices(ref pathBuilder);
-            var approximated = pathBuilder.AsSpan();
-
-            if (approximated.Length < 2)
-            {
-                return EmptyArray<SliderTick>.Value;
-            }
-
             var segLens = new ValueListBuilder<double>(stackalloc double[64]);
             var cumLens = new ValueListBuilder<double>(stackalloc double[64]);
             try
             {
-                CreateCumulativeLengths(approximated, ref segLens, ref cumLens, out var totalLength);
+                sliderInfo.ComputePathVertices(ref pathBuilder, ref segLens, ref cumLens);
+                var approximated = pathBuilder.AsSpan();
+
+                if (approximated.Length < 2)
+                {
+                    return EmptyArray<SliderTick>.Value;
+                }
+
+                var totalLength = cumLens.Length > 0 ? cumLens[cumLens.Length - 1] : 0;
                 if (totalLength <= 0)
                 {
                     return EmptyArray<SliderTick>.Value;
@@ -174,11 +188,10 @@ public static class SliderExtensions
         }
     }
 
-    /// <summary>
-    /// osu!lazer implementation to compute approximated data.
-    /// </summary>
-    /// <returns></returns>
-    private static void ComputePathVertices(this SliderInfo sliderInfo, ref ValueListBuilder<Vector3> builder)
+    private static void ComputePathVertices(this SliderInfo sliderInfo,
+        ref ValueListBuilder<Vector3> builder,
+        ref ValueListBuilder<double> segmentLengths,
+        ref ValueListBuilder<double> cumulativeLengths)
     {
         var controlPoints = sliderInfo.ControlPoints;
         if (controlPoints.Count == 0) return;
@@ -225,9 +238,9 @@ public static class SliderExtensions
                 ComputePath(currentType, segmentBuffer.Slice(0, segmentCount), ref builder);
             }
 
-            // Trim to PixelLength
+            // Trim to PixelLength and calculate lengths
             var pixelLength = sliderInfo.PixelLength;
-            if (builder.Length > 1 && pixelLength > 0)
+            if (builder.Length > 1)
             {
                 double currentLength = 0;
                 var count = builder.Length;
@@ -239,7 +252,7 @@ public static class SliderExtensions
                     var dy = (double)p2.Y - p1.Y;
                     var dist = Math.Sqrt(dx * dx + dy * dy);
 
-                    if (currentLength + dist >= pixelLength)
+                    if (pixelLength > 0 && currentLength + dist >= pixelLength)
                     {
                         var remaining = pixelLength - currentLength;
                         if (remaining <= 0.0001) // Tolerance
@@ -251,19 +264,24 @@ public static class SliderExtensions
                             var t = (float)(remaining / dist);
                             builder[i + 1] = Vector3.Lerp(p1, p2, t);
                             builder.Length = i + 2;
+
+                            segmentLengths.Append(remaining);
+                            cumulativeLengths.Append(pixelLength);
                         }
 
                         return;
                     }
 
+                    segmentLengths.Append(dist);
                     currentLength += dist;
+                    cumulativeLengths.Append(currentLength);
                 }
 
                 // Extend if actual length is less than pixelLength
-                if (count >= 2)
+                if (pixelLength > 0 && currentLength < pixelLength)
                 {
-                    var pPrev = builder[count - 2];
-                    var pLast = builder[count - 1];
+                    var pPrev = builder[builder.Length - 2];
+                    var pLast = builder[builder.Length - 1];
                     var dx = (double)pLast.X - pPrev.X;
                     var dy = (double)pLast.Y - pPrev.Y;
                     var dist = Math.Sqrt(dx * dx + dy * dy);
@@ -278,6 +296,9 @@ public static class SliderExtensions
                             pLast.Z
                         );
                         builder.Append(newPoint);
+
+                        segmentLengths.Append(remaining);
+                        cumulativeLengths.Append(pixelLength);
                     }
                 }
             }
@@ -393,29 +414,6 @@ public static class SliderExtensions
     #endregion
 
     #region Helpers
-
-    private static void CreateCumulativeLengths(
-        ReadOnlySpan<Vector3> points,
-        ref ValueListBuilder<double> segmentLengths,
-        ref ValueListBuilder<double> cumulativeLengths,
-        out double totalLength)
-    {
-        var segmentCount = points.Length - 1;
-
-        totalLength = 0;
-        for (var i = 0; i < segmentCount; i++)
-        {
-            var a = points[i];
-            var b = points[i + 1];
-            var dx = b.X - a.X;
-            var dy = b.Y - a.Y;
-            var len = Math.Sqrt(dx * dx + dy * dy);
-
-            segmentLengths.Append(len);
-            totalLength += len;
-            cumulativeLengths.Append(totalLength);
-        }
-    }
 
     private static Vector3 InterpolateSequential(
         ReadOnlySpan<Vector3> points,
