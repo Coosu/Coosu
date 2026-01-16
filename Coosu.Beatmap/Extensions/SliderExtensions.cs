@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Buffers;
 using System.Collections.Generic;
 using System.Linq;
@@ -200,6 +200,7 @@ public static class SliderExtensions
                 var cp = controlPoints[i];
                 if (cp.Z != 0) // Type delimiter
                 {
+                    segmentBuffer[segmentCount++] = controlPoints[i + 1];
                     if (segmentCount > 1)
                     {
                         ComputePath(currentType, segmentBuffer.Slice(0, segmentCount), ref builder);
@@ -211,6 +212,7 @@ public static class SliderExtensions
                     segmentBuffer[segmentCount++] = lastPoint;
 
                     currentType = (SliderType)((int)cp.Z - 1);
+                    i++;
                 }
                 else
                 {
@@ -229,7 +231,8 @@ public static class SliderExtensions
         }
     }
 
-    private static void ComputePath(SliderType type, scoped ReadOnlySpan<Vector3> points, ref ValueListBuilder<Vector3> builder)
+    private static void ComputePath(SliderType type, scoped ReadOnlySpan<Vector3> points,
+        ref ValueListBuilder<Vector3> builder)
     {
         switch (type)
         {
@@ -255,7 +258,8 @@ public static class SliderExtensions
 
     #region Path Algorithms
 
-    private static void ComputePathVerticesPerfect(scoped ReadOnlySpan<Vector3> points, ref ValueListBuilder<Vector3> builder)
+    private static void ComputePathVerticesPerfect(scoped ReadOnlySpan<Vector3> points,
+        ref ValueListBuilder<Vector3> builder)
     {
         if (points.Length != 3)
         {
@@ -273,7 +277,8 @@ public static class SliderExtensions
         foreach (var p in result) builder.Append(p);
     }
 
-    private static void ComputePathVerticesBezier(scoped ReadOnlySpan<Vector3> allPoints, ref ValueListBuilder<Vector3> builder)
+    private static void ComputePathVerticesBezier(scoped ReadOnlySpan<Vector3> allPoints,
+        ref ValueListBuilder<Vector3> builder)
     {
         int totalCount = allPoints.Length;
         if (totalCount < 2) return;
@@ -321,7 +326,8 @@ public static class SliderExtensions
         }
     }
 
-    private static void ComputePathVerticesCatmull(scoped ReadOnlySpan<Vector3> allPoints, ref ValueListBuilder<Vector3> builder)
+    private static void ComputePathVerticesCatmull(scoped ReadOnlySpan<Vector3> allPoints,
+        ref ValueListBuilder<Vector3> builder)
     {
         var catmullTrail = PathApproximator.CatmullToPiecewiseLinear(allPoints);
         foreach (var p in catmullTrail) builder.Append(p);
