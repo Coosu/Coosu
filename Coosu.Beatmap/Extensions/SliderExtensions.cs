@@ -224,6 +224,41 @@ public static class SliderExtensions
             {
                 ComputePath(currentType, segmentBuffer.Slice(0, segmentCount), ref builder);
             }
+
+            // Trim to PixelLength
+            var pixelLength = sliderInfo.PixelLength;
+            if (builder.Length > 1 && pixelLength > 0)
+            {
+                double currentLength = 0;
+                var count = builder.Length;
+                for (int i = 0; i < count - 1; i++)
+                {
+                    var p1 = builder[i];
+                    var p2 = builder[i + 1];
+                    var dx = (double)p2.X - p1.X;
+                    var dy = (double)p2.Y - p1.Y;
+                    var dist = Math.Sqrt(dx * dx + dy * dy);
+
+                    if (currentLength + dist >= pixelLength)
+                    {
+                        var remaining = pixelLength - currentLength;
+                        if (remaining <= 0.0001) // Tolerance
+                        {
+                            builder.Length = i + 1;
+                        }
+                        else
+                        {
+                            var t = (float)(remaining / dist);
+                            builder[i + 1] = Vector3.Lerp(p1, p2, t);
+                            builder.Length = i + 2;
+                        }
+
+                        break;
+                    }
+
+                    currentLength += dist;
+                }
+            }
         }
         finally
         {
