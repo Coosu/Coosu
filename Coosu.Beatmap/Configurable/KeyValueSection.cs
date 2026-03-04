@@ -157,7 +157,7 @@ public abstract class KeyValueSection : Section
                 if (rawObj is ICollection { Count: 0 }) return;
             }
 
-            if (sectionInfo.Attribute.Default.GetHashCode() == rawObj?.GetHashCode())
+            if (sectionInfo.Attribute.Default.Equals(rawObj))
                 return;
         }
 

@@ -17,4 +17,9 @@ public sealed class OsuReadOptions : ReadOptions
     {
         SampleIgnored = true;
     }
+
+    public void DisableAutoCompute()
+    {
+        AutoCompute = false;
+    }
 }

@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Reflection;
 using Coosu.Shared.Numerics;
@@ -8,7 +8,7 @@ namespace Coosu.Beatmap.Internal;
 
 internal static class ValueConvert
 {
-    private static readonly Dictionary<string, MethodInfo?> MethodCache = new();
+    private static readonly ConcurrentDictionary<string, MethodInfo?> s_methodCache = new();
 
     public static object? ConvertValue(ReadOnlySpan<char> value, Type propType, bool useSpecificFormat)
     {
@@ -48,6 +48,7 @@ internal static class ValueConvert
             var result = ParseHelper.ParseByte(value);
             return result;
         }
+
         if (propType == StaticTypes.Sbyte)
         {
             var result = ParseHelper.ParseSByte(value);
@@ -86,19 +87,16 @@ internal static class ValueConvert
 
         object arg = value.ToString();
         var methodName = "To" + propType.Name;
-        if (!MethodCache.TryGetValue(methodName, out var method))
-        {
-            method = StaticTypes.SystemConvert.GetMethods()
+        var method = s_methodCache.GetOrAdd(methodName, static key =>
+            StaticTypes.SystemConvert.GetMethods()
                 .FirstOrDefault(t =>
                 {
-                    if (t.Name != methodName) return false;
+                    if (t.Name != key) return false;
                     var parameters = t.GetParameters();
                     return parameters.Length == 1 && parameters[0].ParameterType == StaticTypes.Object;
-                });
-            MethodCache.Add(methodName, method);
-        }
+                }));
 
-        if (method == default)
+        if (method == null)
         {
             throw new MissingMethodException($"Target method not found in System.Convert: {methodName}");
         }
