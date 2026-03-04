@@ -54,16 +54,7 @@ public sealed class TimingPoint : SerializeWritableObject
     [SectionIgnore]
     public bool IsOmitted => (Effects & Effects.OmitFirstBarLine) == Effects.OmitFirstBarLine;
 
-    public override string ToString() =>
-        string.Format("{0},{1},{2},{3},{4},{5},{6},{7}",
-            Offset.ToString(ParseHelper.EnUsNumberFormat),
-            Factor.ToString(ParseHelper.EnUsNumberFormat),
-            Rhythm,
-            (int)TimingSampleset + 1,
-            Track,
-            Volume,
-            Convert.ToInt32(!IsInherit),
-            Convert.ToInt32((int)Effects));
+    public override string ToString() => ToSerializedString(14);
 
     public override void AppendSerializedString(TextWriter textWriter, int version)
     {

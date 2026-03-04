@@ -109,16 +109,29 @@ public class OsuFile : Config
     }
 
     /// <summary>
-    /// Note this is not async stream, but async parsing
+    /// Parse a beatmap file on ThreadPool to avoid blocking the caller thread.
+    /// This method does not use true async I/O.
     /// </summary>
     /// <param name="path"></param>
     /// <param name="configReadOption"></param>
     /// <returns></returns>
-    public static async Task<LocalOsuFile> ReadFromFileAsync(string path,
+    public static Task<LocalOsuFile> ReadFromFileOnThreadPool(string path,
         Action<OsuReadOptions>? configReadOption = null)
     {
-        using var fs = new FileStream(GetActualPath(path), FileMode.Open, FileAccess.Read, FileShare.Read);
-        return await Task.Run(() => (LocalOsuFile)ReadFromStream(fs, configReadOption));
+        return Task.Run(() => ReadFromFile(path, configReadOption));
+    }
+
+    /// <summary>
+    /// Legacy async-compatible API. This method does not use true async I/O.
+    /// </summary>
+    /// <param name="path"></param>
+    /// <param name="configReadOption"></param>
+    /// <returns></returns>
+    [Obsolete("ReadFromFileAsync does not perform true async I/O. Use ReadFromFileOnThreadPool for explicit thread-pool parsing, or ReadFromFile for synchronous parsing.")]
+    public static Task<LocalOsuFile> ReadFromFileAsync(string path,
+        Action<OsuReadOptions>? configReadOption = null)
+    {
+        return ReadFromFileOnThreadPool(path, configReadOption);
     }
 
     public string SaveToDirectory(string directory, string? difficultyName = null)
