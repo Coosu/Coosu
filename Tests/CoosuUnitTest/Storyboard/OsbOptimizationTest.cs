@@ -1,0 +1,234 @@
+using System;
+using System.Threading.Tasks;
+using Coosu.Storyboard;
+using Coosu.Storyboard.Extensions.Optimizing;
+using Xunit;
+
+namespace CoosuUnitTest.Storyboard;
+
+public class OsbOptimizationTest
+{
+    [Fact]
+    public async Task CompressAsync_NormalizesImagePathAndRoundsCommandValues()
+    {
+        await AssertOptimizesToAsync(
+            """
+            Sprite,Foreground,Centre,"folder/image.png",320,240
+             M,0,0,1000,320.123456,240.987654,400.123456,300.987654
+            """,
+            """
+            Sprite,Foreground,Centre,"folder\image.png",320,240
+             M,0,0,1000,320.123,240.988,400.123,300.988
+            """,
+            options => options.RoundingDecimalPlaces = 3);
+    }
+
+    [Fact]
+    public async Task CompressAsync_CombinesAdjacentStaticCommandsWithTheSameValue()
+    {
+        await AssertOptimizesToAsync(
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             M,0,-100,2100,320,240,400,240
+             F,0,0,1000,0.5
+             F,0,1000,2000,0.5
+            """,
+            """
+            Sprite,Foreground,Centre,"sprite.png",0,0
+             M,0,-100,2100,320,240,400,240
+             F,0,0,2000,0.5
+            """);
+    }
+
+    [Fact]
+    public async Task CompressAsync_RemovesAStaticCommandAlreadyRepresentedByPreviousTail()
+    {
+        await AssertOptimizesToAsync(
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             M,0,0,2000,320,240,400,240
+             F,0,0,1000,0,1
+             F,0,1000,1500,1
+            """,
+            """
+            Sprite,Foreground,Centre,"sprite.png",0,0
+             F,0,0,1000,0,1
+             M,0,0,2000,320,240,400,240
+            """);
+    }
+
+    [Fact]
+    public async Task CompressAsync_RemovesInstantCommandOverwrittenAtTheSameTime()
+    {
+        await AssertOptimizesToAsync(
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             M,0,0,2000,320,240,400,240
+             F,0,0,,1
+             F,0,0,1000,0,1
+            """,
+            """
+            Sprite,Foreground,Centre,"sprite.png",0,0
+             F,0,0,1000,0,1
+             M,0,0,2000,320,240,400,240
+            """);
+    }
+
+    [Fact]
+    public async Task CompressAsync_RemovesStaticDefaultCommandInsideSpriteLifetime()
+    {
+        await AssertOptimizesToAsync(
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             M,0,0,2000,320,240,400,240
+             S,0,500,1000,1
+            """,
+            """
+            Sprite,Foreground,Centre,"sprite.png",0,0
+             M,0,0,2000,320,240,400,240
+            """);
+    }
+
+    [Fact]
+    public async Task CompressAsync_MovesStaticIntegerPositionIntoSpriteHeader()
+    {
+        await AssertOptimizesToAsync(
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             F,0,0,2000,0.5
+             M,0,500,1000,100,200
+            """,
+            """
+            Sprite,Foreground,Centre,"sprite.png",100,200
+             F,0,0,2000,0.5
+            """);
+    }
+
+    [Fact]
+    public async Task CompressAsync_ResetsHeaderPositionWhenAnimatedMoveMustRemain()
+    {
+        await AssertOptimizesToAsync(
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             M,0,0,1000,320,240,400,240
+             F,0,0,1500,0.5
+            """,
+            """
+            Sprite,Foreground,Centre,"sprite.png",0,0
+             M,0,0,1000,320,240,400,240
+             F,0,0,1500,0.5
+            """);
+    }
+
+    [Fact]
+    public async Task CompressAsync_RemovesCommandsHiddenByFadeOut()
+    {
+        await AssertOptimizesToAsync(
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             F,0,0,1000,1,0
+             M,0,1100,1200,100,100,200,200
+             M,0,1300,1400,200,200,300,300
+             R,0,1000,2000,0,1
+            """,
+            """
+            Sprite,Foreground,Centre,"sprite.png",200,200
+             F,0,0,1000,1,0
+             R,0,1000,2000,0
+            """);
+    }
+
+    [Fact]
+    public async Task CompressAsync_ConvertsLargeAbsoluteTimingsToSingleLoop()
+    {
+        await AssertOptimizesToAsync(
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             M,0,1000000,1000100,320,240,400,240
+             F,0,1000100,1000200,0.5,0.8
+             S,0,1000200,1000300,1,2
+             R,0,1000300,1000400,0,1
+             C,0,1000400,1000500,255,255,255,128,64,32
+            """,
+            """
+            Sprite,Foreground,Centre,"sprite.png",0,0
+             L,1000000,1
+              M,0,0,100,320,240,400,240
+              F,0,100,200,0.5,0.8
+              S,0,200,300,1,2
+              R,0,300,400,0,1
+              C,0,400,500,255,255,255,128,64,32
+            """,
+            options => options.ConvertToLoop = true);
+    }
+
+    [Fact]
+    public async Task CompressAsync_RoundsCommandsInsideLoopsAndTriggers()
+    {
+        await AssertOptimizesToAsync(
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             F,0,0,5000,0.5
+             L,1000,2
+              M,0,0,500,320.12345,240.98765,400.12345,300.98765
+             T,HitSound,2000,3000
+              S,0,0,500,1.23456,2.34567
+            """,
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             L,1000,2
+              M,0,0,500,320.12,240.99,400.12,300.99
+             F,0,0,5000,0.5
+             T,HitSound,2000,3000
+              S,0,0,500,1.23,2.35
+            """,
+            options => options.RoundingDecimalPlaces = 2);
+    }
+
+    [Fact]
+    public async Task CompressAsync_RemovesZeroDurationSpriteButKeepsOneDuplicateBackground()
+    {
+        await AssertOptimizesToAsync(
+            """
+            Sprite,Foreground,Centre,"instant.png",320,240
+             F,0,1000,,1
+            Sprite,Background,Centre,"bg.jpg",320,240
+            Sprite,Background,Centre,"bg.jpg",320,240
+            Sprite,Foreground,Centre,"effective.png",320,240
+             F,0,0,1000,0,1
+            """,
+            """
+            Sprite,Background,Centre,"bg.jpg",320,240
+            Sprite,Foreground,Centre,"effective.png",320,240
+             F,0,0,1000,0,1
+            """);
+    }
+
+    private static async Task AssertOptimizesToAsync(
+        string inputEventText,
+        string expectedEventText,
+        Action<CompressOptions>? configure = null)
+    {
+        var osb = $"""
+                   [Events]
+                   //Storyboard Layer 0 (Background)
+                   {inputEventText}
+                   //Storyboard Sound Samples
+                   """;
+        var layer = Layer.ParseFromText(osb);
+        using var compressor = new SpriteCompressor(layer, options =>
+        {
+            options.ThreadCount = 1;
+            options.ConvertToLoop = false;
+            configure?.Invoke(options);
+        });
+
+        Assert.True(await compressor.CompressAsync());
+
+        var actualEventText = await layer.ToScriptStringAsync();
+        Assert.Equal(NormalizeLineEndings(expectedEventText), NormalizeLineEndings(actualEventText));
+    }
+
+    private static string NormalizeLineEndings(string text) =>
+        text.Replace("\r\n", "\n").Trim();
+}
