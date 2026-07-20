@@ -14,4 +14,5 @@ public enum SituationType
     ThisPrevIsStaticAndSequentToCombine,
     ThisIsStaticAndSequentWithPrevToCombine,
     PrevIsStaticAndTimeOverlapWithThisStartTimeToRemove,
+    TwoStaticFadesToZeroDurationTransition,
 }

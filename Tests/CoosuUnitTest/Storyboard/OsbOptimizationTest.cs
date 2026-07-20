@@ -9,7 +9,7 @@ namespace CoosuUnitTest.Storyboard;
 public class OsbOptimizationTest
 {
     [Fact]
-    public async Task Test()
+    public async Task CompressAsync_CombinesTwoStaticFadesWithoutChangingSpriteLifetime()
     {
         await AssertOptimizesToAsync(
             """
@@ -23,7 +23,76 @@ public class OsbOptimizationTest
              M,0,0,1000,320,240,400,240
              F,0,500,,1,0
             """);
+        await AssertOptimizesToAsync(
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             M,0,0,1000,320,240,400,240
+             F,0,5,,1
+             F,0,500,,0
+            """,
+            """
+            Sprite,Foreground,Centre,"sprite.png",0,0
+             M,0,0,1000,320,240,400,240
+             F,0,500,,1,0
+            """);
     }
+
+    [Fact]
+    public async Task CompressAsync_DoesNotCombineStaticFadeThatDefinesSpriteLifetime()
+    {
+        await AssertOptimizesToAsync(
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             M,0,0,1000,320,240,400,240
+             F,0,-5,,1
+             F,0,500,,0
+            """,
+            """
+            Sprite,Foreground,Centre,"sprite.png",0,0
+             F,0,-5,,1
+             M,0,0,1000,320,240,400,240
+             F,0,500,,0
+            """);
+    }
+
+    [Fact]
+    public async Task CompressAsync_DoesNotApplyStaticFadeOptimizationToOtherCommandTypes()
+    {
+        await AssertOptimizesToAsync(
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             M,0,0,1000,320,240,400,240
+             S,0,0,,1.5
+             S,0,500,,2
+            """,
+            """
+            Sprite,Foreground,Centre,"sprite.png",0,0
+             S,0,0,,1.5
+             M,0,0,1000,320,240,400,240
+             S,0,500,,2
+            """);
+    }
+
+    [Fact]
+    public async Task CompressAsync_DoesNotCombineAChainOfStaticFades()
+    {
+        await AssertOptimizesToAsync(
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             M,0,0,1500,320,240,400,240
+             F,0,0,,1
+             F,0,500,,0
+             F,0,1000,,1
+            """,
+            """
+            Sprite,Foreground,Centre,"sprite.png",0,0
+             F,0,0,,1
+             M,0,0,1500,320,240,400,240
+             F,0,500,,0
+             F,0,1000,,1
+            """);
+    }
+
     [Fact]
     public async Task CompressAsync_PreservesDifferentValuesOfZeroDurationCommand()
     {

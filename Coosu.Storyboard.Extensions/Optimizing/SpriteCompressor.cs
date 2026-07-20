@@ -732,6 +732,29 @@ public class SpriteCompressor : IDisposable
                             },
                             preE, nowE);
                     }
+                    // A pair of static fades can be shortened to one zero-duration command with two values:
+                    // F,0,0,,1 + F,0,500,,0 => F,0,500,,1,0.
+                    // Keep this deliberately narrow. In particular, the first fade must not define the sprite's
+                    // lifetime, and compound commands or a third fade may change how values are inherited.
+                    else if (type == EventTypes.Fade
+                             && list.Count == 2
+                             && host is Sprite { LoopList.Count: 0, TriggerList.Count: 0 }
+                             && preE.StartTime.Equals(preE.EndTime)
+                             && nowE.StartTime.Equals(nowE.EndTime)
+                             && preE.StartTime < nowE.StartTime
+                             && preE.IsStartsEqualsEnds()
+                             && nowE.IsStartsEqualsEnds()
+                             && preE.IsTimeInRange(host))
+                    {
+                        RaiseSituationEvent(host, SituationType.TwoStaticFadesToZeroDurationTransition,
+                            () =>
+                            {
+                                nowE.SetStarts(preE.GetStarts());
+                                RemoveEvent(host, list, preE, ref count);
+                                index--;
+                            },
+                            preE, nowE);
+                    }
                     /*
                      * 当 此event结束时间 < obj最大时间 (或包括此event有两个以上的最大时间)
                      * 且 此event的param固定

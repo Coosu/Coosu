@@ -36,6 +36,9 @@ public static class SituationExtension
                 return "ThisIsStaticAndSequentWithPrevToCombine.";
             case SituationType.PrevIsStaticAndTimeOverlapWithThisStartTimeToRemove:
                 return "PrevIsStaticAndTimeOverlapWithThisStartTimeToRemove.";
+            case SituationType.TwoStaticFadesToZeroDurationTransition:
+                return "Two static fade commands can be represented by one zero-duration transition " +
+                       "without changing the sprite lifetime.";
             default:
                 throw new ArgumentOutOfRangeException(nameof(situationType), situationType, null);
         }
