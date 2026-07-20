@@ -343,19 +343,6 @@ public class SpriteCompressor : IDisposable
         {
             RemoveByInvisibleList(host, obsoleteList, keyEvents);
         }
-
-        foreach (var hostEvent in host.Events)
-        {
-            if (hostEvent.EventType.Size < 1) continue;
-            if (hostEvent.StartTime.Equals(hostEvent.EndTime) && !hostEvent.IsStartsEqualsEnds())
-            {
-                hostEvent.Fill();
-                for (int i = 0; i < hostEvent.EventType.Size; i++)
-                {
-                    hostEvent.SetValue(i, hostEvent.GetValue(i + hostEvent.EventType.Size));
-                }
-            }
-        }
     }
 
     /// <summary>

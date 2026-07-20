@@ -9,6 +9,38 @@ namespace CoosuUnitTest.Storyboard;
 public class OsbOptimizationTest
 {
     [Fact]
+    public async Task Test()
+    {
+        await AssertOptimizesToAsync(
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             M,0,0,1000,320,240,400,240
+             F,0,0,,1
+             F,0,500,,0
+            """,
+            """
+            Sprite,Foreground,Centre,"sprite.png",0,0
+             M,0,0,1000,320,240,400,240
+             F,0,500,,1,0
+            """);
+    }
+    [Fact]
+    public async Task CompressAsync_PreservesDifferentValuesOfZeroDurationCommand()
+    {
+        await AssertOptimizesToAsync(
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             M,0,0,1000,320,240,400,240
+             F,0,500,500,1,0
+            """,
+            """
+            Sprite,Foreground,Centre,"sprite.png",0,0
+             M,0,0,1000,320,240,400,240
+             F,0,500,,1,0
+            """);
+    }
+
+    [Fact]
     public async Task CompressAsync_NormalizesImagePathAndRoundsCommandValues()
     {
         await AssertOptimizesToAsync(
