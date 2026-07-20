@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Coosu.Shared;
 using Coosu.Storyboard.Common;
+using Coosu.Storyboard.Easing;
 using Coosu.Storyboard.Events;
 using Coosu.Storyboard.Extensions.Computing;
 
@@ -381,6 +382,62 @@ public class SpriteCompressor : IDisposable
             {
                 ArrayPool<BasicEvent>.Shared.Return(keyEvents);
             }
+
+            MergeOverlappingParameters(host);
+            NormalizeIrrelevantEasing(host);
+        }
+    }
+
+    /// <summary>
+    /// Parameters only take effect within their declared interval, so adjacent or
+    /// overlapping intervals of the same type can be represented by one command.
+    /// </summary>
+    private static void MergeOverlappingParameters(IDetailedEventHost host)
+    {
+        var groups = host.Events
+            .OfType<Parameter>()
+            .GroupBy(k => k.Type)
+            .ToArray();
+
+        foreach (var group in groups)
+        {
+            var parameters = group
+                .OrderBy(k => k.StartTime)
+                .ThenBy(k => k.EndTime)
+                .ToArray();
+            if (parameters.Length < 2) continue;
+
+            var current = parameters[0];
+            for (var i = 1; i < parameters.Length; i++)
+            {
+                var next = parameters[i];
+                if (next.StartTime > current.EndTime)
+                {
+                    current = next;
+                    continue;
+                }
+
+                // StartTime and EndTime participate in event ordering. Remove the
+                // events before changing an interval in case the host uses a SortedSet.
+                host.RemoveEvent(current);
+                host.RemoveEvent(next);
+                current.EndTime = Math.Max(current.EndTime, next.EndTime);
+                host.AddEvent(current);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Easing has no observable effect without interpolation.
+    /// </summary>
+    private static void NormalizeIrrelevantEasing(IDetailedEventHost host)
+    {
+        foreach (var keyEvent in host.Events.OfType<BasicEvent>())
+        {
+            if (keyEvent is Parameter) continue;
+            if (!keyEvent.StartTime.Equals(keyEvent.EndTime) && !keyEvent.IsStartsEqualsEnds()) continue;
+
+            keyEvent.Easing = LinearEase.Instance;
         }
     }
 

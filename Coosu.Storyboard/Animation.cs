@@ -72,7 +72,10 @@ public sealed class Animation : Sprite
         await writer.WriteStandardizedNumberAsync(FrameCount);
         await writer.WriteAsync(',');
         await writer.WriteStandardizedNumberAsync((int)FrameDelay);
-        await writer.WriteAsync(',');
-        await writer.WriteAsync(LoopType);
+        if (LoopType != LoopType.LoopForever)
+        {
+            await writer.WriteAsync(',');
+            await writer.WriteAsync(LoopType);
+        }
     }
 }

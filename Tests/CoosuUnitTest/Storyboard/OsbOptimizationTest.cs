@@ -287,6 +287,96 @@ public class OsbOptimizationTest
     }
 
     [Fact]
+    public async Task CompressAsync_NormalizesEasingWhenNoInterpolationOccurs()
+    {
+        await AssertOptimizesToAsync(
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             M,34,0,2000,320,240,400,240
+             S,34,100,500,2
+             R,34,1000,1000,0,1
+             L,1200,2
+              C,34,0,200,128,64,32
+             T,HitSound,1500,1800
+              S,34,0,200,2
+            """,
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             L,1200,2
+              C,0,0,200,128,64,32
+             M,34,0,2000,320,240,400,240
+             S,0,100,500,2
+             R,0,1000,,0,1
+             T,HitSound,1500,1800
+              S,0,0,200,2
+            """);
+    }
+
+    [Fact]
+    public async Task CompressAsync_MergesOnlyTouchingOrOverlappingParametersOfTheSameType()
+    {
+        await AssertOptimizesToAsync(
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             M,0,0,2000,320,240,400,240
+             P,0,100,500,A
+             P,0,500,1000,A
+             P,0,800,1200,A
+             P,0,200,300,H
+             P,0,400,600,H
+            """,
+            """
+            Sprite,Foreground,Centre,"sprite.png",0,0
+             M,0,0,2000,320,240,400,240
+             P,0,100,1200,A
+             P,0,200,300,H
+             P,0,400,600,H
+            """);
+    }
+
+    [Fact]
+    public async Task CompressAsync_MergesParametersIndependentlyInsideLoopsAndTriggers()
+    {
+        await AssertOptimizesToAsync(
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             F,0,0,5000,0.5
+             L,1000,2
+              P,0,0,100,A
+              P,0,100,200,A
+             T,HitSound,2000,3000
+              P,0,0,50,H
+              P,0,40,100,H
+            """,
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             L,1000,2
+              P,0,0,200,A
+             F,0,0,5000,0.5
+             T,HitSound,2000,3000
+              P,0,0,100,H
+            """);
+    }
+
+    [Fact]
+    public async Task CompressAsync_OmitsOnlyTheDefaultAnimationLoopType()
+    {
+        await AssertOptimizesToAsync(
+            """
+            Animation,Foreground,Centre,"forever.png",320,240,4,50,LoopForever
+             F,0,0,1000,0,1
+            Animation,Foreground,Centre,"once.png",320,240,4,50,LoopOnce
+             F,0,2000,3000,0,1
+            """,
+            """
+            Animation,Foreground,Centre,"forever.png",320,240,4,50
+             F,0,0,1000,0,1
+            Animation,Foreground,Centre,"once.png",320,240,4,50,LoopOnce
+             F,0,2000,3000,0,1
+            """);
+    }
+
+    [Fact]
     public async Task CompressAsync_RemovesZeroDurationSpriteButKeepsOneDuplicateBackground()
     {
         await AssertOptimizesToAsync(
