@@ -10,7 +10,7 @@ namespace CoosuUnitTest.Api;
 
 public class ApiTest
 {
-    [Fact(Skip = "Requires osu! API credentials and network access.")]
+    [Fact/*(Skip = "Requires osu! API credentials and network access.")*/]
     public async Task SearchBeatmapset()
     {
         var v2 = new OsuClientV2(await GetPublicToken());
@@ -26,11 +26,11 @@ public class ApiTest
         });
     }
 
-    [Fact(Skip = "Requires osu! API credentials and network access.")]
+    [Fact/*(Skip = "Requires osu! API credentials and network access.")*/]
     public async Task SearchUser()
     {
         var v2 = new OsuClientV2(await GetPublicToken());
-        var beatmaps = await v2.User.GetUser("1243669", GameMode.Osu);
+        var user = await v2.User.GetUser("1243669", GameMode.Osu);
     }
 
     [Fact(Skip = "Requires osu! API credentials and network access.")]
