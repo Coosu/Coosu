@@ -377,6 +377,122 @@ public class OsbOptimizationTest
     }
 
     [Fact]
+    public async Task CompressAsync_UsesShorthandForSequentialCommandsWithTheSameDuration()
+    {
+        await AssertOptimizesToAsync(
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             M,0,-100,3100,320,240,400,240
+             F,0,0,1000,0.2,0.4
+             F,0,1000,2000,0.4,0.6
+             F,0,2000,3000,0.6,0.8
+            """,
+            """
+            Sprite,Foreground,Centre,"sprite.png",0,0
+             M,0,-100,3100,320,240,400,240
+             F,0,0,1000,0.2,0.4,0.6,0.8
+            """);
+    }
+
+    [Fact]
+    public async Task CompressAsync_ParsesAndWritesMultiValueMoveShorthand()
+    {
+        await AssertOptimizesToAsync(
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             F,0,-100,1200,0.5
+             M,1,0,500,0,0,100,100,200,50
+            """,
+            """
+            Sprite,Foreground,Centre,"sprite.png",0,0
+             F,0,-100,1200,0.5
+             M,1,0,500,0,0,100,100,200,50
+            """);
+    }
+
+    [Fact]
+    public async Task CompressAsync_UsesSequentialCommandShorthandInsideLoopsAndTriggers()
+    {
+        await AssertOptimizesToAsync(
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             F,0,0,5000,0.5
+             L,1000,2
+              S,0,0,100,1,2
+              S,0,100,200,2,3
+             T,HitSound,2000,3000
+              R,0,0,100,0,1
+              R,0,100,200,1,2
+            """,
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             L,1000,2
+              S,0,0,100,1,2,3
+             F,0,0,5000,0.5
+             T,HitSound,2000,3000
+              R,0,0,100,0,1,2
+            """);
+    }
+
+    [Fact]
+    public async Task CompressAsync_DoesNotUseSequentialCommandShorthandWhenConditionsDiffer()
+    {
+        await AssertOptimizesToAsync(
+            """
+            Sprite,Foreground,Centre,"duration.png",320,240
+             M,0,-100,400,320,240,400,240
+             F,0,0,100,0.2,0.4
+             F,0,100,250,0.4,0.6
+            Sprite,Foreground,Centre,"easing.png",320,240
+             M,0,-100,300,320,240,400,240
+             F,1,0,100,0.2,0.4
+             F,2,100,200,0.4,0.6
+            Sprite,Foreground,Centre,"gap.png",320,240
+             M,0,-100,350,320,240,400,240
+             F,0,0,100,0.2,0.4
+             F,0,150,250,0.4,0.6
+            Sprite,Foreground,Centre,"value.png",320,240
+             M,0,-100,300,320,240,400,240
+             F,0,0,100,0.2,0.4
+             F,0,100,200,0.5,0.6
+            """,
+            """
+            Sprite,Foreground,Centre,"duration.png",0,0
+             M,0,-100,400,320,240,400,240
+             F,0,0,100,0.2,0.4
+             F,0,100,250,0.4,0.6
+            Sprite,Foreground,Centre,"easing.png",0,0
+             M,0,-100,300,320,240,400,240
+             F,1,0,100,0.2,0.4
+             F,2,100,200,0.4,0.6
+            Sprite,Foreground,Centre,"gap.png",0,0
+             M,0,-100,350,320,240,400,240
+             F,0,0,100,0.2,0.4
+             F,0,150,250,0.4,0.6
+            Sprite,Foreground,Centre,"value.png",0,0
+             M,0,-100,300,320,240,400,240
+             F,0,0,100,0.2,0.4
+             F,0,100,200,0.5,0.6
+            """);
+    }
+
+    [Fact]
+    public async Task SerializeAsync_DoesNotEnableSequentialCommandShorthandByDefault()
+    {
+        await AssertSerializesToAsync(
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             F,0,0,1000,0.2,0.4
+             F,0,1000,2000,0.4,0.6
+            """,
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             F,0,0,1000,0.2,0.4
+             F,0,1000,2000,0.4,0.6
+            """);
+    }
+
+    [Fact]
     public async Task CompressAsync_RemovesZeroDurationSpriteButKeepsOneDuplicateBackground()
     {
         await AssertOptimizesToAsync(
@@ -415,6 +531,20 @@ public class OsbOptimizationTest
         });
 
         Assert.True(await compressor.CompressAsync());
+
+        var actualEventText = await layer.ToScriptStringAsync();
+        Assert.Equal(NormalizeLineEndings(expectedEventText), NormalizeLineEndings(actualEventText));
+    }
+
+    private static async Task AssertSerializesToAsync(string inputEventText, string expectedEventText)
+    {
+        var osb = $"""
+                   [Events]
+                   //Storyboard Layer 0 (Background)
+                   {inputEventText}
+                   //Storyboard Sound Samples
+                   """;
+        var layer = Layer.ParseFromText(osb);
 
         var actualEventText = await layer.ToScriptStringAsync();
         Assert.Equal(NormalizeLineEndings(expectedEventText), NormalizeLineEndings(actualEventText));

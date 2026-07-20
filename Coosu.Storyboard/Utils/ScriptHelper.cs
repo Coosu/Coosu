@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Coosu.Storyboard.Common;
 
@@ -8,6 +10,34 @@ namespace Coosu.Storyboard.Utils;
 
 public static class ScriptHelper
 {
+    private sealed class ElementEventsWriterHolder
+    {
+        public ElementEventsWriterHolder(Func<TextWriter, ISceneObject, bool, Task> writer)
+        {
+            Writer = writer;
+        }
+
+        public Func<TextWriter, ISceneObject, bool, Task> Writer { get; set; }
+    }
+
+    private static readonly ConditionalWeakTable<ISceneObject, ElementEventsWriterHolder> ElementEventsWriters = new();
+
+    /// <summary>
+    /// Registers a serialization override without adding formatter state to the scene object itself.
+    /// </summary>
+    public static void SetElementEventsWriter(ISceneObject sceneObject,
+        Func<TextWriter, ISceneObject, bool, Task> writer)
+    {
+        if (sceneObject == null) throw new ArgumentNullException(nameof(sceneObject));
+        if (writer == null) throw new ArgumentNullException(nameof(writer));
+
+        var holder = ElementEventsWriters.GetValue(sceneObject, _ => new ElementEventsWriterHolder(writer));
+        holder.Writer = writer;
+    }
+
+    public static bool RemoveElementEventsWriter(ISceneObject sceneObject) =>
+        ElementEventsWriters.Remove(sceneObject);
+
     public static async Task WriteGroupedEventAsync(TextWriter writer, IEnumerable<IKeyEvent> events, int index)
     {
         var indent = new string(' ', index);
@@ -60,6 +90,12 @@ public static class ScriptHelper
 
     public static async Task WriteElementEventsAsync(TextWriter writer, ISceneObject sceneObject, bool group)
     {
+        if (ElementEventsWriters.TryGetValue(sceneObject, out var customWriter))
+        {
+            await customWriter.Writer(writer, sceneObject, group);
+            return;
+        }
+
         if (sceneObject is ILoopHost loopHost)
         {
             foreach (var loop in loopHost.LoopList)

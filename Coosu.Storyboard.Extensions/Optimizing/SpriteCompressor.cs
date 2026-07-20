@@ -11,6 +11,7 @@ using Coosu.Storyboard.Common;
 using Coosu.Storyboard.Easing;
 using Coosu.Storyboard.Events;
 using Coosu.Storyboard.Extensions.Computing;
+using Coosu.Storyboard.Utils;
 
 namespace Coosu.Storyboard.Extensions.Optimizing;
 
@@ -288,6 +289,7 @@ public class SpriteCompressor : IDisposable
         collection = new SortedSet<IKeyEvent>(sprite.Events, EventSequenceComparer.Instance);
         sprite.ResetEventCollection(EventSequenceComparer.Instance);
         sprite.AddEvents(collection);
+        ScriptHelper.SetElementEventsWriter(sprite, WriteElementEventsWithShorthandAsync);
 
         if (sprite.ObjectType == ObjectTypes.Sprite &&
             Path.GetFileName(sprite.ImagePath) == sprite.ImagePath &&
@@ -438,6 +440,151 @@ public class SpriteCompressor : IDisposable
             if (!keyEvent.StartTime.Equals(keyEvent.EndTime) && !keyEvent.IsStartsEqualsEnds()) continue;
 
             keyEvent.Easing = LinearEase.Instance;
+        }
+    }
+
+    private static async Task WriteElementEventsWithShorthandAsync(TextWriter writer, ISceneObject sceneObject,
+        bool group)
+    {
+        if (sceneObject is ILoopHost loopHost)
+        {
+            foreach (var loop in loopHost.LoopList)
+                await WriteSubEventHostWithShorthandAsync(writer, loop, group);
+        }
+
+        await WriteEventsWithShorthandAsync(writer, sceneObject.Events, 1, group);
+
+        if (sceneObject is ITriggerHost triggerHost)
+        {
+            foreach (var trigger in triggerHost.TriggerList)
+                await WriteSubEventHostWithShorthandAsync(writer, trigger, group);
+        }
+    }
+
+    private static async Task WriteSubEventHostWithShorthandAsync(TextWriter writer, ISubEventHost subEventHost,
+        bool group)
+    {
+        await writer.WriteAsync(' ');
+        await subEventHost.WriteHeaderAsync(writer);
+        await writer.WriteLineAsync();
+        await WriteEventsWithShorthandAsync(writer, subEventHost.Events, 2, group);
+    }
+
+    private static async Task WriteEventsWithShorthandAsync(TextWriter writer, IEnumerable<IKeyEvent> events,
+        int index, bool group)
+    {
+        IEnumerable<IKeyEvent> orderedEvents;
+        if (group)
+        {
+            orderedEvents = events
+                .OrderBy(k => k.EventType)
+                .ThenBy(k => k.EndTime)
+                .ThenBy(k => k.EventType.Index);
+        }
+        else
+        {
+            orderedEvents = events is SortedSet<IKeyEvent> sortedSet
+                ? sortedSet
+                : events.OrderBy(k => k, EventSequenceComparer.Instance);
+        }
+
+        var eventList = orderedEvents.ToList();
+        var chains = FindSequentialCommandChains(eventList, out var shorthandTails);
+        var indent = new string(' ', index);
+        foreach (var keyEvent in eventList)
+        {
+            if (shorthandTails.Contains(keyEvent)) continue;
+
+            await writer.WriteAsync(indent);
+            if (chains.TryGetValue(keyEvent, out var chain))
+                await WriteSequentialCommandShorthandAsync(writer, (BasicEvent)keyEvent, chain);
+            else
+                await keyEvent.WriteScriptAsync(writer);
+            await writer.WriteLineAsync();
+        }
+    }
+
+    private static Dictionary<IKeyEvent, IReadOnlyList<BasicEvent>> FindSequentialCommandChains(
+        IReadOnlyCollection<IKeyEvent> events, out HashSet<IKeyEvent> shorthandTails)
+    {
+        var chains = new Dictionary<IKeyEvent, IReadOnlyList<BasicEvent>>();
+        shorthandTails = new HashSet<IKeyEvent>();
+
+        foreach (var group in events
+                     .OfType<BasicEvent>()
+                     .Where(IsSequentialCommandShorthandSupported)
+                     .GroupBy(k => k.EventType))
+        {
+            var commandList = group
+                .OrderBy(k => k.StartTime)
+                .ThenBy(k => k.EndTime)
+                .ToList();
+
+            for (var i = 0; i < commandList.Count;)
+            {
+                var end = i + 1;
+                while (end < commandList.Count &&
+                       CanUseSequentialCommandShorthand(commandList[end - 1], commandList[end]))
+                {
+                    end++;
+                }
+
+                if (end - i > 1)
+                {
+                    var tails = commandList.GetRange(i + 1, end - i - 1);
+                    chains.Add(commandList[i], tails);
+                    foreach (var tail in tails)
+                        shorthandTails.Add(tail);
+                }
+
+                i = end;
+            }
+        }
+
+        return chains;
+    }
+
+    private static bool IsSequentialCommandShorthandSupported(BasicEvent keyEvent)
+    {
+        var type = keyEvent.EventType;
+        return type == EventTypes.Fade || type == EventTypes.Move ||
+               type == EventTypes.MoveX || type == EventTypes.MoveY ||
+               type == EventTypes.Scale || type == EventTypes.Vector ||
+               type == EventTypes.Rotate || type == EventTypes.Color;
+    }
+
+    private static bool CanUseSequentialCommandShorthand(BasicEvent current, BasicEvent next)
+    {
+        var duration = current.EndTime - current.StartTime;
+        if (duration <= 0 || !duration.Equals(next.EndTime - next.StartTime)) return false;
+        if (!current.EndTime.Equals(next.StartTime)) return false;
+        if (current.Easing.TryGetEasingType() is not { } easing ||
+            next.Easing.TryGetEasingType() != easing) return false;
+
+        return current.GetEnds().SequenceEqual(next.GetStarts());
+    }
+
+    private static async Task WriteSequentialCommandShorthandAsync(TextWriter writer, BasicEvent head,
+        IEnumerable<BasicEvent> tails)
+    {
+        await writer.WriteAsync(head.EventType.Flag);
+        await writer.WriteAsync(',');
+        await writer.WriteAsync(((int)head.Easing.GetEasingType()).ToString());
+        await writer.WriteAsync(',');
+        await writer.WriteStandardizedNumberAsync(Math.Round(head.StartTime));
+        await writer.WriteAsync(',');
+        await writer.WriteStandardizedNumberAsync(Math.Round(head.EndTime));
+        await writer.WriteAsync(',');
+
+        var values = head.GetStarts()
+            .Concat(head.GetEnds())
+            .Concat(tails.SelectMany(k => k.GetEnds()));
+        var isFirst = true;
+        foreach (var value in values)
+        {
+            if (!isFirst) await writer.WriteAsync(',');
+            await writer.WriteStandardizedNumberAsync(value);
+            isFirst = false;
         }
     }
 

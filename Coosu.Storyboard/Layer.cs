@@ -482,23 +482,18 @@ public class Layer : ISpriteHost, IAdjustable
                 }
             }
 
-            if (valueStore.Count <= size * 2 || (valueStore.Count) % size != 0)
+            if (valueStore.Count == size || valueStore.Count == size * 2)
             {
                 var basicEvent = BasicEvent.Create(eventType, (EasingType)easing, startTime, endTime,
                     valueStore);
                 context.CurrentObject!.AddEvent(basicEvent);
             }
-            else
+            else if (valueStore.Count > size * 2 && valueStore.Count % size == 0)
             {
                 var duration = endTime - startTime;
-                for (int i = 0, j = 0; i < rawParams.Length - size; i += size, j++)
+                for (int i = 0, j = 0; i <= valueStore.Count - size * 2; i += size, j++)
                 {
-                    var copy = new List<double>(size * 2);
-
-                    for (int k = 0; k < size * 2; k++)
-                    {
-                        copy.Add(rawParams[i + k]);
-                    }
+                    var copy = valueStore.GetRange(i, size * 2);
 
                     var newStartTime = startTime + duration * j;
                     var newEndTime = endTime + duration * j;
@@ -506,6 +501,10 @@ public class Layer : ISpriteHost, IAdjustable
                         newStartTime, newEndTime, copy);
                     context.CurrentObject!.AddEvent(basicEvent);
                 }
+            }
+            else
+            {
+                throw new ArgumentException($"Incorrect parameter length for {identifier}: {valueStore.Count}");
             }
         }
         else
