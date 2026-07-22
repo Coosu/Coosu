@@ -5,7 +5,8 @@ namespace Coosu.Storyboard.Extensions.Optimizing;
 public class CompressOptions
 {
     /// <summary>
-    /// Specific whether automatically convert large timings to single loop command to reduce file size.
+    /// Specifies whether repeated command periods and large absolute timings may be represented
+    /// by loop commands when the final serialized text becomes shorter.
     /// <para>The default value is true.</para>
     /// </summary>
     public bool ConvertToLoop { get; set; } = true;

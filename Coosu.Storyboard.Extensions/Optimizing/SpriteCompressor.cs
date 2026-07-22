@@ -275,10 +275,6 @@ public class SpriteCompressor : IDisposable
         var obsoleteList = sprite.ComputeInvisibleRange(out var keyEvents);
         PreOptimize(sprite, obsoleteList, keyEvents);
         NormalOptimize(sprite);
-        if (Options.ConvertToLoop)
-        {
-            ConvertToLoop(sprite);
-        }
 
         if (Options.RoundingDecimalPlaces >= 0)
         {
@@ -295,6 +291,11 @@ public class SpriteCompressor : IDisposable
         if (Options.ReduceCommandDimensions)
         {
             CommandDimensionReducer.Reduce(sprite, MeasureSerializedLength);
+        }
+
+        if (Options.ConvertToLoop)
+        {
+            LoopCompressor.Reduce(sprite, MeasureSerializedLength);
         }
 
         if (sprite.ObjectType == ObjectTypes.Sprite &&
@@ -600,68 +601,6 @@ public class SpriteCompressor : IDisposable
             await writer.WriteStandardizedNumberAsync(value);
             isFirst = false;
         }
-    }
-
-    private void ConvertToLoop(Sprite sprite)
-    {
-        IEnumerable<IKeyEvent> enumerable = sprite.Events
-            .Where(k => k.StartTime > 1000)
-            .OrderBy(k => k.StartTime);
-
-        if (sprite.LoopList.Count > 0)
-        {
-            var loops =
-                new HashSet<EventType>(sprite.LoopList.SelectMany(k => k.Events.Select(o => o.EventType)));
-            enumerable = enumerable.Where(k => !loops.Contains(k.EventType));
-        }
-
-        if (sprite.TriggerList.Count > 0)
-        {
-            var triggers =
-                new HashSet<EventType>(sprite.TriggerList.SelectMany(k => k.Events.Select(o => o.EventType)));
-            enumerable = enumerable.Where(k => !triggers.Contains(k.EventType));
-        }
-
-        var events = enumerable.ToArray();
-        if (events.Length <= 1) return;
-        var start = events[0].StartTime;
-
-        var beforeCount = events
-            .Sum(k =>
-            {
-                if ((int)k.EndTime == (int)k.StartTime)
-                {
-                    return ((int)k.StartTime).GetDigitCount();
-                }
-
-                return ((int)k.StartTime).GetDigitCount() + ((int)k.EndTime).GetDigitCount();
-            });
-        var afterCount = events
-            .Sum(k =>
-            {
-                if ((int)k.EndTime == (int)k.StartTime)
-                {
-                    return ((int)(k.StartTime - start)).GetDigitCount() + 1;
-                }
-
-                return ((int)(k.StartTime - start)).GetDigitCount() +
-                       ((int)(k.EndTime - start)).GetDigitCount() + 1;
-            });
-        var reduceCount = beforeCount - afterCount;
-
-        var loopStrLen = ((int)start).GetDigitCount() + 7;
-        if (loopStrLen >= reduceCount) return;
-
-        var loopCommand = new Loop(start, 1);
-        foreach (var keyEvent in events)
-        {
-            keyEvent.StartTime -= start;
-            keyEvent.EndTime -= start;
-            loopCommand.AddEvent(keyEvent);
-            sprite.RemoveEvent(keyEvent);
-        }
-
-        sprite.AddLoop(loopCommand);
     }
 
     private void RoundingValues(Sprite sprite)

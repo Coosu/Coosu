@@ -240,6 +240,263 @@ public class OsbOptimizationTest
     }
 
     [Fact]
+    public async Task CompressAsync_DetectsTheShortestRepeatedMultiCommandLoop()
+    {
+        await AssertOptimizesToAsync(
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             S,0,1000,1500,1,2
+             R,0,1500,2000,0,1
+             S,0,2000,2500,1,2
+             R,0,2500,3000,0,1
+             S,0,3000,3500,1,2
+             R,0,3500,4000,0,1
+             S,0,4000,4500,1,2
+             R,0,4500,5000,0,1
+            """,
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             L,1000,4
+              S,0,0,500,1,2
+              R,0,500,1000,0,1
+            """,
+            options => options.ConvertToLoop = true);
+    }
+
+    [Fact]
+    public async Task CompressAsync_DetectsARepeatHiddenBySequentialShorthand()
+    {
+        await AssertOptimizesToAsync(
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             R,0,1000,1500,0,1
+             R,0,1500,2000,1,0
+             R,0,2000,2500,0,1
+             R,0,2500,3000,1,0
+             R,0,3000,3500,0,1
+             R,0,3500,4000,1,0
+             R,0,4000,4500,0,1
+             R,0,4500,5000,1,0
+             R,0,5000,5500,0,1
+             R,0,5500,6000,1,0
+            """,
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             L,1000,5
+              R,0,0,500,0,1,0
+            """,
+            options => options.ConvertToLoop = true);
+    }
+
+    [Fact]
+    public async Task CompressAsync_KeepsSequentialShorthandWhenItIsShorterThanLoop()
+    {
+        await AssertOptimizesToAsync(
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             R,0,0,500,0,1
+             R,0,500,1000,1,0
+             R,0,1000,1500,0,1
+             R,0,1500,2000,1,0
+            """,
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             R,0,0,500,0,1,0,1,0
+            """,
+            options => options.ConvertToLoop = true);
+    }
+
+    [Fact]
+    public async Task CompressAsync_LeavesNonRepeatingPrefixAndSuffixOutsideLoop()
+    {
+        await AssertOptimizesToAsync(
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             C,0,0,500,255,0,0
+             S,0,1000,1500,1,2
+             R,0,1500,2000,0,1
+             S,0,2000,2500,1,2
+             R,0,2500,3000,0,1
+             S,0,3000,3500,1,2
+             R,0,3500,4000,0,1
+             C,0,4500,5000,0,255,0
+            """,
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             L,1000,3
+              S,0,0,500,1,2
+              R,0,500,1000,0,1
+             C,0,0,500,255,0,0
+             C,0,4500,5000,0,255,0
+            """,
+            options => options.ConvertToLoop = true);
+    }
+
+    [Fact]
+    public async Task CompressAsync_DetectsRepeatedTypesAmongUnrelatedInterleavedCommands()
+    {
+        await AssertOptimizesToAsync(
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             S,0,1000,1500,1,2
+             C,0,1250,1350,255,0,0,0,255,0
+             R,0,1500,2000,0,1
+             S,0,2000,2500,1,2
+             C,0,2300,2400,0,255,0,0,0,255
+             R,0,2500,3000,0,1
+             S,0,3000,3500,1,2
+             C,0,3600,3700,0,0,255,255,0,0
+             R,0,3500,4000,0,1
+            """,
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             L,1000,3
+              S,0,0,500,1,2
+              R,0,500,1000,0,1
+             C,0,1250,1350,255,0,0,0,255,0
+             C,0,2300,2400,0,255,0,0,0,255
+             C,0,3600,3700,0,0,255,255,0,0
+            """,
+            options => options.ConvertToLoop = true);
+    }
+
+    [Fact]
+    public async Task CompressAsync_UsesTheMaximalRepeatedPrefixAndKeepsDifferentTail()
+    {
+        await AssertOptimizesToAsync(
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             S,0,0,150,1,2
+             R,0,150,300,0,1
+             S,0,300,450,1,2
+             R,0,450,600,0,1
+             S,0,600,750,1,2
+             R,0,750,900,0,2
+            """,
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             L,0,2
+              S,0,0,150,1,2
+              R,0,150,300,0,1
+             S,0,600,750,1,2
+             R,0,750,900,0,2
+            """,
+            options => options.ConvertToLoop = true);
+    }
+
+    [Fact]
+    public async Task CompressAsync_CreatesMultipleDisjointLoopsAcrossOptimizationRounds()
+    {
+        await AssertOptimizesToAsync(
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             S,0,0,150,1,2
+             R,0,150,300,0,1
+             S,0,300,450,1,2
+             R,0,450,600,0,1
+             S,0,600,750,1,2
+             R,0,750,900,0,1
+             S,0,900,1050,1,2
+             R,0,1050,1200,0,1
+             S,0,1200,1350,3,4
+             R,0,1350,1500,2,3
+             S,0,2000,2150,5,6
+             R,0,2150,2300,4,5
+             S,0,2300,2450,5,6
+             R,0,2450,2600,4,5
+             S,0,2600,2750,5,6
+             R,0,2750,2900,4,5
+            """,
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             L,0,4
+              S,0,0,150,1,2
+              R,0,150,300,0,1
+             L,2000,3
+              S,0,0,150,5,6
+              R,0,150,300,4,5
+             S,0,1200,1350,3,4
+             R,0,1350,1500,2,3
+            """,
+            options => options.ConvertToLoop = true);
+    }
+
+    [Fact]
+    public async Task CompressAsync_DoesNotTreatDifferentValuesAsARepeatedLoop()
+    {
+        await AssertOptimizesToAsync(
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             S,0,0,150,1,2
+             R,0,150,300,0,1
+             S,0,300,450,1,3
+             R,0,450,600,0,2
+             S,0,600,750,1,4
+             R,0,750,900,0,3
+            """,
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             S,0,0,150,1,2
+             R,0,150,300,0,1
+             S,0,300,450,1,3
+             R,0,450,600,0,2
+             S,0,600,750,1,4
+             R,0,750,900,0,3
+            """,
+            options => options.ConvertToLoop = true);
+    }
+
+    [Fact]
+    public async Task CompressAsync_DoesNotCreateLoopWithTheWrongIterationDuration()
+    {
+        await AssertOptimizesToAsync(
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             R,0,0,100,0,1
+             R,0,1000,1100,0,1
+             R,0,2000,2100,0,1
+            """,
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             R,0,0,100,0,1
+             R,0,1000,1100,0,1
+             R,0,2000,2100,0,1
+            """,
+            options => options.ConvertToLoop = true);
+    }
+
+    [Fact]
+    public async Task CompressAsync_DoesNotMoveTriggerCommandTypesIntoLoop()
+    {
+        await AssertOptimizesToAsync(
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             S,0,0,150,1,2
+             R,0,150,300,0,1
+             S,0,300,450,1,2
+             R,0,450,600,0,1
+             S,0,600,750,1,2
+             R,0,750,900,0,1
+             T,HitSound,0,900
+              S,0,0,150,1,2
+              R,0,150,300,0,1
+            """,
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             S,0,0,150,1,2
+             R,0,150,300,0,1
+             S,0,300,450,1,2
+             R,0,450,600,0,1
+             S,0,600,750,1,2
+             R,0,750,900,0,1
+             T,HitSound,0,900
+              S,0,0,150,1,2
+              R,0,150,300,0,1
+            """,
+            options => options.ConvertToLoop = true);
+    }
+
+    [Fact]
     public async Task CompressAsync_ConvertsLargeAbsoluteTimingsToSingleLoop()
     {
         await AssertOptimizesToAsync(
