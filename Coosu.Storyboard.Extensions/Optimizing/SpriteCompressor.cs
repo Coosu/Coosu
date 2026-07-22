@@ -285,11 +285,17 @@ public class SpriteCompressor : IDisposable
             RoundingValues(sprite);
         }
 
-        // to compute equals
+        // Candidate clones use sorted event collections. Normalize the source first so
+        // both sides are measured using the same duplicate and ordering semantics.
         collection = new SortedSet<IKeyEvent>(sprite.Events, EventSequenceComparer.Instance);
         sprite.ResetEventCollection(EventSequenceComparer.Instance);
         sprite.AddEvents(collection);
+
         ScriptHelper.SetElementEventsWriter(sprite, WriteElementEventsWithShorthandAsync);
+        if (Options.ReduceCommandDimensions)
+        {
+            CommandDimensionReducer.Reduce(sprite, MeasureSerializedLength);
+        }
 
         if (sprite.ObjectType == ObjectTypes.Sprite &&
             Path.GetFileName(sprite.ImagePath) == sprite.ImagePath &&
@@ -301,6 +307,14 @@ public class SpriteCompressor : IDisposable
 
         sprite.ImagePath = sprite.ImagePath.Replace('/', '\\');
         return sprite.HasEffectiveTiming();
+    }
+
+    private static int MeasureSerializedLength(Sprite sprite)
+    {
+        using var writer = new StringWriter();
+        WriteElementEventsWithShorthandAsync(writer, sprite, sprite.EnableGroupedSerialization)
+            .GetAwaiter().GetResult();
+        return writer.GetStringBuilder().Length;
     }
 
     /// <summary>

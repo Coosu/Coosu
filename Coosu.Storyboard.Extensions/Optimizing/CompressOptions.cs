@@ -11,6 +11,13 @@ public class CompressOptions
     public bool ConvertToLoop { get; set; } = true;
 
     /// <summary>
+    /// Specifies whether command families may be rewritten to a lower-dimensional representation
+    /// when the final serialized text becomes shorter.
+    /// <para>The default value is true.</para>
+    /// </summary>
+    public bool ReduceCommandDimensions { get; set; } = true;
+
+    /// <summary>
     /// Discretizing accuracy that how many numbers will be preserved after decimal point.
     /// If the value is null the numbers will not be rounded.
     /// <para>The default value is 3.</para>

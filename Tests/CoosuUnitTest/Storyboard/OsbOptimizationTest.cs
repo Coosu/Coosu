@@ -493,6 +493,291 @@ public class OsbOptimizationTest
     }
 
     [Fact]
+    public async Task CompressAsync_ConvertsUniformVectorsToScaleAcrossTheWholeSprite()
+    {
+        await AssertOptimizesToAsync(
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             F,0,-100,5000,0.5
+             V,0,0,500,1,1,2,2
+             L,1000,2
+              V,0,0,500,2,2,3,3
+             T,HitSound,3000,4000
+              V,0,0,500,3,3,4,4
+            """,
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             L,1000,2
+              S,0,0,500,2,3
+             F,0,-100,5000,0.5
+             S,0,0,500,1,2
+             T,HitSound,3000,4000
+              S,0,0,500,3,4
+            """);
+    }
+
+    [Fact]
+    public async Task CompressAsync_UnifiesExistingScaleAndUniformVectorCommands()
+    {
+        await AssertOptimizesToAsync(
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             F,0,-100,2500,0.5
+             S,0,0,1000,1,2
+             V,0,1000,2000,2,2,3,3
+            """,
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             F,0,-100,2500,0.5
+             S,0,0,1000,1,2,3
+            """);
+    }
+
+    [Fact]
+    public async Task CompressAsync_DoesNotPartiallyConvertVectorCommands()
+    {
+        await AssertOptimizesToAsync(
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             F,0,-100,2500,0.5
+             V,0,0,1000,1,1,2,2
+             L,1000,2
+              V,0,0,500,2,1,3,2
+            """,
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             L,1000,2
+              V,0,0,500,2,1,3,2
+             F,0,-100,2500,0.5
+             V,0,0,1000,1,1,2,2
+            """);
+    }
+
+    [Fact]
+    public async Task CompressAsync_DoesNotRewriteMixedScaleFamilyWithNonUniformVector()
+    {
+        await AssertOptimizesToAsync(
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             F,0,-100,2500,0.5
+             S,0,0,1000,1,2
+             V,0,1000,2000,2,1,3,2
+            """,
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             F,0,-100,2500,0.5
+             S,0,0,1000,1,2
+             V,0,1000,2000,2,1,3,2
+            """);
+    }
+
+    [Fact]
+    public async Task CompressAsync_UsesRoundedValuesWhenReducingVectorDimensions()
+    {
+        await AssertOptimizesToAsync(
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             F,0,-100,1500,0.5
+             V,0,0,1000,1.23441,1.23449,2.34541,2.34549
+            """,
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             F,0,-100,1500,0.5
+             S,0,0,1000,1.234,2.345
+            """,
+            options => options.RoundingDecimalPlaces = 3);
+    }
+
+    [Fact]
+    public async Task CompressAsync_SplitsMovesWhenTheFinalTextIsShorter()
+    {
+        await AssertOptimizesToAsync(
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             F,0,-100,5100,0.5
+             M,0,0,1000,0,240,100,240
+             M,0,1000,2000,100,240,200,240
+             M,0,2000,3000,200,240,300,240
+             M,0,3000,4000,300,240,400,240
+             M,0,4000,5000,400,240,500,240
+            """,
+            """
+            Sprite,Foreground,Centre,"sprite.png",0,0
+             F,0,-100,5100,0.5
+             MX,0,0,1000,0,100,200,300,400,500
+             MY,0,0,5000,240
+            """);
+    }
+
+    [Fact]
+    public async Task CompressAsync_SplitsMovesAlongTheYDimensionSymmetrically()
+    {
+        await AssertOptimizesToAsync(
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             F,0,-100,5100,0.5
+             M,0,0,1000,320,0,320,100
+             M,0,1000,2000,320,100,320,200
+             M,0,2000,3000,320,200,320,300
+             M,0,3000,4000,320,300,320,400
+             M,0,4000,5000,320,400,320,500
+            """,
+            """
+            Sprite,Foreground,Centre,"sprite.png",0,0
+             F,0,-100,5100,0.5
+             MY,0,0,1000,0,100,200,300,400,500
+             MX,0,0,5000,320
+            """);
+    }
+
+    [Fact]
+    public async Task CompressAsync_DoesNotSplitASingleOneDimensionalMove()
+    {
+        await AssertOptimizesToAsync(
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             F,0,-100,1100,0.5
+             M,0,0,1000,0,240,100,240
+            """,
+            """
+            Sprite,Foreground,Centre,"sprite.png",0,0
+             F,0,-100,1100,0.5
+             M,0,0,1000,0,240,100,240
+            """);
+    }
+
+    [Fact]
+    public async Task CompressAsync_KeepsMovesWhenSplitTextIsNotShorter()
+    {
+        await AssertOptimizesToAsync(
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             F,0,-100,3100,0.5
+             M,0,0,1000,0,0,100,100
+             M,0,1000,2000,100,100,200,200
+             M,0,2000,3000,200,200,300,300
+            """,
+            """
+            Sprite,Foreground,Centre,"sprite.png",0,0
+             F,0,-100,3100,0.5
+             M,0,0,1000,0,0,100,100,200,200,300,300
+            """);
+    }
+
+    [Fact]
+    public async Task CompressAsync_DoesNotChangeAnAlreadyMixedPositionFamily()
+    {
+        await AssertOptimizesToAsync(
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             F,0,-100,2100,0.5
+             M,0,0,1000,0,240,100,240
+             MX,0,1000,2000,100,200
+            """,
+            """
+            Sprite,Foreground,Centre,"sprite.png",0,0
+             F,0,-100,2100,0.5
+             M,0,0,1000,0,240,100,240
+             MX,0,1000,2000,100,200
+            """);
+    }
+
+    [Fact]
+    public async Task CompressAsync_DetectsPositionFamilyConflictsAcrossLoopsAndTriggers()
+    {
+        await AssertOptimizesToAsync(
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             F,0,-100,5100,0.5
+             M,0,0,1000,0,240,100,240
+             M,0,1000,2000,100,240,200,240
+             M,0,2000,3000,200,240,300,240
+             M,0,3000,4000,300,240,400,240
+             M,0,4000,5000,400,240,500,240
+             L,1000,2
+              MX,0,0,500,0,100
+             T,HitSound,3000,4000
+              MY,0,0,500,240,300
+            """,
+            """
+            Sprite,Foreground,Centre,"sprite.png",0,0
+             L,1000,2
+              MX,0,0,500,0,100
+             F,0,-100,5100,0.5
+             M,0,0,1000,0,240,100,240,200,240,300,240,400,240,500,240
+             T,HitSound,3000,4000
+              MY,0,0,500,240,300
+            """);
+    }
+
+    [Fact]
+    public async Task CompressAsync_SplitsMovesAtomicallyAcrossLoopsAndTriggers()
+    {
+        await AssertOptimizesToAsync(
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             F,0,-100,8100,0.5
+             M,0,0,1000,0,123456.789,100,123456.789
+             M,0,1000,2000,100,123456.789,200,123456.789
+             M,0,2000,3000,200,123456.789,300,123456.789
+             M,0,3000,4000,300,123456.789,400,123456.789
+             M,0,4000,5000,400,123456.789,500,123456.789
+             M,0,5000,6000,500,123456.789,600,123456.789
+             M,0,6000,7000,600,123456.789,700,123456.789
+             M,0,7000,8000,700,123456.789,800,123456.789
+             L,1000,2
+              M,0,0,500,0,123456.789,50,123456.789
+             T,HitSound,3000,4000
+              M,0,0,500,50,123456.789,100,123456.789
+            """,
+            """
+            Sprite,Foreground,Centre,"sprite.png",0,0
+             L,1000,2
+              MX,0,0,500,0,50
+              MY,0,0,500,123456.789
+             F,0,-100,8100,0.5
+             MX,0,0,1000,0,100,200,300,400,500,600,700,800
+             MY,0,0,8000,123456.789
+             T,HitSound,3000,4000
+              MX,0,0,500,50,100
+              MY,0,0,500,123456.789
+            """);
+    }
+
+    [Fact]
+    public async Task CompressAsync_PreservesAnimationHeaderWhenReducingDimensions()
+    {
+        await AssertOptimizesToAsync(
+            """
+            Animation,Foreground,Centre,"animation.png",320,240,4,50,LoopOnce
+             F,0,-100,1500,0.5
+             V,0,0,1000,1,1,2,2
+            """,
+            """
+            Animation,Foreground,Centre,"animation.png",320,240,4,50,LoopOnce
+             F,0,-100,1500,0.5
+             S,0,0,1000,1,2
+            """);
+    }
+
+    [Fact]
+    public async Task CompressAsync_CanDisableCommandDimensionReduction()
+    {
+        await AssertOptimizesToAsync(
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             F,0,-100,1500,0.5
+             V,0,0,1000,1,1,2,2
+            """,
+            """
+            Sprite,Foreground,Centre,"sprite.png",320,240
+             F,0,-100,1500,0.5
+             V,0,0,1000,1,1,2,2
+            """,
+            options => options.ReduceCommandDimensions = false);
+    }
+
+    [Fact]
     public async Task CompressAsync_RemovesZeroDurationSpriteButKeepsOneDuplicateBackground()
     {
         await AssertOptimizesToAsync(
