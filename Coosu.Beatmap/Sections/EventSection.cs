@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using Coosu.Beatmap.Configurable;
 using Coosu.Beatmap.Sections.Event;
@@ -22,12 +22,24 @@ namespace Coosu.Beatmap.Sections;
 [SectionProperty("Events")]
 public sealed class EventSection : Section
 {
+    private enum EventType
+    {
+        Unknown,
+        Background,
+        Video,
+        Break,
+        Sprite,
+        Sample,
+        Animation
+    }
+
     private const string SectionBgVideo = "//Background and Video events";
     private const string SectionBreak = "//Break Periods";
     private const string SectionStoryboard = "//Storyboard";
     private const string SectionSbSamples = "//Storyboard Sound Samples";
 
     private readonly StringBuilder _sbInfo = new();
+    private string? _storyboardText;
     private readonly Dictionary<string, StringBuilder> _unknownSection = new();
     private string? _currentSection;
     private readonly OsuReadOptions _options;
@@ -48,11 +60,33 @@ public sealed class EventSection : Section
     /// For detailed analyzing, use <see href="https://www.nuget.org/packages/Coosu.Storyboard/"/> package for parsing storyboard elements.
     /// </para>
     /// </summary>
-    public string? StoryboardText { get; set; }
+    public string? StoryboardText
+    {
+        get
+        {
+            if (_storyboardText != null || _sbInfo.Length == 0) return _storyboardText;
+            var length = _sbInfo.Length;
+            while (length > 0 && (_sbInfo[length - 1] == '\r' || _sbInfo[length - 1] == '\n')) length--;
+            return _storyboardText = _sbInfo.ToString(0, length);
+        }
+        set
+        {
+            _storyboardText = value;
+            _sbInfo.Clear();
+        }
+    }
 
     public override void Match(ReadOnlyMemory<char> memory)
     {
         var lineSpan = memory.Span;
+        if (lineSpan.IsEmpty) return;
+
+        // Commands dominate large storyboards. They need no event-type scan or lookup.
+        if (lineSpan[0] == ' ' || lineSpan[0] == '_' || lineSpan[0] == '\t')
+        {
+            if (!_options.StoryboardIgnored) AppendStoryboardLine(lineSpan);
+            return;
+        }
 
         if (lineSpan.StartsWith("//".AsSpan()))
         {
@@ -66,36 +100,34 @@ public sealed class EventSection : Section
                     _currentSection = SectionBreak;
                     break;
                 case SectionSbSamples:
-                    if (!_options.StoryboardIgnored)
-                    {
-                        StoryboardText = _sbInfo.ToString().TrimEnd('\r', '\n');
-                        _sbInfo.Clear();
-                    }
-
                     _currentSection = SectionSbSamples;
                     break;
                 default:
                     if (section.StartsWith(SectionStoryboard.AsSpan()))
                     {
                         _currentSection = SectionStoryboard;
-                        if (!_options.StoryboardIgnored) _sbInfo.AppendLine(lineSpan.ToString());
+                        if (!_options.StoryboardIgnored) AppendStoryboardLine(lineSpan);
                     }
                     else
                     {
                         _currentSection = section.ToString();
-                        _unknownSection.Add(section.ToString(), new StringBuilder());
+                        if (!_unknownSection.ContainsKey(_currentSection))
+                            _unknownSection.Add(_currentSection, new StringBuilder());
                     }
                     break;
             }
         }
         else
         {
-            switch (_currentSection)
+            // Comment headings are optional and can be out of order. In particular,
+            // a Sprite can follow break periods before the next storyboard heading.
+            var eventType = GetEventType(lineSpan);
+            switch (eventType)
             {
-                case SectionBgVideo:
+                case EventType.Background:
+                case EventType.Video:
                     // https://osu.ppy.sh/help/wiki/osu!_File_Formats/Osu_(file_format)#videos
-                    if (lineSpan.StartsWith("Video,".AsSpan()) ||
-                        lineSpan.StartsWith("1,".AsSpan()))
+                    if (eventType == EventType.Video)
                     {
                         double offset = default;
                         string filename = "";
@@ -112,10 +144,6 @@ public sealed class EventSection : Section
                         }
 
                         VideoInfo = new VideoData { Offset = offset, Filename = filename };
-                    }
-                    else if (lineSpan.Length > 0 && (lineSpan[0] == '_' || lineSpan[0] == ' '))
-                    {
-                        break;
                     }
                     else
                     {
@@ -138,7 +166,7 @@ public sealed class EventSection : Section
                         BackgroundInfo = new BackgroundData { Filename = filename, X = x, Y = y };
                     }
                     break;
-                case SectionBreak:
+                case EventType.Break:
                     {
                         int startTime = default;
                         int endTime = default;
@@ -157,9 +185,8 @@ public sealed class EventSection : Section
                         Breaks.Add(new RangeValue<int>(startTime, endTime));
                     }
                     break;
-                case SectionSbSamples:
-                    if (!_options.SampleIgnored && (lineSpan.StartsWith("Sample,".AsSpan()) ||
-                                                    lineSpan.StartsWith("5,".AsSpan())))
+                case EventType.Sample:
+                    if (!_options.SampleIgnored)
                     {
                         int offset = default;
                         byte magicalInt = default;
@@ -188,14 +215,74 @@ public sealed class EventSection : Section
                         });
                     }
                     break;
-                case SectionStoryboard:
-                    if (!_options.StoryboardIgnored) _sbInfo.AppendLine(lineSpan.ToString());
+                case EventType.Sprite:
+                case EventType.Animation:
+                    _currentSection = SectionStoryboard;
+                    if (!_options.StoryboardIgnored) AppendStoryboardLine(lineSpan);
                     break;
                 default:
-                    if (_currentSection != null) _unknownSection[_currentSection].AppendLine(lineSpan.ToString());
+                    if (_currentSection != null &&
+                        _unknownSection.TryGetValue(_currentSection, out var unknownSection))
+                    {
+                        unknownSection.AppendLine(lineSpan.ToString());
+                    }
+                    else
+                    {
+                        if (!_options.StoryboardIgnored) AppendStoryboardLine(lineSpan);
+                    }
                     break;
             }
         }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static EventType GetEventType(ReadOnlySpan<char> line)
+    {
+        if (line.Length > 1 && line[1] == ',')
+        {
+            return line[0] switch
+            {
+                '0' => EventType.Background,
+                '1' => EventType.Video,
+                '2' => EventType.Break,
+                '4' => EventType.Sprite,
+                '5' => EventType.Sample,
+                '6' => EventType.Animation,
+                _ => EventType.Unknown
+            };
+        }
+
+        switch (line[0])
+        {
+            case 'S':
+                if (line.StartsWith("Sample,".AsSpan())) return EventType.Sample;
+                if (line.StartsWith("Sprite,".AsSpan())) return EventType.Sprite;
+                break;
+            case 'B':
+                if (line.StartsWith("Background,".AsSpan())) return EventType.Background;
+                if (line.StartsWith("Break,".AsSpan())) return EventType.Break;
+                break;
+            case 'V':
+                if (line.StartsWith("Video,".AsSpan())) return EventType.Video;
+                break;
+            case 'A':
+                if (line.StartsWith("Animation,".AsSpan())) return EventType.Animation;
+                break;
+        }
+
+        return EventType.Unknown;
+    }
+
+    private void AppendStoryboardLine(ReadOnlySpan<char> line)
+    {
+        if (_sbInfo.Length == 0 && !string.IsNullOrEmpty(_storyboardText)) _sbInfo.AppendLine(_storyboardText);
+        _storyboardText = null;
+#if NET6_0_OR_GREATER
+        _sbInfo.Append(line);
+        _sbInfo.AppendLine();
+#else
+        _sbInfo.AppendLine(line.ToString());
+#endif
     }
 
     public override void AppendSerializedString(TextWriter textWriter, int version)
@@ -218,9 +305,9 @@ public sealed class EventSection : Section
 
         if (StoryboardText != null) textWriter.WriteLine(StoryboardText);
         textWriter.WriteLine(SectionSbSamples);
-        var validSampleList = Samples.Where(k => k.Volume > 0);
-        foreach (var sampleData in validSampleList)
+        foreach (var sampleData in Samples)
         {
+            if (sampleData.Volume == 0) continue;
             sampleData.AppendSerializedString(textWriter, version);
             textWriter.WriteLine();
         }
