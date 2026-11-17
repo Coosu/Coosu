@@ -10,6 +10,7 @@ jobs:
     runs-on: windows-latest
     permissions:
       contents: write
+      id-token: write
 
     steps:
     - name: Checkout code
@@ -72,9 +73,15 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+    - name: NuGet Login
+      id: login
+      uses: NuGet/login@v1
+      with:
+        user: milkitic
+
     - name: Push Nuget Package
       shell: pwsh
       run: |
         Get-ChildItem -Path ci-pack/*.nupkg | ForEach-Object {
-          dotnet nuget push $_.FullName --api-key ${{ secrets.NUGET_API_KEY }} --source "https://api.nuget.org/v3/index.json" --skip-duplicate
+          dotnet nuget push $_.FullName --api-key ${{ steps.login.outputs.NUGET_API_KEY }} --source "https://api.nuget.org/v3/index.json" --skip-duplicate
         }
